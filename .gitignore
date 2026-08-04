@@ -1,0 +1,27 @@
+# Python
+backend/venv/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/*.db
+backend/**/*.db
+backend/.env
+backend/media/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Secrets / local
+.env
+.env.*
+!.env.example
+!**/.env.example
