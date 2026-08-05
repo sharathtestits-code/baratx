@@ -30,8 +30,17 @@ class EmailSignupRequest(BaseModel):
 
 
 class EmailLoginRequest(BaseModel):
-    email: EmailStr
+    # Accepts email address or username (field name kept for API compatibility).
+    email: str
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def valid_login_id(cls, v):
+        v = (v or "").strip()
+        if len(v) < 3:
+            raise ValueError("Enter your email or username")
+        return v
 
 
 class PhoneOtpRequest(BaseModel):

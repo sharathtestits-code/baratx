@@ -35,15 +35,24 @@ export default function Feed() {
   const loadingMoreRef = useRef(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && token && !user) return;
+    if (!loading && !token) {
       navigate("/login");
     }
-  }, [loading, user, navigate]);
+  }, [loading, token, user, navigate]);
 
   useEffect(() => {
     if (user) loadFeed(tab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, tab]);
+
+  if (loading || (token && !user)) {
+    return <div className="page-loading">Loading…</div>;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   async function loadFeed(nextTab) {
     setFeedLoading(true);

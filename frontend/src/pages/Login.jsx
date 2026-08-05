@@ -6,15 +6,16 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function Login() {
   const [params] = useSearchParams();
-  const initialEmail = params.get("email") || "";
-  const [method, setMethod] = useState(initialEmail.includes("@") || !initialEmail ? "email" : "email");
+  const initialId = params.get("email") || params.get("username") || "";
+  const preferPhone = params.get("method") === "phone";
+  const [method, setMethod] = useState(preferPhone ? "phone" : "email");
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [email, setEmail] = useState(initialEmail.includes("@") ? initialEmail : "");
+  const [email, setEmail] = useState(initialId);
   const [password, setPassword] = useState("");
 
   const [phone, setPhone] = useState("+91");
@@ -27,7 +28,7 @@ export default function Login() {
     setError("");
     setBusy(true);
     try {
-      const { access_token } = await api.loginEmail({ email, password });
+      const { access_token } = await api.loginEmail({ email: email.trim(), password });
       login(access_token);
       navigate("/feed");
     } catch (err) {
@@ -105,12 +106,24 @@ export default function Login() {
       {method === "email" ? (
         <form onSubmit={handleEmailLogin}>
           <label>
-            Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            Email or username
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
+              required
+            />
           </label>
           <label>
             Password
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
           </label>
           <button type="submit" disabled={busy}>
             {busy ? "Logging in..." : "Log in"}

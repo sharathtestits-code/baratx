@@ -11,13 +11,13 @@ export default function Signup() {
   const { login } = useAuth();
 
   // shared fields
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(params.get("username") || "");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   // email fields
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
 
   // phone fields

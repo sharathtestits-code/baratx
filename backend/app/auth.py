@@ -9,6 +9,12 @@ SECRET_KEY = os.environ.get("JWT_SECRET", "dev-secret-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
+if (
+    os.environ.get("ENVIRONMENT", "development") == "production"
+    and SECRET_KEY == "dev-secret-change-in-production"
+):
+    raise RuntimeError("JWT_SECRET must be set to a strong value in production")
+
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")

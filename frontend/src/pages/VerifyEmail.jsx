@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 export default function VerifyEmail() {
   const [params] = useSearchParams();
   const token = params.get("token") || "";
+  const navigate = useNavigate();
   const { token: authToken, updateUser, user } = useAuth();
   const [status, setStatus] = useState(token ? "loading" : "missing");
   const [message, setMessage] = useState("");
@@ -38,6 +39,13 @@ export default function VerifyEmail() {
     };
   }, [token, authToken, updateUser]);
 
+  useEffect(() => {
+    if (status !== "ok") return;
+    if (!(user || authToken)) return;
+    const t = setTimeout(() => navigate("/feed", { replace: true }), 1600);
+    return () => clearTimeout(t);
+  }, [status, user, authToken, navigate]);
+
   return (
     <div className="auth-card">
       <h1>Confirm email</h1>
@@ -45,7 +53,12 @@ export default function VerifyEmail() {
       {status === "missing" && (
         <p className="error">Missing verification token. Open the link from your email.</p>
       )}
-      {status === "ok" && <p className="success-banner">{message}</p>}
+      {status === "ok" && (
+        <>
+          <p className="success-banner">{message}</p>
+          {(user || authToken) && <p className="hint">Taking you to your feed…</p>}
+        </>
+      )}
       {status === "error" && <p className="error">{message}</p>}
       <p className="switch-link">
         {user || authToken ? (

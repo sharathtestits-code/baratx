@@ -1,4 +1,4 @@
-import { Link, Navigate, Route, Routes } from "react-router-dom";
+import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -27,11 +27,44 @@ function AuthChrome({ children }) {
   );
 }
 
+function AppShell() {
+  return (
+    <div className="app-shell">
+      <Sidebar />
+      <main className="app-main">
+        <EmailVerifyBanner />
+        <Routes>
+          <Route path="/" element={<Navigate to="/feed" replace />} />
+          <Route path="/signup" element={<Navigate to="/feed" replace />} />
+          <Route path="/login" element={<Navigate to="/feed" replace />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/posts/:postId" element={<PostDetail />} />
+          <Route path="/u/:username" element={<Profile />} />
+          <Route path="*" element={<Navigate to="/feed" replace />} />
+        </Routes>
+      </main>
+      <RightRail />
+      <BottomNav />
+    </div>
+  );
+}
+
 export default function App() {
   const { token, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <div className="page-loading">Loading…</div>;
+  }
+
+  // Email confirm stays outside the app shell even when logged in.
+  if (location.pathname === "/verify-email") {
+    return (
+      <AuthChrome>
+        <VerifyEmail />
+      </AuthChrome>
+    );
   }
 
   if (!token) {
@@ -54,37 +87,10 @@ export default function App() {
             </AuthChrome>
           }
         />
-        <Route
-          path="/verify-email"
-          element={
-            <AuthChrome>
-              <VerifyEmail />
-            </AuthChrome>
-          }
-        />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     );
   }
 
-  return (
-    <div className="app-shell">
-      <Sidebar />
-      <main className="app-main">
-        <EmailVerifyBanner />
-        <Routes>
-          <Route path="/" element={<Navigate to="/feed" replace />} />
-          <Route path="/signup" element={<Navigate to="/feed" replace />} />
-          <Route path="/login" element={<Navigate to="/feed" replace />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/posts/:postId" element={<PostDetail />} />
-          <Route path="/u/:username" element={<Profile />} />
-        </Routes>
-      </main>
-      <RightRail />
-      <BottomNav />
-    </div>
-  );
+  return <AppShell />;
 }

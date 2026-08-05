@@ -6,7 +6,7 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 
 /**
  * X-inspired landing: brand-dominant right column + auth actions on the left.
- * India theme via saffron CTAs / navy links (CSS tokens). App Store QR later.
+ * India theme via saffron CTAs / navy links (CSS tokens).
  */
 export default function Landing() {
   const navigate = useNavigate();
@@ -15,11 +15,22 @@ export default function Landing() {
   function handleNext(e) {
     e.preventDefault();
     const q = emailOrUser.trim();
-    if (q) {
-      navigate(`/login?email=${encodeURIComponent(q)}`);
-    } else {
-      navigate("/login");
+    if (!q) {
+      navigate("/signup");
+      return;
     }
+    if (q.includes("@")) {
+      navigate(`/signup?email=${encodeURIComponent(q)}`);
+    } else {
+      navigate(`/signup?username=${encodeURIComponent(q)}`);
+    }
+  }
+
+  function signInPath() {
+    const q = emailOrUser.trim();
+    if (!q) return "/login";
+    if (q.includes("@")) return `/login?email=${encodeURIComponent(q)}`;
+    return `/login?username=${encodeURIComponent(q)}`;
   }
 
   return (
@@ -63,14 +74,13 @@ export default function Landing() {
             </form>
 
             <p className="x-legal">
-              By signing up, you agree to the{" "}
-              <a href="#terms">Terms of Service</a> and{" "}
-              <a href="#privacy">Privacy Policy</a>, including Cookie Use.
+              By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie
+              Use.
             </p>
 
             <div className="x-have-account">
               <p>Already have an account?</p>
-              <Link to="/login" className="x-btn x-btn-outline">
+              <Link to={signInPath()} className="x-btn x-btn-outline">
                 Sign in
               </Link>
               <Link to="/signup" className="x-create-link">

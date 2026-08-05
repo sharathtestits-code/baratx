@@ -101,11 +101,12 @@ Open and sign up with the same email:
 
 ## 5. What is NOT done yet (next coding step)
 
-Wire production into the app code:
+Done already: `CORS_ORIGINS`, hide `dev_otp` in production, email verify via Resend, Google sign-in.
 
-- Read `DATABASE_URL` / `CORS_ORIGINS` / `ENVIRONMENT` from env
-- Real MSG91 OTP (hide `dev_otp` when `ENVIRONMENT=production`)
+Still open:
+
+- Real MSG91 OTP SMS (phone auth still demo until SMS is wired)
 - R2/S3 media uploads instead of local `/media`
 - Landing copy: English-only + “more languages coming”
 
-Say when accounts + domain are bought and we will do that wiring.
+Say when you want MSG91 or R2 and we will wire those next.

@@ -40,10 +40,19 @@ run_migrations()
 
 app = FastAPI(title="BaratX API", version="0.4.1")
 
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+_cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
+if _cors_raw:
+    CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+elif ENVIRONMENT == "production":
+    CORS_ORIGINS = ["https://barathx.com", "https://baratx.pages.dev"]
+else:
+    CORS_ORIGINS = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # demo only — restrict in production
-    allow_credentials=False,  # we use Bearer tokens, not cookies, so no need for credentials mode
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=False,  # Bearer tokens, not cookies
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -65,7 +74,19 @@ optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 OTP_TTL_MINUTES = 5
 EMAIL_VERIFY_TTL_HOURS = 24
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
+
+def _otp_response(code: str) -> dict:
+    """Never leak OTP codes in production responses."""
+    body = {
+        "message": "OTP sent" if ENVIRONMENT == "production" else "OTP generated (demo mode, no SMS sent)",
+        "expires_in_minutes": OTP_TTL_MINUTES,
+    }
+    if ENVIRONMENT != "production":
+        body["dev_otp"] = code
+    else:
+        print(f"[otp] generated for production request (not returned in response)")
+    return body
 
 
 def issue_email_verification(db: Session, user: models.User) -> tuple[bool, Optional[str]]:
@@ -314,9 +335,13 @@ def resend_verification(
 
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)
 def login_email(payload: schemas.EmailLoginRequest, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == payload.email).first()
+    ident = payload.email.strip()
+    if "@" in ident:
+        user = db.query(models.User).filter(models.User.email == ident.lower()).first()
+    else:
+        user = db.query(models.User).filter(models.User.username == ident).first()
     if not user or not auth.verify_password(payload.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
+        raise HTTPException(status_code=401, detail="Incorrect email/username or password")
 
     token = auth.create_access_token(user.id)
     return schemas.TokenResponse(access_token=token)
@@ -388,9 +413,7 @@ def signup_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Dep
     )
     db.add(otp)
     db.commit()
-
-    # DEV ONLY: return the OTP directly instead of sending an SMS.
-    return {"message": "OTP generated (demo mode, no SMS sent)", "dev_otp": code, "expires_in_minutes": OTP_TTL_MINUTES}
+    return _otp_response(code)
 
 
 @app.post("/auth/signup/phone/verify", response_model=schemas.TokenResponse)
@@ -447,8 +470,7 @@ def login_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depe
     )
     db.add(otp)
     db.commit()
-
-    return {"message": "OTP generated (demo mode, no SMS sent)", "dev_otp": code, "expires_in_minutes": OTP_TTL_MINUTES}
+    return _otp_response(code)
 
 
 @app.post("/auth/login/phone/verify", response_model=schemas.TokenResponse)

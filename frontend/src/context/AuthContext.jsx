@@ -14,17 +14,31 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return;
     }
+    let cancelled = false;
+    setLoading(true);
     api
       .me(token)
-      .then(setUser)
+      .then((me) => {
+        if (!cancelled) setUser(me);
+      })
       .catch(() => {
+        if (cancelled) return;
         setToken(null);
+        setUser(null);
         localStorage.removeItem("iv_token");
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
   function login(newToken) {
+    // Keep loading true until /users/me resolves so Feed doesn't bounce to /login.
+    setLoading(true);
+    setUser(null);
     localStorage.setItem("iv_token", newToken);
     setToken(newToken);
   }
@@ -33,6 +47,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("iv_token");
     setToken(null);
     setUser(null);
+    setLoading(false);
   }
 
   function updateUser(partialOrFull) {

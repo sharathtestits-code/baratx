@@ -14,6 +14,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [showFallback, setShowFallback] = useState(false);
 
   async function handleCredential(response) {
     if (!response?.credential) return;
@@ -34,6 +35,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
 
   function startGoogle() {
     setError("");
+    setShowFallback(false);
     if (!CLIENT_ID) {
       setError("Google sign-in is not configured yet. Add VITE_GOOGLE_CLIENT_ID.");
       return;
@@ -47,12 +49,12 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
       callback: handleCredential,
       ux_mode: "popup",
     });
-    // Prompt One Tap / account chooser; also render a fallback click path
     window.google.accounts.id.prompt((notification) => {
       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        // Fall back: open the OAuth code button via temporary render
-        const host = document.getElementById("google-btn-host");
-        if (host) {
+        setShowFallback(true);
+        requestAnimationFrame(() => {
+          const host = document.getElementById("google-btn-host");
+          if (!host || !window.google?.accounts?.id) return;
           host.innerHTML = "";
           window.google.accounts.id.renderButton(host, {
             theme: "outline",
@@ -61,7 +63,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
             text: "continue_with",
             width: host.offsetWidth || 320,
           });
-        }
+        });
       }
     });
   }
@@ -80,11 +82,13 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
 
   return (
     <div className="x-google-wrap">
-      <button type="button" className="x-btn x-btn-google" onClick={startGoogle} disabled={busy}>
-        <GoogleG className="x-btn-icon" />
-        {busy ? "Signing in…" : label}
-      </button>
-      <div id="google-btn-host" className="google-btn-host" />
+      {!showFallback && (
+        <button type="button" className="x-btn x-btn-google" onClick={startGoogle} disabled={busy}>
+          <GoogleG className="x-btn-icon" />
+          {busy ? "Signing in…" : label}
+        </button>
+      )}
+      <div id="google-btn-host" className="google-btn-host" hidden={!showFallback} />
       {error && <p className="x-inline-error">{error}</p>}
     </div>
   );
