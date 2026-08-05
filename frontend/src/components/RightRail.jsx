@@ -10,9 +10,9 @@ const SUGGESTED_PEOPLE = [
     blurb: "Startups, policy & builders across India",
   },
   {
-    display_name: "Hyderabad Pulse",
-    username: "hydpulse",
-    blurb: "City news, culture, and local voices",
+    display_name: "Bharat Voices",
+    username: "bharatvoices",
+    blurb: "Culture, ideas, and everyday India",
   },
   {
     display_name: "Desi Sports Desk",
