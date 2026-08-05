@@ -1,14 +1,14 @@
 :root {
-  /* X-like neutrals */
-  --bg: #f7f9f9;
+  /* Warm India-first neutrals */
+  --bg: #faf8f5;
   --surface: #ffffff;
-  --border: #eff3f4;
-  --border-strong: #cfd9de;
+  --border: #efe8e0;
+  --border-strong: #d4cbc0;
   --text: #0f1419;
   --text-secondary: #536471;
   --text-tertiary: #8b98a5;
 
-  /* India flag — saffron, white, green + Ashoka chakra blue */
+  /* India flag — saffron primary, navy secondary, green success */
   --brand: #ff671f;
   --brand-hover: #e55a10;
   --brand-tint: #fff1e6;
@@ -16,7 +16,23 @@
   --india-green: #138808;
   --india-green-tint: #e7f6e8;
   --chakra: #000080;
+  --chakra-hover: #0000a0;
   --chakra-tint: #e8e8f8;
+  --link: var(--chakra);
+  --success: var(--india-green);
+  --success-tint: var(--india-green-tint);
+
+  /* Subtle saffron → white → green (profile / hero) */
+  --india-gradient:
+    linear-gradient(
+      180deg,
+      rgba(255, 153, 51, 0.5) 0%,
+      rgba(255, 153, 51, 0.18) 26%,
+      rgba(255, 255, 255, 0.95) 46%,
+      rgba(255, 255, 255, 0.82) 54%,
+      rgba(19, 136, 8, 0.16) 74%,
+      rgba(19, 136, 8, 0.42) 100%
+    );
 
   --like: #f91880;
   --like-tint: #fce8f0;
@@ -65,7 +81,7 @@ button {
 
 .topbar {
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 3px solid var(--brand-flag);
   background: var(--surface);
   display: flex;
   align-items: center;
@@ -270,7 +286,8 @@ button {
 
 .sidebar-link.active {
   font-weight: 800;
-  background: rgba(15, 20, 25, 0.06);
+  background: var(--brand-tint);
+  color: var(--text);
 }
 
 .sidebar-link.active .sidebar-icon {
@@ -389,7 +406,7 @@ button {
 }
 
 .rail-card {
-  background: #f7f9f9;
+  background: #f7f4ef;
   border-radius: var(--radius-lg);
   padding: 0.85rem 0 0.35rem;
   overflow: hidden;
@@ -487,7 +504,7 @@ button {
 .rail-card-more {
   display: block;
   padding: 0.85rem 1rem 0.95rem;
-  color: var(--brand);
+  color: var(--link);
   text-decoration: none;
   font-size: 0.88rem;
   font-weight: 600;
@@ -689,9 +706,74 @@ button:disabled {
 }
 
 .switch-link a {
-  color: var(--brand);
+  color: var(--link);
   font-weight: 700;
   text-decoration: none;
+}
+
+.switch-link a:hover {
+  color: var(--chakra-hover);
+  text-decoration: underline;
+}
+
+.success-banner {
+  background: var(--success-tint);
+  color: var(--success);
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.verify-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  background: var(--brand-tint);
+  border-bottom: 1px solid rgba(255, 103, 31, 0.25);
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.verify-banner-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.verify-banner-text strong {
+  color: var(--brand-hover);
+}
+
+.verify-banner-note {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.verify-banner-note a {
+  color: var(--link);
+}
+
+.verify-banner-btn {
+  flex-shrink: 0;
+  margin: 0 !important;
+  padding: 0.4rem 0.9rem !important;
+  border-radius: 999px !important;
+  border: none !important;
+  background: var(--brand) !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.verify-banner-btn:hover:not(:disabled) {
+  background: var(--brand-hover) !important;
 }
 
 .page-loading {
@@ -1295,16 +1377,7 @@ a.post-username:hover {
 
 .profile-cover {
   height: 180px;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 153, 51, 0.55) 0%,
-      rgba(255, 153, 51, 0.22) 28%,
-      rgba(255, 255, 255, 0.92) 48%,
-      rgba(255, 255, 255, 0.75) 52%,
-      rgba(19, 136, 8, 0.22) 72%,
-      rgba(19, 136, 8, 0.5) 100%
-    );
+  background: var(--india-gradient);
   background-size: cover;
   background-position: center;
   position: relative;
@@ -1621,6 +1694,9 @@ a.post-username:hover {
 
 .landing-hero {
   padding: 3rem 1rem 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--india-gradient);
+  margin: 0 0.5rem;
 }
 
 .landing-tagline {
@@ -1904,5 +1980,331 @@ a.post-time:hover {
     padding: 1.5rem;
     box-shadow: none;
     border: none;
+  }
+}
+
+/* ---------- X-style landing (logged out) ---------- */
+
+.x-landing {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  background: var(--surface);
+}
+
+.x-landing-auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  order: 1;
+}
+
+.x-landing-auth-inner {
+  width: 100%;
+  max-width: 360px;
+}
+
+.x-landing-mark-sm {
+  width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 1.75rem;
+}
+
+.x-landing-headline {
+  margin: 0 0 0.35rem;
+  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.x-landing-subhead {
+  margin: 0 0 1.75rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.x-auth-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.x-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.x-btn-icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+}
+
+.x-btn-phone {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.x-btn-phone:hover {
+  background: #272c30;
+}
+
+.x-btn-google {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.x-btn-google:hover {
+  background: var(--bg);
+}
+
+.x-btn-next {
+  background: var(--brand);
+  color: #fff;
+  margin-top: 0.35rem;
+}
+
+.x-btn-next:hover {
+  background: var(--brand-hover);
+}
+
+.x-btn-outline {
+  background: transparent;
+  color: var(--brand);
+  border-color: var(--border-strong);
+}
+
+.x-btn-outline:hover {
+  background: var(--brand-tint);
+}
+
+.x-auth-or {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin: 0.15rem 0;
+}
+
+.x-auth-or::before,
+.x-auth-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.x-auth-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.x-field-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.x-field-simple input {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.x-field-simple input:focus {
+  outline: none;
+  border-color: var(--chakra);
+  box-shadow: 0 0 0 1px var(--chakra);
+}
+
+.x-legal {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--text-tertiary);
+}
+
+.x-legal a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.x-legal a:hover {
+  text-decoration: underline;
+}
+
+.x-have-account {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.x-have-account p {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.x-create-link {
+  text-align: center;
+  color: var(--link);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.x-create-link:hover {
+  text-decoration: underline;
+}
+
+.x-inline-error {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+.google-btn-host {
+  min-height: 0;
+}
+
+.x-landing-brand {
+  position: relative;
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: var(--india-gradient);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.x-landing-brand-glow {
+  position: absolute;
+  inset: 18% 22%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.x-landing-mark-xl {
+  width: min(42vw, 280px);
+  height: min(42vw, 280px);
+  position: relative;
+  z-index: 1;
+}
+
+.x-landing-word {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.x-landing-word-x {
+  background: linear-gradient(135deg, var(--brand-flag) 0%, var(--brand) 55%, var(--india-green) 140%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 900;
+}
+
+.page-auth .topbar-minimal {
+  border-bottom-color: var(--border);
+}
+
+.sidebar-brand-mark {
+  padding: 0.55rem;
+}
+
+.sidebar-post-btn {
+  margin: 0.85rem 0.35rem 0;
+  width: calc(100% - 0.7rem);
+  padding: 0.85rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sidebar-post-btn:hover {
+  background: var(--brand-hover);
+}
+
+.sidebar-user-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-more-icon {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--text-secondary);
+  margin-left: auto;
+}
+
+.sidebar-logout-text {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .x-landing {
+    grid-template-columns: 1fr;
+  }
+
+  .x-landing-brand {
+    min-height: 36vh;
+    order: 0;
+    padding: 2rem 1rem;
+  }
+
+  .x-landing-mark-xl {
+    width: 120px;
+    height: 120px;
+  }
+
+  .x-landing-word {
+    font-size: 2rem;
+  }
+
+  .x-landing-auth {
+    order: 1;
+    align-items: flex-start;
+    padding-top: 1.5rem;
   }
 }

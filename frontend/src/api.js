@@ -31,6 +31,17 @@ export const api = {
   loginEmail: (body) =>
     request("/auth/login/email", { method: "POST", body: JSON.stringify(body) }),
 
+  loginGoogle: (body) =>
+    request("/auth/google", { method: "POST", body: JSON.stringify(body) }),
+
+  verifyEmail: (token) =>
+    request("/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) }),
+  resendVerification: (token) =>
+    request("/auth/resend-verification", {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+
   signupPhoneRequestOtp: (phone) =>
     request("/auth/signup/phone/request-otp", { method: "POST", body: JSON.stringify({ phone }) }),
   signupPhoneVerify: (body) =>

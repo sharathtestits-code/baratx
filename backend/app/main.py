@@ -1,4 +1,5 @@
 import os
+import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -10,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import or_, text
 from sqlalchemy.orm import Session
 
-from app import auth, models, schemas
+from app import auth, email as email_service, google_auth, models, schemas
 from app.database import Base, SessionLocal, engine, get_db
 
 Base.metadata.create_all(bind=engine)
@@ -63,6 +64,50 @@ bearer_scheme = HTTPBearer()
 optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 OTP_TTL_MINUTES = 5
+EMAIL_VERIFY_TTL_HOURS = 24
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
+
+def issue_email_verification(db: Session, user: models.User) -> tuple[bool, Optional[str]]:
+    """Create a verification token and attempt to email it. Returns (sent, dev_url)."""
+    if not user.email:
+        return False, None
+
+    # Invalidate prior unused tokens for this user
+    prior = (
+        db.query(models.EmailVerificationToken)
+        .filter(
+            models.EmailVerificationToken.user_id == user.id,
+            models.EmailVerificationToken.consumed == False,  # noqa: E712
+        )
+        .all()
+    )
+    for row in prior:
+        row.consumed = True
+
+    raw = secrets.token_urlsafe(32)
+    row = models.EmailVerificationToken(
+        user_id=user.id,
+        token=raw,
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=EMAIL_VERIFY_TTL_HOURS),
+    )
+    db.add(row)
+    db.commit()
+
+    try:
+        sent, verify_url = email_service.send_verification_email(
+            user.email, user.display_name, raw
+        )
+    except Exception as exc:  # noqa: BLE001 — surface as soft failure; account still created
+        print(f"[email] failed to send verification to {user.email}: {exc}")
+        verify_url = email_service.build_verify_url(raw)
+        sent = False
+
+    dev_url = None
+    if not sent and ENVIRONMENT != "production":
+        dev_url = verify_url
+        print(f"[email] DEV verify URL for {user.email}: {verify_url}")
+    return sent, dev_url
 
 
 async def save_upload_image(image: UploadFile, max_bytes: int) -> str:
@@ -194,14 +239,77 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
         display_name=payload.display_name,
         email=payload.email,
         password_hash=auth.hash_password(payload.password),
-        is_email_verified=False,  # demo: real deployment would send a verification email
+        is_email_verified=False,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
+    sent, dev_url = issue_email_verification(db, user)
+
     token = auth.create_access_token(user.id)
-    return schemas.TokenResponse(access_token=token)
+    return schemas.TokenResponse(
+        access_token=token,
+        email_verification_sent=sent,
+        dev_verify_url=dev_url,
+    )
+
+
+@app.post("/auth/verify-email", response_model=schemas.MessageResponse)
+def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_db)):
+    row = (
+        db.query(models.EmailVerificationToken)
+        .filter(
+            models.EmailVerificationToken.token == payload.token,
+            models.EmailVerificationToken.consumed == False,  # noqa: E712
+        )
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=400, detail="Invalid or already used verification link")
+
+    expires = row.expires_at
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if expires < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Verification link expired — request a new one")
+
+    user = db.query(models.User).filter(models.User.id == row.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    row.consumed = True
+    user.is_email_verified = True
+    db.commit()
+    return schemas.MessageResponse(message="Email confirmed. Your BaratX account is active.")
+
+
+@app.post("/auth/resend-verification", response_model=schemas.MessageResponse)
+def resend_verification(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not current_user.email:
+        raise HTTPException(status_code=400, detail="No email on this account")
+    if current_user.is_email_verified:
+        return schemas.MessageResponse(message="Email is already verified")
+
+    sent, dev_url = issue_email_verification(db, current_user)
+    if sent:
+        return schemas.MessageResponse(
+            message="Verification email sent. Check your inbox.",
+            email_verification_sent=True,
+        )
+    if ENVIRONMENT == "production":
+        raise HTTPException(
+            status_code=503,
+            detail="Email delivery is not configured yet. Try again later.",
+        )
+    return schemas.MessageResponse(
+        message="Email provider not configured — use the development verify link.",
+        email_verification_sent=False,
+        dev_verify_url=dev_url,
+    )
 
 
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)
@@ -209,6 +317,53 @@ def login_email(payload: schemas.EmailLoginRequest, db: Session = Depends(get_db
     user = db.query(models.User).filter(models.User.email == payload.email).first()
     if not user or not auth.verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+
+    token = auth.create_access_token(user.id)
+    return schemas.TokenResponse(access_token=token)
+
+
+@app.post("/auth/google", response_model=schemas.TokenResponse)
+def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+    if not google_auth.google_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Google sign-in is not configured. Set GOOGLE_CLIENT_ID on the API.",
+        )
+    try:
+        claims = google_auth.verify_google_id_token(payload.id_token)
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    email = claims["email"].lower().strip()
+    display_name = (claims.get("name") or email.split("@")[0])[:50]
+    picture = claims.get("picture")
+
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
+        username = base
+        n = 0
+        while db.query(models.User).filter(models.User.username == username).first():
+            n += 1
+            username = f"{base}{n}"[:20]
+
+        user = models.User(
+            username=username,
+            display_name=display_name,
+            email=email,
+            password_hash=auth.hash_password(secrets.token_urlsafe(24)),
+            is_email_verified=True,
+            avatar_url=picture,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    else:
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            db.commit()
 
     token = auth.create_access_token(user.id)
     return schemas.TokenResponse(access_token=token)

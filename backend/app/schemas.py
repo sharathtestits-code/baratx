@@ -67,6 +67,23 @@ class PhoneLoginVerify(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    email_verification_sent: bool = False
+    # Only populated in development when outbound email is not configured.
+    dev_verify_url: Optional[str] = None
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+
+
+class MessageResponse(BaseModel):
+    message: str
+    email_verification_sent: bool = False
+    dev_verify_url: Optional[str] = None
 
 
 class UserUpdate(BaseModel):

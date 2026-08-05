@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function Signup() {
-  const [method, setMethod] = useState("email"); // "email" | "phone"
+  const [params] = useSearchParams();
+  const [method, setMethod] = useState(params.get("method") === "phone" ? "phone" : "email");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -29,13 +31,17 @@ export default function Signup() {
     setError("");
     setBusy(true);
     try {
-      const { access_token } = await api.signupEmail({
+      const res = await api.signupEmail({
         email,
         password,
         username,
         display_name: displayName,
       });
-      login(access_token);
+      if (res.dev_verify_url) {
+        // Local/dev without SMTP — keep link available after redirect via sessionStorage
+        sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
+      }
+      login(res.access_token);
       navigate("/feed");
     } catch (err) {
       setError(err.message);
@@ -80,8 +86,14 @@ export default function Signup() {
   }
 
   return (
-    <div className="auth-card">
+    <div className="auth-card auth-card-x">
       <h1>Create your account</h1>
+
+      <GoogleSignInButton label="Sign up with Google" onError={setError} />
+
+      <div className="x-auth-or" role="separator">
+        <span>or</span>
+      </div>
 
       <div className="method-toggle">
         <button

@@ -1,17 +1,20 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function Login() {
-  const [method, setMethod] = useState("email");
+  const [params] = useSearchParams();
+  const initialEmail = params.get("email") || "";
+  const [method, setMethod] = useState(initialEmail.includes("@") || !initialEmail ? "email" : "email");
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initialEmail.includes("@") ? initialEmail : "");
   const [password, setPassword] = useState("");
 
   const [phone, setPhone] = useState("+91");
@@ -65,8 +68,14 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-card">
-      <h1>Log in</h1>
+    <div className="auth-card auth-card-x">
+      <h1>Sign in to BaratX</h1>
+
+      <GoogleSignInButton label="Continue with Google" onError={setError} />
+
+      <div className="x-auth-or" role="separator">
+        <span>or</span>
+      </div>
 
       <div className="method-toggle">
         <button

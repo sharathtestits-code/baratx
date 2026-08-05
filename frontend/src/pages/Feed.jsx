@@ -198,7 +198,7 @@ export default function Feed() {
           className={tab === "global" ? "feed-tab active" : "feed-tab"}
           onClick={() => setTab("global")}
         >
-          Global
+          For you
         </button>
         <button
           type="button"

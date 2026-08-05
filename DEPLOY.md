@@ -18,16 +18,35 @@ English-only public path. Do these in order. You must complete payments/signups 
   - `aragorn.ns.cloudflare.com`
 - DNS verified live (dig NS returns Cloudflare)
 
-## 1b. Email (done)
+## 1b. Email (inbound vs outbound)
 
-- Cloudflare Email Routing: **Enabled**, DNS **Locked**
-- Destination: `sharathtestits@gmail.com` (verified)
-- Rule: **`hello@barathx.com` → Gmail** (Active)
-- Catch-all: Drop / Disabled (only `hello@` receives mail)
+**Inbound (done):** Cloudflare Email Routing
+- Destination: `sharathtestits@gmail.com`
+- Rule: `hello@barathx.com` → Gmail
 
-## 1c. Next accounts
+**Outbound activation email (app code ready):**
+Cloudflare Routing cannot *send*. Prefer **Resend** from `hello@barathx.com` (verify `barathx.com` in Resend). Keep Gmail SMTP as backup/debug only.
 
-1. **Railway** (in progress) — https://railway.com — sign in with GitHub
+```
+FRONTEND_URL=https://barathx.com
+EMAIL_FROM=BaratX <hello@barathx.com>
+RESEND_API_KEY=re_xxx
+# Optional backup/debug (ignored when RESEND_API_KEY is set):
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=sharathtestits@gmail.com
+# SMTP_PASSWORD=<gmail-app-password>
+```
+
+Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify link** in the banner.
+
+## 1c. Hosting accounts
+
+1. **Railway** (done — API + Postgres + env vars)
+   - Project: `charming-sparkle` / service `baratx`
+   - Public URL: https://baratx-production.up.railway.app
+   - Docs: https://baratx-production.up.railway.app/docs
+   - Vars set: `DATABASE_URL`, `JWT_SECRET`, `ENVIRONMENT`, `CORS_ORIGINS`
 2. MSG91 later for SMS OTP
 
 ### Railway deploy notes

@@ -68,6 +68,19 @@ class OTP(Base):
     consumed = Column(Boolean, default=False, nullable=False)
 
 
+class EmailVerificationToken(Base):
+    """One-time tokens emailed after signup to confirm the user's address."""
+
+    __tablename__ = "email_verification_tokens"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    token = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    expires_at = Column(DateTime, nullable=False)
+    consumed = Column(Boolean, default=False, nullable=False)
+
+
 class Post(Base):
     __tablename__ = "posts"
 

@@ -98,3 +98,25 @@ export function IconCamera({ className = "" }) {
     </svg>
   );
 }
+
+export function IconPhone({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path
+        d="M8 3h3.5l1 4.5-2 1.5a12 12 0 0 0 5 5l1.5-2L21 12.5V16a2 2 0 0 1-2 2A14 14 0 0 1 5 6a2 2 0 0 1 2-2Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconMore({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="currentColor">
+      <circle cx="5" cy="12" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="19" cy="12" r="1.6" />
+    </svg>
+  );
+}
