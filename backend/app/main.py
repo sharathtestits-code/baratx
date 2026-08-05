@@ -1334,8 +1334,32 @@ def delete_post(
             except OSError:
                 pass
 
-    # Clear dependent rows that lack ORM cascades (avoids FK 500s).
+    reply_ids = [
+        r[0]
+        for r in db.query(models.Reply.id).filter(models.Reply.post_id == post_id).all()
+    ]
+
+    # Explicit cleanup — Postgres enforces FKs that SQLite often skips.
     db.query(models.Notification).filter(models.Notification.post_id == post_id).delete(
+        synchronize_session=False
+    )
+    if reply_ids:
+        db.query(models.Notification).filter(models.Notification.reply_id.in_(reply_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.ReplyLike).filter(models.ReplyLike.reply_id.in_(reply_ids)).delete(
+            synchronize_session=False
+        )
+        # Break self-FK on nested replies before delete.
+        db.query(models.Reply).filter(models.Reply.post_id == post_id).update(
+            {models.Reply.parent_reply_id: None}, synchronize_session=False
+        )
+        db.query(models.Reply).filter(models.Reply.post_id == post_id).delete(
+            synchronize_session=False
+        )
+
+    db.query(models.Like).filter(models.Like.post_id == post_id).delete(synchronize_session=False)
+    db.query(models.Repost).filter(models.Repost.post_id == post_id).delete(
         synchronize_session=False
     )
     db.query(models.Bookmark).filter(models.Bookmark.post_id == post_id).delete(

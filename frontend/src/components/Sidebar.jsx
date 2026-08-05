@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
-import { IconBell, IconBookmark, IconHome, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
+import { IconBell, IconBookmark, IconHome, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
@@ -47,7 +47,9 @@ export default function Sidebar() {
   useEffect(() => {
     if (!moreOpen) return;
     function onDoc(e) {
-      if (moreRef.current && !moreRef.current.contains(e.target)) {
+      const t = e.target;
+      if (t.closest?.(".sidebar-more-btn") || t.closest?.(".sidebar-user")) return;
+      if (moreRef.current && !moreRef.current.contains(t)) {
         setMoreOpen(false);
       }
     }
@@ -77,6 +79,34 @@ export default function Sidebar() {
       if (el) el.focus();
     });
   }
+
+  function toggleMore() {
+    setMoreOpen((v) => !v);
+  }
+
+  const moreMenu = moreOpen ? (
+    <div className="more-menu" role="menu">
+      {MORE_LINKS.map((item) => (
+        <Link
+          key={item.to}
+          to={item.to}
+          role="menuitem"
+          className="more-menu-item"
+          onClick={() => setMoreOpen(false)}
+        >
+          {item.label}
+        </Link>
+      ))}
+      <button
+        type="button"
+        role="menuitem"
+        className="more-menu-item more-menu-logout"
+        onClick={handleLogout}
+      >
+        Log out @{user.username}
+      </button>
+    </div>
+  ) : null;
 
   return (
     <aside className="sidebar">
@@ -116,32 +146,17 @@ export default function Sidebar() {
             <span>Profile</span>
           </NavLink>
 
-          <div className="sidebar-more-wrap" ref={moreRef}>
+          <div className="sidebar-more-wrap">
             <button
               type="button"
               className={`sidebar-link sidebar-more-btn ${moreOpen ? "active" : ""}`}
               aria-haspopup="menu"
               aria-expanded={moreOpen}
-              onClick={() => setMoreOpen((v) => !v)}
+              onClick={toggleMore}
             >
               <IconMore className="sidebar-icon" />
               <span>More</span>
             </button>
-            {moreOpen && (
-              <div className="more-menu" role="menu">
-                {MORE_LINKS.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    role="menuitem"
-                    className="more-menu-item"
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
           </div>
         </nav>
         <button type="button" className="sidebar-post-btn" onClick={goCompose}>
@@ -149,8 +164,15 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <div className="sidebar-user-wrap">
-        <button type="button" className="sidebar-user" onClick={handleLogout} title="Log out">
+      <div className="sidebar-user-wrap" ref={moreRef}>
+        <button
+          type="button"
+          className="sidebar-user"
+          aria-haspopup="menu"
+          aria-expanded={moreOpen}
+          title="Account and more"
+          onClick={toggleMore}
+        >
           <Avatar name={user.display_name} username={user.username} url={user.avatar_url} size={40} />
           <div className="sidebar-user-info">
             <div className="sidebar-user-name">{user.display_name}</div>
@@ -158,10 +180,7 @@ export default function Sidebar() {
           </div>
           <IconMore className="sidebar-more-icon" />
         </button>
-        <button type="button" className="sidebar-logout-text" onClick={handleLogout}>
-          <IconLogout className="sidebar-logout-icon" />
-          Log out
-        </button>
+        {moreMenu}
       </div>
     </aside>
   );

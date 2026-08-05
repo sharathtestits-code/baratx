@@ -2940,6 +2940,7 @@ a.post-time:hover {
 }
 
 .sidebar-user-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -3285,4 +3286,19 @@ a.post-time:hover {
 .ok-hint {
   color: var(--success, #00ba7c);
   padding: 0 1rem;
+}
+
+.sidebar-user-wrap {
+  position: relative;
+}
+
+.more-menu-logout {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+  margin-top: 0.25rem;
+  color: var(--danger, #f4212e);
 }

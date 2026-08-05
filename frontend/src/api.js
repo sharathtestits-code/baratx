@@ -12,14 +12,18 @@ async function request(path, options = {}) {
   }
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
+  const headers = { ...(extraHeaders || {}) };
+  // Only set JSON content-type when sending a body — bare DELETE/GET with
+  // Content-Type: application/json can confuse some proxies.
+  if (rest.body != null && !headers["Content-Type"] && !headers["content-type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       ...rest,
       signal: controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        ...(extraHeaders || {}),
-      },
+      headers,
     });
 
     const data = await res.json().catch(() => ({}));
@@ -35,6 +39,9 @@ async function request(path, options = {}) {
   } catch (err) {
     if (err?.name === "AbortError") {
       throw new Error("Request timed out. Check your connection and try again.");
+    }
+    if (err instanceof TypeError || /failed to fetch/i.test(err?.message || "")) {
+      throw new Error("Could not reach BaratX. Check your connection and try again.");
     }
     throw err;
   } finally {
