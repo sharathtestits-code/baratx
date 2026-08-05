@@ -15,6 +15,7 @@ import Bookmarks from "./pages/Bookmarks";
 import Messages from "./pages/Messages";
 import MessageThread from "./pages/MessageThread";
 import Hashtag from "./pages/Hashtag";
+import Admin from "./pages/Admin";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
@@ -72,7 +73,14 @@ export default function App() {
     return <div className="page-loading">Loading…</div>;
   }
 
-  // Email confirm / password reset stay outside the app shell even when logged in.
+  // Admin + email confirm / password reset stay outside the app shell.
+  if (location.pathname === "/admin") {
+    return (
+      <AuthChrome>
+        <Admin />
+      </AuthChrome>
+    );
+  }
   if (location.pathname === "/verify-email") {
     return (
       <AuthChrome>

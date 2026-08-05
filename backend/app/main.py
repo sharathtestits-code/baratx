@@ -4,11 +4,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import or_, text
+from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session
 
 from app import auth, email as email_service, google_auth, models, schemas, sms, text_parse
@@ -94,6 +94,7 @@ run_migrations()
 app = FastAPI(title="BaratX API", version="0.5.0")
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "").strip()
 _cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
 if _cors_raw:
     CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
@@ -438,6 +439,101 @@ def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+# ---------- Admin (password-protected signup insights) ----------
+
+def require_admin(x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret")):
+    if not ADMIN_SECRET:
+        raise HTTPException(
+            status_code=503,
+            detail="Admin is not configured. Set ADMIN_SECRET on the API service.",
+        )
+    if not x_admin_secret or not secrets.compare_digest(x_admin_secret, ADMIN_SECRET):
+        raise HTTPException(status_code=401, detail="Invalid admin secret")
+    return True
+
+
+def _signup_method(user: models.User) -> str:
+    if user.phone and not user.email:
+        return "phone"
+    if user.email:
+        return "email"
+    if user.phone:
+        return "phone"
+    return "unknown"
+
+
+@app.get("/admin/stats", response_model=schemas.AdminStatsOut)
+def admin_stats(_: bool = Depends(require_admin), db: Session = Depends(get_db)):
+    now = datetime.now(timezone.utc)
+    day_ago = now - timedelta(days=1)
+    week_ago = now - timedelta(days=7)
+    return schemas.AdminStatsOut(
+        total_users=db.query(func.count(models.User.id)).scalar() or 0,
+        users_last_24h=db.query(func.count(models.User.id))
+        .filter(models.User.created_at >= day_ago)
+        .scalar()
+        or 0,
+        users_last_7d=db.query(func.count(models.User.id))
+        .filter(models.User.created_at >= week_ago)
+        .scalar()
+        or 0,
+        with_email=db.query(func.count(models.User.id))
+        .filter(models.User.email.isnot(None))
+        .scalar()
+        or 0,
+        with_phone=db.query(func.count(models.User.id))
+        .filter(models.User.phone.isnot(None))
+        .scalar()
+        or 0,
+        email_verified=db.query(func.count(models.User.id))
+        .filter(models.User.is_email_verified.is_(True))
+        .scalar()
+        or 0,
+        phone_verified=db.query(func.count(models.User.id))
+        .filter(models.User.is_phone_verified.is_(True))
+        .scalar()
+        or 0,
+    )
+
+
+@app.get("/admin/users", response_model=schemas.AdminUsersOut)
+def admin_users(
+    limit: int = 50,
+    offset: int = 0,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    limit = max(1, min(limit, 200))
+    offset = max(0, offset)
+    total = db.query(func.count(models.User.id)).scalar() or 0
+    rows = (
+        db.query(models.User)
+        .order_by(models.User.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return schemas.AdminUsersOut(
+        total=total,
+        limit=limit,
+        offset=offset,
+        users=[
+            schemas.AdminUserRow(
+                id=u.id,
+                username=u.username,
+                display_name=u.display_name,
+                email=u.email,
+                phone=u.phone,
+                is_email_verified=bool(u.is_email_verified),
+                is_phone_verified=bool(u.is_phone_verified),
+                created_at=u.created_at,
+                signup_method=_signup_method(u),
+            )
+            for u in rows
+        ],
+    )
 
 
 # ---------- Email signup / login ----------

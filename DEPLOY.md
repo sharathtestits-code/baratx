@@ -47,7 +47,15 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
    - Public URL: https://baratx-production.up.railway.app
    - Docs: https://baratx-production.up.railway.app/docs
    - Vars set: `DATABASE_URL`, `JWT_SECRET`, `ENVIRONMENT`, `CORS_ORIGINS`
+   - Optional: `ADMIN_SECRET` for the registrations page at https://barathx.com/admin
 2. MSG91 later for SMS OTP
+
+### See who registered
+
+1. Set `ADMIN_SECRET` on the Railway API service (long random string).
+2. Redeploy the API if needed.
+3. Open https://barathx.com/admin and enter that secret.
+4. You’ll see total users, last 24h / 7d counts, and a newest-first list.
 
 ### Railway deploy notes
 
@@ -59,6 +67,7 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
   - `JWT_SECRET` = long random string
   - `ENVIRONMENT=production`
   - `CORS_ORIGINS` = frontend URL when ready
+  - `ADMIN_SECRET` = long random string (for /admin)
 
 
 ## 2. Create free accounts (no code yet)

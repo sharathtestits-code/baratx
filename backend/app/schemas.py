@@ -326,3 +326,32 @@ class ConversationOut(BaseModel):
     user: AuthorOut
     last_message: MessageOut
     unread_count: int
+
+
+class AdminStatsOut(BaseModel):
+    total_users: int
+    users_last_24h: int
+    users_last_7d: int
+    with_email: int
+    with_phone: int
+    email_verified: int
+    phone_verified: int
+
+
+class AdminUserRow(BaseModel):
+    id: str
+    username: str
+    display_name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    is_email_verified: bool
+    is_phone_verified: bool
+    created_at: datetime
+    signup_method: str
+
+
+class AdminUsersOut(BaseModel):
+    total: int
+    limit: int
+    offset: int
+    users: list[AdminUserRow]

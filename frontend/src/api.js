@@ -258,3 +258,12 @@ export const notificationsApi = {
   markRead: (token) =>
     request("/notifications/read", { method: "POST", headers: authHeaders(token) }),
 };
+
+export const adminApi = {
+  stats: (adminSecret) =>
+    request("/admin/stats", { headers: { "X-Admin-Secret": adminSecret } }),
+  users: (adminSecret, { limit = 50, offset = 0 } = {}) =>
+    request(`/admin/users?limit=${limit}&offset=${offset}`, {
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
+};
