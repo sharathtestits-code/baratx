@@ -2871,6 +2871,47 @@ a.post-time:hover {
   background: var(--bg);
 }
 
+.x-google-wrap {
+  width: 100%;
+}
+
+.x-google-shell {
+  position: relative;
+  width: 100%;
+  min-height: 2.85rem;
+}
+
+.x-google-face {
+  width: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.x-google-shell.is-busy .x-google-face {
+  opacity: 0.7;
+}
+
+.google-btn-host {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  opacity: 0.02;
+  cursor: pointer;
+}
+
+.google-btn-host > div,
+.google-btn-host iframe {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+}
+
+.x-google-loading {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+}
+
 .x-btn-next {
   background: var(--brand);
   color: #fff;
@@ -2983,10 +3024,6 @@ a.post-time:hover {
   margin: 0.35rem 0 0;
   font-size: 0.8rem;
   color: var(--danger);
-}
-
-.google-btn-host {
-  min-height: 0;
 }
 
 .x-landing-brand {

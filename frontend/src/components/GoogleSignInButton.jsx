@@ -1,22 +1,25 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
- * Google Identity Services button. Requires VITE_GOOGLE_CLIENT_ID and a matching
- * GOOGLE_CLIENT_ID on the API. Shows a disabled stub when not configured.
+ * Google sign-in that keeps the BaratX button look, but uses GIS renderButton
+ * (popup account chooser next to the control) — not One Tap in the top-right.
  */
 export default function GoogleSignInButton({ label = "Continue with Google", onError }) {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const wrapRef = useRef(null);
+  const hostRef = useRef(null);
+  const callbackRef = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [showFallback, setShowFallback] = useState(false);
+  const [gisReady, setGisReady] = useState(false);
 
-  async function handleCredential(response) {
+  callbackRef.current = async (response) => {
     if (!response?.credential) return;
     setBusy(true);
     setError("");
@@ -32,47 +35,88 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
     } finally {
       setBusy(false);
     }
-  }
+  };
 
-  function startGoogle() {
-    setError("");
-    setShowFallback(false);
-    if (!CLIENT_ID) {
-      setError("Google sign-in is not configured yet. Add VITE_GOOGLE_CLIENT_ID.");
-      return;
-    }
-    if (!window.google?.accounts?.id) {
-      setError("Google script still loading — try again in a moment.");
-      return;
-    }
-    window.google.accounts.id.initialize({
-      client_id: CLIENT_ID,
-      callback: handleCredential,
-      ux_mode: "popup",
-    });
-    window.google.accounts.id.prompt((notification) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        setShowFallback(true);
-        requestAnimationFrame(() => {
-          const host = document.getElementById("google-btn-host");
-          if (!host || !window.google?.accounts?.id) return;
-          host.innerHTML = "";
-          window.google.accounts.id.renderButton(host, {
-            theme: "outline",
-            size: "large",
-            shape: "pill",
-            text: "continue_with",
-            width: host.offsetWidth || 320,
-          });
-        });
+  useEffect(() => {
+    if (!CLIENT_ID) return undefined;
+    let cancelled = false;
+    let resizeTimer = null;
+
+    function render() {
+      if (cancelled || !window.google?.accounts?.id || !hostRef.current || !wrapRef.current) {
+        return false;
       }
-    });
-  }
+
+      window.google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: (res) => callbackRef.current?.(res),
+        ux_mode: "popup",
+        auto_select: false,
+        cancel_on_tap_outside: true,
+        context: "signin",
+      });
+
+      // Never show One Tap in the corner.
+      try {
+        window.google.accounts.id.cancel();
+      } catch {
+        // ignore
+      }
+
+      const width = Math.max(240, Math.floor(wrapRef.current.offsetWidth || 320));
+      hostRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(hostRef.current, {
+        theme: "outline",
+        size: "large",
+        shape: "pill",
+        text: "continue_with",
+        width,
+        logo_alignment: "left",
+      });
+      setGisReady(true);
+      return true;
+    }
+
+    function waitAndRender() {
+      if (render()) return;
+      const id = window.setInterval(() => {
+        if (render()) window.clearInterval(id);
+      }, 200);
+      window.setTimeout(() => window.clearInterval(id), 12000);
+    }
+
+    waitAndRender();
+
+    function onResize() {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => render(), 150);
+    }
+    window.addEventListener("resize", onResize);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener("resize", onResize);
+      try {
+        window.google?.accounts?.id?.cancel();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
 
   if (!CLIENT_ID) {
     return (
       <div className="x-google-wrap">
-        <button type="button" className="x-btn x-btn-google" onClick={startGoogle}>
+        <button
+          type="button"
+          className="x-btn x-btn-google"
+          onClick={() => {
+            const msg = "Google sign-in is not configured yet. Add VITE_GOOGLE_CLIENT_ID.";
+            setError(msg);
+            onError?.(msg);
+          }}
+        >
           <GoogleG className="x-btn-icon" />
           {label}
         </button>
@@ -82,14 +126,20 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
   }
 
   return (
-    <div className="x-google-wrap">
-      {!showFallback && (
-        <button type="button" className="x-btn x-btn-google" onClick={startGoogle} disabled={busy}>
+    <div className="x-google-wrap" ref={wrapRef}>
+      <div className={`x-google-shell ${busy ? "is-busy" : ""} ${gisReady ? "is-ready" : ""}`}>
+        <div className="x-btn x-btn-google x-google-face" aria-hidden="true">
           <GoogleG className="x-btn-icon" />
           {busy ? "Signing in…" : label}
-        </button>
-      )}
-      <div id="google-btn-host" className="google-btn-host" hidden={!showFallback} />
+        </div>
+        <div
+          ref={hostRef}
+          className="google-btn-host"
+          title={label}
+          aria-label={label}
+        />
+      </div>
+      {!gisReady && !error && <p className="hint x-google-loading">Loading Google…</p>}
       {error && <p className="x-inline-error">{error}</p>}
     </div>
   );
