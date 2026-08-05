@@ -2536,33 +2536,113 @@ a.post-username:hover {
 .post-detail-topbar {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 1rem;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
   z-index: 5;
+  min-height: 3.35rem;
 }
 
-.back-btn {
+.post-detail-back {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
   border: none;
+  border-radius: 999px;
   background: transparent;
   color: var(--text);
-  font-weight: 700;
-  font-size: 0.92rem;
   cursor: pointer;
-  padding: 0.4rem 0.6rem;
-  margin: 0 !important;
-  border-radius: 999px;
+  padding: 0;
+  margin: 0;
 }
 
-.back-btn:hover {
-  background: rgba(15, 20, 25, 0.05);
+.post-detail-back:hover {
+  background: rgba(15, 20, 25, 0.08);
+}
+
+.post-detail-back-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: block;
+}
+
+.post-detail-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.post-detail-main {
+  border-bottom: 1px solid var(--border);
 }
 
 .post-detail-card {
+  border-bottom: 8px solid var(--border);
+}
+
+.detail-reply-composer {
+  padding: 1rem 1.15rem 1.15rem;
+  border-bottom: 8px solid var(--border);
+  background: var(--surface);
+}
+
+.detail-reply-composer-row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.detail-reply-composer-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-reply-composer textarea {
+  width: 100%;
+  min-height: 5.5rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  resize: vertical;
+  font-size: 1.05rem;
+  font-family: inherit;
+  line-height: 1.45;
+  padding: 0.85rem 1rem;
+  color: var(--text);
+  background: var(--bg, #fff);
+  box-sizing: border-box;
+}
+
+.detail-reply-composer textarea:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(255, 103, 31, 0.15);
+}
+
+.detail-reply-composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.7rem;
+}
+
+.detail-reply-submit {
+  min-width: 5.5rem;
+  padding: 0.55rem 1.25rem;
+  font-weight: 700;
+}
+
+.detail-reply-login {
+  padding: 1rem 1.25rem;
   border-bottom: 8px solid var(--border);
 }
 

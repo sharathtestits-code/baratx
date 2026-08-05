@@ -71,15 +71,29 @@ export default function PostDetail() {
     navigate("/feed");
   }
 
+  function goBack() {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/feed");
+  }
+
   if (loading) return <div className="page-loading">Loading post...</div>;
   if (error && !post) {
     return (
       <div className="feed-wrap">
         <div className="post-detail-topbar">
-          <button type="button" className="back-btn" onClick={() => navigate(-1)}>
-            ← Back
+          <button type="button" className="post-detail-back" onClick={goBack} aria-label="Go back">
+            <svg viewBox="0 0 24 24" className="post-detail-back-icon" aria-hidden="true">
+              <path
+                d="M15 18l-6-6 6-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
-          <h1 className="feed-title">Post</h1>
+          <h1 className="post-detail-title">Post</h1>
         </div>
         <div className="error">{error}</div>
       </div>
@@ -90,15 +104,74 @@ export default function PostDetail() {
   return (
     <div className="feed-wrap">
       <div className="post-detail-topbar">
-        <button type="button" className="back-btn" onClick={() => navigate(-1)}>
-          ← Back
+        <button type="button" className="post-detail-back" onClick={goBack} aria-label="Go back">
+          <svg viewBox="0 0 24 24" className="post-detail-back-icon" aria-hidden="true">
+            <path
+              d="M15 18l-6-6 6-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
-        <h1 className="feed-title">Post</h1>
+        <h1 className="post-detail-title">Post</h1>
       </div>
 
-      <div className="post-list">
+      <div className="post-list post-detail-main">
         <PostCard post={post} onDeleted={handleDeleted} detailMode />
       </div>
+
+      {token ? (
+        <form className="detail-reply-composer" onSubmit={submitReply}>
+          <div className="detail-reply-composer-row">
+            <Avatar
+              name={user?.display_name}
+              username={user?.username}
+              url={user?.avatar_url}
+              size={44}
+            />
+            <div className="detail-reply-composer-body">
+              {parentReply && (
+                <div className="replying-to">
+                  Replying to @{parentReply.author.username}{" "}
+                  <button type="button" onClick={() => setParentReply(null)}>
+                    Cancel
+                  </button>
+                </div>
+              )}
+              <textarea
+                id="post-reply-composer"
+                placeholder={
+                  parentReply
+                    ? `Reply to @${parentReply.author.username}`
+                    : "Post your reply"
+                }
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                maxLength={500}
+                rows={3}
+              />
+              <div className="detail-reply-composer-footer">
+                <span className="hint">{replyText.length}/500</span>
+                <button
+                  type="submit"
+                  className="btn btn-primary detail-reply-submit"
+                  disabled={replyBusy || !replyText.trim()}
+                >
+                  {replyBusy ? "Replying…" : "Reply"}
+                </button>
+              </div>
+            </div>
+          </div>
+          {replyError && <div className="error">{replyError}</div>}
+        </form>
+      ) : (
+        <p className="hint profile-posts-hint detail-reply-login">
+          <Link to="/login">Log in</Link> to reply.
+        </p>
+      )}
 
       <div className="post-detail-replies">
         <h2 className="section-title">Replies</h2>
@@ -111,38 +184,6 @@ export default function PostDetail() {
             ))}
           </div>
         )}
-
-        {token ? (
-          <form className="reply-form detail-reply-form" onSubmit={submitReply}>
-            <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={36} />
-            <div className="reply-compose-col">
-              {parentReply && (
-                <div className="replying-to">
-                  Replying to @{parentReply.author.username}{" "}
-                  <button type="button" onClick={() => setParentReply(null)}>
-                    Cancel
-                  </button>
-                </div>
-              )}
-              <input
-                id="post-reply-composer"
-                type="text"
-                placeholder={parentReply ? `Reply to @${parentReply.author.username}` : "Post your reply"}
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                maxLength={500}
-              />
-            </div>
-            <button type="submit" disabled={replyBusy || !replyText.trim()}>
-              {replyBusy ? "..." : "Reply"}
-            </button>
-          </form>
-        ) : (
-          <p className="hint profile-posts-hint">
-            <Link to="/login">Log in</Link> to reply.
-          </p>
-        )}
-        {replyError && <div className="error">{replyError}</div>}
       </div>
     </div>
   );
