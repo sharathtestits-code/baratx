@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, models, schemas, sms, text_parse
+from app import auth, email as email_service, google_auth, models, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 
@@ -90,6 +90,16 @@ def run_migrations():
 
 
 run_migrations()
+
+# Cold-start density: official BaratX accounts + starter posts.
+with SessionLocal() as _seed_db:
+    try:
+        seed.seed_official_accounts(_seed_db)
+    except Exception:  # noqa: BLE001 — never block API boot on seed
+        import logging
+
+        logging.getLogger("baratx").exception("Official account seed failed")
+
 
 app = FastAPI(title="BaratX API", version="0.5.0")
 
@@ -415,6 +425,31 @@ def create_notification(
             reply_id=reply_id,
         )
     )
+    # Retention: email when possible (never fail the social action).
+    try:
+        recipient = db.query(models.User).filter(models.User.id == recipient_id).first()
+        actor = db.query(models.User).filter(models.User.id == actor_id).first()
+        if not recipient or not actor or not recipient.email:
+            return
+        preview = None
+        if reply_id:
+            reply = db.query(models.Reply).filter(models.Reply.id == reply_id).first()
+            if reply:
+                preview = reply.text
+        elif post_id:
+            post = db.query(models.Post).filter(models.Post.id == post_id).first()
+            if post:
+                preview = post.text
+        email_service.send_activity_email(
+            recipient.email,
+            recipient.display_name or recipient.username,
+            actor.display_name or actor.username,
+            actor.username,
+            kind,
+            preview=preview,
+        )
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
@@ -479,6 +514,13 @@ def admin_stats(_: bool = Depends(require_admin), db: Session = Depends(get_db))
     now = datetime.now(timezone.utc)
     day_ago = now - timedelta(days=1)
     week_ago = now - timedelta(days=7)
+    posters_subq = db.query(models.Post.author_id).distinct().subquery()
+    posters_24h_subq = (
+        db.query(models.Post.author_id)
+        .filter(models.Post.created_at >= day_ago)
+        .distinct()
+        .subquery()
+    )
     return schemas.AdminStatsOut(
         total_users=db.query(func.count(models.User.id)).scalar() or 0,
         users_last_24h=db.query(func.count(models.User.id))
@@ -505,6 +547,13 @@ def admin_stats(_: bool = Depends(require_admin), db: Session = Depends(get_db))
         .filter(models.User.is_phone_verified.is_(True))
         .scalar()
         or 0,
+        total_posts=db.query(func.count(models.Post.id)).scalar() or 0,
+        posts_last_24h=db.query(func.count(models.Post.id))
+        .filter(models.Post.created_at >= day_ago)
+        .scalar()
+        or 0,
+        users_with_posts=db.query(func.count()).select_from(posters_subq).scalar() or 0,
+        posters_last_24h=db.query(func.count()).select_from(posters_24h_subq).scalar() or 0,
     )
 
 
@@ -565,6 +614,9 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    seed.follow_official_accounts(db, user)
+    db.commit()
 
     sent, dev_url = issue_email_verification(db, user)
 
@@ -766,6 +818,8 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
         db.add(user)
         db.commit()
         db.refresh(user)
+        seed.follow_official_accounts(db, user)
+        db.commit()
     else:
         if not user.is_email_verified:
             user.is_email_verified = True
@@ -821,6 +875,9 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
     db.commit()
     db.refresh(user)
 
+    seed.follow_official_accounts(db, user)
+    db.commit()
+
     token = auth.create_access_token(user.id)
     return schemas.TokenResponse(access_token=token)
 
@@ -866,6 +923,19 @@ def login_phone_verify(payload: schemas.PhoneLoginVerify, db: Session = Depends(
 @app.get("/users/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return serialize_user(current_user, current_user)
+
+
+@app.post("/users/me/bootstrap-follows", response_model=schemas.MessageResponse)
+def bootstrap_follows(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """One-tap follow of official BaratX accounts (idempotent)."""
+    added = seed.follow_official_accounts(db, current_user)
+    db.commit()
+    if added:
+        return schemas.MessageResponse(message=f"Following {added} official BaratX account(s).")
+    return schemas.MessageResponse(message="You’re already following official BaratX accounts.")
 
 
 @app.patch("/users/me", response_model=schemas.UserOut)

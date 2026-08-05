@@ -190,3 +190,67 @@ def send_password_reset_email(to_email: str, display_name: str, token: str) -> t
 """
     sent = send_email(to_email, subject, text_body, html_body)
     return sent, reset_url
+
+
+_KIND_COPY = {
+    "follow": "followed you",
+    "like": "liked your post",
+    "repost": "reposted your post",
+    "reply": "replied to your post",
+    "mention": "mentioned you",
+    "message": "sent you a message",
+}
+
+
+def send_activity_email(
+    to_email: str,
+    recipient_name: str,
+    actor_name: str,
+    actor_username: str,
+    kind: str,
+    preview: Optional[str] = None,
+) -> bool:
+    """Best-effort retention email when someone interacts with you."""
+    if not to_email:
+        return False
+    action = _KIND_COPY.get(kind, "interacted with you")
+    subject = f"{actor_name} {action} on BaratX"
+    cta = f"{FRONTEND_URL}/notifications"
+    if kind == "message":
+        cta = f"{FRONTEND_URL}/messages/{actor_username}"
+    preview_line = f'\n"{preview[:140]}"\n' if preview else "\n"
+    text_body = (
+        f"Hi {recipient_name},\n\n"
+        f"@{actor_username} {action} on BaratX."
+        f"{preview_line}\n"
+        f"Open BaratX: {cta}\n\n"
+        f"— BaratX\n"
+    )
+    preview_html = (
+        f'<p style="color:#536471;border-left:3px solid #efe8e0;padding-left:12px;">{preview[:140]}</p>'
+        if preview
+        else ""
+    )
+    html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
+  <p>Hi {recipient_name},</p>
+  <p><strong>@{actor_username}</strong> {action} on <strong>BaratX</strong>.</p>
+  {preview_html}
+  <p style="margin: 28px 0;">
+    <a href="{cta}"
+       style="background:#FF671F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;">
+      Open BaratX
+    </a>
+  </p>
+  <p style="color:#8b98a5;font-size:13px;">You’re getting this because someone interacted with your account.</p>
+  <p>— BaratX</p>
+</body>
+</html>
+"""
+    try:
+        return send_email(to_email, subject, text_body, html_body)
+    except Exception:
+        logger.exception("Activity email failed for %s", to_email)
+        return False

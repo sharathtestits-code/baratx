@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { postsApi } from "../api";
+import { api, postsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
+import WelcomePanel from "../components/WelcomePanel";
 import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
@@ -20,6 +21,8 @@ export default function Feed() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const quotePostId = searchParams.get("quote");
+  const wantWelcome =
+    searchParams.get("welcome") === "1" || sessionStorage.getItem("bx_welcome") === "1";
 
   const [tab, setTab] = useState("global");
   const [items, setItems] = useState([]);
@@ -34,8 +37,17 @@ export default function Feed() {
   const [quotePreview, setQuotePreview] = useState(null);
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState("");
+  const [showWelcome, setShowWelcome] = useState(wantWelcome);
   const fileInputRef = useRef(null);
+  const composeRef = useRef(null);
   const loadingMoreRef = useRef(false);
+
+  useEffect(() => {
+    if (wantWelcome) {
+      sessionStorage.setItem("bx_welcome", "1");
+      setShowWelcome(true);
+    }
+  }, [wantWelcome]);
 
   useEffect(() => {
     if (!loading && token && !user) return;
@@ -68,6 +80,26 @@ export default function Feed() {
       cancelled = true;
     };
   }, [quotePostId, token]);
+
+  useEffect(() => {
+    if (!user || !token) return;
+    if (localStorage.getItem("bx_first_post_done") === "1") return;
+    let cancelled = false;
+    api
+      .getUserPosts(user.username, token)
+      .then((posts) => {
+        if (cancelled) return;
+        if (!Array.isArray(posts) || posts.length === 0) {
+          setShowWelcome(true);
+        } else {
+          localStorage.setItem("bx_first_post_done", "1");
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user, token]);
 
   if (loading || (token && !user)) {
     return <div className="page-loading">Loading…</div>;
@@ -160,6 +192,11 @@ export default function Feed() {
         setSearchParams({});
         setQuotePreview(null);
       }
+      localStorage.setItem("bx_first_post_done", "1");
+      sessionStorage.removeItem("bx_welcome");
+      setShowWelcome(false);
+      window.dispatchEvent(new CustomEvent("bx:first-post"));
+      api.bootstrapFollows(token).catch(() => {});
     } catch (err) {
       setPostError(err.message);
     } finally {
@@ -170,8 +207,6 @@ export default function Feed() {
   function handleDeleted(postId) {
     setItems((prev) => prev.filter((i) => i.post.id !== postId));
   }
-
-  if (loading) return <div className="page-loading">Loading...</div>;
 
   const remaining = MAX_LEN - text.length;
   const charCountClass = remaining < 20 ? "char-count char-count-low" : "char-count";
@@ -197,7 +232,8 @@ export default function Feed() {
           <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
           <div className="compose-body">
             <textarea
-              placeholder="What is happening?"
+              ref={composeRef}
+              placeholder={showWelcome ? "Say hello with your city…" : "What is happening?"}
               value={text}
               onChange={(e) => setText(e.target.value)}
               maxLength={MAX_LEN}
@@ -250,6 +286,10 @@ export default function Feed() {
         </div>
       </form>
 
+      {showWelcome && (
+        <WelcomePanel token={token} text={text} setText={setText} onPostedFlag composeRef={composeRef} />
+      )}
+
       <div className="feed-tabs">
         <button
           type="button"
@@ -288,7 +328,7 @@ export default function Feed() {
           </p>
           <p className="hint">
             {tab === "following"
-              ? "Follow people from Global or Search to see their posts here."
+              ? "Tap Follow official BaratX above, or find people in Explore."
               : "Be the first to say something."}
           </p>
         </div>

@@ -23,7 +23,8 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
     try {
       const data = await api.loginGoogle({ id_token: response.credential });
       login(data.access_token);
-      navigate("/feed");
+      sessionStorage.setItem("bx_welcome", "1");
+      navigate("/feed?welcome=1");
     } catch (err) {
       const msg = err.message || "Google sign-in failed";
       setError(msg);

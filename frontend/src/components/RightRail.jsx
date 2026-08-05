@@ -62,7 +62,7 @@ export default function RightRail() {
           <ul className="rail-people">
             {SUGGESTED_PEOPLE.map((person) => (
               <li key={person.username}>
-                <Link to={`/search?q=${encodeURIComponent(person.username)}`} className="rail-person">
+                <Link to={`/u/${encodeURIComponent(person.username)}`} className="rail-person">
                   <Avatar name={person.display_name} username={person.username} size={40} />
                   <div className="rail-person-info">
                     <div className="rail-person-name">

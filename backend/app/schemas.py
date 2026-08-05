@@ -336,6 +336,10 @@ class AdminStatsOut(BaseModel):
     with_phone: int
     email_verified: int
     phone_verified: int
+    total_posts: int = 0
+    posts_last_24h: int = 0
+    users_with_posts: int = 0
+    posters_last_24h: int = 0
 
 
 class AdminUserRow(BaseModel):

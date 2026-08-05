@@ -2147,6 +2147,124 @@ a.post-username:hover {
   }
 }
 
+/* ---------- Welcome / first-post push ---------- */
+
+.welcome-panel {
+  margin: 0 0 0.5rem;
+  padding: 1rem 1.25rem 1.15rem;
+  border-bottom: 8px solid var(--border);
+  background: var(--brand-tint);
+}
+
+.welcome-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.welcome-title {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.welcome-sub {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.welcome-skip {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.welcome-skip:hover {
+  color: var(--text);
+}
+
+.welcome-section {
+  margin-bottom: 0.75rem;
+}
+
+.welcome-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-bottom: 0.4rem;
+}
+
+.welcome-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.welcome-chip {
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.welcome-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
+}
+
+.welcome-chip-prompt {
+  border-radius: 12px;
+  text-align: left;
+  font-weight: 500;
+  max-width: 100%;
+}
+
+.welcome-follow {
+  margin-top: 0.35rem;
+}
+
+.welcome-follow-btn {
+  border: none;
+  background: var(--chakra);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.welcome-follow-btn:hover:not(:disabled) {
+  background: var(--chakra-hover);
+}
+
+.welcome-follow-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.welcome-follow-msg {
+  margin: 0.45rem 0 0;
+}
+
 .user-results {
   display: flex;
   flex-direction: column;

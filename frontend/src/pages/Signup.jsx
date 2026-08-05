@@ -42,7 +42,8 @@ export default function Signup() {
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
       }
       login(res.access_token);
-      navigate("/feed");
+      sessionStorage.setItem("bx_welcome", "1");
+      navigate("/feed?welcome=1");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -77,7 +78,8 @@ export default function Signup() {
         display_name: displayName,
       });
       login(access_token);
-      navigate("/feed");
+      sessionStorage.setItem("bx_welcome", "1");
+      navigate("/feed?welcome=1");
     } catch (err) {
       setError(err.message);
     } finally {

@@ -126,12 +126,24 @@ export default function Admin() {
             <span className="admin-stat-label">Total users</span>
           </div>
           <div className="admin-stat">
-            <span className="admin-stat-value">{stats.users_last_24h}</span>
-            <span className="admin-stat-label">Last 24 hours</span>
+            <span className="admin-stat-value">{stats.users_with_posts ?? "—"}</span>
+            <span className="admin-stat-label">Users who posted</span>
           </div>
           <div className="admin-stat">
-            <span className="admin-stat-value">{stats.users_last_7d}</span>
-            <span className="admin-stat-label">Last 7 days</span>
+            <span className="admin-stat-value">{stats.posters_last_24h ?? "—"}</span>
+            <span className="admin-stat-label">Posters (24h)</span>
+          </div>
+          <div className="admin-stat">
+            <span className="admin-stat-value">{stats.posts_last_24h ?? "—"}</span>
+            <span className="admin-stat-label">Posts (24h)</span>
+          </div>
+          <div className="admin-stat">
+            <span className="admin-stat-value">{stats.total_posts ?? "—"}</span>
+            <span className="admin-stat-label">Total posts</span>
+          </div>
+          <div className="admin-stat">
+            <span className="admin-stat-value">{stats.users_last_24h}</span>
+            <span className="admin-stat-label">Signups (24h)</span>
           </div>
           <div className="admin-stat">
             <span className="admin-stat-value">{stats.email_verified}</span>

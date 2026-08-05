@@ -109,6 +109,12 @@ export const api = {
       headers: authHeaders(token),
     }),
 
+  bootstrapFollows: (token) =>
+    request("/users/me/bootstrap-follows", {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+
   uploadAvatar: async (token, file) => {
     const form = new FormData();
     form.append("image", file);
