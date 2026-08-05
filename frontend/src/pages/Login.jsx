@@ -128,6 +128,9 @@ export default function Login() {
           <button type="submit" disabled={busy}>
             {busy ? "Logging in..." : "Log in"}
           </button>
+          <p className="switch-link" style={{ marginTop: 12 }}>
+            <Link to="/forgot-password">Forgot password?</Link>
+          </p>
         </form>
       ) : !otpSent ? (
         <form onSubmit={handleRequestOtp}>

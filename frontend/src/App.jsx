@@ -2,6 +2,8 @@ import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
@@ -58,11 +60,18 @@ export default function App() {
     return <div className="page-loading">Loading…</div>;
   }
 
-  // Email confirm stays outside the app shell even when logged in.
+  // Email confirm / password reset stay outside the app shell even when logged in.
   if (location.pathname === "/verify-email") {
     return (
       <AuthChrome>
         <VerifyEmail />
+      </AuthChrome>
+    );
+  }
+  if (location.pathname === "/reset-password") {
+    return (
+      <AuthChrome>
+        <ResetPassword />
       </AuthChrome>
     );
   }
@@ -84,6 +93,14 @@ export default function App() {
           element={
             <AuthChrome>
               <Login />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthChrome>
+              <ForgotPassword />
             </AuthChrome>
           }
         />

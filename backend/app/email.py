@@ -58,6 +58,10 @@ def build_verify_url(token: str) -> str:
     return f"{FRONTEND_URL}/verify-email?token={token}"
 
 
+def build_reset_url(token: str) -> str:
+    return f"{FRONTEND_URL}/reset-password?token={token}"
+
+
 def _send_smtp(to_email: str, subject: str, text_body: str, html_body: str) -> None:
     msg = EmailMessage()
     msg["Subject"] = subject
@@ -152,3 +156,37 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
 """
     sent = send_email(to_email, subject, text_body, html_body)
     return sent, verify_url
+
+
+def send_password_reset_email(to_email: str, display_name: str, token: str) -> tuple[bool, str]:
+    reset_url = build_reset_url(token)
+    subject = "Reset your BaratX password"
+    text_body = (
+        f"Hi {display_name},\n\n"
+        f"We received a request to reset your BaratX password. Open this link:\n\n"
+        f"{reset_url}\n\n"
+        f"This link expires in 1 hour. If you did not request a reset, ignore this email.\n\n"
+        f"— BaratX\n"
+    )
+    html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
+  <p>Hi {display_name},</p>
+  <p>We received a request to reset your <strong>BaratX</strong> password.</p>
+  <p style="margin: 28px 0;">
+    <a href="{reset_url}"
+       style="background:#FF671F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;">
+      Reset password
+    </a>
+  </p>
+  <p style="color:#536471;font-size:14px;">Or paste this link into your browser:<br/>
+    <a href="{reset_url}" style="color:#000080;">{reset_url}</a>
+  </p>
+  <p style="color:#8b98a5;font-size:13px;">This link expires in 1 hour.</p>
+  <p>— BaratX</p>
+</body>
+</html>
+"""
+    sent = send_email(to_email, subject, text_body, html_body)
+    return sent, reset_url

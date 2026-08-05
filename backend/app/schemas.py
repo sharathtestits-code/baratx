@@ -85,6 +85,22 @@ class VerifyEmailRequest(BaseModel):
     token: str
 
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str
+
+    @field_validator("password")
+    @classmethod
+    def valid_reset_password(cls, v):
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+
 class GoogleAuthRequest(BaseModel):
     id_token: str
 
@@ -92,7 +108,9 @@ class GoogleAuthRequest(BaseModel):
 class MessageResponse(BaseModel):
     message: str
     email_verification_sent: bool = False
+    # Dev-only helpers when outbound email is not configured.
     dev_verify_url: Optional[str] = None
+    dev_reset_url: Optional[str] = None
 
 
 class UserUpdate(BaseModel):

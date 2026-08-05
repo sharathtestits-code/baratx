@@ -42,6 +42,11 @@ export const api = {
       headers: authHeaders(token),
     }),
 
+  forgotPassword: (email) =>
+    request("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
+  resetPassword: (body) =>
+    request("/auth/reset-password", { method: "POST", body: JSON.stringify(body) }),
+
   signupPhoneRequestOtp: (phone) =>
     request("/auth/signup/phone/request-otp", { method: "POST", body: JSON.stringify({ phone }) }),
   signupPhoneVerify: (body) =>

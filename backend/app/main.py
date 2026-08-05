@@ -74,6 +74,7 @@ optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 OTP_TTL_MINUTES = 5
 EMAIL_VERIFY_TTL_HOURS = 24
+PASSWORD_RESET_TTL_HOURS = 1
 
 
 def _otp_response(code: str) -> dict:
@@ -331,6 +332,87 @@ def resend_verification(
         email_verification_sent=False,
         dev_verify_url=dev_url,
     )
+
+
+@app.post("/auth/forgot-password", response_model=schemas.MessageResponse)
+def forgot_password(payload: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Always returns a generic success message to avoid email enumeration."""
+    generic = schemas.MessageResponse(
+        message="If that email is registered, we sent a password reset link."
+    )
+    user = db.query(models.User).filter(models.User.email == str(payload.email).lower()).first()
+    if not user or not user.email:
+        return generic
+
+    prior = (
+        db.query(models.PasswordResetToken)
+        .filter(
+            models.PasswordResetToken.user_id == user.id,
+            models.PasswordResetToken.consumed == False,  # noqa: E712
+        )
+        .all()
+    )
+    for row in prior:
+        row.consumed = True
+
+    raw = secrets.token_urlsafe(32)
+    row = models.PasswordResetToken(
+        user_id=user.id,
+        token=raw,
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=PASSWORD_RESET_TTL_HOURS),
+    )
+    db.add(row)
+    db.commit()
+
+    try:
+        sent, reset_url = email_service.send_password_reset_email(
+            user.email, user.display_name, raw
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"[email] failed to send password reset to {user.email}: {exc}")
+        sent = False
+        reset_url = email_service.build_reset_url(raw)
+
+    if sent:
+        return generic
+    if ENVIRONMENT == "production":
+        raise HTTPException(
+            status_code=503,
+            detail="Email delivery is not configured yet. Try again later.",
+        )
+    return schemas.MessageResponse(
+        message="Email provider not configured — use the development reset link.",
+        dev_reset_url=reset_url,
+    )
+
+
+@app.post("/auth/reset-password", response_model=schemas.MessageResponse)
+def reset_password(payload: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
+    row = (
+        db.query(models.PasswordResetToken)
+        .filter(
+            models.PasswordResetToken.token == payload.token,
+            models.PasswordResetToken.consumed == False,  # noqa: E712
+        )
+        .first()
+    )
+    if not row:
+        raise HTTPException(status_code=400, detail="Invalid or already used reset link")
+
+    expires = row.expires_at
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if expires < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Reset link expired. Request a new one.")
+
+    user = db.query(models.User).filter(models.User.id == row.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    row.consumed = True
+    user.password_hash = auth.hash_password(payload.password)
+    db.commit()
+    return schemas.MessageResponse(message="Password updated. You can sign in with your new password.")
 
 
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)
