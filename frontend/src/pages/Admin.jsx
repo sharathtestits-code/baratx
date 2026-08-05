@@ -4,6 +4,18 @@ import { adminApi } from "../api";
 
 const SECRET_KEY = "baratx_admin_secret";
 
+const OFFICIAL_OPTIONS = [
+  { value: "baratx", label: "@baratx — BaratX" },
+  { value: "bharatvoices", label: "@bharatvoices — Bharat Voices" },
+  { value: "indiatech", label: "@indiatech — India Tech Daily" },
+];
+
+const WELCOME_PROMPTS = [
+  "Welcome to BaratX — glad you’re here. What’s your city?",
+  "Nice first post. What made you join BaratX today?",
+  "Welcome! Reply with one India take you wish more people heard.",
+];
+
 function formatWhen(iso) {
   if (!iso) return "—";
   try {
@@ -23,40 +35,70 @@ function verifiedLabel(u) {
   return parts.length ? parts.join(" · ") : "—";
 }
 
+function OfficialSelect({ id, value, onChange }) {
+  return (
+    <select id={id} className="admin-select" value={value} onChange={(e) => onChange(e.target.value)}>
+      {OFFICIAL_OPTIONS.map((opt) => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 export default function Admin() {
   const [secret, setSecret] = useState(() => sessionStorage.getItem(SECRET_KEY) || "");
   const [draft, setDraft] = useState("");
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
+  const [recentPosts, setRecentPosts] = useState([]);
+  const [recentTotal, setRecentTotal] = useState(0);
+  const [newUsersOnly, setNewUsersOnly] = useState(true);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   const [postText, setPostText] = useState("");
   const [postAs, setPostAs] = useState("baratx");
   const [posting, setPosting] = useState(false);
+  const [replyAs, setReplyAs] = useState("baratx");
+  const [replyDrafts, setReplyDrafts] = useState({});
+  const [replyingId, setReplyingId] = useState(null);
 
-  const load = useCallback(async (adminSecret) => {
-    if (!adminSecret) return;
-    setBusy(true);
-    setError("");
-    try {
-      const [s, u] = await Promise.all([
-        adminApi.stats(adminSecret),
-        adminApi.users(adminSecret, { limit: 100, offset: 0 }),
-      ]);
-      setStats(s);
-      setUsers(u.users || []);
-      setTotal(u.total || 0);
-    } catch (err) {
-      setStats(null);
-      setUsers([]);
-      setTotal(0);
-      setError(err.message || "Could not load admin data");
-    } finally {
-      setBusy(false);
-    }
-  }, []);
+  const load = useCallback(
+    async (adminSecret) => {
+      if (!adminSecret) return;
+      setBusy(true);
+      setError("");
+      try {
+        const [s, u, posts] = await Promise.all([
+          adminApi.stats(adminSecret),
+          adminApi.users(adminSecret, { limit: 100, offset: 0 }),
+          adminApi.recentPosts(adminSecret, {
+            limit: 30,
+            newUsersOnly,
+            days: 7,
+          }),
+        ]);
+        setStats(s);
+        setUsers(u.users || []);
+        setTotal(u.total || 0);
+        setRecentPosts(posts.posts || []);
+        setRecentTotal(posts.total || 0);
+      } catch (err) {
+        setStats(null);
+        setUsers([]);
+        setTotal(0);
+        setRecentPosts([]);
+        setRecentTotal(0);
+        setError(err.message || "Could not load admin data");
+      } finally {
+        setBusy(false);
+      }
+    },
+    [newUsersOnly]
+  );
 
   useEffect(() => {
     if (secret) load(secret);
@@ -80,8 +122,11 @@ export default function Admin() {
     setStats(null);
     setUsers([]);
     setTotal(0);
+    setRecentPosts([]);
+    setRecentTotal(0);
     setError("");
     setMsg("");
+    setReplyDrafts({});
   }
 
   async function handleAdminPost(e) {
@@ -103,6 +148,37 @@ export default function Admin() {
     } finally {
       setPosting(false);
     }
+  }
+
+  async function handleAdminReply(e, post) {
+    e.preventDefault();
+    const text = (replyDrafts[post.id] || "").trim();
+    if (!text || !secret) return;
+    setReplyingId(post.id);
+    setError("");
+    setMsg("");
+    try {
+      const reply = await adminApi.createReply(secret, {
+        post_id: post.id,
+        text,
+        username: replyAs,
+      });
+      setReplyDrafts((prev) => {
+        const next = { ...prev };
+        delete next[post.id];
+        return next;
+      });
+      setMsg(`Commented as @${reply.author?.username || replyAs} on @${post.author?.username}'s post`);
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not comment");
+    } finally {
+      setReplyingId(null);
+    }
+  }
+
+  function usePrompt(postId, prompt) {
+    setReplyDrafts((prev) => ({ ...prev, [postId]: prompt }));
   }
 
   if (!secret) {
@@ -177,16 +253,7 @@ export default function Admin() {
             <label className="admin-field" htmlFor="admin-post-as">
               Account
             </label>
-            <select
-              id="admin-post-as"
-              className="admin-select"
-              value={postAs}
-              onChange={(e) => setPostAs(e.target.value)}
-            >
-              <option value="baratx">@baratx — BaratX</option>
-              <option value="bharatvoices">@bharatvoices — Bharat Voices</option>
-              <option value="indiatech">@indiatech — India Tech Daily</option>
-            </select>
+            <OfficialSelect id="admin-post-as" value={postAs} onChange={setPostAs} />
           </div>
 
           <div className="admin-field-block">
@@ -216,6 +283,112 @@ export default function Admin() {
             </button>
           </div>
         </form>
+      </section>
+
+      <section className="admin-compose admin-engage" aria-labelledby="admin-engage-title">
+        <div className="admin-engage-head">
+          <div>
+            <h2 id="admin-engage-title">Comment on new users</h2>
+            <p className="admin-lead">
+              Welcome new joiners by replying to their posts — not only broadcasting.
+            </p>
+          </div>
+          <label className="admin-toggle">
+            <input
+              type="checkbox"
+              checked={newUsersOnly}
+              onChange={(e) => setNewUsersOnly(e.target.checked)}
+            />
+            New joiners (7d) only
+          </label>
+        </div>
+
+        <div className="admin-field-block admin-engage-account">
+          <label className="admin-field" htmlFor="admin-reply-as">
+            Reply as
+          </label>
+          <OfficialSelect id="admin-reply-as" value={replyAs} onChange={setReplyAs} />
+        </div>
+
+        {recentPosts.length === 0 && !busy && (
+          <p className="admin-empty-inline">
+            {newUsersOnly
+              ? "No posts from users who joined in the last 7 days yet."
+              : "No community posts to comment on yet."}
+          </p>
+        )}
+
+        <ul className="admin-post-list">
+          {recentPosts.map((post) => {
+            const draftText = replyDrafts[post.id] || "";
+            const busyReply = replyingId === post.id;
+            return (
+              <li key={post.id} className="admin-post-card">
+                <div className="admin-post-meta">
+                  <Link
+                    className="admin-user-link"
+                    to={`/u/${encodeURIComponent(post.author?.username || "")}`}
+                  >
+                    @{post.author?.username}
+                  </Link>
+                  <span className="admin-post-name">{post.author?.display_name}</span>
+                  <span className="admin-post-time">{formatWhen(post.created_at)}</span>
+                  <Link className="admin-post-open" to={`/posts/${post.id}`}>
+                    Open
+                  </Link>
+                </div>
+                <p className="admin-post-text">{post.text}</p>
+                <p className="admin-post-stats">
+                  {post.reply_count ?? 0} replies · {post.like_count ?? 0} likes
+                </p>
+
+                <div className="admin-prompt-row">
+                  {WELCOME_PROMPTS.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      className="admin-prompt-chip"
+                      onClick={() => usePrompt(post.id, prompt)}
+                    >
+                      {prompt.length > 42 ? `${prompt.slice(0, 42)}…` : prompt}
+                    </button>
+                  ))}
+                </div>
+
+                <form className="admin-reply-form" onSubmit={(e) => handleAdminReply(e, post)}>
+                  <textarea
+                    className="admin-textarea admin-reply-textarea"
+                    value={draftText}
+                    onChange={(e) =>
+                      setReplyDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))
+                    }
+                    maxLength={500}
+                    rows={3}
+                    placeholder={`Comment as @${replyAs}…`}
+                    required
+                  />
+                  <div className="admin-compose-footer">
+                    <span className="admin-char-count">{draftText.length}/500</span>
+                    <button
+                      type="submit"
+                      className="admin-btn admin-btn-primary"
+                      disabled={busyReply || !draftText.trim()}
+                    >
+                      {busyReply ? "Commenting…" : "Comment"}
+                    </button>
+                  </div>
+                </form>
+              </li>
+            );
+          })}
+        </ul>
+
+        {recentPosts.length > 0 && (
+          <p className="admin-count admin-engage-count">
+            Showing {recentPosts.length} of {recentTotal} posts
+            {newUsersOnly ? " from new joiners" : ""}
+          </p>
+        )}
       </section>
 
       {statItems.length > 0 && (

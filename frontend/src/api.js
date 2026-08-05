@@ -387,8 +387,19 @@ export const adminApi = {
     request(`/admin/users?limit=${limit}&offset=${offset}`, {
       headers: { "X-Admin-Secret": adminSecret },
     }),
+  recentPosts: (adminSecret, { limit = 30, newUsersOnly = true, days = 7 } = {}) =>
+    request(
+      `/admin/recent-posts?limit=${limit}&new_users_only=${newUsersOnly ? "true" : "false"}&days=${days}`,
+      { headers: { "X-Admin-Secret": adminSecret } }
+    ),
   createPost: (adminSecret, body) =>
     request("/admin/posts", {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify(body),
+    }),
+  createReply: (adminSecret, body) =>
+    request("/admin/replies", {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify(body),

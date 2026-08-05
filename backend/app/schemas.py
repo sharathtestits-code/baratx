@@ -405,6 +405,34 @@ class AdminPostCreate(BaseModel):
         return str(v).strip().lstrip("@").lower()
 
 
+class AdminReplyCreate(BaseModel):
+    post_id: str
+    text: str
+    username: Optional[str] = "baratx"
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("Reply cannot be empty")
+        if len(v) > 500:
+            raise ValueError("Reply must be 500 characters or fewer")
+        return v
+
+    @field_validator("username")
+    @classmethod
+    def valid_username(cls, v):
+        if v is None or not str(v).strip():
+            return "baratx"
+        return str(v).strip().lstrip("@").lower()
+
+
+class AdminRecentPostsOut(BaseModel):
+    total: int
+    posts: list[PostOut]
+
+
 # ---------- Lists / Communities / Spaces ----------
 
 

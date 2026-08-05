@@ -3669,6 +3669,159 @@ button.admin-btn-ghost:hover:not(:disabled),
   padding: 1.5rem 0.75rem !important;
 }
 
+.admin-engage {
+  margin-top: 0;
+}
+
+.admin-engage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.admin-engage-head h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  color: #0f1419;
+}
+
+.admin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #536471;
+  cursor: pointer;
+  user-select: none;
+  margin: 0.15rem 0 0;
+}
+
+.admin-toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #ff671f;
+}
+
+.admin-engage-account {
+  margin-top: 0.9rem;
+  max-width: 320px;
+}
+
+.admin-empty-inline {
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: #f7f2ec;
+  color: #536471;
+  font-size: 0.9rem;
+}
+
+.admin-post-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.admin-post-card {
+  padding: 0.95rem 1rem 1rem;
+  border: 1px solid #e4d9ce;
+  border-radius: 14px;
+  background: #faf7f3;
+}
+
+.admin-post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.85rem;
+}
+
+.admin-post-name {
+  color: #0f1419;
+  font-weight: 700;
+}
+
+.admin-post-time,
+.admin-post-stats {
+  color: #8b98a5;
+  font-size: 0.8rem;
+}
+
+.admin-post-stats {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.admin-post-open {
+  margin-left: auto;
+  color: #000080;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.82rem;
+}
+
+.admin-post-open:hover {
+  text-decoration: underline;
+}
+
+.admin-post-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.45;
+  color: #0f1419;
+  font-size: 0.95rem;
+}
+
+.admin-prompt-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.admin-prompt-chip {
+  border: 1px solid #d9cfc4;
+  background: #ffffff;
+  color: #3d2314;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.3;
+  max-width: 100%;
+}
+
+.admin-prompt-chip:hover {
+  border-color: #ff671f;
+  background: #fff1e6;
+}
+
+.admin-reply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.admin-reply-textarea {
+  min-height: 4.5rem;
+  background: #ffffff;
+}
+
+.admin-engage-count {
+  margin-top: 0.85rem;
+}
+
 @media (max-width: 640px) {
   .admin-main {
     padding: 1rem 0.75rem 2.5rem;
@@ -3680,6 +3833,10 @@ button.admin-btn-ghost:hover:not(:disabled),
 
   .admin-btn {
     padding: 0.5rem 0.9rem;
+  }
+
+  .admin-post-open {
+    margin-left: 0;
   }
 }
 

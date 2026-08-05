@@ -622,15 +622,7 @@ def admin_create_post(
     db: Session = Depends(get_db),
 ):
     """Post as an official BaratX account using ADMIN_SECRET (no user login)."""
-    username = payload.username
-    if username not in set(seed.OFFICIAL_USERNAMES):
-        raise HTTPException(
-            status_code=400,
-            detail=f"Can only post as official accounts: {', '.join(seed.OFFICIAL_USERNAMES)}",
-        )
-    author = db.query(models.User).filter(models.User.username == username).first()
-    if not author:
-        raise HTTPException(status_code=404, detail=f"@{username} not found — seed may not have run")
+    author = _official_author(db, payload.username)
 
     post = models.Post(author_id=author.id, text=payload.text)
     db.add(post)
@@ -640,6 +632,81 @@ def admin_create_post(
     db.commit()
     db.refresh(post)
     return serialize_post(post, author)
+
+
+@app.get("/admin/recent-posts", response_model=schemas.AdminRecentPostsOut)
+def admin_recent_posts(
+    limit: int = 30,
+    new_users_only: bool = True,
+    days: int = 7,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Recent posts from community members — for welcoming new joiners with replies."""
+    limit = max(1, min(limit, 100))
+    days = max(1, min(days, 30))
+    official = set(seed.OFFICIAL_USERNAMES)
+    q = (
+        db.query(models.Post)
+        .join(models.User, models.User.id == models.Post.author_id)
+        .filter(~models.User.username.in_(official))
+    )
+    if new_users_only:
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        q = q.filter(models.User.created_at >= since)
+    total = q.count()
+    rows = q.order_by(models.Post.created_at.desc()).limit(limit).all()
+    return schemas.AdminRecentPostsOut(
+        total=total,
+        posts=[serialize_post(p, None) for p in rows],
+    )
+
+
+@app.post("/admin/replies", response_model=schemas.ReplyOut)
+def admin_create_reply(
+    payload: schemas.AdminReplyCreate,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Reply as an official BaratX account using ADMIN_SECRET (no user login)."""
+    author = _official_author(db, payload.username)
+    post = db.query(models.Post).filter(models.Post.id == payload.post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    text = payload.text.strip()
+    reply = models.Reply(
+        post_id=post.id,
+        author_id=author.id,
+        text=text,
+        parent_reply_id=None,
+    )
+    db.add(reply)
+    db.flush()
+    create_notification(
+        db,
+        recipient_id=post.author_id,
+        actor_id=author.id,
+        kind="reply",
+        post_id=post.id,
+        reply_id=reply.id,
+    )
+    notify_mentions(db, author.id, text, post_id=post.id, reply_id=reply.id)
+    db.commit()
+    db.refresh(reply)
+    return serialize_reply(reply, author)
+
+
+def _official_author(db: Session, username: str) -> models.User:
+    if username not in set(seed.OFFICIAL_USERNAMES):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Can only act as official accounts: {', '.join(seed.OFFICIAL_USERNAMES)}",
+        )
+    author = db.query(models.User).filter(models.User.username == username).first()
+    if not author:
+        raise HTTPException(status_code=404, detail=f"@{username} not found — seed may not have run")
+    return author
 
 
 # ---------- Email signup / login ----------
