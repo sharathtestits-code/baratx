@@ -44,6 +44,23 @@ function AuthChrome({ children }) {
   );
 }
 
+function AdminChrome({ children }) {
+  return (
+    <div className="page page-admin">
+      <header className="admin-topbar">
+        <Link to="/" className="admin-brand" aria-label="BaratX Home">
+          <Logo variant="full" className="admin-topbar-logo" />
+          <span className="admin-topbar-badge">Admin</span>
+        </Link>
+        <Link to="/" className="admin-topbar-back">
+          Back to BaratX
+        </Link>
+      </header>
+      <main className="admin-main">{children}</main>
+    </div>
+  );
+}
+
 function AppShell() {
   return (
     <div className="app-shell">
@@ -92,9 +109,9 @@ export default function App() {
   // Admin + email confirm / password reset stay outside the app shell.
   if (location.pathname === "/admin") {
     return (
-      <AuthChrome>
+      <AdminChrome>
         <Admin />
-      </AuthChrome>
+      </AdminChrome>
     );
   }
   if (location.pathname === "/verify-email") {

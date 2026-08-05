@@ -16,6 +16,13 @@ function formatWhen(iso) {
   }
 }
 
+function verifiedLabel(u) {
+  const parts = [];
+  if (u.is_email_verified) parts.push("email");
+  if (u.is_phone_verified) parts.push("phone");
+  return parts.length ? parts.join(" · ") : "—";
+}
+
 export default function Admin() {
   const [secret, setSecret] = useState(() => sessionStorage.getItem(SECRET_KEY) || "");
   const [draft, setDraft] = useState("");
@@ -100,67 +107,95 @@ export default function Admin() {
 
   if (!secret) {
     return (
-      <div className="auth-card auth-card-x admin-card">
+      <div className="admin-unlock">
         <h1>Registrations</h1>
-        <p className="hint">Enter the ADMIN_SECRET from Railway to view signups.</p>
-        {error && <div className="error">{error}</div>}
-        <form onSubmit={handleUnlock}>
-          <label>
+        <p className="admin-lead">Enter the ADMIN_SECRET from Railway to view signups.</p>
+        {error && <div className="admin-error">{error}</div>}
+        <form className="admin-unlock-form" onSubmit={handleUnlock}>
+          <label className="admin-field" htmlFor="admin-secret">
             Admin secret
-            <input
-              type="password"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
           </label>
-          <button type="submit" disabled={busy}>
+          <input
+            id="admin-secret"
+            type="password"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            autoComplete="current-password"
+            required
+          />
+          <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
             {busy ? "Opening…" : "Open"}
           </button>
         </form>
-        <p className="switch-link">
-          <Link to="/">Back to BaratX</Link>
-        </p>
       </div>
     );
   }
+
+  const statItems = stats
+    ? [
+        { value: stats.total_users, label: "Total users" },
+        { value: stats.users_with_posts ?? "—", label: "Users who posted" },
+        { value: stats.posters_last_24h ?? "—", label: "Posters (24h)" },
+        { value: stats.posts_last_24h ?? "—", label: "Posts (24h)" },
+        { value: stats.total_posts ?? "—", label: "Total posts" },
+        { value: stats.users_last_24h, label: "Signups (24h)" },
+        { value: stats.email_verified, label: "Email verified" },
+        { value: stats.with_phone, label: "With phone" },
+      ]
+    : [];
 
   return (
     <div className="admin-panel">
       <header className="admin-header">
         <div>
           <h1>Registrations</h1>
-          <p className="hint">Live BaratX signup overview</p>
+          <p className="admin-lead">Live BaratX signup overview</p>
         </div>
         <div className="admin-actions">
-          <button type="button" className="btn-secondary" onClick={() => load(secret)} disabled={busy}>
+          <button
+            type="button"
+            className="admin-btn admin-btn-ghost"
+            onClick={() => load(secret)}
+            disabled={busy}
+          >
             {busy ? "Refreshing…" : "Refresh"}
           </button>
-          <button type="button" className="btn-secondary" onClick={handleLock}>
+          <button type="button" className="admin-btn admin-btn-ghost" onClick={handleLock}>
             Lock
           </button>
         </div>
       </header>
 
-      {error && <div className="error">{error}</div>}
-      {msg && <p className="hint ok-hint">{msg}</p>}
+      {error && <div className="admin-error">{error}</div>}
+      {msg && <p className="admin-ok">{msg}</p>}
 
-      <section className="admin-compose">
-        <h2>Post as BaratX</h2>
-        <p className="hint">Publish from an official account without logging into the app.</p>
+      <section className="admin-compose" aria-labelledby="admin-compose-title">
+        <h2 id="admin-compose-title">Post as BaratX</h2>
+        <p className="admin-lead">Publish from an official account without logging into the app.</p>
         <form className="admin-compose-form" onSubmit={handleAdminPost}>
-          <label>
-            Account
-            <select value={postAs} onChange={(e) => setPostAs(e.target.value)}>
+          <div className="admin-field-block">
+            <label className="admin-field" htmlFor="admin-post-as">
+              Account
+            </label>
+            <select
+              id="admin-post-as"
+              className="admin-select"
+              value={postAs}
+              onChange={(e) => setPostAs(e.target.value)}
+            >
               <option value="baratx">@baratx — BaratX</option>
               <option value="bharatvoices">@bharatvoices — Bharat Voices</option>
               <option value="indiatech">@indiatech — India Tech Daily</option>
             </select>
-          </label>
-          <label>
-            Post
+          </div>
+
+          <div className="admin-field-block">
+            <label className="admin-field" htmlFor="admin-post-text">
+              Post
+            </label>
             <textarea
+              id="admin-post-text"
+              className="admin-textarea"
               value={postText}
               onChange={(e) => setPostText(e.target.value)}
               maxLength={500}
@@ -168,52 +203,33 @@ export default function Admin() {
               placeholder="Say something India can reply to…"
               required
             />
-            <span className="char-count">{postText.length}/500</span>
-          </label>
-          <button type="submit" className="btn btn-primary" disabled={posting || !postText.trim()}>
-            {posting ? "Posting…" : "Post"}
-          </button>
+          </div>
+
+          <div className="admin-compose-footer">
+            <span className="admin-char-count">{postText.length}/500</span>
+            <button
+              type="submit"
+              className="admin-btn admin-btn-primary"
+              disabled={posting || !postText.trim()}
+            >
+              {posting ? "Posting…" : "Post"}
+            </button>
+          </div>
         </form>
       </section>
 
-      {stats && (
+      {statItems.length > 0 && (
         <div className="admin-stats">
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.total_users}</span>
-            <span className="admin-stat-label">Total users</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.users_with_posts ?? "—"}</span>
-            <span className="admin-stat-label">Users who posted</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.posters_last_24h ?? "—"}</span>
-            <span className="admin-stat-label">Posters (24h)</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.posts_last_24h ?? "—"}</span>
-            <span className="admin-stat-label">Posts (24h)</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.total_posts ?? "—"}</span>
-            <span className="admin-stat-label">Total posts</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.users_last_24h}</span>
-            <span className="admin-stat-label">Signups (24h)</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.email_verified}</span>
-            <span className="admin-stat-label">Email verified</span>
-          </div>
-          <div className="admin-stat">
-            <span className="admin-stat-value">{stats.with_phone}</span>
-            <span className="admin-stat-label">With phone</span>
-          </div>
+          {statItems.map((item) => (
+            <div className="admin-stat" key={item.label}>
+              <span className="admin-stat-value">{item.value}</span>
+              <span className="admin-stat-label">{item.label}</span>
+            </div>
+          ))}
         </div>
       )}
 
-      <p className="hint admin-count">
+      <p className="admin-count">
         Showing {users.length} of {total} users (newest first)
       </p>
 
@@ -242,18 +258,15 @@ export default function Admin() {
               <tr key={u.id}>
                 <td>{formatWhen(u.created_at)}</td>
                 <td>
-                  <Link to={`/u/${encodeURIComponent(u.username)}`}>@{u.username}</Link>
+                  <Link className="admin-user-link" to={`/u/${encodeURIComponent(u.username)}`}>
+                    @{u.username}
+                  </Link>
                 </td>
                 <td>{u.display_name}</td>
                 <td>{u.email || "—"}</td>
                 <td>{u.phone || "—"}</td>
                 <td>{u.signup_method}</td>
-                <td>
-                  {u.is_email_verified ? "email" : ""}
-                  {u.is_email_verified && u.is_phone_verified ? " · " : ""}
-                  {u.is_phone_verified ? "phone" : ""}
-                  {!u.is_email_verified && !u.is_phone_verified ? "—" : ""}
-                </td>
+                <td>{verifiedLabel(u)}</td>
               </tr>
             ))}
           </tbody>
