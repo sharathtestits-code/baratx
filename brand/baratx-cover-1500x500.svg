@@ -5,15 +5,14 @@
       <stop offset="55%" stop-color="#FFE8D6"/>
       <stop offset="100%" stop-color="#FFF1E6"/>
     </linearGradient>
-    <linearGradient id="bxRing" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FF9933"/>
-      <stop offset="48%" stop-color="#FFFFFF"/>
-      <stop offset="100%" stop-color="#138808"/>
+    <linearGradient id="bxRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3D2314"/>
+      <stop offset="55%" stop-color="#C45A12"/>
+      <stop offset="100%" stop-color="#FF671F"/>
     </linearGradient>
     <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#FF9933"/>
-      <stop offset="50%" stop-color="#FF671F"/>
-      <stop offset="100%" stop-color="#138808"/>
+      <stop offset="0%" stop-color="#C45A12"/>
+      <stop offset="100%" stop-color="#FF671F"/>
     </linearGradient>
   </defs>
 
@@ -50,7 +49,7 @@
     <tspan fill="#1A1A1A">Barat</tspan><tspan fill="#FF671F">X</tspan>
   </text>
   <text x="100" y="290" font-family="Helvetica Neue, Arial, sans-serif" font-weight="500" font-size="28" fill="#5C534C" letter-spacing="0.02em">
-    Indias public square
+    India's public square
   </text>
   <text x="100" y="336" font-family="Helvetica Neue, Arial, sans-serif" font-weight="400" font-size="20" fill="#8A7F76">
     barathx.com
@@ -61,7 +60,6 @@
   <g transform="translate(1188 250)">
     <circle cx="0" cy="0" r="118" fill="url(#bxRing)"/>
     <circle cx="0" cy="0" r="94" fill="#FF671F"/>
-    <circle cx="0" cy="0" r="94" fill="none" stroke="#000080" stroke-width="3" opacity="0.35"/>
     <text x="0" y="28" text-anchor="middle" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="900" font-size="78" letter-spacing="-0.06em" fill="#FFFFFF">BX</text>
   </g>
 </svg>

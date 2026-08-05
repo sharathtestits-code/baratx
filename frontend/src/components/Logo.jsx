@@ -5,6 +5,8 @@ import { useId } from "react";
  * - mark: BX circle (favicon / compact nav)
  * - wordmark: BaratX with custom X
  * - full: mark + wordmark
+ *
+ * Brand color only (saffron/warm ink) — no saffron–white–green flag ring.
  */
 export function LogoMark({ className = "", title = "BaratX" }) {
   const uid = useId().replace(/:/g, "");
@@ -21,10 +23,10 @@ export function LogoMark({ className = "", title = "BaratX" }) {
     >
       {title ? <title>{title}</title> : null}
       <defs>
-        <linearGradient id={ringId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FF9933" />
-          <stop offset="48%" stopColor="#FFFFFF" />
-          <stop offset="100%" stopColor="#138808" />
+        <linearGradient id={ringId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3D2314" />
+          <stop offset="55%" stopColor="#C45A12" />
+          <stop offset="100%" stopColor="#FF671F" />
         </linearGradient>
       </defs>
       <circle cx="16" cy="16" r="15.25" fill={`url(#${ringId})`} />
@@ -41,7 +43,6 @@ export function LogoMark({ className = "", title = "BaratX" }) {
       >
         BX
       </text>
-      <circle cx="16" cy="16" r="12.1" fill="none" stroke="#000080" strokeWidth="0.55" opacity="0.35" />
     </svg>
   );
 }

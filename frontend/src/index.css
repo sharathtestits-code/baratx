@@ -81,7 +81,7 @@ button {
 
 .topbar {
   padding: 1rem 1.5rem;
-  border-bottom: 3px solid var(--brand-flag);
+  border-bottom: 3px solid var(--brand);
   background: var(--surface);
   display: flex;
   align-items: center;
@@ -125,10 +125,6 @@ button {
 
 .logo-wordmark-x {
   color: var(--brand);
-  background: linear-gradient(135deg, var(--brand-flag) 0%, var(--brand) 55%, var(--india-green) 140%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   font-weight: 900;
   margin-left: 0.02em;
 }
@@ -2722,7 +2718,10 @@ a.post-time:hover {
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
-  background: var(--india-gradient);
+  /* Explicit warm dark → saffron wash — not flag tricolor */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255, 103, 31, 0.28) 0%, transparent 65%),
+    linear-gradient(165deg, #140e0a 0%, #2a1810 42%, #5c2e14 78%, #ff671f 145%);
   overflow: hidden;
   min-height: 100vh;
 }
@@ -2749,6 +2748,7 @@ a.post-time:hover {
   height: min(42vw, 280px);
   position: relative;
   z-index: 1;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.35));
 }
 
 .x-landing-word {
@@ -2757,14 +2757,11 @@ a.post-time:hover {
   font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
   letter-spacing: -0.04em;
-  color: var(--text);
+  color: #fff8f2;
 }
 
 .x-landing-word-x {
-  background: linear-gradient(135deg, var(--brand-flag) 0%, var(--brand) 55%, var(--india-green) 140%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #ffb07a;
   font-weight: 900;
 }
 
