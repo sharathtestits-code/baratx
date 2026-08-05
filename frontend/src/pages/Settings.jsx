@@ -1,29 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { api, socialApi } from "../api";
+import { socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
 
-const LANGUAGES = [
-  { value: "en", label: "English" },
-  { value: "hi", label: "Hindi" },
-  { value: "te", label: "Telugu" },
-];
-
 export default function Settings() {
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout } = useAuth();
   const navigate = useNavigate();
-  const [language, setLanguage] = useState(user?.language || "en");
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
-
-  useEffect(() => {
-    setLanguage(user?.language || "en");
-  }, [user?.language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,22 +36,6 @@ export default function Settings() {
       cancelled = true;
     };
   }, [token]);
-
-  async function saveLanguage(e) {
-    e.preventDefault();
-    setSaving(true);
-    setMsg("");
-    setError("");
-    try {
-      const updated = await api.updateMe(token, { language });
-      updateUser(updated);
-      setMsg("Language saved.");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function unmute(username) {
     try {
@@ -96,28 +67,12 @@ export default function Settings() {
       </div>
 
       {error && <div className="error">{error}</div>}
-      {msg && <p className="hint ok-hint">{msg}</p>}
 
       <section className="settings-section">
         <h2>Language</h2>
-        <p className="hint">Choose your preferred language for BaratX.</p>
-        <form className="settings-form" onSubmit={saveLanguage}>
-          <select
-            className="settings-select"
-            value={language}
-            onChange={(e) => setLanguage(e.target.value)}
-            aria-label="Language"
-          >
-            {LANGUAGES.map((l) => (
-              <option key={l.value} value={l.value}>
-                {l.label}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? "Saving…" : "Save"}
-          </button>
-        </form>
+        <p className="hint">
+          BaratX is English-first for now. Hindi and Telugu UI will arrive in a later update.
+        </p>
       </section>
 
       <section className="settings-section">
