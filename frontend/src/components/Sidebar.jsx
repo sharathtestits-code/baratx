@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
-import { IconBell, IconHome, IconLogout, IconSearch, IconUser, IconMore } from "./Icons";
+import { IconBell, IconBookmark, IconHome, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
@@ -74,6 +74,14 @@ export default function Sidebar() {
               {unread > 0 && <span className="nav-badge">{unread > 9 ? "9+" : unread}</span>}
             </span>
             <span>Notifications</span>
+          </NavLink>
+          <NavLink to="/messages" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
+            <IconMessage className="sidebar-icon" />
+            <span>Messages</span>
+          </NavLink>
+          <NavLink to="/bookmarks" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
+            <IconBookmark className="sidebar-icon" />
+            <span>Bookmarks</span>
           </NavLink>
           <NavLink to={`/u/${user.username}`} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconUser className="sidebar-icon" />

@@ -17,6 +17,7 @@ export default function PostDetail() {
   const [error, setError] = useState("");
 
   const [replyText, setReplyText] = useState("");
+  const [parentReply, setParentReply] = useState(null);
   const [replyBusy, setReplyBusy] = useState(false);
   const [replyError, setReplyError] = useState("");
 
@@ -49,10 +50,16 @@ export default function PostDetail() {
     setReplyBusy(true);
     setReplyError("");
     try {
-      const newReply = await socialApi.createReply(token, postId, replyText.trim());
+      const newReply = await socialApi.createReply(
+        token,
+        postId,
+        replyText.trim(),
+        parentReply?.id
+      );
       setReplies((prev) => [...prev, newReply]);
       setPost((p) => (p ? { ...p, reply_count: (p.reply_count || 0) + 1 } : p));
       setReplyText("");
+      setParentReply(null);
     } catch (err) {
       setReplyError(err.message);
     } finally {
@@ -100,7 +107,7 @@ export default function PostDetail() {
         ) : (
           <div className="detail-reply-list">
             {replies.map((r) => (
-              <ReplyItem key={r.id} reply={r} />
+              <ReplyItem key={r.id} reply={r} onReplyTo={setParentReply} />
             ))}
           </div>
         )}
@@ -108,14 +115,24 @@ export default function PostDetail() {
         {token ? (
           <form className="reply-form detail-reply-form" onSubmit={submitReply}>
             <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={36} />
-            <input
-              id="post-reply-composer"
-              type="text"
-              placeholder="Post your reply"
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              maxLength={500}
-            />
+            <div className="reply-compose-col">
+              {parentReply && (
+                <div className="replying-to">
+                  Replying to @{parentReply.author.username}{" "}
+                  <button type="button" onClick={() => setParentReply(null)}>
+                    Cancel
+                  </button>
+                </div>
+              )}
+              <input
+                id="post-reply-composer"
+                type="text"
+                placeholder={parentReply ? `Reply to @${parentReply.author.username}` : "Post your reply"}
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                maxLength={500}
+              />
+            </div>
             <button type="submit" disabled={replyBusy || !replyText.trim()}>
               {replyBusy ? "..." : "Reply"}
             </button>

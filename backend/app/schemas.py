@@ -178,6 +178,17 @@ class AuthorOut(BaseModel):
         from_attributes = True
 
 
+class QuotedPostOut(BaseModel):
+    id: str
+    text: str
+    image_url: Optional[str] = None
+    created_at: datetime
+    author: AuthorOut
+
+    class Config:
+        from_attributes = True
+
+
 class PostOut(BaseModel):
     id: str
     text: str
@@ -189,6 +200,9 @@ class PostOut(BaseModel):
     repost_count: int = 0
     liked_by_me: bool = False
     reposted_by_me: bool = False
+    bookmarked_by_me: bool = False
+    quoted_post: Optional[QuotedPostOut] = None
+    hashtags: list[str] = []
 
     class Config:
         from_attributes = True
@@ -196,6 +210,7 @@ class PostOut(BaseModel):
 
 class ReplyCreate(BaseModel):
     text: str
+    parent_reply_id: Optional[str] = None
 
 
 class ReplyOut(BaseModel):
@@ -206,6 +221,7 @@ class ReplyOut(BaseModel):
     author: AuthorOut
     like_count: int = 0
     liked_by_me: bool = False
+    parent_reply_id: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -235,7 +251,7 @@ class SearchResults(BaseModel):
 
 class NotificationOut(BaseModel):
     id: str
-    type: str  # follow | like | reply | repost
+    type: str  # follow | like | reply | repost | mention | message
     created_at: datetime
     is_read: bool
     actor: AuthorOut
@@ -253,4 +269,60 @@ class NotificationListOut(BaseModel):
 
 
 class UnreadCountOut(BaseModel):
+    unread_count: int
+
+
+class ReportCreate(BaseModel):
+    reason: str
+    details: str = ""
+    target_username: Optional[str] = None
+    target_post_id: Optional[str] = None
+
+    @field_validator("reason")
+    @classmethod
+    def valid_reason(cls, v):
+        v = (v or "").strip()
+        if len(v) < 3 or len(v) > 80:
+            raise ValueError("Reason must be 3–80 characters")
+        return v
+
+    @field_validator("details")
+    @classmethod
+    def valid_details(cls, v):
+        if v is None:
+            return ""
+        if len(v) > 500:
+            raise ValueError("Details must be 500 characters or fewer")
+        return v
+
+
+class MessageCreate(BaseModel):
+    text: str
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("Message cannot be empty")
+        if len(v) > 1000:
+            raise ValueError("Message must be 1000 characters or fewer")
+        return v
+
+
+class MessageOut(BaseModel):
+    id: str
+    text: str
+    created_at: datetime
+    is_read: bool
+    sender: AuthorOut
+    recipient: AuthorOut
+
+    class Config:
+        from_attributes = True
+
+
+class ConversationOut(BaseModel):
+    user: AuthorOut
+    last_message: MessageOut
     unread_count: int

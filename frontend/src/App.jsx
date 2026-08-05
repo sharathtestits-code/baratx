@@ -11,6 +11,10 @@ import Search from "./pages/Search";
 import PostDetail from "./pages/PostDetail";
 import Notifications from "./pages/Notifications";
 import FollowList from "./pages/FollowList";
+import Bookmarks from "./pages/Bookmarks";
+import Messages from "./pages/Messages";
+import MessageThread from "./pages/MessageThread";
+import Hashtag from "./pages/Hashtag";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
@@ -44,6 +48,10 @@ function AppShell() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/search" element={<Search />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:username" element={<MessageThread />} />
+          <Route path="/hashtag/:tag" element={<Hashtag />} />
           <Route path="/posts/:postId" element={<PostDetail />} />
           <Route path="/u/:username" element={<Profile />} />
           <Route path="/u/:username/:kind" element={<FollowList />} />

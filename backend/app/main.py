@@ -11,8 +11,9 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import or_, text
 from sqlalchemy.orm import Session
 
-from app import auth, email as email_service, google_auth, models, schemas
+from app import auth, email as email_service, google_auth, models, schemas, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
+from app.extra_routes import register_extra_routes
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,39 +21,77 @@ Base.metadata.create_all(bind=engine)
 def run_migrations():
     """
     Base.metadata.create_all() only creates tables that don't exist yet — it
-    never alters existing tables. SQLite has no automatic migration system,
-    so when we add new columns to an already-existing table (like avatar_url/
-    cover_url on users), we need to add them by hand here. Safe to run every
-    startup: it only ALTERs a column in if it's actually missing.
+    never alters existing tables. Add missing columns safely on startup.
     """
-    if not str(engine.url).startswith("sqlite"):
-        return
+    url = str(engine.url)
     with engine.connect() as conn:
-        existing_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
-        if "avatar_url" not in existing_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
-        if "cover_url" not in existing_cols:
-            conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
+        if url.startswith("sqlite"):
+            existing_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
+            if "avatar_url" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
+            if "cover_url" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
 
-        # notifications.kind may have been created as "type" in an earlier attempt
-        notif_tables = {
-            row[0]
-            for row in conn.execute(
-                text("SELECT name FROM sqlite_master WHERE type='table' AND name='notifications'")
-            )
-        }
-        if "notifications" in notif_tables:
-            notif_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(notifications)"))}
-            if "kind" not in notif_cols and "type" in notif_cols:
-                conn.execute(text("ALTER TABLE notifications RENAME COLUMN type TO kind"))
-            elif "kind" not in notif_cols:
-                conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
+            post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
+            if "quoted_post_id" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN quoted_post_id VARCHAR"))
+
+            reply_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(replies)"))}
+            if "parent_reply_id" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+
+            notif_tables = {
+                row[0]
+                for row in conn.execute(
+                    text("SELECT name FROM sqlite_master WHERE type='table' AND name='notifications'")
+                )
+            }
+            if "notifications" in notif_tables:
+                notif_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(notifications)"))}
+                if "kind" not in notif_cols and "type" in notif_cols:
+                    conn.execute(text("ALTER TABLE notifications RENAME COLUMN type TO kind"))
+                elif "kind" not in notif_cols:
+                    conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
+        else:
+            # Postgres / other: add missing columns if tables already exist.
+            def cols(table: str) -> set[str]:
+                rows = conn.execute(
+                    text(
+                        "SELECT column_name FROM information_schema.columns "
+                        "WHERE table_name = :t"
+                    ),
+                    {"t": table},
+                )
+                return {r[0] for r in rows}
+
+            user_cols = cols("users")
+            if user_cols:
+                if "avatar_url" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
+                if "cover_url" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
+
+            post_cols = cols("posts")
+            if post_cols and "quoted_post_id" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN quoted_post_id VARCHAR"))
+
+            reply_cols = cols("replies")
+            if reply_cols and "parent_reply_id" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+
+            notif_cols = cols("notifications")
+            if notif_cols and "kind" not in notif_cols:
+                if "type" in notif_cols:
+                    conn.execute(text("ALTER TABLE notifications RENAME COLUMN type TO kind"))
+                else:
+                    conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
+
         conn.commit()
 
 
 run_migrations()
 
-app = FastAPI(title="BaratX API", version="0.4.1")
+app = FastAPI(title="BaratX API", version="0.5.0")
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 _cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
@@ -91,17 +130,39 @@ EMAIL_VERIFY_TTL_HOURS = 24
 PASSWORD_RESET_TTL_HOURS = 1
 
 
-def _otp_response(code: str) -> dict:
-    """Never leak OTP codes in production responses."""
+def _otp_response(code: str, sms_sent: bool = False) -> dict:
+    """Never leak OTP codes in production when SMS was actually sent."""
     body = {
-        "message": "OTP sent" if ENVIRONMENT == "production" else "OTP generated (demo mode, no SMS sent)",
+        "message": "OTP sent" if (ENVIRONMENT == "production" or sms_sent) else "OTP generated (demo mode)",
         "expires_in_minutes": OTP_TTL_MINUTES,
+        "sms_sent": sms_sent,
     }
-    if ENVIRONMENT != "production":
+    if ENVIRONMENT != "production" or not sms_sent:
         body["dev_otp"] = code
     else:
-        print(f"[otp] generated for production request (not returned in response)")
+        print("[otp] generated for production request (not returned in response)")
     return body
+
+
+def issue_otp(db: Session, phone: str, purpose: str) -> dict:
+    try:
+        sms.check_otp_rate_limit(phone)
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
+
+    code = auth.generate_otp()
+    otp = models.OTP(
+        phone=phone,
+        code=code,
+        purpose=purpose,
+        expires_at=datetime.now(timezone.utc) + timedelta(minutes=OTP_TTL_MINUTES),
+    )
+    db.add(otp)
+    db.commit()
+    sms_sent = sms.send_otp_sms(phone, code)
+    if not sms_sent:
+        print(f"[otp] {purpose} for {phone}: {code} (SMS not sent)")
+    return _otp_response(code, sms_sent=sms_sent)
 
 
 def issue_email_verification(db: Session, user: models.User) -> tuple[bool, Optional[str]]:
@@ -224,9 +285,34 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
 def serialize_post(post: models.Post, current_user: Optional[models.User]) -> schemas.PostOut:
     liked_by_me = False
     reposted_by_me = False
+    bookmarked_by_me = False
     if current_user:
         liked_by_me = any(like.user_id == current_user.id for like in post.likes)
         reposted_by_me = any(r.user_id == current_user.id for r in post.reposts)
+        from sqlalchemy.orm import object_session
+
+        sess = object_session(post)
+        if sess is not None:
+            bookmarked_by_me = (
+                sess.query(models.Bookmark.id)
+                .filter(models.Bookmark.user_id == current_user.id, models.Bookmark.post_id == post.id)
+                .first()
+                is not None
+            )
+
+    quoted = None
+    if getattr(post, "quoted_post_id", None) and post.quoted_post is not None:
+        qp = post.quoted_post
+        quoted = schemas.QuotedPostOut(
+            id=qp.id,
+            text=qp.text,
+            image_url=qp.image_url,
+            created_at=qp.created_at,
+            author=schemas.AuthorOut.model_validate(qp.author),
+        )
+
+    tags = text_parse.extract_hashtags(post.text)
+
     return schemas.PostOut(
         id=post.id,
         text=post.text,
@@ -238,6 +324,9 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         repost_count=len(post.reposts),
         liked_by_me=liked_by_me,
         reposted_by_me=reposted_by_me,
+        bookmarked_by_me=bookmarked_by_me,
+        quoted_post=quoted,
+        hashtags=tags,
     )
 
 
@@ -253,7 +342,56 @@ def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) ->
         author=schemas.AuthorOut.model_validate(reply.author),
         like_count=len(reply.likes),
         liked_by_me=liked_by_me,
+        parent_reply_id=getattr(reply, "parent_reply_id", None),
     )
+
+
+def attach_hashtags(db: Session, post: models.Post, text: str):
+    for tag in text_parse.extract_hashtags(text):
+        ht = db.query(models.Hashtag).filter(models.Hashtag.tag == tag).first()
+        if not ht:
+            ht = models.Hashtag(tag=tag)
+            db.add(ht)
+            db.flush()
+        exists = (
+            db.query(models.PostHashtag)
+            .filter(models.PostHashtag.post_id == post.id, models.PostHashtag.hashtag_id == ht.id)
+            .first()
+        )
+        if not exists:
+            db.add(models.PostHashtag(post_id=post.id, hashtag_id=ht.id))
+
+
+def notify_mentions(db: Session, actor_id: str, text: str, post_id: Optional[str] = None, reply_id: Optional[str] = None):
+    for username in text_parse.extract_mentions(text):
+        user = db.query(models.User).filter(models.User.username == username).first()
+        if user:
+            create_notification(
+                db,
+                recipient_id=user.id,
+                actor_id=actor_id,
+                kind="mention",
+                post_id=post_id,
+                reply_id=reply_id,
+            )
+
+
+def hidden_author_ids(db: Session, current_user: Optional[models.User]) -> set[str]:
+    if not current_user:
+        return set()
+    blocked = {
+        r[0]
+        for r in db.query(models.Block.blocked_id).filter(models.Block.blocker_id == current_user.id).all()
+    }
+    blocked_by = {
+        r[0]
+        for r in db.query(models.Block.blocker_id).filter(models.Block.blocked_id == current_user.id).all()
+    }
+    muted = {
+        r[0]
+        for r in db.query(models.Mute.muted_id).filter(models.Mute.muter_id == current_user.id).all()
+    }
+    return blocked | blocked_by | muted
 
 
 def create_notification(
@@ -532,25 +670,14 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
 
 
 # ---------- Phone + OTP signup / login ----------
-# NOTE: this is a demo stub. No real SMS is sent — the OTP is returned in the
-# API response (dev_otp) so you can test the flow. Wire in an SMS provider
-# (MSG91, Twilio Verify, etc.) before shipping this to real users.
+# Uses MSG91 when MSG91_AUTH_KEY + MSG91_TEMPLATE_ID are set; otherwise demo OTP
+# (dev_otp) is returned for local testing. OTP requests are rate-limited.
 
 @app.post("/auth/signup/phone/request-otp")
 def signup_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depends(get_db)):
     if db.query(models.User).filter(models.User.phone == payload.phone).first():
         raise HTTPException(status_code=400, detail="Phone number already registered")
-
-    code = auth.generate_otp()
-    otp = models.OTP(
-        phone=payload.phone,
-        code=code,
-        purpose="signup",
-        expires_at=datetime.now(timezone.utc) + timedelta(minutes=OTP_TTL_MINUTES),
-    )
-    db.add(otp)
-    db.commit()
-    return _otp_response(code)
+    return issue_otp(db, payload.phone, "signup")
 
 
 @app.post("/auth/signup/phone/verify", response_model=schemas.TokenResponse)
@@ -597,17 +724,7 @@ def login_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depe
     user = db.query(models.User).filter(models.User.phone == payload.phone).first()
     if not user:
         raise HTTPException(status_code=404, detail="No account with this phone number")
-
-    code = auth.generate_otp()
-    otp = models.OTP(
-        phone=payload.phone,
-        code=code,
-        purpose="login",
-        expires_at=datetime.now(timezone.utc) + timedelta(minutes=OTP_TTL_MINUTES),
-    )
-    db.add(otp)
-    db.commit()
-    return _otp_response(code)
+    return issue_otp(db, payload.phone, "login")
 
 
 @app.post("/auth/login/phone/verify", response_model=schemas.TokenResponse)
@@ -863,6 +980,7 @@ def list_following(
 async def create_post(
     text: str = Form(...),
     image: Optional[UploadFile] = File(None),
+    quote_post_id: Optional[str] = Form(None),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -871,6 +989,13 @@ async def create_post(
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
     if len(text) > MAX_POST_LENGTH:
         raise HTTPException(status_code=400, detail=f"Post must be {MAX_POST_LENGTH} characters or fewer")
+
+    quoted_post_id = None
+    if quote_post_id:
+        quoted = db.query(models.Post).filter(models.Post.id == quote_post_id).first()
+        if not quoted:
+            raise HTTPException(status_code=404, detail="Quoted post not found")
+        quoted_post_id = quoted.id
 
     image_url = None
     if image is not None and image.filename:
@@ -888,8 +1013,16 @@ async def create_post(
             f.write(contents)
         image_url = f"/media/{filename}"
 
-    post = models.Post(author_id=current_user.id, text=text, image_url=image_url)
+    post = models.Post(
+        author_id=current_user.id,
+        text=text,
+        image_url=image_url,
+        quoted_post_id=quoted_post_id,
+    )
     db.add(post)
+    db.flush()
+    attach_hashtags(db, post, text)
+    notify_mentions(db, current_user.id, text, post_id=post.id)
     db.commit()
     db.refresh(post)
     return serialize_post(post, current_user)
@@ -927,15 +1060,20 @@ def list_posts(
         repost_query = repost_query.filter(models.Repost.created_at < cursor)
 
     # pull a generous window from each side, then merge + trim — good enough at demo scale
-    posts = post_query.limit(limit * 2).all()
-    reposts = repost_query.limit(limit * 2).all()
+    posts = post_query.limit(limit * 3).all()
+    reposts = repost_query.limit(limit * 3).all()
+    hidden = hidden_author_ids(db, current_user)
 
     items = []
     for p in posts:
+        if p.author_id in hidden:
+            continue
         items.append(
             schemas.FeedItemOut(post=serialize_post(p, current_user), reposted_by=None, item_time=p.created_at)
         )
     for r in reposts:
+        if r.user_id in hidden or (r.post and r.post.author_id in hidden):
+            continue
         items.append(
             schemas.FeedItemOut(
                 post=serialize_post(r.post, current_user),
@@ -1114,7 +1252,18 @@ def create_reply(
     if len(text) > MAX_REPLY_LENGTH:
         raise HTTPException(status_code=400, detail=f"Reply must be {MAX_REPLY_LENGTH} characters or fewer")
 
-    reply = models.Reply(post_id=post_id, author_id=current_user.id, text=text)
+    parent_reply_id = payload.parent_reply_id
+    if parent_reply_id:
+        parent = db.query(models.Reply).filter(models.Reply.id == parent_reply_id).first()
+        if not parent or parent.post_id != post_id:
+            raise HTTPException(status_code=400, detail="Invalid parent reply")
+
+    reply = models.Reply(
+        post_id=post_id,
+        author_id=current_user.id,
+        text=text,
+        parent_reply_id=parent_reply_id,
+    )
     db.add(reply)
     db.flush()
     create_notification(
@@ -1125,6 +1274,18 @@ def create_reply(
         post_id=post.id,
         reply_id=reply.id,
     )
+    if parent_reply_id:
+        parent = db.query(models.Reply).filter(models.Reply.id == parent_reply_id).first()
+        if parent:
+            create_notification(
+                db,
+                recipient_id=parent.author_id,
+                actor_id=current_user.id,
+                kind="reply",
+                post_id=post.id,
+                reply_id=reply.id,
+            )
+    notify_mentions(db, current_user.id, text, post_id=post.id, reply_id=reply.id)
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, current_user)
@@ -1293,3 +1454,13 @@ def mark_notifications_read(
     )
     db.commit()
     return schemas.UnreadCountOut(unread_count=0)
+
+
+register_extra_routes(
+    app,
+    get_current_user=get_current_user,
+    get_current_user_optional=get_current_user_optional,
+    serialize_user=serialize_user,
+    serialize_post=serialize_post,
+    create_notification=create_notification,
+)

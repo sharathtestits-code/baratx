@@ -101,12 +101,14 @@ class Post(Base):
     author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     text = Column(Text, nullable=False)
     image_url = Column(String, nullable=True)
+    quoted_post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     author = relationship("User", back_populates="posts")
     likes = relationship("Like", back_populates="post", cascade="all, delete-orphan")
     replies = relationship("Reply", back_populates="post", cascade="all, delete-orphan")
     reposts = relationship("Repost", back_populates="post", cascade="all, delete-orphan")
+    quoted_post = relationship("Post", remote_side=[id], foreign_keys=[quoted_post_id])
 
 
 class Like(Base):
@@ -128,12 +130,14 @@ class Reply(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     post_id = Column(String, ForeignKey("posts.id"), nullable=False, index=True)
     author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    parent_reply_id = Column(String, ForeignKey("replies.id"), nullable=True, index=True)
     text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     post = relationship("Post", back_populates="replies")
     author = relationship("User", back_populates="replies")
     likes = relationship("ReplyLike", back_populates="reply", cascade="all, delete-orphan")
+    parent = relationship("Reply", remote_side=[id], foreign_keys=[parent_reply_id])
 
 
 class ReplyLike(Base):
@@ -176,14 +180,14 @@ class Repost(Base):
 
 
 class Notification(Base):
-    """In-app notifications for follow / like / reply / repost."""
+    """In-app notifications for follow / like / reply / repost / mention / message."""
 
     __tablename__ = "notifications"
 
     id = Column(String, primary_key=True, default=gen_uuid)
     recipient_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     actor_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
-    kind = Column(String, nullable=False)  # follow | like | reply | repost
+    kind = Column(String, nullable=False)  # follow | like | reply | repost | mention | message
     post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
     reply_id = Column(String, ForeignKey("replies.id"), nullable=True)
     is_read = Column(Boolean, default=False, nullable=False, index=True)
@@ -193,3 +197,79 @@ class Notification(Base):
     actor = relationship("User", foreign_keys=[actor_id])
     post = relationship("Post")
     reply = relationship("Reply")
+
+
+class Bookmark(Base):
+    __tablename__ = "bookmarks"
+    __table_args__ = (UniqueConstraint("user_id", "post_id", name="uq_bookmark_user_post"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    post_id = Column(String, ForeignKey("posts.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    user = relationship("User")
+    post = relationship("Post")
+
+
+class Block(Base):
+    __tablename__ = "blocks"
+    __table_args__ = (UniqueConstraint("blocker_id", "blocked_id", name="uq_block_pair"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    blocker_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    blocked_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class Mute(Base):
+    __tablename__ = "mutes"
+    __table_args__ = (UniqueConstraint("muter_id", "muted_id", name="uq_mute_pair"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    muter_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    muted_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class Report(Base):
+    __tablename__ = "reports"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    reporter_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    target_user_id = Column(String, ForeignKey("users.id"), nullable=True, index=True)
+    target_post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
+    reason = Column(String, nullable=False, default="")
+    details = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+
+class Hashtag(Base):
+    __tablename__ = "hashtags"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    tag = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class PostHashtag(Base):
+    __tablename__ = "post_hashtags"
+    __table_args__ = (UniqueConstraint("post_id", "hashtag_id", name="uq_post_hashtag"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    post_id = Column(String, ForeignKey("posts.id"), nullable=False, index=True)
+    hashtag_id = Column(String, ForeignKey("hashtags.id"), nullable=False, index=True)
+
+
+class DirectMessage(Base):
+    __tablename__ = "direct_messages"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    sender_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    recipient_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    text = Column(Text, nullable=False)
+    is_read = Column(Boolean, default=False, nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    sender = relationship("User", foreign_keys=[sender_id])
+    recipient = relationship("User", foreign_keys=[recipient_id])

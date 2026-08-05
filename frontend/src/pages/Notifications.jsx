@@ -28,6 +28,10 @@ function notificationCopy(n) {
       return "reposted your post";
     case "reply":
       return "replied to your post";
+    case "mention":
+      return "mentioned you";
+    case "message":
+      return "sent you a message";
     default:
       return "interacted with you";
   }
@@ -64,6 +68,10 @@ export default function Notifications() {
   }, [token]);
 
   function openNotification(n) {
+    if (n.type === "message") {
+      navigate(`/messages/${n.actor.username}`);
+      return;
+    }
     if (n.post_id) {
       navigate(`/posts/${n.post_id}`);
       return;

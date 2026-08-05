@@ -1740,6 +1740,184 @@ a.post-username:hover {
   white-space: nowrap;
 }
 
+.text-link {
+  color: var(--brand);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.quoted-post {
+  display: block;
+  margin-top: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--surface);
+}
+
+.quoted-post:hover {
+  background: var(--brand-tint);
+}
+
+.quoted-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.quoted-head strong {
+  color: var(--text);
+}
+
+.compose-quote {
+  position: relative;
+}
+
+.profile-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.reply-nested {
+  margin-left: 1.5rem;
+  border-left: 2px solid var(--border);
+  padding-left: 0.65rem;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.reply-compose-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.replying-to {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.replying-to button {
+  border: none;
+  background: none;
+  color: var(--brand);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.dm-row {
+  text-decoration: none;
+  color: inherit;
+}
+
+.dm-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.dm-unread {
+  display: inline-block;
+  margin-left: 0.4rem;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.dm-thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 70vh;
+}
+
+.dm-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem;
+}
+
+.dm-bubble {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  max-width: 85%;
+}
+
+.dm-bubble.mine {
+  align-self: flex-end;
+}
+
+.dm-bubble.theirs {
+  align-self: flex-start;
+}
+
+.dm-bubble-text {
+  padding: 0.65rem 0.85rem;
+  border-radius: 14px;
+  background: var(--brand-tint);
+  line-height: 1.35;
+}
+
+.dm-bubble.mine .dm-bubble-text {
+  background: var(--brand);
+  color: #fff;
+}
+
+.dm-compose {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.dm-compose input {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.dm-compose button {
+  border: none;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.action-btn.bookmark-action.active,
+.action-btn.quote-action:hover {
+  color: var(--brand);
+}
+
+.report-action {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
 .follow-btn {
   border: none;
   background: var(--text) !important;

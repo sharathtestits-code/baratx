@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { API_BASE, api } from "../api";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { API_BASE, api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
@@ -19,6 +19,7 @@ const LANGUAGE_LABELS = {
 export default function Profile() {
   const { username } = useParams();
   const { token, user, updateUser } = useAuth();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -292,14 +293,49 @@ export default function Profile() {
               </div>
             ) : (
               token && (
-                <button
-                  type="button"
-                  className={`follow-btn ${profile.is_following ? "following" : ""}`}
-                  onClick={toggleFollow}
-                  disabled={followBusy}
-                >
-                  {profile.is_following ? "Following" : "Follow"}
-                </button>
+                <div className="profile-action-row">
+                  <button
+                    type="button"
+                    className={`follow-btn ${profile.is_following ? "following" : ""}`}
+                    onClick={toggleFollow}
+                    disabled={followBusy}
+                  >
+                    {profile.is_following ? "Following" : "Follow"}
+                  </button>
+                  <Link to={`/messages/${profile.username}`} className="profile-edit-btn">
+                    Message
+                  </Link>
+                  <button
+                    type="button"
+                    className="profile-edit-btn"
+                    onClick={async () => {
+                      try {
+                        await socialApi.mute(token, profile.username);
+                        window.alert(`Muted @${profile.username}`);
+                      } catch (err) {
+                        setError(err.message);
+                      }
+                    }}
+                  >
+                    Mute
+                  </button>
+                  <button
+                    type="button"
+                    className="profile-edit-btn"
+                    onClick={async () => {
+                      if (!window.confirm(`Block @${profile.username}?`)) return;
+                      try {
+                        await socialApi.block(token, profile.username);
+                        window.alert(`Blocked @${profile.username}`);
+                        navigate("/feed");
+                      } catch (err) {
+                        setError(err.message);
+                      }
+                    }}
+                  >
+                    Block
+                  </button>
+                </div>
               )
             )}
           </div>

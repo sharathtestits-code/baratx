@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
 import { IconHeart } from "./Icons";
 
-export default function ReplyItem({ reply }) {
+export default function ReplyItem({ reply, onReplyTo }) {
   const { token } = useAuth();
   const [liked, setLiked] = useState(reply.liked_by_me);
   const [likeCount, setLikeCount] = useState(reply.like_count);
@@ -23,7 +23,7 @@ export default function ReplyItem({ reply }) {
         : await socialApi.likeReply(token, reply.id);
       setLiked(updated.liked_by_me);
       setLikeCount(updated.like_count);
-    } catch (err) {
+    } catch {
       setLiked(wasLiked);
       setLikeCount((c) => (wasLiked ? c + 1 : c - 1));
     } finally {
@@ -32,7 +32,7 @@ export default function ReplyItem({ reply }) {
   }
 
   return (
-    <div className="reply">
+    <div className={`reply${reply.parent_reply_id ? " reply-nested" : ""}`}>
       <Link to={`/u/${reply.author.username}`}>
         <Avatar name={reply.author.display_name} username={reply.author.username} url={reply.author.avatar_url} size={32} />
       </Link>
@@ -46,15 +46,22 @@ export default function ReplyItem({ reply }) {
           </Link>
         </div>
         <p className="reply-text">{reply.text}</p>
-        <button
-          type="button"
-          className={`reply-like-btn ${liked ? "active" : ""}`}
-          onClick={toggleLike}
-          disabled={!token || busy}
-          title={token ? "Like" : "Log in to like"}
-        >
-          <IconHeart filled={liked} className="reply-like-icon" /> <span>{likeCount}</span>
-        </button>
+        <div className="reply-actions">
+          <button
+            type="button"
+            className={`reply-like-btn ${liked ? "active" : ""}`}
+            onClick={toggleLike}
+            disabled={!token || busy}
+            title={token ? "Like" : "Log in to like"}
+          >
+            <IconHeart filled={liked} className="reply-like-icon" /> <span>{likeCount}</span>
+          </button>
+          {token && onReplyTo && (
+            <button type="button" className="reply-like-btn" onClick={() => onReplyTo(reply)}>
+              Reply
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

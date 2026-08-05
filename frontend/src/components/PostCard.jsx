@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, postsApi, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
-import { IconHeart, IconReply, IconRepost, IconTrash } from "./Icons";
+import { IconBookmark, IconHeart, IconQuote, IconReply, IconRepost, IconTrash } from "./Icons";
 
 function timeAgo(dateStr) {
   const date = new Date(dateStr);
@@ -19,6 +19,29 @@ function timeAgo(dateStr) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function linkifyText(text) {
+  const parts = text.split(/([@#][A-Za-z0-9_]{2,40})/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("@") && part.length > 3) {
+      const u = part.slice(1);
+      return (
+        <Link key={i} to={`/u/${u}`} className="text-link" onClick={(e) => e.stopPropagation()}>
+          {part}
+        </Link>
+      );
+    }
+    if (part.startsWith("#") && part.length > 2) {
+      const tag = part.slice(1);
+      return (
+        <Link key={i} to={`/hashtag/${tag}`} className="text-link" onClick={(e) => e.stopPropagation()}>
+          {part}
+        </Link>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 export default function PostCard({ post, repostedBy = null, onDeleted = () => {}, detailMode = false }) {
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -30,6 +53,9 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
   const [reposted, setReposted] = useState(post.reposted_by_me);
   const [repostCount, setRepostCount] = useState(post.repost_count);
   const [repostBusy, setRepostBusy] = useState(false);
+
+  const [bookmarked, setBookmarked] = useState(!!post.bookmarked_by_me);
+  const [bookmarkBusy, setBookmarkBusy] = useState(false);
 
   const [deleted, setDeleted] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
@@ -50,7 +76,7 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
         : await socialApi.like(token, post.id);
       setLiked(updated.liked_by_me);
       setLikeCount(updated.like_count);
-    } catch (err) {
+    } catch {
       setLiked(wasLiked);
       setLikeCount((c) => (wasLiked ? c + 1 : c - 1));
     } finally {
@@ -70,11 +96,28 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
         : await socialApi.repost(token, post.id);
       setReposted(updated.reposted_by_me);
       setRepostCount(updated.repost_count);
-    } catch (err) {
+    } catch {
       setReposted(wasReposted);
       setRepostCount((c) => (wasReposted ? c + 1 : c - 1));
     } finally {
       setRepostBusy(false);
+    }
+  }
+
+  async function toggleBookmark() {
+    if (!token || bookmarkBusy) return;
+    setBookmarkBusy(true);
+    const was = bookmarked;
+    setBookmarked(!was);
+    try {
+      const updated = was
+        ? await socialApi.unbookmark(token, post.id)
+        : await socialApi.bookmark(token, post.id);
+      setBookmarked(!!updated.bookmarked_by_me);
+    } catch {
+      setBookmarked(was);
+    } finally {
+      setBookmarkBusy(false);
     }
   }
 
@@ -99,6 +142,18 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
       return;
     }
     navigate(postPath);
+  }
+
+  async function handleReport() {
+    if (!token) return;
+    const reason = window.prompt("Why are you reporting this post?");
+    if (!reason || reason.trim().length < 3) return;
+    try {
+      await socialApi.report(token, { reason: reason.trim(), target_post_id: post.id });
+      window.alert("Report submitted. Thanks.");
+    } catch (err) {
+      window.alert(err.message);
+    }
   }
 
   if (deleted) return null;
@@ -135,9 +190,24 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               </Link>
             )}
           </div>
-          <p className="post-text">{post.text}</p>
+          <p className="post-text">{linkifyText(post.text)}</p>
           {post.image_url && (
             <img className="post-image" src={`${API_BASE}${post.image_url}`} alt="" />
+          )}
+          {post.quoted_post && (
+            <Link to={`/posts/${post.quoted_post.id}`} className="quoted-post" onClick={(e) => e.stopPropagation()}>
+              <div className="quoted-head">
+                <Avatar
+                  name={post.quoted_post.author.display_name}
+                  username={post.quoted_post.author.username}
+                  url={post.quoted_post.author.avatar_url}
+                  size={20}
+                />
+                <strong>{post.quoted_post.author.display_name}</strong>
+                <span>@{post.quoted_post.author.username}</span>
+              </div>
+              <p>{post.quoted_post.text}</p>
+            </Link>
           )}
 
           <div className="post-actions">
@@ -166,6 +236,17 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
             </button>
             <button
               type="button"
+              className="action-btn quote-action"
+              onClick={() => navigate(`/feed?quote=${post.id}`)}
+              disabled={!token}
+              title="Quote"
+            >
+              <span className="action-icon-wrap">
+                <IconQuote />
+              </span>
+            </button>
+            <button
+              type="button"
               className={`action-btn like-action ${liked ? "active" : ""}`}
               onClick={toggleLike}
               disabled={!token || likeBusy}
@@ -176,7 +257,18 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               </span>
               <span>{likeCount}</span>
             </button>
-            {isMine && (
+            <button
+              type="button"
+              className={`action-btn bookmark-action ${bookmarked ? "active" : ""}`}
+              onClick={toggleBookmark}
+              disabled={!token || bookmarkBusy}
+              title={token ? "Bookmark" : "Log in to bookmark"}
+            >
+              <span className="action-icon-wrap">
+                <IconBookmark filled={bookmarked} />
+              </span>
+            </button>
+            {isMine ? (
               <button
                 type="button"
                 className="action-btn delete-action"
@@ -188,6 +280,12 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
                   <IconTrash />
                 </span>
               </button>
+            ) : (
+              token && (
+                <button type="button" className="action-btn report-action" onClick={handleReport} title="Report">
+                  …
+                </button>
+              )
             )}
           </div>
         </div>

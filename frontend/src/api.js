@@ -136,10 +136,11 @@ export const postsApi = {
 
   get: (id, token) => request(`/posts/${id}`, { headers: authHeaders(token) }),
 
-  create: async (token, { text, image }) => {
+  create: async (token, { text, image, quotePostId }) => {
     const form = new FormData();
     form.append("text", text);
     if (image) form.append("image", image);
+    if (quotePostId) form.append("quote_post_id", quotePostId);
 
     const res = await fetch(`${API_BASE}/posts`, {
       method: "POST",
@@ -175,13 +176,21 @@ export const socialApi = {
   unrepost: (token, postId) =>
     request(`/posts/${postId}/repost`, { method: "DELETE", headers: authHeaders(token) }),
 
+  bookmark: (token, postId) =>
+    request(`/posts/${postId}/bookmark`, { method: "POST", headers: authHeaders(token) }),
+
+  unbookmark: (token, postId) =>
+    request(`/posts/${postId}/bookmark`, { method: "DELETE", headers: authHeaders(token) }),
+
+  listBookmarks: (token) => request("/bookmarks", { headers: authHeaders(token) }),
+
   listReplies: (postId) => request(`/posts/${postId}/replies`),
 
-  createReply: (token, postId, text) =>
+  createReply: (token, postId, text, parentReplyId) =>
     request(`/posts/${postId}/replies`, {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, parent_reply_id: parentReplyId || null }),
     }),
 
   likeReply: (token, replyId) =>
@@ -189,6 +198,52 @@ export const socialApi = {
 
   unlikeReply: (token, replyId) =>
     request(`/replies/${replyId}/like`, { method: "DELETE", headers: authHeaders(token) }),
+
+  block: (token, username) =>
+    request(`/users/${encodeURIComponent(username)}/block`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+
+  unblock: (token, username) =>
+    request(`/users/${encodeURIComponent(username)}/block`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
+
+  mute: (token, username) =>
+    request(`/users/${encodeURIComponent(username)}/mute`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+
+  unmute: (token, username) =>
+    request(`/users/${encodeURIComponent(username)}/mute`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
+
+  report: (token, body) =>
+    request("/reports", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+
+  hashtag: (tag, token) =>
+    request(`/hashtags/${encodeURIComponent(tag)}`, { headers: authHeaders(token) }),
+};
+
+export const messagesApi = {
+  conversations: (token) => request("/messages", { headers: authHeaders(token) }),
+  thread: (token, username) =>
+    request(`/messages/${encodeURIComponent(username)}`, { headers: authHeaders(token) }),
+  send: (token, username, text) =>
+    request(`/messages/${encodeURIComponent(username)}`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ text }),
+    }),
 };
 
 export const searchApi = {

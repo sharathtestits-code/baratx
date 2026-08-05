@@ -133,3 +133,31 @@ export function IconBell({ className = "" }) {
     </svg>
   );
 }
+
+export function IconBookmark({ filled = false, className = "" }) {
+  return filled ? (
+    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="currentColor">
+      <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconMessage({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function IconQuote({ className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="currentColor">
+      <path d="M7 17h3l2-4V7H5v6h3zm7 0h3l2-4V7h-7v6h3z" opacity="0.85" />
+    </svg>
+  );
+}

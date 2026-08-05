@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { postsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
@@ -18,6 +18,8 @@ function feedItemKey(item) {
 export default function Feed() {
   const { token, user, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const quotePostId = searchParams.get("quote");
 
   const [tab, setTab] = useState("global");
   const [items, setItems] = useState([]);
@@ -29,6 +31,7 @@ export default function Feed() {
   const [text, setText] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [quotePreview, setQuotePreview] = useState(null);
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState("");
   const fileInputRef = useRef(null);
@@ -45,6 +48,26 @@ export default function Feed() {
     if (user) loadFeed(tab);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, tab]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadQuote() {
+      if (!quotePostId || !token) {
+        setQuotePreview(null);
+        return;
+      }
+      try {
+        const post = await postsApi.get(quotePostId, token);
+        if (!cancelled) setQuotePreview(post);
+      } catch {
+        if (!cancelled) setQuotePreview(null);
+      }
+    }
+    loadQuote();
+    return () => {
+      cancelled = true;
+    };
+  }, [quotePostId, token]);
 
   if (loading || (token && !user)) {
     return <div className="page-loading">Loading…</div>;
@@ -125,10 +148,18 @@ export default function Feed() {
     }
     setPosting(true);
     try {
-      const newPost = await postsApi.create(token, { text: text.trim(), image: imageFile });
+      const newPost = await postsApi.create(token, {
+        text: text.trim(),
+        image: imageFile,
+        quotePostId: quotePostId || undefined,
+      });
       setItems((prev) => [{ post: newPost, reposted_by: null, item_time: newPost.created_at }, ...prev]);
       setText("");
       clearImage();
+      if (quotePostId) {
+        setSearchParams({});
+        setQuotePreview(null);
+      }
     } catch (err) {
       setPostError(err.message);
     } finally {
@@ -178,6 +209,24 @@ export default function Feed() {
                 <button type="button" className="remove-image" onClick={clearImage}>
                   <IconClose />
                 </button>
+              </div>
+            )}
+            {quotePreview && (
+              <div className="quoted-post compose-quote">
+                <div className="quoted-head">
+                  Quoting @{quotePreview.author.username}
+                  <button
+                    type="button"
+                    className="remove-image"
+                    onClick={() => {
+                      setSearchParams({});
+                      setQuotePreview(null);
+                    }}
+                  >
+                    <IconClose />
+                  </button>
+                </div>
+                <p>{quotePreview.text}</p>
               </div>
             )}
             {postError && <div className="error">{postError}</div>}
