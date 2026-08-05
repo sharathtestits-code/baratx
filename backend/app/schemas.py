@@ -118,6 +118,7 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     bio: Optional[str] = None
     language: Optional[str] = None
+    theme: Optional[str] = None
 
     @field_validator("display_name")
     @classmethod
@@ -157,6 +158,15 @@ class UserUpdate(BaseModel):
             raise ValueError("Language must be en, hi, or te")
         return v
 
+    @field_validator("theme")
+    @classmethod
+    def valid_theme(cls, v):
+        if v is None:
+            return v
+        if v not in ("saffron", "midnight", "monsoon", "ink"):
+            raise ValueError("Theme must be saffron, midnight, monsoon, or ink")
+        return v
+
 
 class UserOut(BaseModel):
     id: str
@@ -165,6 +175,7 @@ class UserOut(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     language: str
+    theme: str = "saffron"
     bio: str
     avatar_url: Optional[str] = None
     cover_url: Optional[str] = None

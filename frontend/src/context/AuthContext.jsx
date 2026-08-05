@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../api";
+import { applyTheme, isValidTheme } from "../theme";
 
 const AuthContext = createContext(null);
 
@@ -19,7 +20,9 @@ export function AuthProvider({ children }) {
     api
       .me(token)
       .then((me) => {
-        if (!cancelled) setUser(me);
+        if (cancelled) return;
+        setUser(me);
+        if (isValidTheme(me?.theme)) applyTheme(me.theme);
       })
       .catch(() => {
         if (cancelled) return;
@@ -53,6 +56,7 @@ export function AuthProvider({ children }) {
 
   function updateUser(partialOrFull) {
     setUser((prev) => ({ ...prev, ...partialOrFull }));
+    if (isValidTheme(partialOrFull?.theme)) applyTheme(partialOrFull.theme);
   }
 
   return (

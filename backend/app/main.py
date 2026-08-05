@@ -32,6 +32,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
             if "cover_url" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
+            if "theme" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN theme VARCHAR DEFAULT 'saffron'"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -75,6 +77,8 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
                 if "cover_url" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
+                if "theme" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN theme VARCHAR DEFAULT 'saffron'"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -296,6 +300,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         email=user.email,
         phone=user.phone,
         language=user.language,
+        theme=getattr(user, "theme", None) or "saffron",
         bio=user.bio,
         is_email_verified=user.is_email_verified,
         is_phone_verified=user.is_phone_verified,
@@ -969,6 +974,8 @@ def update_me(
         current_user.bio = data["bio"]
     if "language" in data:
         current_user.language = data["language"]
+    if "theme" in data:
+        current_user.theme = data["theme"]
     if "username" in data:
         new_username = data["username"]
         reserved = set(seed.OFFICIAL_USERNAMES) | {

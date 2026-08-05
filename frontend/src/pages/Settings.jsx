@@ -1,16 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { socialApi } from "../api";
+import { api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import ThemePicker from "../components/ThemePicker";
+import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
 
 export default function Settings() {
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
+  const [theme, setTheme] = useState(() => user?.theme || getStoredTheme());
+  const [themeSaving, setThemeSaving] = useState(false);
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.theme) setTheme(user.theme);
+  }, [user?.theme]);
 
   useEffect(() => {
     let cancelled = false;
@@ -36,6 +45,24 @@ export default function Settings() {
       cancelled = true;
     };
   }, [token]);
+
+  async function saveTheme(nextId) {
+    setTheme(nextId);
+    applyTheme(nextId);
+    setThemeSaving(true);
+    setMsg("");
+    setError("");
+    try {
+      const updated = await api.updateMe(token, { theme: nextId });
+      updateUser(updated);
+      markThemeChosen();
+      setMsg("Appearance saved.");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setThemeSaving(false);
+    }
+  }
 
   async function unmute(username) {
     try {
@@ -67,6 +94,14 @@ export default function Settings() {
       </div>
 
       {error && <div className="error">{error}</div>}
+      {msg && <p className="hint ok-hint">{msg}</p>}
+
+      <section className="settings-section">
+        <h2>Appearance</h2>
+        <p className="hint">Choose how BaratX looks for you. Changes apply instantly.</p>
+        <ThemePicker value={theme} onChange={saveTheme} compact />
+        {themeSaving && <p className="hint">Saving…</p>}
+      </section>
 
       <section className="settings-section">
         <h2>Language</h2>

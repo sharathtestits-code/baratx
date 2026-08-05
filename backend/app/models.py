@@ -24,6 +24,7 @@ class User(Base):
     password_hash = Column(String, nullable=False)
 
     language = Column(String, default="en", nullable=False)  # en | hi | te
+    theme = Column(String, default="saffron", nullable=False)  # saffron | midnight | monsoon | ink
     bio = Column(String, default="", nullable=False)
 
     avatar_url = Column(String, nullable=True)

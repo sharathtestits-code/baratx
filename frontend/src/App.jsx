@@ -28,6 +28,7 @@ import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
 import EmailVerifyBanner from "./components/EmailVerifyBanner";
 import Logo from "./components/Logo";
+import ThemeOnboarding from "./components/ThemeOnboarding";
 import { useAuth } from "./context/AuthContext";
 
 function AuthChrome({ children }) {
@@ -49,6 +50,7 @@ function AppShell() {
       <Sidebar />
       <main className="app-main">
         <EmailVerifyBanner />
+        <ThemeOnboarding />
         <Routes>
           <Route path="/" element={<Navigate to="/feed" replace />} />
           <Route path="/signup" element={<Navigate to="/feed" replace />} />
