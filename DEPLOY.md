@@ -27,8 +27,19 @@ English-only public path. Do these in order. You must complete payments/signups 
 
 ## 1c. Next accounts
 
-1. Create Railway account for API hosting
+1. **Railway** (in progress) — https://railway.com — sign in with GitHub
 2. MSG91 later for SMS OTP
+
+### Railway deploy notes
+
+- Repo: `sharathtestits-code/baratx`
+- Root `Dockerfile` + `railway.toml` build the **backend** from the monorepo (do not set Root Directory, or leave it `/`)
+- Alternate: Root Directory = `backend` uses `backend/Dockerfile`
+- After Postgres is added, set on the API service:
+  - `DATABASE_URL=${{Postgres.DATABASE_URL}}` (or Railway’s variable reference UI)
+  - `JWT_SECRET` = long random string
+  - `ENVIRONMENT=production`
+  - `CORS_ORIGINS` = frontend URL when ready
 
 
 ## 2. Create free accounts (no code yet)

@@ -1,3 +1,6 @@
+# Build from monorepo root so Railway does not need a Root Directory setting.
+# Context: repository root. Dockerfile path: backend/Dockerfile (via railway.toml).
+
 FROM python:3.13-slim
 
 WORKDIR /app
@@ -5,10 +8,10 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app ./app
+COPY backend/app ./app
 
 EXPOSE 8000
 

@@ -24,6 +24,8 @@ def run_migrations():
     cover_url on users), we need to add them by hand here. Safe to run every
     startup: it only ALTERs a column in if it's actually missing.
     """
+    if not str(engine.url).startswith("sqlite"):
+        return
     with engine.connect() as conn:
         existing_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
         if "avatar_url" not in existing_cols:
