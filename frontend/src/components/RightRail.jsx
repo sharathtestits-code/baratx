@@ -45,15 +45,27 @@ export default function RightRail() {
   return (
     <aside className="right-rail" aria-label="Explore">
       <div className="right-rail-inner">
-        <form className="rail-search" onSubmit={handleSearch}>
-          <IconSearch className="rail-search-icon" />
+        <form className="rail-search" onSubmit={handleSearch} role="search">
+          <IconSearch className="rail-search-icon" aria-hidden="true" />
           <input
             type="search"
             placeholder="Search BaratX"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search BaratX"
+            enterKeyHint="search"
+            autoComplete="off"
           />
+          {query ? (
+            <button
+              type="button"
+              className="rail-search-clear"
+              onClick={() => setQuery("")}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          ) : null}
         </form>
 
         <section className="rail-card">
