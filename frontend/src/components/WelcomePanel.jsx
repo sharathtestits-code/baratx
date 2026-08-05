@@ -13,14 +13,10 @@ const PROMPTS = [
 /**
  * Aggressive first-session panel: city chip → prompt → post, plus follow bootstrap.
  */
-export default function WelcomePanel({
-  token,
-  text,
-  setText,
-  onPostedFlag,
-  composeRef,
-}) {
-  const [dismissed, setDismissed] = useState(false);
+export default function WelcomePanel({ token, setText, onPostedFlag, composeRef }) {
+  const [dismissed, setDismissed] = useState(
+    () => localStorage.getItem("bx_first_post_done") === "1"
+  );
   const [followBusy, setFollowBusy] = useState(false);
   const [followMsg, setFollowMsg] = useState("");
   const [followDone, setFollowDone] = useState(false);
@@ -31,11 +27,19 @@ export default function WelcomePanel({
     }
   }, []);
 
-  if (dismissed) return null;
+  useEffect(() => {
+    if (!onPostedFlag) return undefined;
+    const handler = () => {
+      localStorage.setItem("bx_first_post_done", "1");
+      sessionStorage.removeItem("bx_welcome");
+      setDismissed(true);
+    };
+    window.addEventListener("bx:first-post", handler);
+    return () => window.removeEventListener("bx:first-post", handler);
+  }, [onPostedFlag]);
 
   function applyCity(city) {
-    const next = `Hello from ${city}. `;
-    setText(next);
+    setText(`Hello from ${city}. `);
     composeRef?.current?.focus();
   }
 
@@ -63,17 +67,7 @@ export default function WelcomePanel({
     sessionStorage.removeItem("bx_welcome");
   }
 
-  // Expose completion for parent after successful post
-  useEffect(() => {
-    if (!onPostedFlag) return;
-    const handler = () => {
-      localStorage.setItem("bx_first_post_done", "1");
-      sessionStorage.removeItem("bx_welcome");
-      setDismissed(true);
-    };
-    window.addEventListener("bx:first-post", handler);
-    return () => window.removeEventListener("bx:first-post", handler);
-  }, [onPostedFlag]);
+  if (dismissed) return null;
 
   return (
     <div className="welcome-panel">

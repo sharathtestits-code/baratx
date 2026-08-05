@@ -42,6 +42,59 @@ export default function Feed() {
   const composeRef = useRef(null);
   const loadingMoreRef = useRef(false);
 
+  const loadFeed = useCallback(
+    async (nextTab) => {
+      if (!token) return;
+      setFeedLoading(true);
+      setFeedError("");
+      setHasMore(true);
+      try {
+        const data = await postsApi.list(token, { feed: nextTab });
+        setItems(Array.isArray(data) ? data : []);
+        setHasMore((Array.isArray(data) ? data : []).length >= PAGE_SIZE);
+      } catch (err) {
+        setFeedError(err.message);
+        setItems([]);
+        setHasMore(false);
+      } finally {
+        setFeedLoading(false);
+      }
+    },
+    [token]
+  );
+
+  const loadMore = useCallback(async () => {
+    if (!token || loadingMoreRef.current || !hasMore || items.length === 0) return;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    const before = items[items.length - 1]?.item_time;
+    try {
+      const data = await postsApi.list(token, { feed: tab, before });
+      setItems((prev) => {
+        const seen = new Set(prev.map((i) => i.post.id));
+        const next = [...prev];
+        for (const item of data || []) {
+          if (!seen.has(item.post.id)) {
+            seen.add(item.post.id);
+            next.push(item);
+          }
+        }
+        return next;
+      });
+      setHasMore((data || []).length >= PAGE_SIZE);
+    } catch (err) {
+      setFeedError(err.message);
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
+    }
+  }, [token, hasMore, items, tab]);
+
+  const setSentinel = useInfiniteScroll({
+    disabled: feedLoading || loadingMore || !hasMore || items.length === 0 || !user,
+    onLoadMore: loadMore,
+  });
+
   useEffect(() => {
     if (wantWelcome) {
       sessionStorage.setItem("bx_welcome", "1");
@@ -58,8 +111,7 @@ export default function Feed() {
 
   useEffect(() => {
     if (user) loadFeed(tab);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, tab]);
+  }, [user, tab, loadFeed]);
 
   useEffect(() => {
     let cancelled = false;
@@ -100,63 +152,6 @@ export default function Feed() {
       cancelled = true;
     };
   }, [user, token]);
-
-  if (loading || (token && !user)) {
-    return <div className="page-loading">Loading…</div>;
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  async function loadFeed(nextTab) {
-    setFeedLoading(true);
-    setFeedError("");
-    setHasMore(true);
-    try {
-      const data = await postsApi.list(token, { feed: nextTab });
-      setItems(data);
-      setHasMore(data.length >= PAGE_SIZE);
-    } catch (err) {
-      setFeedError(err.message);
-      setItems([]);
-      setHasMore(false);
-    } finally {
-      setFeedLoading(false);
-    }
-  }
-
-  const loadMore = useCallback(async () => {
-    if (!token || loadingMoreRef.current || !hasMore || items.length === 0) return;
-    loadingMoreRef.current = true;
-    setLoadingMore(true);
-    const before = items[items.length - 1]?.item_time;
-    try {
-      const data = await postsApi.list(token, { feed: tab, before });
-      setItems((prev) => {
-        const seen = new Set(prev.map((i) => i.post.id));
-        const next = [...prev];
-        for (const item of data) {
-          if (!seen.has(item.post.id)) {
-            seen.add(item.post.id);
-            next.push(item);
-          }
-        }
-        return next;
-      });
-      setHasMore(data.length >= PAGE_SIZE);
-    } catch (err) {
-      setFeedError(err.message);
-    } finally {
-      loadingMoreRef.current = false;
-      setLoadingMore(false);
-    }
-  }, [token, hasMore, items, tab]);
-
-  const setSentinel = useInfiniteScroll({
-    disabled: feedLoading || loadingMore || !hasMore || items.length === 0,
-    onLoadMore: loadMore,
-  });
 
   function handleImageChange(e) {
     const file = e.target.files?.[0];
@@ -206,6 +201,14 @@ export default function Feed() {
 
   function handleDeleted(postId) {
     setItems((prev) => prev.filter((i) => i.post.id !== postId));
+  }
+
+  if (loading || (token && !user)) {
+    return <div className="page-loading">Loading…</div>;
+  }
+
+  if (!user) {
+    return null;
   }
 
   const remaining = MAX_LEN - text.length;
