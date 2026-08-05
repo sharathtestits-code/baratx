@@ -251,6 +251,10 @@ export const socialApi = {
       headers: authHeaders(token),
     }),
 
+  listMutes: (token) => request("/users/me/mutes", { headers: authHeaders(token) }),
+
+  listBlocks: (token) => request("/users/me/blocks", { headers: authHeaders(token) }),
+
   report: (token, body) =>
     request("/reports", {
       method: "POST",
@@ -260,6 +264,88 @@ export const socialApi = {
 
   hashtag: (tag, token) =>
     request(`/hashtags/${encodeURIComponent(tag)}`, { headers: authHeaders(token) }),
+};
+
+export const listsApi = {
+  list: (token) => request("/lists", { headers: authHeaders(token) }),
+  get: (token, id) => request(`/lists/${id}`, { headers: authHeaders(token) }),
+  create: (token, body) =>
+    request("/lists", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  update: (token, id, body) =>
+    request(`/lists/${id}`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  remove: (token, id) =>
+    request(`/lists/${id}`, { method: "DELETE", headers: authHeaders(token) }),
+  members: (token, id) => request(`/lists/${id}/members`, { headers: authHeaders(token) }),
+  addMember: (token, id, username) =>
+    request(`/lists/${id}/members/${encodeURIComponent(username)}`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+  removeMember: (token, id, username) =>
+    request(`/lists/${id}/members/${encodeURIComponent(username)}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
+  feed: (token, id) => request(`/lists/${id}/feed`, { headers: authHeaders(token) }),
+};
+
+export const communitiesApi = {
+  list: (token) => request("/communities", { headers: authHeaders(token) }),
+  get: (token, slug) =>
+    request(`/communities/${encodeURIComponent(slug)}`, { headers: authHeaders(token) }),
+  create: (token, body) =>
+    request("/communities", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  join: (token, slug) =>
+    request(`/communities/${encodeURIComponent(slug)}/join`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+  leave: (token, slug) =>
+    request(`/communities/${encodeURIComponent(slug)}/leave`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+  feed: (token, slug) =>
+    request(`/communities/${encodeURIComponent(slug)}/feed`, { headers: authHeaders(token) }),
+  post: (token, slug, text) =>
+    request(`/communities/${encodeURIComponent(slug)}/posts`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ text }),
+    }),
+};
+
+export const spacesApi = {
+  list: (token, status = "open") =>
+    request(`/spaces?status=${encodeURIComponent(status)}`, { headers: authHeaders(token) }),
+  get: (token, id) => request(`/spaces/${id}`, { headers: authHeaders(token) }),
+  create: (token, body) =>
+    request("/spaces", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  close: (token, id) =>
+    request(`/spaces/${id}/close`, { method: "POST", headers: authHeaders(token) }),
+  feed: (token, id) => request(`/spaces/${id}/feed`, { headers: authHeaders(token) }),
+  post: (token, id, text) =>
+    request(`/spaces/${id}/posts`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ text }),
+    }),
 };
 
 export const messagesApi = {

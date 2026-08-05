@@ -102,6 +102,8 @@ class Post(Base):
     text = Column(Text, nullable=False)
     image_url = Column(String, nullable=True)
     quoted_post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
+    community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     author = relationship("User", back_populates="posts")
@@ -109,6 +111,8 @@ class Post(Base):
     replies = relationship("Reply", back_populates="post", cascade="all, delete-orphan")
     reposts = relationship("Repost", back_populates="post", cascade="all, delete-orphan")
     quoted_post = relationship("Post", remote_side=[id], foreign_keys=[quoted_post_id])
+    community = relationship("Community", back_populates="posts", foreign_keys=[community_id])
+    space = relationship("Space", back_populates="posts", foreign_keys=[space_id])
 
 
 class Like(Base):
@@ -273,3 +277,75 @@ class DirectMessage(Base):
 
     sender = relationship("User", foreign_keys=[sender_id])
     recipient = relationship("User", foreign_keys=[recipient_id])
+
+
+class UserList(Base):
+    """Named list of accounts owned by a user (X-style Lists)."""
+
+    __tablename__ = "user_lists"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    owner_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String, default="", nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    owner = relationship("User", foreign_keys=[owner_id])
+    members = relationship("ListMember", back_populates="user_list", cascade="all, delete-orphan")
+
+
+class ListMember(Base):
+    __tablename__ = "list_members"
+    __table_args__ = (UniqueConstraint("list_id", "user_id", name="uq_list_member"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    list_id = Column(String, ForeignKey("user_lists.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user_list = relationship("UserList", back_populates="members")
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class Community(Base):
+    __tablename__ = "communities"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    slug = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(String, default="", nullable=False)
+    created_by = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    creator = relationship("User", foreign_keys=[created_by])
+    members = relationship("CommunityMember", back_populates="community", cascade="all, delete-orphan")
+    posts = relationship("Post", back_populates="community", foreign_keys="Post.community_id")
+
+
+class CommunityMember(Base):
+    __tablename__ = "community_members"
+    __table_args__ = (UniqueConstraint("community_id", "user_id", name="uq_community_member"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    community_id = Column(String, ForeignKey("communities.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    community = relationship("Community", back_populates="members")
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class Space(Base):
+    """Text discussion room (not live audio)."""
+
+    __tablename__ = "spaces"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    title = Column(String, nullable=False)
+    host_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    status = Column(String, default="open", nullable=False, index=True)  # open | closed
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    closes_at = Column(DateTime, nullable=True)
+
+    host = relationship("User", foreign_keys=[host_id])
+    posts = relationship("Post", back_populates="space", foreign_keys="Post.space_id")

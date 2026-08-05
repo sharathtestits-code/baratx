@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
@@ -6,10 +6,19 @@ import { IconBell, IconBookmark, IconHome, IconLogout, IconMessage, IconSearch, 
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
+const MORE_LINKS = [
+  { to: "/lists", label: "Lists" },
+  { to: "/communities", label: "Communities" },
+  { to: "/spaces", label: "Spaces" },
+  { to: "/settings", label: "Settings and privacy" },
+];
+
 export default function Sidebar() {
   const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const [unread, setUnread] = useState(0);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef(null);
 
   useEffect(() => {
     if (!token) return;
@@ -35,9 +44,28 @@ export default function Sidebar() {
     };
   }, [token]);
 
+  useEffect(() => {
+    if (!moreOpen) return;
+    function onDoc(e) {
+      if (moreRef.current && !moreRef.current.contains(e.target)) {
+        setMoreOpen(false);
+      }
+    }
+    function onKey(e) {
+      if (e.key === "Escape") setMoreOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
+
   if (!user) return null;
 
   function handleLogout() {
+    setMoreOpen(false);
     logout();
     navigate("/");
   }
@@ -87,6 +115,34 @@ export default function Sidebar() {
             <IconUser className="sidebar-icon" />
             <span>Profile</span>
           </NavLink>
+
+          <div className="sidebar-more-wrap" ref={moreRef}>
+            <button
+              type="button"
+              className={`sidebar-link sidebar-more-btn ${moreOpen ? "active" : ""}`}
+              aria-haspopup="menu"
+              aria-expanded={moreOpen}
+              onClick={() => setMoreOpen((v) => !v)}
+            >
+              <IconMore className="sidebar-icon" />
+              <span>More</span>
+            </button>
+            {moreOpen && (
+              <div className="more-menu" role="menu">
+                {MORE_LINKS.map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    role="menuitem"
+                    className="more-menu-item"
+                    onClick={() => setMoreOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
         <button type="button" className="sidebar-post-btn" onClick={goCompose}>
           Post

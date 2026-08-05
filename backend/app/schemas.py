@@ -370,3 +370,144 @@ class AdminUsersOut(BaseModel):
     limit: int
     offset: int
     users: list[AdminUserRow]
+
+
+# ---------- Lists / Communities / Spaces ----------
+
+
+class UserListCreate(BaseModel):
+    name: str
+    description: Optional[str] = ""
+
+    @field_validator("name")
+    @classmethod
+    def valid_name(cls, v):
+        v = (v or "").strip()
+        if len(v) < 1 or len(v) > 50:
+            raise ValueError("List name must be 1–50 characters")
+        return v
+
+    @field_validator("description")
+    @classmethod
+    def valid_description(cls, v):
+        if v is None:
+            return ""
+        if len(v) > 160:
+            raise ValueError("Description must be 160 characters or fewer")
+        return v
+
+
+class UserListUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+    @field_validator("name")
+    @classmethod
+    def valid_name(cls, v):
+        if v is None:
+            return v
+        v = v.strip()
+        if len(v) < 1 or len(v) > 50:
+            raise ValueError("List name must be 1–50 characters")
+        return v
+
+    @field_validator("description")
+    @classmethod
+    def valid_description(cls, v):
+        if v is None:
+            return v
+        if len(v) > 160:
+            raise ValueError("Description must be 160 characters or fewer")
+        return v
+
+
+class UserListOut(BaseModel):
+    id: str
+    name: str
+    description: str
+    created_at: datetime
+    member_count: int
+    owner: AuthorOut
+    is_owner: bool = True
+
+
+class CommunityCreate(BaseModel):
+    name: str
+    description: Optional[str] = ""
+    slug: Optional[str] = None
+
+    @field_validator("name")
+    @classmethod
+    def valid_name(cls, v):
+        v = (v or "").strip()
+        if len(v) < 2 or len(v) > 60:
+            raise ValueError("Community name must be 2–60 characters")
+        return v
+
+    @field_validator("description")
+    @classmethod
+    def valid_description(cls, v):
+        if v is None:
+            return ""
+        if len(v) > 280:
+            raise ValueError("Description must be 280 characters or fewer")
+        return v
+
+    @field_validator("slug")
+    @classmethod
+    def valid_slug(cls, v):
+        if v is None:
+            return v
+        v = v.strip().lower()
+        if not v:
+            return None
+        return v
+
+
+class CommunityOut(BaseModel):
+    id: str
+    slug: str
+    name: str
+    description: str
+    created_at: datetime
+    member_count: int
+    is_member: bool = False
+    creator: Optional[AuthorOut] = None
+
+
+class SpaceCreate(BaseModel):
+    title: str
+    duration_hours: Optional[int] = 24
+
+    @field_validator("title")
+    @classmethod
+    def valid_title(cls, v):
+        v = (v or "").strip()
+        if len(v) < 2 or len(v) > 100:
+            raise ValueError("Space title must be 2–100 characters")
+        return v
+
+
+class SpaceOut(BaseModel):
+    id: str
+    title: str
+    status: str
+    created_at: datetime
+    closes_at: Optional[datetime] = None
+    post_count: int = 0
+    is_host: bool = False
+    host: Optional[AuthorOut] = None
+
+
+class SurfacePostCreate(BaseModel):
+    text: str
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("Post cannot be empty")
+        if len(v) > 280:
+            raise ValueError("Post must be 280 characters or fewer")
+        return v

@@ -79,6 +79,52 @@ def seed_official_accounts(db: Session) -> None:
         db.rollback()
 
 
+DEFAULT_COMMUNITIES = [
+    {
+        "slug": "hyderabad",
+        "name": "Hyderabad",
+        "description": "City talk — food, traffic, startups, and weekend plans.",
+    },
+    {
+        "slug": "builders",
+        "name": "Builders",
+        "description": "Shipping products in India. Share what you’re building.",
+    },
+    {
+        "slug": "india-tech",
+        "name": "India Tech",
+        "description": "Startups, policy, and product news across India.",
+    },
+]
+
+
+def seed_default_communities(db: Session) -> None:
+    """Create a few starter communities owned by @baratx if missing."""
+    host = db.query(models.User).filter(models.User.username == "baratx").first()
+    if not host:
+        return
+    created_any = False
+    for c in DEFAULT_COMMUNITIES:
+        exists = db.query(models.Community).filter(models.Community.slug == c["slug"]).first()
+        if exists:
+            continue
+        community = models.Community(
+            slug=c["slug"],
+            name=c["name"],
+            description=c["description"],
+            created_by=host.id,
+        )
+        db.add(community)
+        db.flush()
+        db.add(models.CommunityMember(community_id=community.id, user_id=host.id))
+        created_any = True
+        logger.info("Seeded community /%s", c["slug"])
+    if created_any:
+        db.commit()
+    else:
+        db.rollback()
+
+
 def follow_official_accounts(db: Session, user: models.User) -> int:
     """Auto-follow official BaratX accounts. Returns number of new follows."""
     added = 0

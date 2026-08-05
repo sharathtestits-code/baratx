@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session, joinedload
 from app import auth, email as email_service, google_auth, models, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
+from app.social_surfaces import register_social_surfaces
 
 Base.metadata.create_all(bind=engine)
 
@@ -35,6 +36,10 @@ def run_migrations():
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN quoted_post_id VARCHAR"))
+            if "community_id" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN community_id VARCHAR"))
+            if "space_id" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
 
             reply_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(replies)"))}
             if "parent_reply_id" not in reply_cols:
@@ -74,6 +79,10 @@ def run_migrations():
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN quoted_post_id VARCHAR"))
+            if post_cols and "community_id" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN community_id VARCHAR"))
+            if post_cols and "space_id" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
 
             reply_cols = cols("replies")
             if reply_cols and "parent_reply_id" not in reply_cols:
@@ -91,7 +100,7 @@ def run_migrations():
 
 run_migrations()
 
-# Cold-start density: official BaratX accounts + starter posts.
+# Cold-start density: official BaratX accounts + starter posts + communities.
 with SessionLocal() as _seed_db:
     try:
         seed.seed_official_accounts(_seed_db)
@@ -99,6 +108,12 @@ with SessionLocal() as _seed_db:
         import logging
 
         logging.getLogger("baratx").exception("Official account seed failed")
+    try:
+        seed.seed_default_communities(_seed_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Community seed failed")
 
 
 app = FastAPI(title="BaratX API", version="0.5.0")
@@ -1240,7 +1255,12 @@ def list_posts(
             raise HTTPException(status_code=401, detail="Log in to view your following feed")
         author_filter_ids = [f.followed_id for f in current_user.following] + [current_user.id]
 
-    post_query = db.query(models.Post).order_by(models.Post.created_at.desc())
+    # Keep community/space posts on their surfaces, not the home feed.
+    post_query = (
+        db.query(models.Post)
+        .filter(models.Post.community_id.is_(None), models.Post.space_id.is_(None))
+        .order_by(models.Post.created_at.desc())
+    )
     repost_query = db.query(models.Repost).order_by(models.Repost.created_at.desc())
 
     if author_filter_ids is not None:
@@ -1313,6 +1333,23 @@ def delete_post(
                 os.remove(filepath)
             except OSError:
                 pass
+
+    # Clear dependent rows that lack ORM cascades (avoids FK 500s).
+    db.query(models.Notification).filter(models.Notification.post_id == post_id).delete(
+        synchronize_session=False
+    )
+    db.query(models.Bookmark).filter(models.Bookmark.post_id == post_id).delete(
+        synchronize_session=False
+    )
+    db.query(models.PostHashtag).filter(models.PostHashtag.post_id == post_id).delete(
+        synchronize_session=False
+    )
+    db.query(models.Report).filter(models.Report.target_post_id == post_id).delete(
+        synchronize_session=False
+    )
+    db.query(models.Post).filter(models.Post.quoted_post_id == post_id).update(
+        {models.Post.quoted_post_id: None}, synchronize_session=False
+    )
 
     db.delete(post)
     db.commit()
@@ -1664,4 +1701,14 @@ register_extra_routes(
     serialize_user=serialize_user,
     serialize_post=serialize_post,
     create_notification=create_notification,
+)
+
+register_social_surfaces(
+    app,
+    get_current_user=get_current_user,
+    get_current_user_optional=get_current_user_optional,
+    serialize_user=serialize_user,
+    serialize_post=serialize_post,
+    attach_hashtags=attach_hashtags,
+    notify_mentions=notify_mentions,
 )

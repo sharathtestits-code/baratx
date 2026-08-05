@@ -16,6 +16,13 @@ import Messages from "./pages/Messages";
 import MessageThread from "./pages/MessageThread";
 import Hashtag from "./pages/Hashtag";
 import Admin from "./pages/Admin";
+import Settings from "./pages/Settings";
+import Lists from "./pages/Lists";
+import ListDetail from "./pages/ListDetail";
+import Communities from "./pages/Communities";
+import CommunityDetail from "./pages/CommunityDetail";
+import Spaces from "./pages/Spaces";
+import SpaceRoom from "./pages/SpaceRoom";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
@@ -56,6 +63,13 @@ function AppShell() {
           <Route path="/posts/:postId" element={<PostDetail />} />
           <Route path="/u/:username" element={<Profile />} />
           <Route path="/u/:username/:kind" element={<FollowList />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/lists" element={<Lists />} />
+          <Route path="/lists/:listId" element={<ListDetail />} />
+          <Route path="/communities" element={<Communities />} />
+          <Route path="/communities/:slug" element={<CommunityDetail />} />
+          <Route path="/spaces" element={<Spaces />} />
+          <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
           <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
       </main>

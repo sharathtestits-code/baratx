@@ -3096,3 +3096,193 @@ a.post-time:hover {
   color: var(--text-secondary, #71767b);
   padding: 1.5rem 0.75rem !important;
 }
+
+/* ---------- More menu + Lists / Communities / Spaces / Settings ---------- */
+
+.sidebar-more-wrap {
+  position: relative;
+}
+
+.sidebar-more-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.more-menu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 0.35rem);
+  min-width: 220px;
+  padding: 0.4rem 0;
+  border-radius: 14px;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.25));
+  background: var(--bg-elevated, var(--bg, #fff));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
+  z-index: 40;
+}
+
+.more-menu-item {
+  display: block;
+  padding: 0.7rem 1rem;
+  color: var(--text, inherit);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.more-menu-item:hover {
+  background: rgba(127, 127, 127, 0.1);
+}
+
+.surface-page .surface-lead {
+  margin: 0 1rem 1rem;
+}
+
+.surface-create {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem 1rem;
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+}
+
+.surface-create input,
+.surface-add-row input,
+.settings-select {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.3));
+  background: var(--bg, #fff);
+  color: inherit;
+  font: inherit;
+}
+
+.surface-card-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.surface-card-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.18));
+  text-decoration: none;
+  color: inherit;
+}
+
+.surface-card-link:hover {
+  background: rgba(127, 127, 127, 0.06);
+}
+
+.surface-meta {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #71767b);
+}
+
+.surface-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary, #71767b);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.surface-compose {
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.18));
+}
+
+.settings-section {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.18));
+}
+
+.settings-section h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.settings-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.settings-form .settings-select {
+  max-width: 220px;
+}
+
+.settings-user-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.settings-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+}
+
+.settings-user-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.settings-user-link span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.surface-search-results {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border, rgba(127, 127, 127, 0.2));
+  border-radius: 12px;
+}
+
+.btn-ghost {
+  border: none;
+  background: transparent;
+  color: var(--brand, #1d9bf0);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+}
+
+.btn-ghost:hover {
+  background: rgba(29, 155, 240, 0.1);
+}
+
+.ok-hint {
+  color: var(--success, #00ba7c);
+  padding: 0 1rem;
+}
