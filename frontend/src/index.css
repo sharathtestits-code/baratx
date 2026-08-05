@@ -48,6 +48,12 @@
   --rail-search-bg: #f0ebe4;
   --rail-search-hover: #ebe4db;
   --rail-card-bg: #f7f4ef;
+  --btn-contrast-bg: #0f1419;
+  --btn-contrast-hover: #272c30;
+  --btn-contrast-text: #ffffff;
+  --error-bg: #fdecea;
+  --error-text: #b3261e;
+  --hover-overlay: rgba(15, 20, 25, 0.05);
 }
 
 [data-theme="midnight"] {
@@ -84,6 +90,12 @@
   --rail-search-bg: #222228;
   --rail-search-hover: #2a2a32;
   --rail-card-bg: #1c1c22;
+  --btn-contrast-bg: #f4f4f5;
+  --btn-contrast-hover: #e4e4e7;
+  --btn-contrast-text: #0f1419;
+  --error-bg: #3a1518;
+  --error-text: #ffb4b0;
+  --hover-overlay: rgba(255, 255, 255, 0.06);
   color-scheme: dark;
 }
 
@@ -121,6 +133,12 @@
   --rail-search-bg: #e8eef2;
   --rail-search-hover: #dde6ec;
   --rail-card-bg: #eef3f6;
+  --btn-contrast-bg: #0f172a;
+  --btn-contrast-hover: #1e293b;
+  --btn-contrast-text: #ffffff;
+  --error-bg: #fdecea;
+  --error-text: #b3261e;
+  --hover-overlay: rgba(15, 23, 42, 0.05);
 }
 
 [data-theme="ink"] {
@@ -157,6 +175,12 @@
   --rail-search-bg: #ececf1;
   --rail-search-hover: #e2e2e9;
   --rail-card-bg: #f0f0f4;
+  --btn-contrast-bg: #0f1419;
+  --btn-contrast-hover: #272c30;
+  --btn-contrast-text: #ffffff;
+  --error-bg: #fdecea;
+  --error-text: #b3261e;
+  --hover-overlay: rgba(15, 20, 25, 0.05);
 }
 
 * {
@@ -396,7 +420,7 @@ button {
 }
 
 .sidebar-link:hover {
-  background: rgba(15, 20, 25, 0.05);
+  background: var(--hover-overlay);
 }
 
 .sidebar-link.active {
@@ -430,7 +454,7 @@ button {
 }
 
 .sidebar-user:hover {
-  background: rgba(15, 20, 25, 0.05);
+  background: var(--hover-overlay);
 }
 
 .sidebar-user-info {
@@ -619,7 +643,7 @@ button {
 }
 
 .rail-person:hover {
-  background: rgba(15, 20, 25, 0.04);
+  background: var(--hover-overlay);
 }
 
 .rail-person-info {
@@ -863,8 +887,8 @@ button:disabled {
 }
 
 .error {
-  background: #fdecea;
-  color: #b3261e;
+  background: var(--error-bg);
+  color: var(--error-text);
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
@@ -2972,29 +2996,18 @@ a.post-time:hover {
 }
 
 .x-btn-phone {
-  background: #0f1419;
-  color: #ffffff;
-  border-color: #0f1419;
+  background: var(--btn-contrast-bg);
+  color: var(--btn-contrast-text);
+  border-color: var(--btn-contrast-bg);
 }
 
 .x-btn-phone:hover {
-  background: #272c30;
-  border-color: #272c30;
+  background: var(--btn-contrast-hover);
+  border-color: var(--btn-contrast-hover);
 }
 
-[data-theme="midnight"] .x-btn-phone {
-  background: #f4f4f5;
-  color: #0f1419;
-  border-color: #f4f4f5;
-}
-
-[data-theme="midnight"] .x-btn-phone:hover {
-  background: #e4e4e7;
-  border-color: #e4e4e7;
-}
-
-[data-theme="midnight"] .x-btn-phone .x-btn-icon {
-  color: #0f1419;
+.x-btn-phone .x-btn-icon {
+  color: var(--btn-contrast-text);
 }
 
 .x-btn-google {
