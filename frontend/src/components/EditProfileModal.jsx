@@ -2,12 +2,6 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 
-const LANGUAGES = [
-  { value: "en", label: "English" },
-  { value: "hi", label: "Hindi (हिन्दी)" },
-  { value: "te", label: "Telugu (తెలుగు)" },
-];
-
 const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
 
 export default function EditProfileModal({ open, profile, onClose, onSaved }) {
@@ -15,7 +9,6 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
-  const [language, setLanguage] = useState("en");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,7 +17,6 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
     setDisplayName(profile.display_name || "");
     setUsername(profile.username || "");
     setBio(profile.bio || "");
-    setLanguage(profile.language || "en");
     setError("");
   }, [open, profile]);
 
@@ -54,7 +46,6 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
         display_name: displayName.trim(),
         username: nextUsername,
         bio,
-        language,
       });
       updateUser(updated);
       onSaved?.(updated);
@@ -110,7 +101,9 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
               />
             </div>
           </label>
-          <p className="hint modal-hint">3–20 characters. Letters, numbers, underscore. Your profile URL changes with this.</p>
+          <p className="hint modal-hint">
+            3–20 characters. Letters, numbers, underscore. Your profile URL changes with this.
+          </p>
 
           <label>
             Bio
@@ -123,20 +116,6 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
             />
             <span className="char-count">{bio.length}/280</span>
           </label>
-
-          <label>
-            Language preference
-            <select value={language} onChange={(e) => setLanguage(e.target.value)}>
-              {LANGUAGES.map((lang) => (
-                <option key={lang.value} value={lang.value}>
-                  {lang.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <p className="hint modal-hint">
-            Saved on your account for Telugu / Hindi / English. Full UI translation comes later.
-          </p>
 
           {error && <div className="error">{error}</div>}
 

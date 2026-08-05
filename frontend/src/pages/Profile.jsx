@@ -10,12 +10,6 @@ import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
 const PAGE_SIZE = 20;
 
-const LANGUAGE_LABELS = {
-  en: "English",
-  hi: "Hindi",
-  te: "Telugu",
-};
-
 export default function Profile() {
   const { username } = useParams();
   const { token, user, updateUser } = useAuth();
@@ -192,7 +186,6 @@ export default function Profile() {
 
   const isMe = user && user.username === profile.username;
   const postLabel = postsLoading ? "…" : `${posts.length}${hasMore ? "+" : ""} post${posts.length === 1 ? "" : "s"}`;
-  const languageLabel = LANGUAGE_LABELS[profile.language] || profile.language;
 
   return (
     <div className="feed-wrap">
@@ -350,10 +343,6 @@ export default function Profile() {
         </div>
 
         {profile.bio && <p className="profile-bio">{profile.bio}</p>}
-
-        <div className="profile-meta">
-          <span className="profile-meta-item">{languageLabel}</span>
-        </div>
 
         {error && <div className="error">{error}</div>}
 
