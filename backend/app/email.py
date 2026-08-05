@@ -76,12 +76,16 @@ def _send_resend(to_email: str, subject: str, text_body: str, html_body: str) ->
         "text": text_body,
         "html": html_body,
     }
+    # Cloudflare in front of Resend blocks the default Python-urllib User-Agent
+    # (HTTP 403 / error code 1010). Send an explicit client identity.
     req = urllib.request.Request(
         "https://api.resend.com/emails",
         data=json.dumps(payload).encode("utf-8"),
         headers={
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "BaratX/1.0 (+https://barathx.com)",
         },
         method="POST",
     )
