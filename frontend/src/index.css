@@ -3100,8 +3100,10 @@ a.post-time:hover {
 
 /* ---------- More menu + Lists / Communities / Spaces / Settings ---------- */
 
-.sidebar-more-wrap {
-  position: relative;
+.sidebar-more-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .sidebar-more-btn {
@@ -3113,29 +3115,20 @@ a.post-time:hover {
   text-align: left;
 }
 
-.more-menu {
-  position: absolute;
-  left: 0;
-  bottom: calc(100% + 0.35rem);
-  min-width: 220px;
-  padding: 0.4rem 0;
-  border-radius: 14px;
-  border: 1px solid var(--border, rgba(127, 127, 127, 0.25));
-  background: var(--bg-elevated, var(--bg, #fff));
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
-  z-index: 40;
+.sidebar-more-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.15rem 0 0.35rem 0.85rem;
+  margin-left: 0.55rem;
+  border-left: 2px solid rgba(127, 127, 127, 0.22);
 }
 
-.more-menu-item {
-  display: block;
-  padding: 0.7rem 1rem;
-  color: var(--text, inherit);
-  text-decoration: none;
+.sidebar-more-link {
+  font-size: 0.95rem;
   font-weight: 600;
-}
-
-.more-menu-item:hover {
-  background: rgba(127, 127, 127, 0.1);
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
 }
 
 .surface-page .surface-lead {
@@ -3286,15 +3279,4 @@ a.post-time:hover {
 .ok-hint {
   color: var(--success, #00ba7c);
   padding: 0 1rem;
-}
-
-.more-menu-logout {
-  width: 100%;
-  border: none;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-  border-top: 1px solid var(--border, rgba(127, 127, 127, 0.2));
-  margin-top: 0.25rem;
-  color: var(--danger, #f4212e);
 }
