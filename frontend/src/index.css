@@ -2972,13 +2972,29 @@ a.post-time:hover {
 }
 
 .x-btn-phone {
-  background: var(--text);
-  color: #fff;
-  border-color: var(--text);
+  background: #0f1419;
+  color: #ffffff;
+  border-color: #0f1419;
 }
 
 .x-btn-phone:hover {
   background: #272c30;
+  border-color: #272c30;
+}
+
+[data-theme="midnight"] .x-btn-phone {
+  background: #f4f4f5;
+  color: #0f1419;
+  border-color: #f4f4f5;
+}
+
+[data-theme="midnight"] .x-btn-phone:hover {
+  background: #e4e4e7;
+  border-color: #e4e4e7;
+}
+
+[data-theme="midnight"] .x-btn-phone .x-btn-icon {
+  color: #0f1419;
 }
 
 .x-btn-google {
@@ -3005,6 +3021,8 @@ a.post-time:hover {
   width: 100%;
   pointer-events: none;
   user-select: none;
+  position: relative;
+  z-index: 1;
 }
 
 .x-google-shell.is-busy .x-google-face {
@@ -3016,7 +3034,7 @@ a.post-time:hover {
   inset: 0;
   z-index: 2;
   overflow: hidden;
-  opacity: 0.02;
+  opacity: 0;
   cursor: pointer;
 }
 
