@@ -2458,6 +2458,36 @@ a.post-username:hover {
   padding: 1rem 1.15rem 1.25rem;
 }
 
+.username-field {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0 0.65rem;
+  background: var(--surface);
+}
+
+.username-field:focus-within {
+  border-color: var(--brand);
+}
+
+.username-prefix {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.username-field input {
+  border: none !important;
+  padding-left: 0.15rem !important;
+  flex: 1;
+  min-width: 0;
+}
+
+.username-field input:focus {
+  outline: none;
+}
+
 .modal-form select {
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--border-strong);

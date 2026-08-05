@@ -181,6 +181,9 @@ export default function Profile() {
 
   function handleProfileSaved(updated) {
     setProfile(updated);
+    if (updated?.username && updated.username !== username) {
+      navigate(`/u/${updated.username}`, { replace: true });
+    }
   }
 
   if (profileLoading) return <div className="page-loading">Loading profile...</div>;

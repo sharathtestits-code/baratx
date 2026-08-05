@@ -954,6 +954,26 @@ def update_me(
         current_user.bio = data["bio"]
     if "language" in data:
         current_user.language = data["language"]
+    if "username" in data:
+        new_username = data["username"]
+        reserved = set(seed.OFFICIAL_USERNAMES) | {
+            "admin",
+            "support",
+            "barathx",
+            "help",
+            "official",
+        }
+        if new_username in reserved:
+            raise HTTPException(status_code=400, detail="That username is reserved")
+        if new_username != current_user.username:
+            taken = (
+                db.query(models.User)
+                .filter(models.User.username == new_username, models.User.id != current_user.id)
+                .first()
+            )
+            if taken:
+                raise HTTPException(status_code=400, detail="Username already taken")
+            current_user.username = new_username
 
     db.commit()
     db.refresh(current_user)

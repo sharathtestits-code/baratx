@@ -115,6 +115,7 @@ class MessageResponse(BaseModel):
 
 class UserUpdate(BaseModel):
     display_name: Optional[str] = None
+    username: Optional[str] = None
     bio: Optional[str] = None
     language: Optional[str] = None
 
@@ -127,6 +128,16 @@ class UserUpdate(BaseModel):
         if len(name) < 1 or len(name) > 50:
             raise ValueError("Display name must be 1–50 characters")
         return name
+
+    @field_validator("username")
+    @classmethod
+    def valid_username(cls, v):
+        if v is None:
+            return v
+        v = v.strip().lstrip("@")
+        if not USERNAME_RE.match(v):
+            raise ValueError("Username must be 3-20 chars: letters, numbers, underscore only")
+        return v.lower()
 
     @field_validator("bio")
     @classmethod

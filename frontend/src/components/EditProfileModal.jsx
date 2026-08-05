@@ -8,9 +8,12 @@ const LANGUAGES = [
   { value: "te", label: "Telugu (తెలుగు)" },
 ];
 
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
 export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   const { token, updateUser } = useAuth();
   const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [language, setLanguage] = useState("en");
   const [busy, setBusy] = useState(false);
@@ -19,6 +22,7 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   useEffect(() => {
     if (!open || !profile) return;
     setDisplayName(profile.display_name || "");
+    setUsername(profile.username || "");
     setBio(profile.bio || "");
     setLanguage(profile.language || "en");
     setError("");
@@ -38,11 +42,17 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!token || busy) return;
+    const nextUsername = username.trim().replace(/^@/, "").toLowerCase();
+    if (!USERNAME_RE.test(nextUsername)) {
+      setError("Username must be 3–20 characters: letters, numbers, underscore only");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
       const updated = await api.updateMe(token, {
         display_name: displayName.trim(),
+        username: nextUsername,
         bio,
         language,
       });
@@ -85,6 +95,24 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
           </label>
 
           <label>
+            Username
+            <div className="username-field">
+              <span className="username-prefix" aria-hidden="true">
+                @
+              </span>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+                maxLength={20}
+                autoComplete="username"
+                required
+              />
+            </div>
+          </label>
+          <p className="hint modal-hint">3–20 characters. Letters, numbers, underscore. Your profile URL changes with this.</p>
+
+          <label>
             Bio
             <textarea
               value={bio}
@@ -116,7 +144,11 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
             <button type="button" className="modal-cancel" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="post-btn" disabled={busy || !displayName.trim()}>
+            <button
+              type="submit"
+              className="post-btn"
+              disabled={busy || !displayName.trim() || !username.trim()}
+            >
               {busy ? "Saving..." : "Save"}
             </button>
           </div>
