@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { API_BASE, api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
@@ -319,12 +319,12 @@ export default function Profile() {
         {error && <div className="error">{error}</div>}
 
         <div className="profile-stats">
-          <span>
+          <Link to={`/u/${profile.username}/following`} className="profile-stat-link">
             <b>{profile.following_count}</b> Following
-          </span>
-          <span>
+          </Link>
+          <Link to={`/u/${profile.username}/followers`} className="profile-stat-link">
             <b>{profile.follower_count}</b> Followers
-          </span>
+          </Link>
         </div>
       </div>
 

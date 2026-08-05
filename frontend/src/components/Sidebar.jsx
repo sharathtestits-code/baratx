@@ -1,12 +1,39 @@
+import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { IconHome, IconLogout, IconSearch, IconUser, IconMore } from "./Icons";
+import { notificationsApi } from "../api";
+import { IconBell, IconHome, IconLogout, IconSearch, IconUser, IconMore } from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
 export default function Sidebar() {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const navigate = useNavigate();
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    async function refresh() {
+      try {
+        const data = await notificationsApi.unreadCount(token);
+        if (!cancelled) setUnread(data.unread_count || 0);
+      } catch {
+        // ignore badge errors
+      }
+    }
+
+    refresh();
+    const onRead = () => setUnread(0);
+    window.addEventListener("bx:notifications-read", onRead);
+    const id = window.setInterval(refresh, 45000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+      window.removeEventListener("bx:notifications-read", onRead);
+    };
+  }, [token]);
 
   if (!user) return null;
 
@@ -17,7 +44,6 @@ export default function Sidebar() {
 
   function goCompose() {
     navigate("/feed");
-    // Focus compose after navigation
     requestAnimationFrame(() => {
       const el = document.querySelector(".compose textarea");
       if (el) el.focus();
@@ -38,6 +64,16 @@ export default function Sidebar() {
           <NavLink to="/search" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconSearch className="sidebar-icon" />
             <span>Explore</span>
+          </NavLink>
+          <NavLink
+            to="/notifications"
+            className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+          >
+            <span className="sidebar-icon-wrap">
+              <IconBell className="sidebar-icon" />
+              {unread > 0 && <span className="nav-badge">{unread > 9 ? "9+" : unread}</span>}
+            </span>
+            <span>Notifications</span>
           </NavLink>
           <NavLink to={`/u/${user.username}`} className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconUser className="sidebar-icon" />

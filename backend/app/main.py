@@ -33,6 +33,20 @@ def run_migrations():
             conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
         if "cover_url" not in existing_cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
+
+        # notifications.kind may have been created as "type" in an earlier attempt
+        notif_tables = {
+            row[0]
+            for row in conn.execute(
+                text("SELECT name FROM sqlite_master WHERE type='table' AND name='notifications'")
+            )
+        }
+        if "notifications" in notif_tables:
+            notif_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(notifications)"))}
+            if "kind" not in notif_cols and "type" in notif_cols:
+                conn.execute(text("ALTER TABLE notifications RENAME COLUMN type TO kind"))
+            elif "kind" not in notif_cols:
+                conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
         conn.commit()
 
 
@@ -239,6 +253,47 @@ def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) ->
         author=schemas.AuthorOut.model_validate(reply.author),
         like_count=len(reply.likes),
         liked_by_me=liked_by_me,
+    )
+
+
+def create_notification(
+    db: Session,
+    *,
+    recipient_id: str,
+    actor_id: str,
+    kind: str,
+    post_id: Optional[str] = None,
+    reply_id: Optional[str] = None,
+):
+    if recipient_id == actor_id:
+        return
+    db.add(
+        models.Notification(
+            recipient_id=recipient_id,
+            actor_id=actor_id,
+            kind=kind,
+            post_id=post_id,
+            reply_id=reply_id,
+        )
+    )
+
+
+def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
+    preview = None
+    reply_preview = None
+    if n.post is not None:
+        preview = (n.post.text or "")[:140]
+    if n.reply is not None:
+        reply_preview = (n.reply.text or "")[:140]
+    return schemas.NotificationOut(
+        id=n.id,
+        type=n.kind,
+        created_at=n.created_at,
+        is_read=n.is_read,
+        actor=schemas.AuthorOut.model_validate(n.actor),
+        post_id=n.post_id,
+        post_preview=preview,
+        reply_preview=reply_preview,
     )
 
 
@@ -723,6 +778,12 @@ def follow_user(
     )
     if not existing:
         db.add(models.Follow(follower_id=current_user.id, followed_id=target.id))
+        create_notification(
+            db,
+            recipient_id=target.id,
+            actor_id=current_user.id,
+            kind="follow",
+        )
         db.commit()
         db.refresh(target)
         db.refresh(current_user)
@@ -752,6 +813,48 @@ def unfollow_user(
         db.refresh(current_user)
 
     return serialize_user(target, current_user)
+
+
+@app.get("/users/{username}/followers", response_model=list[schemas.UserOut])
+def list_followers(
+    username: str,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    limit = max(1, min(limit, 100))
+    follows = (
+        db.query(models.Follow)
+        .filter(models.Follow.followed_id == user.id)
+        .order_by(models.Follow.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return [serialize_user(f.follower, current_user) for f in follows]
+
+
+@app.get("/users/{username}/following", response_model=list[schemas.UserOut])
+def list_following(
+    username: str,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    limit = max(1, min(limit, 100))
+    follows = (
+        db.query(models.Follow)
+        .filter(models.Follow.follower_id == user.id)
+        .order_by(models.Follow.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return [serialize_user(f.followed, current_user) for f in follows]
 
 
 # ---------- Posts / feed ----------
@@ -901,6 +1004,13 @@ def like_post(
     )
     if not existing:
         db.add(models.Like(post_id=post_id, user_id=current_user.id))
+        create_notification(
+            db,
+            recipient_id=post.author_id,
+            actor_id=current_user.id,
+            kind="like",
+            post_id=post.id,
+        )
         db.commit()
         db.refresh(post)
 
@@ -949,6 +1059,13 @@ def repost_post(
     )
     if not existing:
         db.add(models.Repost(post_id=post_id, user_id=current_user.id))
+        create_notification(
+            db,
+            recipient_id=post.author_id,
+            actor_id=current_user.id,
+            kind="repost",
+            post_id=post.id,
+        )
         db.commit()
         db.refresh(post)
 
@@ -999,6 +1116,15 @@ def create_reply(
 
     reply = models.Reply(post_id=post_id, author_id=current_user.id, text=text)
     db.add(reply)
+    db.flush()
+    create_notification(
+        db,
+        recipient_id=post.author_id,
+        actor_id=current_user.id,
+        kind="reply",
+        post_id=post.id,
+        reply_id=reply.id,
+    )
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, current_user)
@@ -1104,3 +1230,66 @@ def search(
         users=[schemas.UserSearchOut.model_validate(u) for u in users],
         posts=[serialize_post(p, current_user) for p in posts],
     )
+
+
+# ---------- Notifications ----------
+
+@app.get("/notifications", response_model=schemas.NotificationListOut)
+def list_notifications(
+    limit: int = 40,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    limit = max(1, min(limit, 100))
+    items = (
+        db.query(models.Notification)
+        .filter(models.Notification.recipient_id == current_user.id)
+        .order_by(models.Notification.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    unread = (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.recipient_id == current_user.id,
+            models.Notification.is_read == False,  # noqa: E712
+        )
+        .count()
+    )
+    return schemas.NotificationListOut(
+        items=[serialize_notification(n) for n in items],
+        unread_count=unread,
+    )
+
+
+@app.get("/notifications/unread-count", response_model=schemas.UnreadCountOut)
+def notifications_unread_count(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    unread = (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.recipient_id == current_user.id,
+            models.Notification.is_read == False,  # noqa: E712
+        )
+        .count()
+    )
+    return schemas.UnreadCountOut(unread_count=unread)
+
+
+@app.post("/notifications/read", response_model=schemas.UnreadCountOut)
+def mark_notifications_read(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.recipient_id == current_user.id,
+            models.Notification.is_read == False,  # noqa: E712
+        )
+        .update({"is_read": True})
+    )
+    db.commit()
+    return schemas.UnreadCountOut(unread_count=0)

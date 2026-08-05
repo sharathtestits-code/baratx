@@ -173,3 +173,23 @@ class Repost(Base):
 
     user = relationship("User", back_populates="reposts")
     post = relationship("Post", back_populates="reposts")
+
+
+class Notification(Base):
+    """In-app notifications for follow / like / reply / repost."""
+
+    __tablename__ = "notifications"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    recipient_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    actor_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False)  # follow | like | reply | repost
+    post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
+    reply_id = Column(String, ForeignKey("replies.id"), nullable=True)
+    is_read = Column(Boolean, default=False, nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    recipient = relationship("User", foreign_keys=[recipient_id])
+    actor = relationship("User", foreign_keys=[actor_id])
+    post = relationship("Post")
+    reply = relationship("Reply")

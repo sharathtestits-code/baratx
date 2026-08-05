@@ -9,6 +9,8 @@ import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import PostDetail from "./pages/PostDetail";
+import Notifications from "./pages/Notifications";
+import FollowList from "./pages/FollowList";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
@@ -41,8 +43,10 @@ function AppShell() {
           <Route path="/login" element={<Navigate to="/feed" replace />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/posts/:postId" element={<PostDetail />} />
           <Route path="/u/:username" element={<Profile />} />
+          <Route path="/u/:username/:kind" element={<FollowList />} />
           <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
       </main>

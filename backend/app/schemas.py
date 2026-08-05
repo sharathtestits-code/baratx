@@ -231,3 +231,26 @@ class UserSearchOut(BaseModel):
 class SearchResults(BaseModel):
     users: list[UserSearchOut]
     posts: list[PostOut]
+
+
+class NotificationOut(BaseModel):
+    id: str
+    type: str  # follow | like | reply | repost
+    created_at: datetime
+    is_read: bool
+    actor: AuthorOut
+    post_id: Optional[str] = None
+    post_preview: Optional[str] = None
+    reply_preview: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class NotificationListOut(BaseModel):
+    items: list[NotificationOut]
+    unread_count: int
+
+
+class UnreadCountOut(BaseModel):
+    unread_count: int

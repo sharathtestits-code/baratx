@@ -118,6 +118,12 @@ export const api = {
 
   removeCover: (token) =>
     request("/users/me/cover", { method: "DELETE", headers: authHeaders(token) }),
+
+  getFollowers: (username, token) =>
+    request(`/users/${encodeURIComponent(username)}/followers`, { headers: authHeaders(token) }),
+
+  getFollowing: (username, token) =>
+    request(`/users/${encodeURIComponent(username)}/following`, { headers: authHeaders(token) }),
 };
 
 export const postsApi = {
@@ -188,4 +194,12 @@ export const socialApi = {
 export const searchApi = {
   search: (q, token) =>
     request(`/search?q=${encodeURIComponent(q)}`, { headers: authHeaders(token) }),
+};
+
+export const notificationsApi = {
+  list: (token) => request("/notifications", { headers: authHeaders(token) }),
+  unreadCount: (token) =>
+    request("/notifications/unread-count", { headers: authHeaders(token) }),
+  markRead: (token) =>
+    request("/notifications/read", { method: "POST", headers: authHeaders(token) }),
 };
