@@ -32,9 +32,14 @@ from typing import Optional
 
 logger = logging.getLogger("baratx.email")
 
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
-EMAIL_FROM = os.environ.get("EMAIL_FROM", "BaratX <hello@barathx.com>")
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
+# Never email localhost verify links from production (common misconfig).
+if ENVIRONMENT == "production" and (
+    "localhost" in FRONTEND_URL or "127.0.0.1" in FRONTEND_URL or not FRONTEND_URL
+):
+    FRONTEND_URL = "https://barathx.com"
+EMAIL_FROM = os.environ.get("EMAIL_FROM", "BaratX <hello@barathx.com>")
 
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
