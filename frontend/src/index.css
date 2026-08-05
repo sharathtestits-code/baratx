@@ -483,6 +483,8 @@ button {
 
 .rail-search {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.65rem;
   background: var(--rail-search-bg);
@@ -1410,6 +1412,8 @@ a.post-username:hover {
 
 .reply-form {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.6rem;
 }
@@ -2150,6 +2154,8 @@ a.post-username:hover {
 
 .search-form {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.55rem;
   margin: 0 0 0.95rem;
