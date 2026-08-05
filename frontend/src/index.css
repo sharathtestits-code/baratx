@@ -2476,7 +2476,7 @@ a.post-username:hover {
 }
 
 .user-result:hover {
-  background: #fafbfc;
+  background: var(--hover-overlay);
 }
 
 .user-result-name {
