@@ -23,7 +23,11 @@ export default function Admin() {
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
   const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
+  const [postText, setPostText] = useState("");
+  const [postAs, setPostAs] = useState("baratx");
+  const [posting, setPosting] = useState(false);
 
   const load = useCallback(async (adminSecret) => {
     if (!adminSecret) return;
@@ -70,6 +74,28 @@ export default function Admin() {
     setUsers([]);
     setTotal(0);
     setError("");
+    setMsg("");
+  }
+
+  async function handleAdminPost(e) {
+    e.preventDefault();
+    if (!postText.trim() || !secret) return;
+    setPosting(true);
+    setError("");
+    setMsg("");
+    try {
+      const post = await adminApi.createPost(secret, {
+        text: postText.trim(),
+        username: postAs,
+      });
+      setPostText("");
+      setMsg(`Posted as @${post.author?.username || postAs}`);
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not post");
+    } finally {
+      setPosting(false);
+    }
   }
 
   if (!secret) {
@@ -118,6 +144,37 @@ export default function Admin() {
       </header>
 
       {error && <div className="error">{error}</div>}
+      {msg && <p className="hint ok-hint">{msg}</p>}
+
+      <section className="admin-compose">
+        <h2>Post as BaratX</h2>
+        <p className="hint">Publish from an official account without logging into the app.</p>
+        <form className="admin-compose-form" onSubmit={handleAdminPost}>
+          <label>
+            Account
+            <select value={postAs} onChange={(e) => setPostAs(e.target.value)}>
+              <option value="baratx">@baratx — BaratX</option>
+              <option value="bharatvoices">@bharatvoices — Bharat Voices</option>
+              <option value="indiatech">@indiatech — India Tech Daily</option>
+            </select>
+          </label>
+          <label>
+            Post
+            <textarea
+              value={postText}
+              onChange={(e) => setPostText(e.target.value)}
+              maxLength={500}
+              rows={4}
+              placeholder="Say something India can reply to…"
+              required
+            />
+            <span className="char-count">{postText.length}/500</span>
+          </label>
+          <button type="submit" className="btn btn-primary" disabled={posting || !postText.trim()}>
+            {posting ? "Posting…" : "Post"}
+          </button>
+        </form>
+      </section>
 
       {stats && (
         <div className="admin-stats">

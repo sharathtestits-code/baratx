@@ -50,12 +50,19 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
    - Optional: `ADMIN_SECRET` for the registrations page at https://barathx.com/admin
 2. MSG91 later for SMS OTP
 
-### See who registered
+### See who registered / post as BaratX
 
 1. Set `ADMIN_SECRET` on the Railway API service (long random string).
 2. Redeploy the API if needed.
 3. Open https://barathx.com/admin and enter that secret.
-4. You’ll see total users, last 24h / 7d counts, and a newest-first list.
+4. You’ll see total users, last 24h / 7d counts, a newest-first list, and **Post as BaratX**.
+
+### Log in as official @baratx (optional)
+
+1. Set `OFFICIAL_ACCOUNT_PASSWORD` on the Railway API (strong password).
+2. Redeploy / restart so seed can sync the hash.
+3. On https://barathx.com/login use username `baratx` (or email `baratx@barathx.com`) + that password.
+4. Same password works for `@bharatvoices` and `@indiatech`.
 
 ### Railway deploy notes
 

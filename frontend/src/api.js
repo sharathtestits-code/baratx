@@ -387,4 +387,10 @@ export const adminApi = {
     request(`/admin/users?limit=${limit}&offset=${offset}`, {
       headers: { "X-Admin-Secret": adminSecret },
     }),
+  createPost: (adminSecret, body) =>
+    request("/admin/posts", {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify(body),
+    }),
 };

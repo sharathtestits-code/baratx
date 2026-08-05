@@ -615,6 +615,33 @@ def admin_users(
     )
 
 
+@app.post("/admin/posts", response_model=schemas.PostOut)
+def admin_create_post(
+    payload: schemas.AdminPostCreate,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Post as an official BaratX account using ADMIN_SECRET (no user login)."""
+    username = payload.username
+    if username not in set(seed.OFFICIAL_USERNAMES):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Can only post as official accounts: {', '.join(seed.OFFICIAL_USERNAMES)}",
+        )
+    author = db.query(models.User).filter(models.User.username == username).first()
+    if not author:
+        raise HTTPException(status_code=404, detail=f"@{username} not found — seed may not have run")
+
+    post = models.Post(author_id=author.id, text=payload.text)
+    db.add(post)
+    db.flush()
+    attach_hashtags(db, post, payload.text)
+    notify_mentions(db, author.id, payload.text, post_id=post.id)
+    db.commit()
+    db.refresh(post)
+    return serialize_post(post, author)
+
+
 # ---------- Email signup / login ----------
 
 @app.post("/auth/signup/email", response_model=schemas.TokenResponse)

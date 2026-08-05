@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import secrets
 
 from sqlalchemy.orm import Session
@@ -45,15 +46,18 @@ OFFICIAL_USERNAMES = [a["username"] for a in OFFICIAL_ACCOUNTS]
 def seed_official_accounts(db: Session) -> None:
     """Create official accounts + starter posts if missing. Safe to run every boot."""
     created_any = False
+    official_password = os.environ.get("OFFICIAL_ACCOUNT_PASSWORD", "").strip()
     for acct in OFFICIAL_ACCOUNTS:
         user = db.query(models.User).filter(models.User.username == acct["username"]).first()
         if not user:
+            # Prefer shared official password when set; otherwise random (unusable login).
+            pwd = official_password or secrets.token_urlsafe(32)
             user = models.User(
                 username=acct["username"],
                 display_name=acct["display_name"],
                 bio=acct["bio"],
                 email=f"{acct['username']}@barathx.com",
-                password_hash=auth.hash_password(secrets.token_urlsafe(32)),
+                password_hash=auth.hash_password(pwd),
                 is_email_verified=True,
             )
             db.add(user)
@@ -64,6 +68,10 @@ def seed_official_accounts(db: Session) -> None:
             # Keep bios current without overwriting user edits to display name.
             if not (user.bio or "").strip():
                 user.bio = acct["bio"]
+            # Sync password from env so founders can log in and post as the brand.
+            if official_password:
+                user.password_hash = auth.hash_password(official_password)
+                created_any = True
 
         existing_posts = (
             db.query(models.Post).filter(models.Post.author_id == user.id).count()
