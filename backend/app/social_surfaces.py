@@ -9,7 +9,7 @@ from typing import Callable, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 
-from app import models, schemas, text_parse
+from app import models, schemas
 from app.database import get_db
 
 router = APIRouter()
