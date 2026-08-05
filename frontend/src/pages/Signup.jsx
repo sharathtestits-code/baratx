@@ -6,7 +6,7 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 
 export default function Signup() {
   const [params] = useSearchParams();
-  const [method, setMethod] = useState(params.get("method") === "phone" ? "phone" : "email");
+  const [method, setMethod] = useState(params.get("method") === "email" ? "email" : "phone");
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -97,16 +97,6 @@ export default function Signup() {
 
       <div className="method-toggle">
         <button
-          className={method === "email" ? "active" : ""}
-          onClick={() => {
-            setMethod("email");
-            setError("");
-          }}
-          type="button"
-        >
-          Email
-        </button>
-        <button
           className={method === "phone" ? "active" : ""}
           onClick={() => {
             setMethod("phone");
@@ -115,6 +105,16 @@ export default function Signup() {
           type="button"
         >
           Phone
+        </button>
+        <button
+          className={method === "email" ? "active" : ""}
+          onClick={() => {
+            setMethod("email");
+            setError("");
+          }}
+          type="button"
+        >
+          Email
         </button>
       </div>
 

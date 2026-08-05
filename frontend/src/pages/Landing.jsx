@@ -5,8 +5,7 @@ import { IconPhone } from "../components/Icons";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 /**
- * X-inspired landing: brand-dominant right column + auth actions on the left.
- * India theme via saffron CTAs / navy links (CSS tokens).
+ * Public GTM landing for logged-out visitors — brand-first, shareable, phone-first CTA.
  */
 export default function Landing() {
   const navigate = useNavigate();
@@ -38,8 +37,11 @@ export default function Landing() {
       <div className="x-landing-auth">
         <div className="x-landing-auth-inner">
           <LogoMark className="x-landing-mark-sm" title="BaratX" />
-          <h1 className="x-landing-headline">Happening now</h1>
-          <h2 className="x-landing-subhead">Join BaratX today.</h2>
+          <p className="x-landing-brand-line">BaratX</p>
+          <h1 className="x-landing-headline">India&apos;s public square</h1>
+          <p className="x-landing-support">
+            Short posts. Real conversation. Start in English — Hindi &amp; Telugu on the way.
+          </p>
 
           <div className="x-auth-stack">
             <button
@@ -74,14 +76,16 @@ export default function Landing() {
             </form>
 
             <p className="x-legal">
-              By signing up, you agree to the Terms of Service and Privacy Policy, including Cookie
-              Use.
+              By signing up, you agree to the Terms of Service and Privacy Policy.
             </p>
 
             <div className="x-have-account">
               <p>Already have an account?</p>
               <Link to={signInPath()} className="x-btn x-btn-outline">
                 Sign in
+              </Link>
+              <Link to="/login?method=phone" className="x-create-link">
+                Sign in with phone OTP
               </Link>
               <Link to="/signup" className="x-create-link">
                 Create account with email
@@ -97,6 +101,7 @@ export default function Landing() {
         <div className="x-landing-word">
           Barat<span className="x-landing-word-x">X</span>
         </div>
+        <p className="x-landing-brand-tag">barathx.com</p>
       </div>
     </div>
   );

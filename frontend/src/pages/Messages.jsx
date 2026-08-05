@@ -11,14 +11,20 @@ export default function Messages() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      setError("Sign in to see messages.");
+      return;
+    }
     let cancelled = false;
     async function load() {
       setLoading(true);
+      setError("");
       try {
         const data = await messagesApi.conversations(token);
-        if (!cancelled) setItems(data);
+        if (!cancelled) setItems(Array.isArray(data) ? data : []);
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) setError(err.message || "Could not load messages");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -35,9 +41,16 @@ export default function Messages() {
         <h1>Messages</h1>
       </div>
       {loading ? (
-        <p className="hint">Loading…</p>
+        <p className="hint search-status">Loading messages…</p>
       ) : error ? (
-        <div className="error">{error}</div>
+        <div className="error">
+          {error}
+          <div style={{ marginTop: 8 }}>
+            <button type="button" className="btn-secondary" onClick={() => window.location.reload()}>
+              Retry
+            </button>
+          </div>
+        </div>
       ) : items.length === 0 ? (
         <div className="empty-state">
           <p className="empty-state-title">No conversations yet</p>
@@ -53,7 +66,7 @@ export default function Messages() {
                   {c.user.display_name}
                   {c.unread_count > 0 && <span className="dm-unread">{c.unread_count}</span>}
                 </div>
-                <div className="people-bio">{c.last_message.text}</div>
+                <div className="people-bio">{c.last_message?.text}</div>
               </div>
             </Link>
           ))}

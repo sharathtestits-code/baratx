@@ -45,6 +45,11 @@ export default function Notifications() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      setError("Sign in to see notifications.");
+      return;
+    }
     let cancelled = false;
     async function load() {
       setLoading(true);
@@ -52,11 +57,13 @@ export default function Notifications() {
       try {
         const data = await notificationsApi.list(token);
         if (cancelled) return;
-        setItems(data.items || []);
-        await notificationsApi.markRead(token);
-        window.dispatchEvent(new CustomEvent("bx:notifications-read"));
+        setItems(Array.isArray(data?.items) ? data.items : []);
+        // Never block the list UI on mark-read.
+        notificationsApi.markRead(token).then(() => {
+          window.dispatchEvent(new CustomEvent("bx:notifications-read"));
+        }).catch(() => {});
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) setError(err.message || "Could not load notifications");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -68,7 +75,7 @@ export default function Notifications() {
   }, [token]);
 
   function openNotification(n) {
-    if (n.type === "message") {
+    if (n.type === "message" && n.actor?.username) {
       navigate(`/messages/${n.actor.username}`);
       return;
     }
@@ -76,7 +83,7 @@ export default function Notifications() {
       navigate(`/posts/${n.post_id}`);
       return;
     }
-    navigate(`/u/${n.actor.username}`);
+    if (n.actor?.username) navigate(`/u/${n.actor.username}`);
   }
 
   return (
@@ -86,9 +93,16 @@ export default function Notifications() {
       </div>
 
       {loading ? (
-        <p className="hint">Loading notifications…</p>
+        <p className="hint search-status">Loading notifications…</p>
       ) : error ? (
-        <div className="error">{error}</div>
+        <div className="error">
+          {error}
+          <div style={{ marginTop: 8 }}>
+            <button type="button" className="btn-secondary" onClick={() => window.location.reload()}>
+              Retry
+            </button>
+          </div>
+        </div>
       ) : items.length === 0 ? (
         <div className="empty-state">
           <p className="empty-state-title">No notifications yet</p>
@@ -104,20 +118,24 @@ export default function Notifications() {
               onClick={() => openNotification(n)}
             >
               <Avatar
-                name={n.actor.display_name}
-                username={n.actor.username}
-                url={n.actor.avatar_url}
+                name={n.actor?.display_name || "User"}
+                username={n.actor?.username || "user"}
+                url={n.actor?.avatar_url}
                 size={44}
               />
               <div className="notif-body">
                 <div className="notif-text">
-                  <Link
-                    to={`/u/${n.actor.username}`}
-                    className="notif-actor"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {n.actor.display_name}
-                  </Link>{" "}
+                  {n.actor?.username ? (
+                    <Link
+                      to={`/u/${n.actor.username}`}
+                      className="notif-actor"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {n.actor.display_name}
+                    </Link>
+                  ) : (
+                    <span className="notif-actor">Someone</span>
+                  )}{" "}
                   {notificationCopy(n)}
                 </div>
                 {(n.reply_preview || n.post_preview) && (

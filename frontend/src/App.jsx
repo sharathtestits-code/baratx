@@ -70,7 +70,7 @@ export default function App() {
   const location = useLocation();
 
   if (loading) {
-    return <div className="page-loading">Loading…</div>;
+    return <div className="page-loading">Starting BaratX…</div>;
   }
 
   // Admin + email confirm / password reset stay outside the app shell.
@@ -124,7 +124,8 @@ export default function App() {
             </AuthChrome>
           }
         />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Unknown logged-out URLs → public landing (GTM share target), not a bare login bounce */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
   }

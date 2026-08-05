@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("iv_token"));
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("iv_token")));
 
   useEffect(() => {
     if (!token) {
@@ -23,6 +23,7 @@ export function AuthProvider({ children }) {
       })
       .catch(() => {
         if (cancelled) return;
+        // Stale/broken session — clear so visitors see the public landing again.
         setToken(null);
         setUser(null);
         localStorage.removeItem("iv_token");

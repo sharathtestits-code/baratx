@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { searchApi } from "../api";
 import { useAuth } from "../context/AuthContext";
@@ -6,10 +6,19 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import { IconSearch } from "../components/Icons";
 
+const QUICK_SEARCHES = [
+  { label: "BaratX", query: "BaratX" },
+  { label: "Startup India", query: "StartupIndia" },
+  { label: "IPL", query: "IPL" },
+  { label: "Monsoon", query: "Monsoon" },
+  { label: "Tech", query: "tech" },
+];
+
 export default function Search() {
   const { token } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") || "";
+  const inputRef = useRef(null);
 
   const [inputValue, setInputValue] = useState(q);
   const [results, setResults] = useState({ users: [], posts: [] });
@@ -22,6 +31,7 @@ export default function Search() {
       runSearch(q);
     } else {
       setResults({ users: [], posts: [] });
+      inputRef.current?.focus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
@@ -41,8 +51,15 @@ export default function Search() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!inputValue.trim()) return;
-    setSearchParams({ q: inputValue.trim() });
+    const next = inputValue.trim();
+    if (!next) return;
+    setSearchParams({ q: next });
+  }
+
+  function clearQuery() {
+    setInputValue("");
+    setSearchParams({});
+    inputRef.current?.focus();
   }
 
   function handleDeleted(postId) {
@@ -51,25 +68,52 @@ export default function Search() {
 
   return (
     <div className="feed-wrap">
-      <form className="search-form" onSubmit={handleSubmit}>
-        <IconSearch className="search-form-icon" />
-        <input
-          type="text"
-          placeholder="Search people or posts..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-        <button type="submit">Search</button>
-      </form>
+      <header className="search-header">
+        <h1 className="search-title">Explore</h1>
+        <form className="search-form" onSubmit={handleSubmit} role="search">
+          <IconSearch className="search-form-icon" aria-hidden="true" />
+          <input
+            ref={inputRef}
+            type="search"
+            placeholder="Search people, posts, topics…"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            aria-label="Search BaratX"
+            enterKeyHint="search"
+            autoComplete="off"
+          />
+          {inputValue ? (
+            <button type="button" className="search-clear" onClick={clearQuery} aria-label="Clear search">
+              ×
+            </button>
+          ) : null}
+          <button type="submit" className="search-submit" disabled={!inputValue.trim()}>
+            Search
+          </button>
+        </form>
+      </header>
 
       {error && <div className="error">{error}</div>}
 
       {!q.trim() ? (
-        <div className="empty-state">
-          <p className="hint">Search for people by name or username, or posts by keyword.</p>
+        <div className="search-empty">
+          <p className="search-empty-lead">Find people and conversations across India.</p>
+          <p className="hint">Try a name, @username, or a topic.</p>
+          <div className="search-chips" aria-label="Suggested searches">
+            {QUICK_SEARCHES.map((item) => (
+              <button
+                key={item.query}
+                type="button"
+                className="search-chip"
+                onClick={() => setSearchParams({ q: item.query })}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       ) : loading ? (
-        <p className="hint">Searching...</p>
+        <p className="hint search-status">Searching…</p>
       ) : (
         <>
           {results.users.length > 0 && (
@@ -92,7 +136,7 @@ export default function Search() {
 
           <h3 className="section-title">Posts</h3>
           {results.posts.length === 0 ? (
-            <p className="hint">No posts found.</p>
+            <p className="hint search-status">No posts found.</p>
           ) : (
             <div className="post-list">
               {results.posts.map((post) => (
@@ -102,7 +146,7 @@ export default function Search() {
           )}
 
           {results.users.length === 0 && results.posts.length === 0 && (
-            <p className="hint">No results for "{q}".</p>
+            <p className="hint search-status">No results for “{q}”.</p>
           )}
         </>
       )}

@@ -6,7 +6,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app import models, schemas
 from app.database import get_db
@@ -249,6 +249,10 @@ def register_extra_routes(app, *, get_current_user, get_current_user_optional, s
     ):
         msgs = (
             db.query(models.DirectMessage)
+            .options(
+                joinedload(models.DirectMessage.sender),
+                joinedload(models.DirectMessage.recipient),
+            )
             .filter(
                 or_(
                     models.DirectMessage.sender_id == current_user.id,

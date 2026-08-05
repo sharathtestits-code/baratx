@@ -1,24 +1,46 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const DEFAULT_TIMEOUT_MS = 15000;
 
 async function request(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-  });
-
-  const data = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    const detail = Array.isArray(data.detail)
-      ? data.detail.map((d) => d.msg).join(", ")
-      : data.detail || "Something went wrong";
-    throw new Error(detail);
+  const { timeoutMs = DEFAULT_TIMEOUT_MS, headers: extraHeaders, signal: externalSignal, ...rest } =
+    options;
+  const controller = new AbortController();
+  const onExternalAbort = () => controller.abort();
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort();
+    else externalSignal.addEventListener("abort", onExternalAbort, { once: true });
   }
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  return data;
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      ...rest,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...(extraHeaders || {}),
+      },
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const detail = Array.isArray(data.detail)
+        ? data.detail.map((d) => d.msg).join(", ")
+        : data.detail || "Something went wrong";
+      throw new Error(detail);
+    }
+
+    return data;
+  } catch (err) {
+    if (err?.name === "AbortError") {
+      throw new Error("Request timed out. Check your connection and try again.");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+    if (externalSignal) externalSignal.removeEventListener("abort", onExternalAbort);
+  }
 }
 
 function authHeaders(token) {
@@ -57,7 +79,7 @@ export const api = {
   loginPhoneVerify: (body) =>
     request("/auth/login/phone/verify", { method: "POST", body: JSON.stringify(body) }),
 
-  me: (token) => request("/users/me", { headers: authHeaders(token) }),
+  me: (token) => request("/users/me", { headers: authHeaders(token), timeoutMs: 12000 }),
 
   updateMe: (token, body) =>
     request("/users/me", {

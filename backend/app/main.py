@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app import auth, email as email_service, google_auth, models, schemas, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
@@ -424,12 +424,22 @@ def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
         preview = (n.post.text or "")[:140]
     if n.reply is not None:
         reply_preview = (n.reply.text or "")[:140]
+    actor = n.actor
+    if actor is None:
+        actor = schemas.AuthorOut(
+            id=n.actor_id or "unknown",
+            username="deleted",
+            display_name="Deleted account",
+            avatar_url=None,
+        )
+    else:
+        actor = schemas.AuthorOut.model_validate(actor)
     return schemas.NotificationOut(
         id=n.id,
         type=n.kind,
         created_at=n.created_at,
         is_read=n.is_read,
-        actor=schemas.AuthorOut.model_validate(n.actor),
+        actor=actor,
         post_id=n.post_id,
         post_preview=preview,
         reply_preview=reply_preview,
@@ -1500,6 +1510,11 @@ def list_notifications(
     limit = max(1, min(limit, 100))
     items = (
         db.query(models.Notification)
+        .options(
+            joinedload(models.Notification.actor),
+            joinedload(models.Notification.post),
+            joinedload(models.Notification.reply),
+        )
         .filter(models.Notification.recipient_id == current_user.id)
         .order_by(models.Notification.created_at.desc())
         .limit(limit)
