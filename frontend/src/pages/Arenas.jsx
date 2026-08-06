@@ -66,8 +66,8 @@ export default function Arenas() {
         <h1>Arenas</h1>
       </div>
       <p className="hint surface-lead arenas-lead">
-        Not another firehose. Pick a topic, pick a side — Sports, Politics, Entertainment, News,
-        Startups (Fund it / Pass), or Spirituality.
+        Not another firehose. Pick a topic, pick a side — Sports, Politics, Entertainment, News, or
+        Spirituality.
       </p>
 
       {error && <div className="error">{error}</div>}

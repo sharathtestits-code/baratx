@@ -175,18 +175,16 @@ export default function ArenaDetail() {
       </section>
 
       <section className="arena-section">
-        <h2 className="section-title">
-          {arenaKey === "startups" ? "Idea validation debates" : "Live debates"}
-        </h2>
-        {arenaKey === "startups" && (
-          <p className="hint surface-lead">
-            BaratX’s YC-style square: pitch a startup idea or thesis. India picks{" "}
-            <strong>Fund it</strong> or <strong>Pass</strong> — then argue why.
-          </p>
-        )}
+        <h2 className="section-title">Live debates</h2>
         {arenaKey === "spirituality" && (
           <p className="hint surface-lead">
             Faith, wellness, and modern practice — debate what resonates in India right now.
+          </p>
+        )}
+        {(arenaKey === "politics" || arenaKey === "news") && (
+          <p className="hint surface-lead">
+            Open one real debate from your city or beat. First 100 people who do (or post one real
+            problem on Home) get ₹150 via UPI.
           </p>
         )}
         <form className="surface-create" onSubmit={startDebate}>

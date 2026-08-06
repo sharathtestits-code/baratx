@@ -26,16 +26,6 @@ export const ARENA_TOPICS = [
     accent: "#0369a1",
   },
   {
-    key: "startups",
-    name: "Startups",
-    blurb: "India’s idea square — pitch like YC, crowd votes Fund it or Pass.",
-    accent: "#b45309",
-    debateFor: "Fund it",
-    debateAgainst: "Pass",
-    composeHint: "Pitch your startup idea for India to Fund it or Pass…",
-    openDebateLabel: "Open Fund it vs Pass",
-  },
-  {
     key: "spirituality",
     name: "Spirituality",
     blurb: "Faith, yoga, festivals, and the searches shaping modern India.",

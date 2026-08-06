@@ -705,3 +705,42 @@ class SurfacePostCreate(BaseModel):
         if v not in ("for", "against"):
             raise ValueError("debate_side must be for or against")
         return v
+
+
+class FoundingStatusOut(BaseModel):
+    cap: int
+    amount_inr: int
+    min_problem_chars: int
+    slots_remaining: int
+    open: bool
+    my_status: Optional[str] = None  # eligible | paid | None
+    my_kind: Optional[str] = None  # problem | debate
+    civic_arenas: list[str] = []
+
+
+class FoundingRewardRow(BaseModel):
+    id: str
+    user_id: str
+    username: str
+    display_name: str
+    kind: str
+    amount_inr: int
+    status: str
+    qualifying_post_id: Optional[str] = None
+    qualifying_space_id: Optional[str] = None
+    note: str = ""
+    created_at: datetime
+    paid_at: Optional[datetime] = None
+
+
+class FoundingRewardsOut(BaseModel):
+    cap: int
+    amount_inr: int
+    slots_remaining: int
+    eligible_count: int
+    paid_count: int
+    rewards: list[FoundingRewardRow]
+
+
+class FoundingMarkPaid(BaseModel):
+    note: Optional[str] = ""

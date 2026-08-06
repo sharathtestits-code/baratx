@@ -7,6 +7,7 @@ import Avatar from "../components/Avatar";
 import WelcomePanel from "../components/WelcomePanel";
 import SuggestedFollows from "../components/SuggestedFollows";
 import TodaysSquare from "../components/TodaysSquare";
+import FoundingStrip from "../components/FoundingStrip";
 import MentionTextarea from "../components/MentionTextarea";
 import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
@@ -43,6 +44,8 @@ export default function Feed() {
   const [postError, setPostError] = useState("");
   const [showWelcome, setShowWelcome] = useState(wantWelcome);
   const [liveDebates, setLiveDebates] = useState([]);
+  const [civicProblem, setCivicProblem] = useState(false);
+  const [foundingRefresh, setFoundingRefresh] = useState(0);
 
   const fileInputRef = useRef(null);
   const composeRef = useRef(null);
@@ -232,9 +235,11 @@ export default function Feed() {
         text: text.trim(),
         image: imageFile,
         quotePostId: quotePostId || undefined,
+        civicProblem: civicProblem || undefined,
       });
       setItems((prev) => [{ post: newPost, reposted_by: null, item_time: newPost.created_at }, ...prev]);
       setText("");
+      setCivicProblem(false);
       clearImage();
       if (quotePostId) {
         setSearchParams({});
@@ -243,6 +248,7 @@ export default function Feed() {
       localStorage.setItem("bx_first_post_done", "1");
       sessionStorage.removeItem("bx_welcome");
       setShowWelcome(false);
+      setFoundingRefresh((n) => n + 1);
       window.dispatchEvent(new CustomEvent("bx:first-post"));
       api.bootstrapFollows(token).catch(() => {});
     } catch (err) {
@@ -328,6 +334,14 @@ export default function Feed() {
               </div>
             )}
             {postError && <div className="error">{postError}</div>}
+            <label className="compose-civic">
+              <input
+                type="checkbox"
+                checked={civicProblem}
+                onChange={(e) => setCivicProblem(e.target.checked)}
+              />
+              <span>This is a real civic / city problem</span>
+            </label>
             <div className="compose-footer">
               <label className="attach-btn" title="Add image">
                 <IconImage />
@@ -347,6 +361,18 @@ export default function Feed() {
           </div>
         </div>
       </form>
+
+      <FoundingStrip
+        key={foundingRefresh}
+        onPostProblem={() => {
+          setCivicProblem(true);
+          if (!text.trim()) {
+            setText("In my city, the real problem is ");
+          }
+          composeRef.current?.focus?.();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
 
       <TodaysSquare
         onAnswer={(question) => {

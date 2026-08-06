@@ -3,13 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 
-const ARENA_ORDER = ["sports", "politics", "entertainment", "news", "startups", "spirituality"];
+const ARENA_ORDER = ["sports", "politics", "entertainment", "news", "spirituality"];
 const ARENA_LABEL = {
   sports: "Sports",
   politics: "Politics",
   entertainment: "Entertainment",
   news: "News",
-  startups: "Startups",
   spirituality: "Spirituality",
 };
 const MIN_PICKS = 1;

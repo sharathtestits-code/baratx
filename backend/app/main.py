@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, media_store, models, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, media_store, models, rewards, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -1705,6 +1705,7 @@ async def create_post(
     text: str = Form(...),
     image: Optional[UploadFile] = File(None),
     quote_post_id: Optional[str] = Form(None),
+    civic_problem: Optional[str] = Form(None),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -1777,6 +1778,11 @@ async def create_post(
                 post_id=post.id,
                 reply_id=welcome.id,
             )
+
+    # Founding 100: quiet reward for one real civic problem (≥50 chars, flagged).
+    mark_problem = str(civic_problem or "").strip().lower() in ("1", "true", "yes", "on")
+    if mark_problem and rewards.qualifies_as_problem(text):
+        rewards.try_award(db, user=current_user, kind="problem", post_id=post.id)
 
     db.commit()
     db.refresh(post)
@@ -2299,10 +2305,99 @@ def admin_seed_topics(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Force-upsert the full 30×arena topic taxonomy (Startups, Spirituality, etc.)."""
+    """Force-upsert the full 30×arena topic taxonomy (active arenas)."""
     from app import topic_ops
 
     return topic_ops.seed_topics(db)
+
+
+@app.get("/rewards/founding", response_model=schemas.FoundingStatusOut)
+def founding_status(
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """Quiet Founding 100 status — slots left + whether this user already earned."""
+    return rewards.status_payload(db, current_user)
+
+
+@app.get("/admin/founding-rewards", response_model=schemas.FoundingRewardsOut)
+def admin_founding_rewards(
+    status: Optional[str] = None,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    q = db.query(models.FoundingReward).order_by(models.FoundingReward.created_at.asc())
+    if status in ("eligible", "paid"):
+        q = q.filter(models.FoundingReward.status == status)
+    rows = q.all()
+    user_ids = [r.user_id for r in rows]
+    users = {
+        u.id: u
+        for u in db.query(models.User).filter(models.User.id.in_(user_ids)).all()
+    } if user_ids else {}
+    eligible_count = (
+        db.query(models.FoundingReward).filter(models.FoundingReward.status == "eligible").count()
+    )
+    paid_count = (
+        db.query(models.FoundingReward).filter(models.FoundingReward.status == "paid").count()
+    )
+    out_rows = []
+    for r in rows:
+        u = users.get(r.user_id)
+        out_rows.append(
+            schemas.FoundingRewardRow(
+                id=r.id,
+                user_id=r.user_id,
+                username=u.username if u else "?",
+                display_name=u.display_name if u else "?",
+                kind=r.kind,
+                amount_inr=r.amount_inr,
+                status=r.status,
+                qualifying_post_id=r.qualifying_post_id,
+                qualifying_space_id=r.qualifying_space_id,
+                note=r.note or "",
+                created_at=r.created_at,
+                paid_at=r.paid_at,
+            )
+        )
+    return schemas.FoundingRewardsOut(
+        cap=rewards.FOUNDING_CAP,
+        amount_inr=rewards.FOUNDING_AMOUNT_INR,
+        slots_remaining=rewards.slots_remaining(db),
+        eligible_count=eligible_count,
+        paid_count=paid_count,
+        rewards=out_rows,
+    )
+
+
+@app.post("/admin/founding-rewards/{reward_id}/paid", response_model=schemas.FoundingRewardRow)
+def admin_mark_founding_paid(
+    reward_id: str,
+    payload: schemas.FoundingMarkPaid,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        row = rewards.mark_paid(db, reward_id, note=payload.note or "")
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Reward not found")
+    db.commit()
+    db.refresh(row)
+    u = db.query(models.User).filter(models.User.id == row.user_id).first()
+    return schemas.FoundingRewardRow(
+        id=row.id,
+        user_id=row.user_id,
+        username=u.username if u else "?",
+        display_name=u.display_name if u else "?",
+        kind=row.kind,
+        amount_inr=row.amount_inr,
+        status=row.status,
+        qualifying_post_id=row.qualifying_post_id,
+        qualifying_space_id=row.qualifying_space_id,
+        note=row.note or "",
+        created_at=row.created_at,
+        paid_at=row.paid_at,
+    )
 
 
 register_extra_routes(

@@ -69,6 +69,8 @@ export default function Admin() {
   const [deletingId, setDeletingId] = useState("");
   const [badgeBusyId, setBadgeBusyId] = useState("");
   const [notifyBadge, setNotifyBadge] = useState(true);
+  const [founding, setFounding] = useState(null);
+  const [payingId, setPayingId] = useState("");
 
   const load = useCallback(
     async (adminSecret) => {
@@ -76,7 +78,7 @@ export default function Admin() {
       setBusy(true);
       setError("");
       try {
-        const [s, u, posts] = await Promise.all([
+        const [s, u, posts, fr] = await Promise.all([
           adminApi.stats(adminSecret),
           adminApi.users(adminSecret, { limit: 100, offset: 0 }),
           adminApi.recentPosts(adminSecret, {
@@ -84,18 +86,21 @@ export default function Admin() {
             newUsersOnly,
             days: 7,
           }),
+          adminApi.foundingRewards(adminSecret),
         ]);
         setStats(s);
         setUsers(u.users || []);
         setTotal(u.total || 0);
         setRecentPosts(posts.posts || []);
         setRecentTotal(posts.total || 0);
+        setFounding(fr);
       } catch (err) {
         setStats(null);
         setUsers([]);
         setTotal(0);
         setRecentPosts([]);
         setRecentTotal(0);
+        setFounding(null);
         setError(err.message || "Could not load admin data");
       } finally {
         setBusy(false);
@@ -128,9 +133,28 @@ export default function Admin() {
     setTotal(0);
     setRecentPosts([]);
     setRecentTotal(0);
+    setFounding(null);
     setError("");
     setMsg("");
     setReplyDrafts({});
+  }
+
+  async function handleMarkFoundingPaid(row) {
+    if (!secret || !row?.id) return;
+    const note = window.prompt("UPI reference / note (optional)", row.note || "") ?? null;
+    if (note === null) return;
+    setPayingId(row.id);
+    setError("");
+    setMsg("");
+    try {
+      await adminApi.markFoundingPaid(secret, row.id, note);
+      setMsg(`Marked @${row.username} as paid ₹${row.amount_inr}`);
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not mark paid");
+    } finally {
+      setPayingId("");
+    }
   }
 
   async function handleAdminPost(e) {
@@ -352,6 +376,61 @@ export default function Admin() {
 
       {error && <div className="admin-error">{error}</div>}
       {msg && <p className="admin-ok">{msg}</p>}
+
+      {founding && (
+        <section className="admin-compose" aria-labelledby="admin-founding-title">
+          <h2 id="admin-founding-title">Founding {founding.cap} — UPI payouts</h2>
+          <p className="admin-lead">
+            ₹{founding.amount_inr} for one real problem post or Politics/News debate.{" "}
+            {founding.slots_remaining} slots left · {founding.eligible_count} unpaid ·{" "}
+            {founding.paid_count} paid.
+          </p>
+          {(founding.rewards || []).length === 0 ? (
+            <p className="admin-empty-inline">No qualifying posts yet.</p>
+          ) : (
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Kind</th>
+                    <th>Status</th>
+                    <th>When</th>
+                    <th />
+                  </tr>
+                </thead>
+                <tbody>
+                  {founding.rewards.map((r) => (
+                    <tr key={r.id}>
+                      <td>
+                        <Link to={`/${r.username}`}>@{r.username}</Link>
+                        <div className="admin-muted">{r.display_name}</div>
+                      </td>
+                      <td>{r.kind}</td>
+                      <td>{r.status}</td>
+                      <td>{formatWhen(r.created_at)}</td>
+                      <td>
+                        {r.status === "eligible" ? (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-primary"
+                            disabled={payingId === r.id}
+                            onClick={() => handleMarkFoundingPaid(r)}
+                          >
+                            {payingId === r.id ? "Saving…" : "Mark paid"}
+                          </button>
+                        ) : (
+                          <span className="admin-muted">{r.note || "Paid"}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="admin-compose" aria-labelledby="admin-compose-title">
         <h2 id="admin-compose-title">Post as BaratX</h2>

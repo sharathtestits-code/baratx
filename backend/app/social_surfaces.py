@@ -446,6 +446,8 @@ def register_social_surfaces(
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
+        from app.topics_data import ACTIVE_ARENA_KEYS
+
         rows = (
             db.query(models.Community)
             .filter(models.Community.is_arena == True)  # noqa: E712
@@ -454,6 +456,9 @@ def register_social_surfaces(
         )
         out = []
         for c in rows:
+            key = c.arena_key or c.slug
+            if key not in ACTIVE_ARENA_KEYS:
+                continue
             member_count = (
                 db.query(models.CommunityMember)
                 .filter(models.CommunityMember.community_id == c.id)
@@ -481,7 +486,7 @@ def register_social_surfaces(
             )
             out.append(
                 schemas.ArenaOut(
-                    key=c.arena_key or c.slug,
+                    key=key,
                     slug=c.slug,
                     name=c.name,
                     description=c.description or "",
@@ -499,6 +504,10 @@ def register_social_surfaces(
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
+        from app.topics_data import ACTIVE_ARENA_KEYS
+
+        if arena_key not in ACTIVE_ARENA_KEYS:
+            raise HTTPException(status_code=404, detail="Arena not found")
         c = (
             db.query(models.Community)
             .filter(
@@ -521,6 +530,10 @@ def register_social_surfaces(
         current_user: models.User = Depends(get_current_user),
         db: Session = Depends(get_db),
     ):
+        from app.topics_data import ACTIVE_ARENA_KEYS
+
+        if arena_key not in ACTIVE_ARENA_KEYS:
+            raise HTTPException(status_code=404, detail="Arena not found")
         c = (
             db.query(models.Community)
             .filter(
@@ -746,6 +759,10 @@ def register_social_surfaces(
         kind = payload.kind or "room"
         community_id = payload.community_id
         if payload.arena_key:
+            from app.topics_data import ACTIVE_ARENA_KEYS
+
+            if payload.arena_key not in ACTIVE_ARENA_KEYS:
+                raise HTTPException(status_code=404, detail="Arena not found")
             arena = (
                 db.query(models.Community)
                 .filter(
@@ -780,6 +797,16 @@ def register_social_surfaces(
             closes_at=now + timedelta(hours=hours),
         )
         db.add(s)
+        db.flush()
+        # Founding 100: one Politics/News debate qualifies for the quiet UPI reward.
+        if payload.arena_key:
+            from app.topics_data import CIVIC_ARENA_KEYS
+            from app import rewards
+
+            if payload.arena_key in CIVIC_ARENA_KEYS:
+                rewards.try_award(
+                    db, user=current_user, kind="debate", space_id=s.id
+                )
         db.commit()
         db.refresh(s)
         s = (
@@ -910,7 +937,7 @@ def register_social_surfaces(
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
-        # Self-heal when code taxonomy is ahead of DB (e.g. new Startups/Spirituality arenas).
+        # Self-heal when code taxonomy is ahead of DB.
         try:
             from app import topic_ops
 
@@ -918,8 +945,12 @@ def register_social_surfaces(
                 topic_ops.seed_topics(db)
         except Exception:  # noqa: BLE001
             pass
-        q = db.query(models.Topic)
+        from app.topics_data import ACTIVE_ARENA_KEYS
+
+        q = db.query(models.Topic).filter(models.Topic.arena_key.in_(ACTIVE_ARENA_KEYS))
         if arena_key:
+            if arena_key not in ACTIVE_ARENA_KEYS:
+                return []
             q = q.filter(models.Topic.arena_key == arena_key)
         rows = q.order_by(models.Topic.arena_key.asc(), models.Topic.name.asc()).all()
         return [_topic_out(t, db, current_user) for t in rows]

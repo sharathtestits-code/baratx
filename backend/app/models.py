@@ -333,7 +333,7 @@ class Community(Base):
     slug = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, default="", nullable=False)
-    # Arena topic homes: sports | politics | entertainment | news | startups | spirituality
+    # Arena topic homes: sports | politics | entertainment | news | spirituality
     is_arena = Column(Boolean, default=False, nullable=False, index=True)
     arena_key = Column(String, nullable=True, unique=True, index=True)
     created_by = Column(String, ForeignKey("users.id"), nullable=False, index=True)
@@ -430,3 +430,22 @@ class UserTopicInterest(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     topic = relationship("Topic", back_populates="interests")
+
+
+class FoundingReward(Base):
+    """First-N incentive: one real civic problem post or Politics/News debate."""
+
+    __tablename__ = "founding_rewards"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False, index=True)
+    kind = Column(String, nullable=False)  # problem | debate
+    amount_inr = Column(Integer, nullable=False, default=150)
+    status = Column(String, nullable=False, default="eligible", index=True)  # eligible | paid
+    qualifying_post_id = Column(String, ForeignKey("posts.id"), nullable=True)
+    qualifying_space_id = Column(String, ForeignKey("spaces.id"), nullable=True)
+    note = Column(String, default="", nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    paid_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", foreign_keys=[user_id])

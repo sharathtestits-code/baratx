@@ -198,11 +198,12 @@ export const postsApi = {
 
   get: (id, token) => request(`/posts/${id}`, { headers: authHeaders(token) }),
 
-  create: async (token, { text, image, quotePostId }) => {
+  create: async (token, { text, image, quotePostId, civicProblem }) => {
     const form = new FormData();
     form.append("text", text);
     if (image) form.append("image", image);
     if (quotePostId) form.append("quote_post_id", quotePostId);
+    if (civicProblem) form.append("civic_problem", "true");
 
     const res = await fetch(`${API_BASE}/posts`, {
       method: "POST",
@@ -497,4 +498,21 @@ export const adminApi = {
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify({ badge, notify: !!notify }),
     }),
+  foundingRewards: (adminSecret, { status } = {}) => {
+    const q = status ? `?status=${encodeURIComponent(status)}` : "";
+    return request(`/admin/founding-rewards${q}`, {
+      headers: { "X-Admin-Secret": adminSecret },
+    });
+  },
+  markFoundingPaid: (adminSecret, rewardId, note = "") =>
+    request(`/admin/founding-rewards/${encodeURIComponent(rewardId)}/paid`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify({ note }),
+    }),
+};
+
+export const rewardsApi = {
+  founding: (token) =>
+    request("/rewards/founding", { headers: authHeaders(token) }),
 };

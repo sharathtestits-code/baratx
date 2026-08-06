@@ -5215,3 +5215,91 @@ a.reply-username.name-badge-gold,
 .legal-back {
   margin-top: 1.75rem;
 }
+
+.compose-civic {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.35rem 0 0.15rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.compose-civic input {
+  accent-color: var(--brand);
+}
+
+.founding-strip {
+  margin: 0.75rem 0 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(194, 65, 12, 0.08), rgba(3, 105, 161, 0.08));
+  border: 1px solid rgba(194, 65, 12, 0.18);
+}
+
+.founding-strip-done {
+  background: rgba(13, 148, 136, 0.08);
+  border-color: rgba(13, 148, 136, 0.22);
+}
+
+.founding-strip-done p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.founding-strip-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.founding-strip-body {
+  margin: 0 0 0.7rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.founding-strip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.founding-strip-cta {
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+}
+
+.founding-strip-cta:hover {
+  background: var(--brand-hover);
+}
+
+.founding-strip-link {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.founding-strip-link:hover {
+  text-decoration: underline;
+}
+
+.admin-muted {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}

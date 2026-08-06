@@ -14,6 +14,6 @@ Ask each to:
 3. Reply to one other person  
 
 ## Don’t
-- Pay for signups
+- Pay for signups (Founding 100 pays only for one real problem/debate — see founding-100-ops.md)
 - Rename the whole UI this week
 - Disappear after inviting people

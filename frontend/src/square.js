@@ -5,7 +5,7 @@ const QUESTIONS = [
   "Which Indian city is most underrated — and why?",
   "What should BaratX never become?",
   "Remote work made Indian careers better or worse?",
-  "What’s one thing Indian startups copy that they shouldn’t?",
+  "What’s one civic problem your city still pretends isn’t real?",
   "Drop your hottest take on cricket without starting a war.",
   "What’s a ‘respectable’ career advice you wish more people ignored?",
   "Which India story do global feeds keep getting wrong?",

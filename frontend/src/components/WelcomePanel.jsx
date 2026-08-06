@@ -4,9 +4,9 @@ import { api } from "../api";
 const CITIES = ["Hyderabad", "Bangalore", "Delhi", "Mumbai", "Chennai", "Pune"];
 
 const PROMPTS = [
-  "What’s one thing India gets wrong in public debate?",
-  "Drop your hottest take on startups in India.",
-  "Who should every BaratX user follow in your city?",
+  "What’s one civic problem your city still pretends isn’t real?",
+  "Drop your hottest take on public debate in India.",
+  "Who should every BaratX user from your city follow?",
   "What should this public square never become?",
 ];
 

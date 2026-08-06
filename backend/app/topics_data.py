@@ -5,15 +5,20 @@ Each topic has an RSS query for Google News (IN). Used to seed debate prompts.
 
 from __future__ import annotations
 
-# Default For/Against labels per arena (Startups = YC-style idea validation).
+# Default For/Against labels per arena.
 ARENA_DEBATE_SIDES: dict[str, tuple[str, str]] = {
     "sports": ("Agree", "Disagree"),
     "politics": ("Agree", "Disagree"),
     "entertainment": ("Agree", "Disagree"),
     "news": ("Agree", "Disagree"),
-    "startups": ("Fund it", "Pass"),
     "spirituality": ("Resonates", "Skeptical"),
 }
+
+# Public arenas shown in product (Startups retired from the square).
+ACTIVE_ARENA_KEYS = frozenset(ARENA_DEBATE_SIDES.keys())
+
+# Civic pulse path — real problems / debates that count toward founding rewards.
+CIVIC_ARENA_KEYS = frozenset({"politics", "news"})
 
 
 def debate_sides_for(arena_key: str | None) -> tuple[str, str]:
@@ -149,39 +154,6 @@ TOPICS_BY_ARENA: dict[str, list[dict]] = {
         {"key": "defence-news", "name": "Defence News", "blurb": "Forces and geopolitics.", "rss_query": "India defence news"},
         {"key": "viral", "name": "Viral India", "blurb": "Stories everyone shared.", "rss_query": "India viral news"},
         {"key": "investigations", "name": "Investigations", "blurb": "Longform and probes.", "rss_query": "India investigation news"},
-    ],
-    # YC-style public square: pitch ideas, India votes Fund it / Pass.
-    "startups": [
-        {"key": "pitch-validation", "name": "Pitch Validation", "blurb": "Drop an idea. Get Fund it / Pass.", "rss_query": "India startup idea pitch"},
-        {"key": "yc-accelerators", "name": "YC & Accelerators", "blurb": "YC, Sequoia Arc, Surge, and more.", "rss_query": "Y Combinator India accelerator"},
-        {"key": "fundraising", "name": "Fundraising", "blurb": "Seed to Series rounds.", "rss_query": "India startup funding round"},
-        {"key": "ai-startups", "name": "AI Startups", "blurb": "Indic models, agents, infra.", "rss_query": "India AI startup funding Sarvam"},
-        {"key": "deeptech", "name": "Deep Tech", "blurb": "Chips, robotics, hard science.", "rss_query": "India deeptech startup"},
-        {"key": "fintech", "name": "Fintech", "blurb": "Payments, lending, UPI rails.", "rss_query": "India fintech startup"},
-        {"key": "saas", "name": "SaaS / B2B", "blurb": "Global SaaS from India.", "rss_query": "India SaaS startup"},
-        {"key": "d2c", "name": "D2C Brands", "blurb": "Beauty, health, unit economics.", "rss_query": "India D2C brand startup"},
-        {"key": "quick-commerce", "name": "Quick Commerce", "blurb": "10-minute delivery wars.", "rss_query": "India quick commerce"},
-        {"key": "healthtech", "name": "Healthtech", "blurb": "Care, diagnostics, medtech.", "rss_query": "India healthtech startup"},
-        {"key": "edtech", "name": "Edtech", "blurb": "Learning after the boom.", "rss_query": "India edtech startup"},
-        {"key": "climate-tech", "name": "Climate Tech", "blurb": "Clean energy and carbon.", "rss_query": "India climate tech startup"},
-        {"key": "space-tech", "name": "Space Tech", "blurb": "Private space and satellites.", "rss_query": "India space tech startup"},
-        {"key": "defence-tech", "name": "Defence Tech", "blurb": "Dual-use and defence startups.", "rss_query": "India defence startup"},
-        {"key": "semicon", "name": "Semiconductors", "blurb": "Design, packaging, fab dreams.", "rss_query": "India semiconductor startup"},
-        {"key": "agritech", "name": "Agritech", "blurb": "Farms, supply chains, tech.", "rss_query": "India agritech startup"},
-        {"key": "logistics", "name": "Logistics", "blurb": "Supply chain and mobility.", "rss_query": "India logistics startup"},
-        {"key": "wealthtech", "name": "Wealthtech", "blurb": "Investing for mass affluent India.", "rss_query": "India wealthtech startup"},
-        {"key": "insurtech", "name": "Insurtech", "blurb": "Insurance distribution tech.", "rss_query": "India insurtech startup"},
-        {"key": "unit-economics", "name": "Unit Economics", "blurb": "Burn, CAC, LTV fights.", "rss_query": "India startup unit economics"},
-        {"key": "product-market-fit", "name": "Product-Market Fit", "blurb": "Do users actually want it?", "rss_query": "startup product market fit"},
-        {"key": "founder-stories", "name": "Founder Stories", "blurb": "Builds, pivots, exits.", "rss_query": "India startup founder"},
-        {"key": "layoffs-hiring", "name": "Hiring & Layoffs", "blurb": "Talent market reality.", "rss_query": "India startup layoffs hiring"},
-        {"key": "ipo-exits", "name": "IPO & Exits", "blurb": "Listings and M&A.", "rss_query": "India startup IPO OYO Zepto"},
-        {"key": "tier2-startups", "name": "Tier-2 / Bharat", "blurb": "Building beyond metros.", "rss_query": "India Tier 2 startup Bharat"},
-        {"key": "women-founders", "name": "Women Founders", "blurb": "Capital and representation.", "rss_query": "India women founders startups"},
-        {"key": "regtech", "name": "Policy & Regtech", "blurb": "DPI, compliance, regulation.", "rss_query": "India startup regulation DPI"},
-        {"key": "investor-takes", "name": "Investor Takes", "blurb": "What VCs are funding now.", "rss_query": "India venture capital 2026"},
-        {"key": "ev-mobility", "name": "EV & Mobility", "blurb": "EVs, charging, mobility.", "rss_query": "India EV startup mobility"},
-        {"key": "global-from-india", "name": "Global from Day One", "blurb": "India-built, world-sold.", "rss_query": "India global SaaS startup"},
     ],
     "spirituality": [
         {"key": "bhajan-clubbing", "name": "Bhajan Clubbing", "blurb": "Gen Z devotion meets nightlife.", "rss_query": "bhajan clubbing India"},
