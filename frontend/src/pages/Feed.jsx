@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { api, postsApi } from "../api";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { api, postsApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import WelcomePanel from "../components/WelcomePanel";
 import SuggestedFollows from "../components/SuggestedFollows";
+import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
@@ -39,6 +40,8 @@ export default function Feed() {
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState("");
   const [showWelcome, setShowWelcome] = useState(wantWelcome);
+  const [liveDebates, setLiveDebates] = useState([]);
+
   const fileInputRef = useRef(null);
   const composeRef = useRef(null);
   const loadingMoreRef = useRef(false);
@@ -95,6 +98,20 @@ export default function Feed() {
     disabled: feedLoading || loadingMore || !hasMore || items.length === 0 || !user,
     onLoadMore: loadMore,
   });
+
+  useEffect(() => {
+    if (!token) return undefined;
+    let cancelled = false;
+    spacesApi
+      .listDebates(token)
+      .then((rows) => {
+        if (!cancelled) setLiveDebates(rows || []);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   useEffect(() => {
     if (wantWelcome) {
@@ -289,6 +306,35 @@ export default function Feed() {
           </div>
         </div>
       </form>
+
+
+      <section className="arena-home-strip" aria-label="Arenas">
+        <div className="arena-home-strip-head">
+          <h2>Arenas</h2>
+          <Link to="/arenas" className="rail-card-more">
+            See all
+          </Link>
+        </div>
+        <div className="arena-home-chips">
+          {ARENA_TOPICS.map((a) => (
+            <Link key={a.key} to={`/arenas/${a.key}`} className="arena-home-chip" style={{ "--arena-accent": a.accent }}>
+              {a.name}
+            </Link>
+          ))}
+        </div>
+        {liveDebates.length > 0 && (
+          <ul className="debate-list debate-list-compact">
+            {liveDebates.slice(0, 3).map((d) => (
+              <li key={d.id}>
+                <Link to={`/spaces/${d.id}`} className="debate-row">
+                  <span className="debate-arena-tag">{d.arena_name || "Debate"}</span>
+                  <span className="debate-title">{d.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {showWelcome && (
         <WelcomePanel token={token} text={text} setText={setText} onPostedFlag composeRef={composeRef} />

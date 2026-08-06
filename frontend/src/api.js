@@ -353,11 +353,39 @@ export const spacesApi = {
   close: (token, id) =>
     request(`/spaces/${id}/close`, { method: "POST", headers: authHeaders(token) }),
   feed: (token, id) => request(`/spaces/${id}/feed`, { headers: authHeaders(token) }),
-  post: (token, id, text) =>
+  post: (token, id, text, debate_side) =>
     request(`/spaces/${id}/posts`, {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, debate_side: debate_side || undefined }),
+    }),
+  setStance: (token, id, side) =>
+    request(`/spaces/${id}/stance`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ side }),
+    }),
+  listDebates: (token, arenaKey) =>
+    request(
+      `/spaces?status=open&kind=debate${arenaKey ? `&arena_key=${encodeURIComponent(arenaKey)}` : ""}`,
+      { headers: authHeaders(token) }
+    ),
+};
+
+export const arenasApi = {
+  list: (token) => request("/arenas", { headers: authHeaders(token) }),
+  get: (token, key) =>
+    request(`/arenas/${encodeURIComponent(key)}`, { headers: authHeaders(token) }),
+  join: (token, key) =>
+    request(`/arenas/${encodeURIComponent(key)}/join`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+  joinMany: (token, keys) =>
+    request("/arenas/join-many", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ keys }),
     }),
 };
 

@@ -14,7 +14,11 @@ export default function SpaceRoom() {
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [stanceBusy, setStanceBusy] = useState(false);
+  const [filter, setFilter] = useState("all"); // all | for | against
   const [error, setError] = useState("");
+
+  const isDebate = space?.kind === "debate";
 
   async function load() {
     setLoading(true);
@@ -38,13 +42,31 @@ export default function SpaceRoom() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, spaceId]);
 
+  async function pickSide(side) {
+    if (!token || stanceBusy) return;
+    setStanceBusy(true);
+    setError("");
+    try {
+      const updated = await spacesApi.setStance(token, spaceId, side);
+      setSpace(updated);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setStanceBusy(false);
+    }
+  }
+
   async function submitPost(e) {
     e.preventDefault();
     if (!text.trim()) return;
+    if (isDebate && !space.my_side) {
+      setError("Pick For or Against before posting");
+      return;
+    }
     setPosting(true);
     setError("");
     try {
-      const post = await spacesApi.post(token, spaceId, text.trim());
+      const post = await spacesApi.post(token, spaceId, text.trim(), space?.my_side);
       setPosts((prev) => [...prev, post]);
       setText("");
     } catch (err) {
@@ -55,7 +77,7 @@ export default function SpaceRoom() {
   }
 
   async function closeSpace() {
-    if (!window.confirm("Close this Space? People won’t be able to post anymore.")) return;
+    if (!window.confirm("Close this debate? People won’t be able to post anymore.")) return;
     setClosing(true);
     setError("");
     try {
@@ -79,21 +101,28 @@ export default function SpaceRoom() {
   if (!space) {
     return (
       <div className="feed-wrap">
-        <div className="error">{error || "Space not found"}</div>
-        <Link to="/spaces">Back to Spaces</Link>
+        <div className="error">{error || "Not found"}</div>
+        <Link to={isDebate ? "/arenas" : "/spaces"}>Back</Link>
       </div>
     );
   }
 
   const open = space.status === "open";
+  const visiblePosts =
+    !isDebate || filter === "all"
+      ? posts
+      : posts.filter((p) => p.debate_side === filter);
 
   return (
-    <div className="feed-wrap surface-page">
+    <div className={`feed-wrap surface-page${isDebate ? " debate-room" : ""}`}>
       <div className="feed-header surface-header-row">
         <div>
-          <Link to="/spaces" className="back-link">
-            ← Spaces
+          <Link to={space.arena_key ? `/arenas/${space.arena_key}` : "/spaces"} className="back-link">
+            ← {space.arena_name || (isDebate ? "Arenas" : "Spaces")}
           </Link>
+          {isDebate && space.arena_name && (
+            <div className="debate-arena-tag">{space.arena_name} debate</div>
+          )}
           <h1>{space.title}</h1>
           <p className="hint">
             Hosted by @{space.host?.username} · {space.status}
@@ -101,57 +130,119 @@ export default function SpaceRoom() {
           </p>
         </div>
         {space.is_host && open && (
-          <button type="button" className="btn btn-secondary" disabled={closing} onClick={closeSpace}>
-            {closing ? "Closing…" : "Close Space"}
+          <button type="button" className="profile-edit-btn" onClick={closeSpace} disabled={closing}>
+            {closing ? "Closing…" : "Close"}
           </button>
         )}
       </div>
 
       {error && <div className="error">{error}</div>}
 
+      {isDebate && (
+        <div className="debate-stance-panel">
+          <p className="debate-stance-lead">Pick a side to join the fight</p>
+          <div className="debate-stance-row">
+            <button
+              type="button"
+              className={`debate-side-btn for${space.my_side === "for" ? " active" : ""}`}
+              disabled={!open || stanceBusy}
+              onClick={() => pickSide("for")}
+            >
+              <span className="debate-side-label">{space.side_for_label}</span>
+              <span className="debate-side-count">{space.for_count}</span>
+            </button>
+            <button
+              type="button"
+              className={`debate-side-btn against${space.my_side === "against" ? " active" : ""}`}
+              disabled={!open || stanceBusy}
+              onClick={() => pickSide("against")}
+            >
+              <span className="debate-side-label">{space.side_against_label}</span>
+              <span className="debate-side-count">{space.against_count}</span>
+            </button>
+          </div>
+          {space.my_side && (
+            <p className="hint">
+              You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong>
+            </p>
+          )}
+          <div className="feed-tabs debate-filter-tabs">
+            <button
+              type="button"
+              className={filter === "all" ? "feed-tab active" : "feed-tab"}
+              onClick={() => setFilter("all")}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              className={filter === "for" ? "feed-tab active" : "feed-tab"}
+              onClick={() => setFilter("for")}
+            >
+              {space.side_for_label}
+            </button>
+            <button
+              type="button"
+              className={filter === "against" ? "feed-tab active" : "feed-tab"}
+              onClick={() => setFilter("against")}
+            >
+              {space.side_against_label}
+            </button>
+          </div>
+        </div>
+      )}
+
       {open ? (
         <form className="compose surface-compose" onSubmit={submitPost}>
           <div className="compose-row">
-            <Avatar
-              name={user?.display_name}
-              username={user?.username}
-              url={user?.avatar_url}
-              size={40}
-            />
+            <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={40} />
             <div className="compose-body">
               <textarea
-                placeholder="Share an update in this Space…"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
+                placeholder={
+                  isDebate
+                    ? space.my_side
+                      ? `Argue for ${
+                          space.my_side === "for" ? space.side_for_label : space.side_against_label
+                        }…`
+                      : "Pick a side above, then post"
+                    : "Say something in this Space"
+                }
                 maxLength={280}
                 rows={3}
+                disabled={isDebate && !space.my_side}
               />
-              <div className="compose-footer">
-                <span className="hint">{text.length}/280</span>
-                <button type="submit" className="btn btn-primary" disabled={posting || !text.trim()}>
-                  {posting ? "Posting…" : "Post"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="post-btn"
+                disabled={posting || !text.trim() || (isDebate && !space.my_side)}
+              >
+                {posting ? "Posting…" : "Post"}
+              </button>
             </div>
           </div>
         </form>
       ) : (
-        <p className="hint">This Space is closed. You can still read the conversation.</p>
+        <p className="hint">This {isDebate ? "debate" : "Space"} is closed.</p>
       )}
 
-      {posts.length === 0 ? (
+      {visiblePosts.length === 0 ? (
         <div className="empty-state">
           <p className="empty-state-title">No posts yet</p>
-          <p className="hint">Say something to get the room going.</p>
+          <p className="hint">{isDebate ? "Pick a side and make the first argument." : "Start the conversation."}</p>
         </div>
       ) : (
         <div className="post-list">
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onDeleted={(id) => setPosts((p) => p.filter((x) => x.id !== id))}
-            />
+          {visiblePosts.map((post) => (
+            <div key={post.id} className="debate-post-wrap">
+              {isDebate && post.debate_side && (
+                <span className={`debate-post-side ${post.debate_side}`}>
+                  {post.debate_side === "for" ? space.side_for_label : space.side_against_label}
+                </span>
+              )}
+              <PostCard post={post} onDeleted={(id) => setPosts((p) => p.filter((x) => x.id !== id))} />
+            </div>
           ))}
         </div>
       )}

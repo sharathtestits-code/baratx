@@ -8,13 +8,16 @@ FastAPI + SQLite (local), frontend is React (Vite).
 **Canonical local path:** `~/Projects/barathx` (do not run from Google Drive).
 
 Public hosting checklist: see [DEPLOY.md](./DEPLOY.md).
+Android / App Store (Capacitor): see [MOBILE.md](./MOBILE.md).
 
 ## Structure
 
 ```
 barathx/
-  backend/    FastAPI — auth, feed, posts, social graph
-  frontend/   React (Vite) — landing, feed, profiles
+  backend/     FastAPI — auth, feed, posts, social graph
+  frontend/    React (Vite) — landing, feed, profiles
+  frontend/android/   Capacitor Android project (com.baratx.app)
+  frontend/ios/       Capacitor iOS project (com.baratx.app)
 ```
 
 ## Run it
@@ -42,6 +45,17 @@ npm run dev
 ```
 
 Open the URL it prints (usually http://localhost:5173).
+
+### 3. Native apps (Capacitor)
+
+```
+cd frontend
+npm run build:app
+npm run open:android   # Android Studio
+npm run open:ios       # Xcode (macOS)
+```
+
+Full Play Store / App Store packaging steps: [MOBILE.md](./MOBILE.md).
 
 ## What's implemented
 

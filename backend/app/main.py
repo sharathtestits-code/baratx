@@ -42,6 +42,34 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN community_id VARCHAR"))
             if "space_id" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
+            if "debate_side" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+
+            # communities arena flags
+            try:
+                community_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(communities)"))}
+                if community_cols:
+                    if "is_arena" not in community_cols:
+                        conn.execute(text("ALTER TABLE communities ADD COLUMN is_arena BOOLEAN DEFAULT 0"))
+                    if "arena_key" not in community_cols:
+                        conn.execute(text("ALTER TABLE communities ADD COLUMN arena_key VARCHAR"))
+            except Exception:
+                pass
+
+            # spaces debate fields
+            try:
+                space_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(spaces)"))}
+                if space_cols:
+                    if "kind" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN kind VARCHAR DEFAULT 'room'"))
+                    if "community_id" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN community_id VARCHAR"))
+                    if "side_for_label" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
+                    if "side_against_label" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+            except Exception:
+                pass
 
             reply_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(replies)"))}
             if "parent_reply_id" not in reply_cols:
@@ -87,6 +115,26 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN community_id VARCHAR"))
             if post_cols and "space_id" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
+            if post_cols and "debate_side" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+
+            community_cols = cols("communities")
+            if community_cols:
+                if "is_arena" not in community_cols:
+                    conn.execute(text("ALTER TABLE communities ADD COLUMN is_arena BOOLEAN DEFAULT FALSE"))
+                if "arena_key" not in community_cols:
+                    conn.execute(text("ALTER TABLE communities ADD COLUMN arena_key VARCHAR"))
+
+            space_cols = cols("spaces")
+            if space_cols:
+                if "kind" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN kind VARCHAR DEFAULT 'room'"))
+                if "community_id" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN community_id VARCHAR"))
+                if "side_for_label" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
+                if "side_against_label" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
 
             reply_cols = cols("replies")
             if reply_cols and "parent_reply_id" not in reply_cols:
@@ -118,6 +166,12 @@ with SessionLocal() as _seed_db:
         import logging
 
         logging.getLogger("baratx").exception("Community seed failed")
+    try:
+        seed.seed_arenas(_seed_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Arena seed failed")
 
 
 app = FastAPI(title="BaratX API", version="0.5.0")
@@ -128,7 +182,15 @@ _cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
 if _cors_raw:
     CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
 elif ENVIRONMENT == "production":
-    CORS_ORIGINS = ["https://barathx.com", "https://baratx.pages.dev"]
+    CORS_ORIGINS = [
+        "https://barathx.com",
+        "https://baratx.pages.dev",
+        # Capacitor native shells (Android https scheme / iOS capacitor scheme)
+        "https://localhost",
+        "capacitor://localhost",
+        "ionic://localhost",
+        "http://localhost",
+    ]
 else:
     CORS_ORIGINS = ["*"]
 
@@ -366,6 +428,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         bookmarked_by_me=bookmarked_by_me,
         quoted_post=quoted,
         hashtags=tags,
+        debate_side=getattr(post, "debate_side", None),
     )
 
 

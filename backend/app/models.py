@@ -105,6 +105,7 @@ class Post(Base):
     quoted_post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
     community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
+    debate_side = Column(String, nullable=True)  # for | against (arena debates only)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     author = relationship("User", back_populates="posts")
@@ -315,12 +316,16 @@ class Community(Base):
     slug = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, default="", nullable=False)
+    # Arena topic homes: sports | politics | entertainment | news
+    is_arena = Column(Boolean, default=False, nullable=False, index=True)
+    arena_key = Column(String, nullable=True, unique=True, index=True)
     created_by = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     creator = relationship("User", foreign_keys=[created_by])
     members = relationship("CommunityMember", back_populates="community", cascade="all, delete-orphan")
     posts = relationship("Post", back_populates="community", foreign_keys="Post.community_id")
+    debates = relationship("Space", back_populates="community", foreign_keys="Space.community_id")
 
 
 class CommunityMember(Base):
@@ -337,7 +342,7 @@ class CommunityMember(Base):
 
 
 class Space(Base):
-    """Text discussion room (not live audio)."""
+    """Text discussion room or arena debate (not live audio)."""
 
     __tablename__ = "spaces"
 
@@ -345,8 +350,30 @@ class Space(Base):
     title = Column(String, nullable=False)
     host_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     status = Column(String, default="open", nullable=False, index=True)  # open | closed
+    kind = Column(String, default="room", nullable=False, index=True)  # room | debate
+    community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
+    side_for_label = Column(String, default="For", nullable=False)
+    side_against_label = Column(String, default="Against", nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     closes_at = Column(DateTime, nullable=True)
 
     host = relationship("User", foreign_keys=[host_id])
+    community = relationship("Community", back_populates="debates", foreign_keys=[community_id])
     posts = relationship("Post", back_populates="space", foreign_keys="Post.space_id")
+    stances = relationship("SpaceStance", back_populates="space", cascade="all, delete-orphan")
+
+
+class SpaceStance(Base):
+    """User picks For/Against in an arena debate."""
+
+    __tablename__ = "space_stances"
+    __table_args__ = (UniqueConstraint("space_id", "user_id", name="uq_space_stance"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    side = Column(String, nullable=False)  # for | against
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    space = relationship("Space", back_populates="stances")
+    user = relationship("User", foreign_keys=[user_id])

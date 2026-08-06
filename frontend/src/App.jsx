@@ -21,6 +21,8 @@ import Lists from "./pages/Lists";
 import ListDetail from "./pages/ListDetail";
 import Communities from "./pages/Communities";
 import CommunityDetail from "./pages/CommunityDetail";
+import Arenas from "./pages/Arenas";
+import ArenaDetail from "./pages/ArenaDetail";
 import Spaces from "./pages/Spaces";
 import SpaceRoom from "./pages/SpaceRoom";
 import Sidebar from "./components/Sidebar";
@@ -87,6 +89,8 @@ function AppShell() {
           <Route path="/lists/:listId" element={<ListDetail />} />
           <Route path="/communities" element={<Communities />} />
           <Route path="/communities/:slug" element={<CommunityDetail />} />
+          <Route path="/arenas" element={<Arenas />} />
+          <Route path="/arenas/:arenaKey" element={<ArenaDetail />} />
           <Route path="/spaces" element={<Spaces />} />
           <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
           <Route path="*" element={<Navigate to="/feed" replace />} />
