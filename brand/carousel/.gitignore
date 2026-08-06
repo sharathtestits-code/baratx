@@ -1,0 +1,4 @@
+node_modules/
+package-lock.json
+_render_cdp.mjs
+*.webp

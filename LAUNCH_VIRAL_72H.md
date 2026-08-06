@@ -176,7 +176,9 @@ What’s the #1 feature you’d ship next?
 **X evening** — quote a real user post (with permission) or your own feed screenshot.
 
 **IG** — Story poll results + “50 of you joined — keep posting.”  
-Carousel optional: Problem → BaratX → How to join (3 slides).
+Carousel optional: Problem → BaratX → real app screens → How to join.
+Ready-to-post 1080×1080 pack: `brand/carousel/export/slide-01.png` … `slide-10.png`
+(built from live barathx.com screenshots — see `brand/carousel/README.md`).
 
 ---
 

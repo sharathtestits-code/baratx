@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BaratX IG Carousel — real app screens</title>
+    <style>
+      :root {
+        --bg: #fff8f2;
+        --ink: #0f1419;
+        --muted: #536471;
+        --brand: #ff671f;
+        --brand-deep: #c45a12;
+        --green: #138808;
+        --navy: #000080;
+        --surface: #ffffff;
+        --border: #e8ddd2;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background: #1a120c;
+        color: var(--ink);
+      }
+
+      .deck {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 24px;
+        align-items: center;
+      }
+
+      .slide {
+        width: 1080px;
+        height: 1080px;
+        min-width: 1080px;
+        min-height: 1080px;
+        max-width: 1080px;
+        max-height: 1080px;
+        position: relative;
+        overflow: hidden;
+        flex: 0 0 1080px;
+        background: var(--bg);
+      }
+
+      .slide-label {
+        position: absolute;
+        top: 18px;
+        left: 24px;
+        z-index: 5;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(15, 20, 25, 0.35);
+      }
+
+      .slide.dark .slide-label,
+      .slide.brand-panel .slide-label {
+        color: rgba(255, 248, 242, 0.45);
+      }
+
+      .story {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 96px 88px;
+        background:
+          radial-gradient(ellipse 80% 55% at 85% 110%, rgba(255, 103, 31, 0.28), transparent 60%),
+          linear-gradient(165deg, #fff8f2 0%, #ffe8d4 55%, #ffd2ad 100%);
+      }
+
+      .story h1 {
+        margin: 0;
+        font-size: 92px;
+        line-height: 1.05;
+        letter-spacing: -0.045em;
+        font-weight: 800;
+        max-width: 16ch;
+      }
+
+      .story.accent {
+        background:
+          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.18), transparent 45%),
+          linear-gradient(165deg, #3d2314 0%, #c45a12 48%, #ff671f 100%);
+        color: #fff8f2;
+      }
+
+      .story.accent h1 {
+        color: #fff8f2;
+      }
+
+      .story .muted {
+        color: var(--muted);
+      }
+
+      .story .hl {
+        color: var(--brand);
+      }
+
+      .brand-reveal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 28px;
+        padding: 80px;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #fff8f2 100%);
+      }
+
+      .brand-reveal .eyebrow {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .brand-reveal h1 {
+        margin: 0;
+        font-size: 64px;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        max-width: 14ch;
+      }
+
+      .brand-reveal h1 em {
+        font-style: normal;
+        color: var(--brand);
+      }
+
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-top: 8px;
+      }
+
+      .logo-mark {
+        width: 112px;
+        height: 112px;
+        border-radius: 999px;
+        display: block;
+      }
+
+      .wordmark {
+        font-size: 72px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      .wordmark span {
+        color: var(--brand);
+      }
+
+      .tag {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .product {
+        display: flex;
+        flex-direction: column;
+        padding: 56px 56px 48px;
+        background: #140e0a;
+        color: #fff8f2;
+      }
+
+      .product-head {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 28px;
+        flex: 0 0 auto;
+      }
+
+      .product-head h1 {
+        margin: 0;
+        font-size: 48px;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+
+      .product-head p {
+        margin: 0;
+        font-size: 26px;
+        color: rgba(255, 248, 242, 0.72);
+        max-width: 28ch;
+      }
+
+      .product-frame {
+        border-radius: 28px;
+        overflow: hidden;
+        border: 3px solid rgba(255, 255, 255, 0.12);
+        background: #000;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      .product-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+      }
+
+      .product.phone .phone-stage {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0;
+      }
+
+      .phone {
+        width: 400px;
+        height: 720px;
+        border-radius: 42px;
+        padding: 12px;
+        background: linear-gradient(160deg, #2a1810, #0f0f12);
+        border: 3px solid rgba(255, 255, 255, 0.16);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+        flex: 0 0 auto;
+      }
+
+      .phone-screen {
+        width: 100%;
+        height: 100%;
+        border-radius: 30px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .phone-screen img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+        display: block;
+      }
+
+      .product-foot {
+        margin-top: 22px;
+        font-size: 22px;
+        font-weight: 700;
+        color: #ffb07a;
+        flex: 0 0 auto;
+      }
+
+      .cta {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 28px;
+        padding: 80px;
+        background:
+          radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255, 103, 31, 0.35), transparent 60%),
+          linear-gradient(180deg, #1a120c 0%, #3d2314 55%, #ff671f 140%);
+        color: #fff8f2;
+      }
+
+      .cta img.logo-mark {
+        width: 160px;
+        height: 160px;
+      }
+
+      .cta h1 {
+        margin: 0;
+        font-size: 56px;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        max-width: 16ch;
+      }
+
+      .cta h1 strong {
+        color: #ffd2ad;
+      }
+
+      .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 42px;
+        border-radius: 999px;
+        background: #fff8f2;
+        color: #c45a12;
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: -0.01em;
+      }
+
+      .cta .fine {
+        margin: 0;
+        font-size: 22px;
+        color: rgba(255, 248, 242, 0.75);
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        min-height: 0;
+      }
+
+      .grid-2 .product-frame {
+        height: 620px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="deck">
+      <!-- 01 -->
+      <section class="slide story" data-slide="01">
+        <div class="slide-label">01</div>
+        <h1>Every social app you use…</h1>
+      </section>
+
+      <!-- 02 -->
+      <section class="slide story" data-slide="02">
+        <div class="slide-label">02</div>
+        <h1 class="muted">…was built for someone else.</h1>
+      </section>
+
+      <!-- 03 -->
+      <section class="slide story accent" data-slide="03">
+        <div class="slide-label">03</div>
+        <h1>Someone else’s culture.<br />Someone else’s language.<br />Someone else’s rules.</h1>
+      </section>
+
+      <!-- 04 -->
+      <section class="slide brand-reveal" data-slide="04">
+        <div class="slide-label">04</div>
+        <p class="eyebrow">So we built</p>
+        <h1>India’s own <em>public square</em>.</h1>
+        <div class="logo-row">
+          <img class="logo-mark" src="../baratx-logo-mark.svg" alt="BX" />
+          <div class="wordmark">Barat<span>X</span></div>
+        </div>
+        <p class="tag">India’s Public Square</p>
+      </section>
+
+      <!-- 05 -->
+      <section class="slide product" data-slide="05">
+        <div class="slide-label">05</div>
+        <div class="product-head">
+          <h1>Join from barathx.com</h1>
+          <p>Real landing screen — not a mock.</p>
+        </div>
+        <div class="product-frame">
+          <img src="screens/01-landing.png" alt="BaratX landing" />
+        </div>
+        <div class="product-foot">Actual BaratX signup</div>
+      </section>
+
+      <!-- 06 — replaces garbled fake in-app slide -->
+      <section class="slide product phone dark brand-panel" data-slide="06">
+        <div class="slide-label">06</div>
+        <div class="product-head">
+          <h1>Inside BaratX</h1>
+          <p>Live feed with real posts. No AI gibberish.</p>
+        </div>
+        <div class="phone-stage">
+          <div class="phone">
+            <div class="phone-screen">
+              <img src="screens/m03-feed.png" alt="BaratX mobile feed" />
+            </div>
+          </div>
+        </div>
+        <div class="product-foot">Screenshot from the live app · For you</div>
+      </section>
+
+      <!-- 07 -->
+      <section class="slide product" data-slide="07">
+        <div class="slide-label">07</div>
+        <div class="product-head">
+          <h1>Short posts. Real conversation.</h1>
+          <p>Open a post. Reply. Stay in the thread.</p>
+        </div>
+        <div class="product-frame">
+          <img src="screens/04-post-detail.png" alt="BaratX post detail" />
+        </div>
+        <div class="product-foot">Post detail + replies</div>
+      </section>
+
+      <!-- 08 -->
+      <section class="slide product" data-slide="08">
+        <div class="slide-label">08</div>
+        <div class="product-head">
+          <h1>Explore India topics</h1>
+          <p>Search people, posts, and conversations.</p>
+        </div>
+        <div class="grid-2">
+          <div class="product-frame">
+            <img src="screens/05-search.png" alt="BaratX explore" />
+          </div>
+          <div class="product-frame">
+            <img src="screens/m05-search.png" alt="BaratX mobile explore" />
+          </div>
+        </div>
+        <div class="product-foot">Desktop + mobile Explore</div>
+      </section>
+
+      <!-- 09 -->
+      <section class="slide product" data-slide="09">
+        <div class="slide-label">09</div>
+        <div class="product-head">
+          <h1>Compose. Follow. Start talking.</h1>
+          <p>First-post prompts and official BaratX accounts.</p>
+        </div>
+        <div class="grid-2">
+          <div class="product-frame">
+            <img src="screens/07-compose.png" alt="BaratX compose" />
+          </div>
+          <div class="product-frame">
+            <img src="screens/03-feed.png" alt="BaratX desktop feed" />
+          </div>
+        </div>
+        <div class="product-foot">Welcome compose + full desktop feed</div>
+      </section>
+
+      <!-- 10 -->
+      <section class="slide cta" data-slide="10">
+        <div class="slide-label">10</div>
+        <img class="logo-mark" src="../baratx-logo-mark.svg" alt="BX" />
+        <h1>Comment <strong>BX</strong> — I’ll personally send you an invite.</h1>
+        <div class="cta-btn">COMMENT ‘BX’ NOW →</div>
+        <p class="fine">BaratX · India’s Public Square · barathx.com</p>
+      </section>
+    </div>
+  </body>
+</html>
