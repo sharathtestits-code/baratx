@@ -108,7 +108,7 @@ export default function Notifications() {
       ) : items.length === 0 ? (
         <div className="empty-state">
           <p className="empty-state-title">No notifications yet</p>
-          <p className="hint">When people follow, like, reply, or repost, it shows up here.</p>
+          <p className="hint">When people follow, like, reply, repost, or tag you, it shows up here.</p>
         </div>
       ) : (
         <div className="notif-list">

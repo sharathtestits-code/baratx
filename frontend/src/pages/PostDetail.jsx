@@ -5,6 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import ReplyItem from "../components/ReplyItem";
+import MentionTextarea from "../components/MentionTextarea";
+
+const MAX_REPLY_LEN = 220;
 
 export default function PostDetail() {
   const { postId } = useParams();
@@ -20,6 +23,12 @@ export default function PostDetail() {
   const [parentReply, setParentReply] = useState(null);
   const [replyBusy, setReplyBusy] = useState(false);
   const [replyError, setReplyError] = useState("");
+
+  function handleReplyTo(reply) {
+    setParentReply(reply);
+    const tag = `@${reply.author.username} `;
+    setReplyText((prev) => (prev.trim().startsWith(`@${reply.author.username}`) ? prev : tag));
+  }
 
   useEffect(() => {
     load();
@@ -141,20 +150,20 @@ export default function PostDetail() {
                   </button>
                 </div>
               )}
-              <textarea
+              <MentionTextarea
                 id="post-reply-composer"
                 placeholder={
                   parentReply
                     ? `Reply to @${parentReply.author.username}`
-                    : "Post your reply"
+                    : "Post your reply — type @ to tag someone"
                 }
                 value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                maxLength={500}
+                onChange={setReplyText}
+                maxLength={MAX_REPLY_LEN}
                 rows={3}
               />
               <div className="detail-reply-composer-footer">
-                <span className="hint">{replyText.length}/500</span>
+                <span className="hint">{replyText.length}/{MAX_REPLY_LEN}</span>
                 <button
                   type="submit"
                   className="btn btn-primary detail-reply-submit"
@@ -180,7 +189,7 @@ export default function PostDetail() {
         ) : (
           <div className="detail-reply-list">
             {replies.map((r) => (
-              <ReplyItem key={r.id} reply={r} onReplyTo={setParentReply} />
+              <ReplyItem key={r.id} reply={r} onReplyTo={handleReplyTo} />
             ))}
           </div>
         )}

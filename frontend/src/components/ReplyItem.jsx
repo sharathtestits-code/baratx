@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
 import { badgeNameClass } from "./OfficialBadge";
 import { IconHeart } from "./Icons";
+import { linkifyText } from "./linkifyText";
 
 export default function ReplyItem({ reply, onReplyTo }) {
   const { token } = useAuth();
@@ -46,7 +47,7 @@ export default function ReplyItem({ reply, onReplyTo }) {
             @{reply.author.username}
           </Link>
         </div>
-        <p className="reply-text">{reply.text}</p>
+        <p className="reply-text">{linkifyText(reply.text)}</p>
         <div className="reply-actions">
           <button
             type="button"

@@ -247,7 +247,7 @@ app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 MAX_POST_LENGTH = 500
-MAX_REPLY_LENGTH = 500
+MAX_REPLY_LENGTH = 220
 MAX_AVATAR_BYTES = 3 * 1024 * 1024  # 3MB
 MAX_COVER_BYTES = 5 * 1024 * 1024  # 5MB
 
@@ -521,10 +521,24 @@ def attach_hashtags(db: Session, post: models.Post, text: str):
             db.add(models.PostHashtag(post_id=post.id, hashtag_id=ht.id))
 
 
-def notify_mentions(db: Session, actor_id: str, text: str, post_id: Optional[str] = None, reply_id: Optional[str] = None):
+def notify_mentions(
+    db: Session,
+    actor_id: str,
+    text: str,
+    post_id: Optional[str] = None,
+    reply_id: Optional[str] = None,
+    exclude_ids: Optional[set] = None,
+):
+    """Notify users tagged with @username in a post or reply (skips actor + exclude_ids)."""
+    skip = set(exclude_ids or set())
+    skip.add(actor_id)
     for username in text_parse.extract_mentions(text):
-        user = db.query(models.User).filter(models.User.username == username).first()
-        if user:
+        user = (
+            db.query(models.User)
+            .filter(models.User.username.ilike(username))
+            .first()
+        )
+        if user and user.id not in skip:
             create_notification(
                 db,
                 recipient_id=user.id,
@@ -533,6 +547,7 @@ def notify_mentions(db: Session, actor_id: str, text: str, post_id: Optional[str
                 post_id=post_id,
                 reply_id=reply_id,
             )
+            skip.add(user.id)
 
 
 def hidden_author_ids(db: Session, current_user: Optional[models.User]) -> set[str]:
@@ -980,7 +995,14 @@ def admin_create_reply(
         post_id=post.id,
         reply_id=reply.id,
     )
-    notify_mentions(db, author.id, text, post_id=post.id, reply_id=reply.id)
+    notify_mentions(
+        db,
+        author.id,
+        text,
+        post_id=post.id,
+        reply_id=reply.id,
+        exclude_ids={post.author_id},
+    )
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, author)
@@ -1999,6 +2021,8 @@ def create_reply(
     )
     db.add(reply)
     db.flush()
+    # Always notify the post owner when someone comments.
+    notified = set()
     create_notification(
         db,
         recipient_id=post.author_id,
@@ -2007,6 +2031,7 @@ def create_reply(
         post_id=post.id,
         reply_id=reply.id,
     )
+    notified.add(post.author_id)
     if parent_reply_id:
         parent = db.query(models.Reply).filter(models.Reply.id == parent_reply_id).first()
         if parent:
@@ -2018,7 +2043,15 @@ def create_reply(
                 post_id=post.id,
                 reply_id=reply.id,
             )
-    notify_mentions(db, current_user.id, text, post_id=post.id, reply_id=reply.id)
+            notified.add(parent.author_id)
+    notify_mentions(
+        db,
+        current_user.id,
+        text,
+        post_id=post.id,
+        reply_id=reply.id,
+        exclude_ids=notified,
+    )
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, current_user)

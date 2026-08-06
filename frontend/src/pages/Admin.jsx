@@ -484,13 +484,13 @@ export default function Admin() {
                     onChange={(e) =>
                       setReplyDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))
                     }
-                    maxLength={500}
+                    maxLength={220}
                     rows={3}
-                    placeholder={`Comment as @${replyAs}…`}
+                    placeholder={`Comment as @${replyAs}… type @ to tag`}
                     required
                   />
                   <div className="admin-compose-footer">
-                    <span className="admin-char-count">{draftText.length}/500</span>
+                    <span className="admin-char-count">{draftText.length}/220</span>
                     <button
                       type="submit"
                       className="admin-btn admin-btn-primary"
