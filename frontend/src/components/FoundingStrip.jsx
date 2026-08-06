@@ -53,7 +53,7 @@ export default function FoundingStrip({ onPostProblem }) {
     const need =
       status.my_kind === "debate"
         ? `${q.stance_count || 0}/${q.need_stances || 2} stances · ${q.post_count || 0}/${q.need_posts || 3} posts`
-        : `${q.like_count || 0}/${q.need_likes || 3} likes · ${q.reply_count || 0}/${q.need_replies || 1} replies`;
+        : `${q.like_count || 0}/${q.need_likes || 11} likes · ${q.reply_count || 0}/${q.need_replies || 1} replies`;
     return (
       <section className="founding-strip" aria-label="Founding reward">
         <p className="founding-strip-label">Founding {status.cap} — waiting on India</p>

@@ -108,8 +108,8 @@ export default function Rewards() {
                 status === "eligible"
                   ? founding.my_kind === "debate"
                     ? `Need ${q.need_stances || 2} stances or ${q.need_posts || 3} posts — now ${q.stance_count || 0} / ${q.post_count || 0}.`
-                    : `Need ${q.need_likes || 3} likes or ${q.need_replies || 1} reply — now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
-                  : "≥3 likes or 1 human reply (official welcome doesn’t count)."
+                    : `Need ${q.need_likes || 11} likes or ${q.need_replies || 1} reply — now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
+                  : "≥11 likes or 1 human reply (official welcome doesn’t count)."
               }
             />
             <Step
