@@ -7,6 +7,7 @@ import Avatar from "./Avatar";
 import Logo from "./Logo";
 
 const MORE_LINKS = [
+  { to: "/rewards", label: "Rewards progress" },
   { to: "/lists", label: "Lists" },
   { to: "/communities", label: "Communities" },
   { to: "/spaces", label: "Spaces" },

@@ -2332,6 +2332,27 @@ def race_status(
     return schemas.RaceStatusOut(**data)
 
 
+def _is_blue(user: models.User) -> bool:
+    badge = (getattr(user, "badge", None) or "none").strip().lower()
+    if badge == "blue" or getattr(user, "is_official", False):
+        return True
+    return (user.username or "").lower() in ("sharath", "baratx")
+
+
+@app.get("/rewards/ops", response_model=schemas.RewardsOpsOut)
+def rewards_ops_for_blue(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Blue accounts: read-only Founding queue + race board. Money actions stay on /admin."""
+    if not _is_blue(current_user):
+        raise HTTPException(status_code=403, detail="Blue accounts only")
+    # Reuse admin serializers without admin secret.
+    founding = admin_founding_rewards(status=None, _=True, db=db)
+    race = schemas.RaceStatusOut(**rewards.race_status_for_user(db, None))
+    return schemas.RewardsOpsOut(founding=founding, race=race)
+
+
 def _founding_row_out(r: models.FoundingReward, u: Optional[models.User], db: Session):
     if r.status == "eligible":
         rewards.refresh_founding_payable(db, r)

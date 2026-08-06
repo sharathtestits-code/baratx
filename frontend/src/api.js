@@ -532,4 +532,5 @@ export const rewardsApi = {
   founding: (token) =>
     request("/rewards/founding", { headers: authHeaders(token) }),
   race: (token) => request("/rewards/race", { headers: authHeaders(token) }),
+  ops: (token) => request("/rewards/ops", { headers: authHeaders(token) }),
 };

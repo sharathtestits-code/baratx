@@ -775,8 +775,16 @@ class RaceStatusOut(BaseModel):
     leader: Optional[RaceLeaderRow] = None
     leaderboard: list[RaceLeaderRow] = []
     my_best: Optional[RaceLeaderRow] = None
+    my_rank: Optional[int] = None
     period_paid: bool = False
     period_winner_username: Optional[str] = None
+
+
+class RewardsOpsOut(BaseModel):
+    """Read-only queue for blue accounts (payout actions stay on /admin)."""
+    founding: FoundingRewardsOut
+    race: RaceStatusOut
+    note: str = "Blue can review progress. Mark paid / lock winner stays on /admin with ADMIN_SECRET."
 
 
 class RaceRewardRow(BaseModel):

@@ -309,7 +309,8 @@ def race_leaderboard(db: Session, *, limit: int = 10, at: Optional[datetime] = N
     for p in posts:
         if p.author and p.author.is_official:
             continue
-        likes = len(p.likes or [])
+        # Prefer relationship likes but filter self/official in prize calc via query for accuracy
+        likes = _post_like_count(db, p.id, author_id=p.author_id)
         ranked.append((likes, p))
     ranked.sort(key=lambda t: (-t[0], t[1].created_at))
     top = []
@@ -342,12 +343,14 @@ def race_leaderboard(db: Session, *, limit: int = 10, at: Optional[datetime] = N
 
 
 def race_status_for_user(db: Session, user: Optional[models.User] = None) -> dict:
-    board = race_leaderboard(db, limit=8)
+    board = race_leaderboard(db, limit=20)
     my_best = None
+    my_rank = None
     if user:
-        for row in board["leaderboard"]:
+        for i, row in enumerate(board["leaderboard"], start=1):
             if row["author_id"] == user.id:
                 my_best = row
+                my_rank = i
                 break
         if my_best is None:
             # User may be outside top N — find their best in period.
@@ -365,8 +368,11 @@ def race_status_for_user(db: Session, user: Optional[models.User] = None) -> dic
                 .all()
             )
             if posts:
-                best = max(posts, key=lambda p: len(p.likes or []))
-                likes = len(best.likes or [])
+                best = max(
+                    posts,
+                    key=lambda p: _post_like_count(db, p.id, author_id=user.id),
+                )
+                likes = _post_like_count(db, best.id, author_id=user.id)
                 my_best = {
                     "post_id": best.id,
                     "text": (best.text or "")[:180],
@@ -377,6 +383,17 @@ def race_status_for_user(db: Session, user: Optional[models.User] = None) -> dic
                     "display_name": user.display_name,
                     "created_at": best.created_at,
                 }
+                # Rank among all period posts
+                all_ranked = []
+                for p in _home_posts_in_period(db, start, end):
+                    if p.author and p.author.is_official:
+                        continue
+                    all_ranked.append((_post_like_count(db, p.id, author_id=p.author_id), p.id))
+                all_ranked.sort(key=lambda t: (-t[0], t[1]))
+                for i, (_likes, pid) in enumerate(all_ranked, start=1):
+                    if pid == best.id:
+                        my_rank = i
+                        break
     paid = (
         db.query(models.RaceReward)
         .filter(models.RaceReward.period_key == board["period_key"])
@@ -385,6 +402,7 @@ def race_status_for_user(db: Session, user: Optional[models.User] = None) -> dic
     return {
         **board,
         "my_best": my_best,
+        "my_rank": my_rank,
         "period_paid": bool(paid and paid.status == "paid"),
         "period_winner_username": paid.username_snapshot if paid else None,
     }

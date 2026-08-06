@@ -20,7 +20,17 @@ Arenas: Sports · Politics · Entertainment · News · Spirituality
 - Prize scales with likes (min 3 likes to win; caps at ₹500)
 - Admin → Lock current leader → Mark paid after UPI
 
-## Soft invite
+## Who sees what
+
+| Who | Where | What they see |
+|-----|--------|----------------|
+| Logged-out | — | Nothing (no reward strips) |
+| Logged-in user | Home strips + **/rewards** | Own Founding steps + race rank / scoreboard |
+| Blue account | **/rewards** → Blue ops view | Read-only founding queue + race top (no Mark paid) |
+| Admin (ADMIN_SECRET) | **/admin** | Full tables, Mark paid, Lock race winner |
+
+Users **don’t rate themselves**. Progress = likes/replies India gives them. They watch the meter on `/rewards`.
+
 > Post a real city problem or open any arena debate. First 100 get ₹150 after people engage. Every 2 weeks the highest-liked Home post wins up to ₹500. barathx.com
 
 ## Don’t
