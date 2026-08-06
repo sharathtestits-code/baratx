@@ -4,7 +4,7 @@ import { API_BASE, api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
-import OfficialBadge, { badgeOf } from "../components/OfficialBadge";
+import { badgeOf, badgeNameClass } from "../components/OfficialBadge";
 import EditProfileModal from "../components/EditProfileModal";
 import { IconCamera } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
@@ -408,11 +408,8 @@ export default function Profile() {
         </div>
 
         <div className="profile-identity">
-          <h2 className="profile-name">
-            {profile.display_name}
-            <OfficialBadge user={profile} />
-          </h2>
-          <div className="profile-username">@{profile.username}</div>
+          <h2 className={badgeNameClass(profile, "profile-name")}>{profile.display_name}</h2>
+          <div className={badgeNameClass(profile, "profile-username")}>@{profile.username}</div>
         </div>
 
         {profile.bio && <p className="profile-bio">{profile.bio}</p>}

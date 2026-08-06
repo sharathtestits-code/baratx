@@ -4711,39 +4711,47 @@ button.admin-btn-ghost:hover:not(:disabled),
   padding: 0.75rem 1.25rem;
 }
 
-/* Official blue / gold badges */
-.official-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: 0.2rem;
-  vertical-align: middle;
-  line-height: 1;
-  flex-shrink: 0;
+/* Blue / gold identity — colored names (no checkmark icon) */
+.name-badge-blue,
+a.name-badge-blue,
+a.name-badge-blue:hover {
+  color: #1d9bf0 !important;
 }
 
-.official-badge svg {
-  width: 1.05em;
-  height: 1.05em;
+.name-badge-gold,
+a.name-badge-gold,
+a.name-badge-gold:hover {
+  color: #ca8a04 !important;
 }
 
-.official-badge-blue {
-  color: #1d9bf0;
+a.post-author.name-badge-blue,
+a.reply-author.name-badge-blue,
+.profile-name.name-badge-blue,
+.suggested-follows-name.name-badge-blue {
+  font-weight: 800;
 }
 
-.official-badge-gold {
-  color: #ca8a04;
+a.post-author.name-badge-gold,
+a.reply-author.name-badge-gold,
+.profile-name.name-badge-gold,
+.suggested-follows-name.name-badge-gold {
+  font-weight: 800;
 }
 
-.profile-name .official-badge {
-  margin-left: 0.35rem;
-  font-size: 1.05rem;
+a.post-username.name-badge-blue,
+a.reply-username.name-badge-blue,
+.profile-username.name-badge-blue,
+.suggested-follows-username.name-badge-blue {
+  color: #0ea5e9 !important;
+  opacity: 0.9;
 }
 
-.post-head .official-badge,
-.reply-head .official-badge,
-.suggested-follows-name .official-badge {
-  font-size: 0.95rem;
+a.post-username.name-badge-gold,
+a.reply-username.name-badge-gold,
+.profile-username.name-badge-gold,
+.suggested-follows-username.name-badge-gold {
+  color: #a16207 !important;
+  opacity: 0.9;
 }
 
 .badge-grant-btn.gold {

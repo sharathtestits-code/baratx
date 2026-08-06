@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
-import OfficialBadge from "./OfficialBadge";
+import { badgeNameClass } from "./OfficialBadge";
 
 export const SUGGESTED_PEOPLE = [
   {
@@ -114,11 +114,10 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
               <Link to={`/u/${encodeURIComponent(person.username)}`} className="suggested-follows-person">
                 <Avatar name={person.display_name} username={person.username} size={40} />
                 <div className="suggested-follows-info">
-                  <div className="suggested-follows-name">
+                  <div className={badgeNameClass(person, "suggested-follows-name")}>
                     {person.display_name}
-                    <OfficialBadge user={person} />
                   </div>
-                  <div className="suggested-follows-username">@{person.username}</div>
+                  <div className={badgeNameClass(person, "suggested-follows-username")}>@{person.username}</div>
                   {person.blurb ? <div className="suggested-follows-blurb">{person.blurb}</div> : null}
                 </div>
               </Link>

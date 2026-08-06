@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, postsApi, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
-import OfficialBadge from "./OfficialBadge";
+import { badgeNameClass } from "./OfficialBadge";
 import { IconBookmark, IconHeart, IconQuote, IconReply, IconRepost, IconTrash } from "./Icons";
 
 function timeAgo(dateStr) {
@@ -176,11 +176,10 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
         </Link>
         <div className="post-body">
           <div className="post-head">
-            <Link to={`/u/${post.author.username}`} className="post-author">
+            <Link to={`/u/${post.author.username}`} className={badgeNameClass(post.author, "post-author")}>
               {post.author.display_name}
             </Link>
-            <OfficialBadge user={post.author} />
-            <Link to={`/u/${post.author.username}`} className="post-username">
+            <Link to={`/u/${post.author.username}`} className={badgeNameClass(post.author, "post-username")}>
               @{post.author.username}
             </Link>
             <span className="post-dot">·</span>
@@ -205,9 +204,8 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
                   url={post.quoted_post.author.avatar_url}
                   size={20}
                 />
-                <strong>{post.quoted_post.author.display_name}</strong>
-                <OfficialBadge user={post.quoted_post.author} />
-                <span>@{post.quoted_post.author.username}</span>
+                <strong className={badgeNameClass(post.quoted_post.author)}>{post.quoted_post.author.display_name}</strong>
+                <span className={badgeNameClass(post.quoted_post.author)}>@{post.quoted_post.author.username}</span>
               </div>
               <p>{post.quoted_post.text}</p>
             </Link>
