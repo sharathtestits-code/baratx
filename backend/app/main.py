@@ -2313,6 +2313,23 @@ def admin_seed_topics(
     return topic_ops.seed_topics(db)
 
 
+@app.post("/admin/daily-digest")
+def admin_daily_digest(
+    force: bool = False,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Post 1–2 trending news takes as @sharath with a BaratX-branded image."""
+    from app import daily_digest
+
+    return daily_digest.run_daily_digest(
+        db,
+        force=force,
+        attach_hashtags=attach_hashtags,
+        notify_mentions=notify_mentions,
+    )
+
+
 @app.get("/rewards/founding", response_model=schemas.FoundingStatusOut)
 def founding_status(
     db: Session = Depends(get_db),
@@ -2549,3 +2566,16 @@ register_social_surfaces(
     attach_hashtags=attach_hashtags,
     notify_mentions=notify_mentions,
 )
+
+# Daily @sharath trending digest (~09:05 IST). Disable with DISABLE_DAILY_DIGEST=1.
+try:
+    from app import daily_digest
+
+    daily_digest.start_daily_digest_scheduler(
+        attach_hashtags=attach_hashtags,
+        notify_mentions=notify_mentions,
+    )
+except Exception:  # noqa: BLE001
+    import logging
+
+    logging.getLogger("baratx").exception("Daily digest scheduler failed to start")

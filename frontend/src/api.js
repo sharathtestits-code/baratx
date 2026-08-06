@@ -482,6 +482,11 @@ export const adminApi = {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
     }),
+  dailyDigest: (adminSecret, force = false) =>
+    request(`/admin/daily-digest?force=${force ? "true" : "false"}`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
   deleteUser: (adminSecret, userId) =>
     request(`/admin/users/${encodeURIComponent(userId)}`, {
       method: "DELETE",

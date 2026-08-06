@@ -405,6 +405,33 @@ export default function Admin() {
           <button
             type="button"
             className="admin-btn admin-btn-ghost"
+            onClick={async () => {
+              setBusy(true);
+              setError("");
+              setMsg("");
+              try {
+                const res = await adminApi.dailyDigest(secret, true);
+                if (res.skipped) {
+                  setMsg(`Daily digest skipped — ${res.reason || "already posted"}`);
+                } else {
+                  setMsg(
+                    `Daily digest (@sharath) — posted ${res.created || 0} of ${res.candidates_scanned || 0} scanned`
+                  );
+                }
+                load(secret);
+              } catch (err) {
+                setError(err.message || "Daily digest failed");
+              } finally {
+                setBusy(false);
+              }
+            }}
+            disabled={busy}
+          >
+            Run daily digest now
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn-ghost"
             onClick={() => load(secret)}
             disabled={busy}
           >
