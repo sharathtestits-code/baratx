@@ -200,6 +200,8 @@ class UserOut(BaseModel):
     cover_url: Optional[str] = None
     is_email_verified: bool
     is_phone_verified: bool
+    badge: str = "none"  # none | gold | blue
+    is_official: bool = False
     created_at: datetime
     follower_count: int = 0
     following_count: int = 0
@@ -214,6 +216,8 @@ class AuthorOut(BaseModel):
     username: str
     display_name: str
     avatar_url: Optional[str] = None
+    badge: str = "none"
+    is_official: bool = False
 
     class Config:
         from_attributes = True
@@ -393,6 +397,8 @@ class AdminUserRow(BaseModel):
     phone: Optional[str] = None
     is_email_verified: bool
     is_phone_verified: bool
+    badge: str = "none"
+    is_official: bool = False
     created_at: datetime
     signup_method: str
 
@@ -402,6 +408,18 @@ class AdminUsersOut(BaseModel):
     limit: int
     offset: int
     users: list[AdminUserRow]
+
+
+class BadgeUpdate(BaseModel):
+    badge: str
+
+    @field_validator("badge")
+    @classmethod
+    def valid_badge(cls, v):
+        v = (v or "").strip().lower()
+        if v not in ("none", "gold", "blue"):
+            raise ValueError("badge must be none, gold, or blue")
+        return v
 
 
 class AdminPostCreate(BaseModel):

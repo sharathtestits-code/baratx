@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { API_BASE, postsApi, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
+import OfficialBadge from "./OfficialBadge";
 import { IconBookmark, IconHeart, IconQuote, IconReply, IconRepost, IconTrash } from "./Icons";
 
 function timeAgo(dateStr) {
@@ -178,6 +179,7 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
             <Link to={`/u/${post.author.username}`} className="post-author">
               {post.author.display_name}
             </Link>
+            <OfficialBadge user={post.author} />
             <Link to={`/u/${post.author.username}`} className="post-username">
               @{post.author.username}
             </Link>
@@ -204,6 +206,7 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
                   size={20}
                 />
                 <strong>{post.quoted_post.author.display_name}</strong>
+                <OfficialBadge user={post.quoted_post.author} />
                 <span>@{post.quoted_post.author.username}</span>
               </div>
               <p>{post.quoted_post.text}</p>

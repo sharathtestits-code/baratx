@@ -34,6 +34,10 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
             if "theme" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN theme VARCHAR DEFAULT 'saffron'"))
+            if "badge" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN badge VARCHAR DEFAULT 'none'"))
+            if "is_official" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN is_official BOOLEAN DEFAULT 0"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -107,6 +111,10 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE users ADD COLUMN cover_url VARCHAR"))
                 if "theme" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN theme VARCHAR DEFAULT 'saffron'"))
+                if "badge" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN badge VARCHAR DEFAULT 'none'"))
+                if "is_official" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN is_official BOOLEAN DEFAULT FALSE"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -363,6 +371,10 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
     is_following = False
     if current_user:
         is_following = any(f.followed_id == user.id for f in current_user.following)
+    badge = (getattr(user, "badge", None) or "none").strip().lower()
+    if badge not in ("none", "gold", "blue"):
+        badge = "none"
+    is_official = bool(getattr(user, "is_official", False) or badge == "blue")
     return schemas.UserOut(
         id=user.id,
         username=user.username,
@@ -374,12 +386,28 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         bio=user.bio,
         is_email_verified=user.is_email_verified,
         is_phone_verified=user.is_phone_verified,
+        badge=badge,
+        is_official=is_official,
         created_at=user.created_at,
         avatar_url=user.avatar_url,
         cover_url=user.cover_url,
         follower_count=len(user.followers),
         following_count=len(user.following),
         is_following=is_following,
+    )
+
+
+def author_out(user: models.User) -> schemas.AuthorOut:
+    badge = (getattr(user, "badge", None) or "none").strip().lower()
+    if badge not in ("none", "gold", "blue"):
+        badge = "none"
+    return schemas.AuthorOut(
+        id=user.id,
+        username=user.username,
+        display_name=user.display_name,
+        avatar_url=user.avatar_url,
+        badge=badge,
+        is_official=bool(getattr(user, "is_official", False) or badge == "blue"),
     )
 
 
@@ -409,7 +437,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
             text=qp.text,
             image_url=qp.image_url,
             created_at=qp.created_at,
-            author=schemas.AuthorOut.model_validate(qp.author),
+            author=author_out(qp.author),
         )
 
     tags = text_parse.extract_hashtags(post.text)
@@ -419,7 +447,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         text=post.text,
         image_url=post.image_url,
         created_at=post.created_at,
-        author=schemas.AuthorOut.model_validate(post.author),
+        author=author_out(post.author),
         like_count=len(post.likes),
         reply_count=len(post.replies),
         repost_count=len(post.reposts),
@@ -441,7 +469,7 @@ def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) ->
         post_id=reply.post_id,
         text=reply.text,
         created_at=reply.created_at,
-        author=schemas.AuthorOut.model_validate(reply.author),
+        author=author_out(reply.author),
         like_count=len(reply.likes),
         liked_by_me=liked_by_me,
         parent_reply_id=getattr(reply, "parent_reply_id", None),
@@ -557,9 +585,11 @@ def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
             username="deleted",
             display_name="Deleted account",
             avatar_url=None,
+            badge="none",
+            is_official=False,
         )
     else:
-        actor = schemas.AuthorOut.model_validate(actor)
+        actor = author_out(actor)
     return schemas.NotificationOut(
         id=n.id,
         type=n.kind,
@@ -678,12 +708,103 @@ def admin_users(
                 phone=u.phone,
                 is_email_verified=bool(u.is_email_verified),
                 is_phone_verified=bool(u.is_phone_verified),
+                badge=(getattr(u, "badge", None) or "none"),
+                is_official=bool(getattr(u, "is_official", False) or (getattr(u, "badge", None) == "blue")),
                 created_at=u.created_at,
                 signup_method=_signup_method(u),
             )
             for u in rows
         ],
     )
+
+
+def _purge_user(db: Session, user: models.User) -> None:
+    """Remove a user and dependent rows that lack cascade-from-user."""
+    uid = user.id
+    # Follows where this user is the followed account (incoming).
+    db.query(models.Follow).filter(
+        (models.Follow.follower_id == uid) | (models.Follow.followed_id == uid)
+    ).delete(synchronize_session=False)
+    db.query(models.Notification).filter(
+        (models.Notification.recipient_id == uid) | (models.Notification.actor_id == uid)
+    ).delete(synchronize_session=False)
+    db.query(models.Bookmark).filter(models.Bookmark.user_id == uid).delete(synchronize_session=False)
+    db.query(models.Block).filter(
+        (models.Block.blocker_id == uid) | (models.Block.blocked_id == uid)
+    ).delete(synchronize_session=False)
+    db.query(models.Mute).filter(
+        (models.Mute.muter_id == uid) | (models.Mute.muted_id == uid)
+    ).delete(synchronize_session=False)
+    db.query(models.Report).filter(
+        (models.Report.reporter_id == uid) | (models.Report.target_user_id == uid)
+    ).delete(synchronize_session=False)
+    db.query(models.DirectMessage).filter(
+        (models.DirectMessage.sender_id == uid) | (models.DirectMessage.recipient_id == uid)
+    ).delete(synchronize_session=False)
+    db.query(models.ListMember).filter(models.ListMember.user_id == uid).delete(synchronize_session=False)
+    db.query(models.UserList).filter(models.UserList.owner_id == uid).delete(synchronize_session=False)
+    db.query(models.CommunityMember).filter(models.CommunityMember.user_id == uid).delete(
+        synchronize_session=False
+    )
+    db.query(models.SpaceStance).filter(models.SpaceStance.user_id == uid).delete(
+        synchronize_session=False
+    )
+    # Spaces hosted by user: close ownership by reassigning to baratx when possible.
+    host = db.query(models.User).filter(models.User.username == "baratx").first()
+    if host and host.id != uid:
+        db.query(models.Space).filter(models.Space.host_id == uid).update(
+            {models.Space.host_id: host.id}, synchronize_session=False
+        )
+    else:
+        db.query(models.Space).filter(models.Space.host_id == uid).delete(synchronize_session=False)
+    # Communities created_by — reassign to baratx
+    if host and host.id != uid:
+        db.query(models.Community).filter(models.Community.created_by == uid).update(
+            {models.Community.created_by: host.id}, synchronize_session=False
+        )
+    db.delete(user)
+
+
+@app.delete("/admin/users/{user_id}", response_model=schemas.MessageResponse)
+def admin_delete_user(
+    user_id: str,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Remove a misleading / abusive account. Protected blue founders cannot be deleted."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.username in seed.PROTECTED_BLUE_USERNAMES:
+        raise HTTPException(status_code=400, detail="Cannot delete protected blue official accounts")
+    username = user.username
+    _purge_user(db, user)
+    db.commit()
+    return schemas.MessageResponse(message=f"Deleted @{username}")
+
+
+@app.delete("/admin/posts/{post_id}", response_model=schemas.MessageResponse)
+def admin_delete_post(
+    post_id: str,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Remove a misleading post."""
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    db.query(models.Notification).filter(models.Notification.post_id == post.id).delete(
+        synchronize_session=False
+    )
+    db.query(models.Bookmark).filter(models.Bookmark.post_id == post.id).delete(
+        synchronize_session=False
+    )
+    db.query(models.PostHashtag).filter(models.PostHashtag.post_id == post.id).delete(
+        synchronize_session=False
+    )
+    db.delete(post)
+    db.commit()
+    return schemas.MessageResponse(message="Post deleted")
 
 
 @app.post("/admin/posts", response_model=schemas.PostOut)
@@ -1179,6 +1300,48 @@ def get_public_profile(
     return serialize_user(user, current_user)
 
 
+@app.post("/users/{username}/badge", response_model=schemas.UserOut)
+def set_user_badge(
+    username: str,
+    payload: schemas.BadgeUpdate,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Blue accounts can grant gold, and promote gold accounts to blue."""
+    actor_badge = (getattr(current_user, "badge", None) or "none").strip().lower()
+    if actor_badge != "blue" and not getattr(current_user, "is_official", False):
+        raise HTTPException(status_code=403, detail="Only blue official accounts can manage badges")
+
+    target = db.query(models.User).filter(models.User.username == username).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+    if target.id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot change your own badge here")
+    if target.username in seed.PROTECTED_BLUE_USERNAMES and payload.badge != "blue":
+        raise HTTPException(status_code=400, detail="Cannot demote protected blue founders")
+
+    current = (getattr(target, "badge", None) or "none").strip().lower()
+    new_badge = payload.badge
+
+    if new_badge == "blue":
+        if current not in ("gold", "blue"):
+            raise HTTPException(
+                status_code=400,
+                detail="Only gold accounts can be promoted to blue. Grant gold first.",
+            )
+    elif new_badge == "gold":
+        if current == "blue" and target.username in seed.PROTECTED_BLUE_USERNAMES:
+            raise HTTPException(status_code=400, detail="Cannot demote protected blue founders")
+    elif new_badge == "none":
+        if current == "blue":
+            raise HTTPException(status_code=400, detail="Demote blue to gold first, or leave as blue")
+
+    seed._apply_badge(target, new_badge)
+    db.commit()
+    db.refresh(target)
+    return serialize_user(target, current_user)
+
+
 @app.get("/users/{username}/posts", response_model=list[schemas.PostOut])
 def get_user_posts(
     username: str,
@@ -1465,7 +1628,7 @@ def list_posts(
         items.append(
             schemas.FeedItemOut(
                 post=serialize_post(r.post, current_user),
-                reposted_by=schemas.AuthorOut.model_validate(r.user),
+                reposted_by=author_out(r.user),
                 item_time=r.created_at,
             )
         )

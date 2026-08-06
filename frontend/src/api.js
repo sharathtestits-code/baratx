@@ -122,6 +122,13 @@ export const api = {
       headers: authHeaders(token),
     }),
 
+  setBadge: (token, username, badge) =>
+    request(`/users/${encodeURIComponent(username)}/badge`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ badge }),
+    }),
+
   bootstrapFollows: (token) =>
     request("/users/me/bootstrap-follows", {
       method: "POST",
@@ -437,5 +444,15 @@ export const adminApi = {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify(body),
+    }),
+  deleteUser: (adminSecret, userId) =>
+    request(`/admin/users/${encodeURIComponent(userId)}`, {
+      method: "DELETE",
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
+  deletePost: (adminSecret, postId) =>
+    request(`/admin/posts/${encodeURIComponent(postId)}`, {
+      method: "DELETE",
+      headers: { "X-Admin-Secret": adminSecret },
     }),
 };

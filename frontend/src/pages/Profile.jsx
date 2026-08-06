@@ -4,6 +4,7 @@ import { API_BASE, api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
+import OfficialBadge, { badgeOf } from "../components/OfficialBadge";
 import EditProfileModal from "../components/EditProfileModal";
 import { IconCamera } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
@@ -23,6 +24,7 @@ export default function Profile() {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
   const [followBusy, setFollowBusy] = useState(false);
+  const [badgeBusy, setBadgeBusy] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [editMenuOpen, setEditMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -302,6 +304,55 @@ export default function Profile() {
                   <Link to={`/messages/${profile.username}`} className="profile-edit-btn">
                     Message
                   </Link>
+                  {badgeOf(user) === "blue" && (
+                    <>
+                      {badgeOf(profile) === "none" && (
+                        <button
+                          type="button"
+                          className="profile-edit-btn badge-grant-btn gold"
+                          disabled={badgeBusy}
+                          onClick={async () => {
+                            setBadgeBusy(true);
+                            setError("");
+                            try {
+                              const updated = await api.setBadge(token, profile.username, "gold");
+                              setProfile(updated);
+                            } catch (err) {
+                              setError(err.message);
+                            } finally {
+                              setBadgeBusy(false);
+                            }
+                          }}
+                        >
+                          {badgeBusy ? "…" : "Grant gold"}
+                        </button>
+                      )}
+                      {badgeOf(profile) === "gold" && (
+                        <button
+                          type="button"
+                          className="profile-edit-btn badge-grant-btn blue"
+                          disabled={badgeBusy}
+                          onClick={async () => {
+                            if (!window.confirm(`Promote @${profile.username} from gold to blue official?`)) {
+                              return;
+                            }
+                            setBadgeBusy(true);
+                            setError("");
+                            try {
+                              const updated = await api.setBadge(token, profile.username, "blue");
+                              setProfile(updated);
+                            } catch (err) {
+                              setError(err.message);
+                            } finally {
+                              setBadgeBusy(false);
+                            }
+                          }}
+                        >
+                          {badgeBusy ? "…" : "Promote to blue"}
+                        </button>
+                      )}
+                    </>
+                  )}
                   <div className="profile-edit-wrap">
                     <button
                       type="button"
@@ -357,7 +408,10 @@ export default function Profile() {
         </div>
 
         <div className="profile-identity">
-          <h2 className="profile-name">{profile.display_name}</h2>
+          <h2 className="profile-name">
+            {profile.display_name}
+            <OfficialBadge user={profile} />
+          </h2>
           <div className="profile-username">@{profile.username}</div>
         </div>
 

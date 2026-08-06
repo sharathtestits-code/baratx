@@ -32,6 +32,9 @@ class User(Base):
 
     is_email_verified = Column(Boolean, default=False, nullable=False)
     is_phone_verified = Column(Boolean, default=False, nullable=False)
+    # none | gold | blue — blue = official verified; gold can be promoted to blue by blue accounts
+    badge = Column(String, default="none", nullable=False, index=True)
+    is_official = Column(Boolean, default=False, nullable=False, index=True)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 

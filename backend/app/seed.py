@@ -18,15 +18,26 @@ OFFICIAL_ACCOUNTS = [
         "username": "baratx",
         "display_name": "BaratX",
         "bio": "Official BaratX — product updates and India conversation prompts.",
+        "badge": "blue",
         "posts": [
             "BaratX is live. India’s public square — short posts, real conversation. Drop your city below.",
             "Rule for this square: reply > like. Say something someone can answer.",
         ],
     },
     {
+        "username": "sharath",
+        "display_name": "Sharath",
+        "bio": "Founder of BaratX. Building India’s public square.",
+        "badge": "blue",
+        "posts": [
+            "I’m Sharath — building BaratX so India gets a real public square, not another firehose. Tell me what you want here.",
+        ],
+    },
+    {
         "username": "bharatvoices",
         "display_name": "Bharat Voices",
         "bio": "Official BaratX — culture, ideas, everyday India.",
+        "badge": "gold",
         "posts": [
             "What’s one India story the feeds keep getting wrong? Reply with your take.",
         ],
@@ -35,6 +46,7 @@ OFFICIAL_ACCOUNTS = [
         "username": "indiatech",
         "display_name": "India Tech Daily",
         "bio": "Official BaratX — startups, policy, and builders across India.",
+        "badge": "gold",
         "posts": [
             "Builders in Hyderabad / Bangalore / Delhi — what are you shipping this week?",
         ],
@@ -42,6 +54,17 @@ OFFICIAL_ACCOUNTS = [
 ]
 
 OFFICIAL_USERNAMES = [a["username"] for a in OFFICIAL_ACCOUNTS]
+BLUE_BADGE_USERNAMES = {a["username"] for a in OFFICIAL_ACCOUNTS if a.get("badge") == "blue"}
+# Founder blue accounts that cannot be demoted or deleted.
+PROTECTED_BLUE_USERNAMES = {"baratx", "sharath"}
+
+
+def _apply_badge(user: models.User, badge: str) -> None:
+    badge = (badge or "none").strip().lower()
+    if badge not in ("none", "gold", "blue"):
+        badge = "none"
+    user.badge = badge
+    user.is_official = badge == "blue"
 
 
 def seed_official_accounts(db: Session) -> None:
@@ -50,8 +73,8 @@ def seed_official_accounts(db: Session) -> None:
     official_password = os.environ.get("OFFICIAL_ACCOUNT_PASSWORD", "").strip()
     for acct in OFFICIAL_ACCOUNTS:
         user = db.query(models.User).filter(models.User.username == acct["username"]).first()
+        want_badge = (acct.get("badge") or "gold").strip().lower()
         if not user:
-            # Prefer shared official password when set; otherwise random (unusable login).
             pwd = official_password or secrets.token_urlsafe(32)
             user = models.User(
                 username=acct["username"],
@@ -61,15 +84,24 @@ def seed_official_accounts(db: Session) -> None:
                 password_hash=auth.hash_password(pwd),
                 is_email_verified=True,
             )
+            _apply_badge(user, want_badge)
             db.add(user)
             db.flush()
             created_any = True
-            logger.info("Seeded official account @%s", acct["username"])
+            logger.info("Seeded official account @%s (%s)", acct["username"], want_badge)
         else:
-            # Keep bios current without overwriting user edits to display name.
             if not (user.bio or "").strip():
                 user.bio = acct["bio"]
-            # Sync password from env so founders can log in and post as the brand.
+            current = (getattr(user, "badge", None) or "none").strip().lower()
+            # Promote seeded brand accounts up to their intended badge; never demote a live blue.
+            if want_badge == "blue" and current != "blue":
+                _apply_badge(user, "blue")
+                created_any = True
+            elif want_badge == "gold" and current == "none":
+                _apply_badge(user, "gold")
+                created_any = True
+            elif current == "blue":
+                user.is_official = True
             if official_password:
                 user.password_hash = auth.hash_password(official_password)
                 created_any = True
@@ -105,6 +137,35 @@ DEFAULT_COMMUNITIES = [
         "description": "Startups, policy, and product news across India.",
     },
 ]
+
+
+def seed_default_communities(db: Session) -> None:
+    """Create a few starter communities owned by @baratx if missing."""
+    host = db.query(models.User).filter(models.User.username == "baratx").first()
+    if not host:
+        return
+    created_any = False
+    for c in DEFAULT_COMMUNITIES:
+        exists = db.query(models.Community).filter(models.Community.slug == c["slug"]).first()
+        if exists:
+            continue
+        community = models.Community(
+            slug=c["slug"],
+            name=c["name"],
+            description=c["description"],
+            created_by=host.id,
+            is_arena=False,
+        )
+        db.add(community)
+        db.flush()
+        db.add(models.CommunityMember(community_id=community.id, user_id=host.id))
+        created_any = True
+        logger.info("Seeded community /%s", c["slug"])
+    if created_any:
+        db.commit()
+    else:
+        db.rollback()
+
 
 ARENA_TOPICS = [
     {
@@ -159,34 +220,6 @@ SAMPLE_DEBATES = [
         "side_against": "Still essential",
     },
 ]
-
-
-def seed_default_communities(db: Session) -> None:
-    """Create a few starter communities owned by @baratx if missing."""
-    host = db.query(models.User).filter(models.User.username == "baratx").first()
-    if not host:
-        return
-    created_any = False
-    for c in DEFAULT_COMMUNITIES:
-        exists = db.query(models.Community).filter(models.Community.slug == c["slug"]).first()
-        if exists:
-            continue
-        community = models.Community(
-            slug=c["slug"],
-            name=c["name"],
-            description=c["description"],
-            created_by=host.id,
-            is_arena=False,
-        )
-        db.add(community)
-        db.flush()
-        db.add(models.CommunityMember(community_id=community.id, user_id=host.id))
-        created_any = True
-        logger.info("Seeded community /%s", c["slug"])
-    if created_any:
-        db.commit()
-    else:
-        db.rollback()
 
 
 def seed_arenas(db: Session) -> None:

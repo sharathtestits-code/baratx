@@ -3,25 +3,32 @@ import { Link } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
+import OfficialBadge from "./OfficialBadge";
 
 export const SUGGESTED_PEOPLE = [
   {
     display_name: "BaratX",
     username: "baratx",
-    blurb: "Official — product updates & India conversation prompts",
-    official: true,
+    blurb: "Official blue — product updates & India conversation prompts",
+    badge: "blue",
+  },
+  {
+    display_name: "Sharath",
+    username: "sharath",
+    blurb: "Founder — building India’s public square",
+    badge: "blue",
   },
   {
     display_name: "Bharat Voices",
     username: "bharatvoices",
-    blurb: "Official BaratX — culture, ideas, everyday India",
-    official: true,
+    blurb: "Gold BaratX — culture, ideas, everyday India",
+    badge: "gold",
   },
   {
     display_name: "India Tech Daily",
     username: "indiatech",
-    blurb: "Official BaratX — startups, policy & builders",
-    official: true,
+    blurb: "Gold BaratX — startups, policy & builders",
+    badge: "gold",
   },
 ];
 
@@ -109,7 +116,7 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
                 <div className="suggested-follows-info">
                   <div className="suggested-follows-name">
                     {person.display_name}
-                    {person.official ? <span className="rail-official-badge">Official</span> : null}
+                    <OfficialBadge user={person} />
                   </div>
                   <div className="suggested-follows-username">@{person.username}</div>
                   {person.blurb ? <div className="suggested-follows-blurb">{person.blurb}</div> : null}
