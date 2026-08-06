@@ -414,8 +414,14 @@ export default function Admin() {
                 if (res.skipped) {
                   setMsg(`Daily digest skipped — ${res.reason || "already posted"}`);
                 } else {
+                  const arenas = (res.posts || [])
+                    .map((p) => p.arena)
+                    .filter(Boolean)
+                    .join(", ");
                   setMsg(
-                    `Daily digest — posted ${res.created || 0} (@${(res.authors || ["sharath", "baratx"]).join(", @")})`
+                    `Daily digest — posted ${res.created || 0}/5` +
+                      (arenas ? ` · ${arenas}` : "") +
+                      ` (@${(res.authors || ["sharath", "baratx"]).join(", @")})`
                   );
                 }
                 load(secret);

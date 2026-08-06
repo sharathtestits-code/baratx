@@ -6,7 +6,7 @@ BX wins when newcomers get a reply. Ship does the product half; you do the human
 1. Open https://barathx.com/admin → comment on new users’ posts as @baratx
 2. Answer every notification reply within an hour when you can
 3. Post **Today’s Square** question yourself first (set the tone)
-4. Confirm **@sharath daily digest** ran (~09:05 IST) — or hit **Run daily digest now** in admin
+4. Confirm **@sharath / @baratx daily digest** ran (~09:05 IST) — target **3–5** multi-arena posts (max 2/arena), or hit **Run daily digest now** in admin
 
 ## Auto (already in code)
 - **New-user first post** → `@baratx` auto-replies a welcome

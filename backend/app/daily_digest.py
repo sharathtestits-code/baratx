@@ -1,7 +1,8 @@
-"""Daily trending digest — post 1–2 quality news takes as @sharath.
+"""Daily trending digest — multi-arena posts as @sharath + @baratx.
 
-Pulls Google News RSS across arenas/topics, ranks for punchiness, renders a
-BaratX-themed image, and posts from the founder account. Quality over volume.
+Pulls Google News RSS across all arenas, scores for BaratX motto fit
+(India's public square — real civic takes, not spam), and posts 3–5
+quality items/day with a per-arena cap so politics doesn't own the feed.
 """
 
 from __future__ import annotations
@@ -28,9 +29,24 @@ logger = logging.getLogger("baratx.daily_digest")
 IST = ZoneInfo("Asia/Kolkata")
 # Split voice across brand + founder so the square feels alive.
 DIGEST_AUTHORS = ("sharath", "baratx")
-MAX_POSTS_PER_AUTHOR = 1
-MAX_POSTS_PER_DAY = len(DIGEST_AUTHORS) * MAX_POSTS_PER_AUTHOR
+
+# Volume: post 3–5 when quality exists. Max 2 per arena so all floors get airtime.
+MIN_POSTS_IF_QUALITY = 3
+MAX_POSTS_PER_DAY = 5
+MAX_POSTS_PER_ARENA = 2
+MAX_POSTS_PER_AUTHOR = 3  # within the daily 5, split across both voices
 POST_MARKER = "#BaratXDaily"
+
+# Soft floor — below this we skip (never pad with junk to hit the min).
+MIN_SCORE_TO_POST = 12.0
+# Slight prefer politics (civic pulse) without excluding other arenas.
+ARENA_WEIGHT = {
+    "politics": 2.5,
+    "news": 1.5,
+    "sports": 1.0,
+    "entertainment": 0.5,
+    "spirituality": 1.0,
+}
 
 # Arena-level trending queries (broader than single subtopics).
 ARENA_TRENDING_QUERIES = {
@@ -45,6 +61,67 @@ BRAND_ORANGE = (255, 103, 31)
 BRAND_NAVY = (15, 23, 42)
 BRAND_CREAM = (255, 248, 242)
 BRAND_WHITE = (255, 255, 255)
+
+# BaratX motto keywords — civic debate / India public square.
+_MOTTO_BOOST = (
+    "india",
+    "bharat",
+    "delhi",
+    "mumbai",
+    "hyderabad",
+    "bangalore",
+    "bengaluru",
+    "chennai",
+    "kolkata",
+    "pune",
+    "modi",
+    "parliament",
+    "lok sabha",
+    "election",
+    "vote",
+    "voter",
+    "constitution",
+    "supreme court",
+    "high court",
+    "policy",
+    "budget",
+    "rupee",
+    "gst",
+    "farmers",
+    "civic",
+    "municipal",
+    "mayor",
+    "cm ",
+    "governor",
+    "isro",
+    "ipl",
+    "cricket",
+    "world cup",
+    "olympics",
+    "protest",
+    "bill",
+    "act ",
+    "rti",
+    "corruption",
+    "scam",
+    "temple",
+    "mosque",
+    "church",
+    "faith",
+)
+_SOFT_PENALTY = (
+    "tips to",
+    "in pictures",
+    "horoscope",
+    "zodiac",
+    "best of",
+    "viral video",
+    "you won't believe",
+    "click here",
+    "netflix top",
+    "recipe",
+    "weight loss",
+)
 
 
 def _today_ist() -> datetime.date:
@@ -68,8 +145,8 @@ def _wrap(text: str, width: int) -> list[str]:
     return lines
 
 
-def _score_headline(title: str) -> float:
-    """Higher = more post-worthy. Prefer punchy, specific India stories."""
+def _score_headline(title: str, arena: str = "") -> float:
+    """Higher = more post-worthy and closer to BaratX motto (civic square)."""
     t = (title or "").strip()
     if len(t) < 28:
         return 0.0
@@ -80,30 +157,19 @@ def _score_headline(title: str) -> float:
     elif len(t) > 140:
         score -= 4
     low = t.lower()
-    for kw in (
-        "india",
-        "delhi",
-        "mumbai",
-        "hyderabad",
-        "bangalore",
-        "bengaluru",
-        "modi",
-        "ipl",
-        "cricket",
-        "election",
-        "budget",
-        "isro",
-        "rupee",
-        "supreme court",
-    ):
+    for kw in _MOTTO_BOOST:
         if kw in low:
-            score += 2
-    # Soft-penalize listicles / evergreen noise
-    for bad in ("tips to", "in pictures", "horoscope", "zodiac", "best of"):
+            score += 2.2
+    for bad in _SOFT_PENALTY:
         if bad in low:
             score -= 8
     if "?" in t:
         score += 2
+    # Debate-shaped language
+    for cue in ("should", "why", "vs", "versus", "debate", "controversy", "row over", "slams"):
+        if cue in low:
+            score += 1.5
+    score += ARENA_WEIGHT.get(arena, 0.0)
     return score
 
 
@@ -125,23 +191,21 @@ def _already_posted_similar(db: Session, author_id: str, title: str) -> bool:
     return False
 
 
-def posts_today_count(db: Session, author_id: str) -> int:
+def posts_today_count(db: Session, author_id: Optional[str] = None) -> int:
     start = datetime.combine(_today_ist(), datetime.min.time(), tzinfo=IST).astimezone(
         timezone.utc
     )
-    return (
-        db.query(models.Post)
-        .filter(
-            models.Post.author_id == author_id,
-            models.Post.created_at >= start,
-            models.Post.text.contains(POST_MARKER),
-        )
-        .count()
+    q = db.query(models.Post).filter(
+        models.Post.created_at >= start,
+        models.Post.text.contains(POST_MARKER),
     )
+    if author_id:
+        q = q.filter(models.Post.author_id == author_id)
+    return q.count()
 
 
-def collect_candidates(db: Session, *, per_arena: int = 3) -> list[dict]:
-    """Scan arenas + a few rotating topics; return scored candidates."""
+def collect_candidates(db: Session, *, per_arena: int = 5) -> list[dict]:
+    """Scan all arenas + rotating topics; return motto-scored candidates."""
     day = _today_ist().toordinal()
     candidates: list[dict] = []
 
@@ -149,7 +213,7 @@ def collect_candidates(db: Session, *, per_arena: int = 3) -> list[dict]:
         query = ARENA_TRENDING_QUERIES.get(arena) or f"India {arena} news"
         for item in rss.fetch_rss_items(query, limit=per_arena):
             title = item.get("title") or ""
-            score = _score_headline(title)
+            score = _score_headline(title, arena)
             if score < 8:
                 continue
             candidates.append(
@@ -168,9 +232,9 @@ def collect_candidates(db: Session, *, per_arena: int = 3) -> list[dict]:
         if topics:
             pick = topics[day % len(topics)]
             q = pick.get("rss_query") or pick.get("name") or arena
-            for item in rss.fetch_rss_items(q, limit=2):
+            for item in rss.fetch_rss_items(q, limit=3):
                 title = item.get("title") or ""
-                score = _score_headline(title) + 1.5  # slight boost for topic hit
+                score = _score_headline(title, arena) + 1.5
                 if score < 8:
                     continue
                 candidates.append(
@@ -194,6 +258,29 @@ def collect_candidates(db: Session, *, per_arena: int = 3) -> list[dict]:
         seen.add(fp)
         uniq.append(c)
     return uniq
+
+
+def select_posts(
+    candidates: list[dict],
+    *,
+    max_posts: int = MAX_POSTS_PER_DAY,
+    max_per_arena: int = MAX_POSTS_PER_ARENA,
+    min_score: float = MIN_SCORE_TO_POST,
+) -> list[dict]:
+    """Pick up to max_posts with arena diversity. Never pad weak stories."""
+    arena_counts: dict[str, int] = {}
+    picked: list[dict] = []
+    for c in candidates:
+        if len(picked) >= max_posts:
+            break
+        if c["score"] < min_score:
+            continue
+        arena = c.get("arena") or "news"
+        if arena_counts.get(arena, 0) >= max_per_arena:
+            continue
+        picked.append(c)
+        arena_counts[arena] = arena_counts.get(arena, 0) + 1
+    return picked
 
 
 def render_brand_card(*, headline: str, arena: str) -> bytes:
@@ -264,7 +351,7 @@ def run_daily_digest(
     attach_hashtags=None,
     notify_mentions=None,
 ) -> dict:
-    """Create up to max_posts trending posts as @sharath and @baratx for today (IST)."""
+    """Create 3–5 motto-aligned posts across arenas as @sharath and @baratx."""
     authors = []
     for username in DIGEST_AUTHORS:
         row = db.query(models.User).filter(models.User.username == username).first()
@@ -273,7 +360,7 @@ def run_daily_digest(
     if not authors:
         return {"ok": False, "error": "digest_accounts_missing", "created": 0}
 
-    already_total = sum(posts_today_count(db, a.id) for a in authors)
+    already_total = posts_today_count(db)
     if already_total >= max_posts and not force:
         return {
             "ok": True,
@@ -281,70 +368,93 @@ def run_daily_digest(
             "reason": "already_posted_today",
             "created": 0,
             "already": already_total,
+            "target": f"{MIN_POSTS_IF_QUALITY}-{max_posts}",
+        }
+
+    remaining_slots = max_posts if force else max(0, max_posts - already_total)
+    if remaining_slots <= 0:
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "slots_full",
+            "created": 0,
+            "already": already_total,
         }
 
     candidates = collect_candidates(db)
+    selected = select_posts(candidates, max_posts=remaining_slots)
+
+    # Prefer hitting the min when enough quality exists; select_posts already
+    # quality-gates — if we have fewer than MIN, we still post what passed.
     created_posts = []
     used_titles = set()
+    author_counts = {a.id: posts_today_count(db, a.id) for a in authors}
+    author_idx = 0
 
-    for author in authors:
-        if len(created_posts) >= max_posts:
-            break
-        author_already = posts_today_count(db, author.id)
-        if author_already >= MAX_POSTS_PER_AUTHOR and not force:
+    for c in selected:
+        title_key = c["title"].lower()
+        if title_key in used_titles:
             continue
-        for c in candidates:
-            if len(created_posts) >= max_posts:
-                break
-            title_key = c["title"].lower()
-            if title_key in used_titles:
+
+        # Round-robin authors, respecting per-author cap.
+        author = None
+        for offset in range(len(authors)):
+            candidate_author = authors[(author_idx + offset) % len(authors)]
+            if author_counts.get(candidate_author.id, 0) >= MAX_POSTS_PER_AUTHOR and not force:
                 continue
-            if _already_posted_similar(db, author.id, c["title"]):
+            if _already_posted_similar(db, candidate_author.id, c["title"]):
                 continue
-            # Also skip if the other official already posted this story today.
-            skip = False
+            # Skip if any digest author already covered this story recently.
+            other_hit = False
             for other in authors:
-                if other.id != author.id and _already_posted_similar(db, other.id, c["title"]):
-                    skip = True
+                if other.id != candidate_author.id and _already_posted_similar(
+                    db, other.id, c["title"]
+                ):
+                    other_hit = True
                     break
-            if skip:
+            if other_hit:
                 continue
+            author = candidate_author
+            author_idx = (author_idx + offset + 1) % len(authors)
+            break
+        if not author:
+            continue
 
-            text = compose_post_text(
-                title=c["title"],
-                arena=c["arena"],
-                link=c.get("link") or "",
-                author=author.username,
+        text = compose_post_text(
+            title=c["title"],
+            arena=c["arena"],
+            link=c.get("link") or "",
+            author=author.username,
+        )
+        try:
+            png = render_brand_card(headline=c["title"], arena=c["arena"])
+            image_url = media_store.save_bytes(
+                png, content_type="image/png", filename="baratx-daily.png"
             )
-            try:
-                png = render_brand_card(headline=c["title"], arena=c["arena"])
-                image_url = media_store.save_bytes(
-                    png, content_type="image/png", filename="baratx-daily.png"
-                )
-            except Exception:  # noqa: BLE001
-                logger.exception("Brand card render failed")
-                image_url = None
+        except Exception:  # noqa: BLE001
+            logger.exception("Brand card render failed")
+            image_url = None
 
-            post = models.Post(author_id=author.id, text=text, image_url=image_url)
-            db.add(post)
-            db.flush()
-            if attach_hashtags:
-                attach_hashtags(db, post, text)
-            if notify_mentions:
-                notify_mentions(db, author.id, text, post_id=post.id)
-            created_posts.append(
-                {
-                    "id": post.id,
-                    "author": author.username,
-                    "arena": c["arena"],
-                    "topic": c["topic"],
-                    "title": c["title"],
-                    "score": c["score"],
-                    "image": bool(image_url),
-                }
-            )
-            used_titles.add(title_key)
-            break  # one post per author per run
+        post = models.Post(author_id=author.id, text=text, image_url=image_url)
+        db.add(post)
+        db.flush()
+        if attach_hashtags:
+            attach_hashtags(db, post, text)
+        if notify_mentions:
+            notify_mentions(db, author.id, text, post_id=post.id)
+        created_posts.append(
+            {
+                "id": post.id,
+                "author": author.username,
+                "arena": c["arena"],
+                "topic": c["topic"],
+                "title": c["title"],
+                "score": c["score"],
+                "image": bool(image_url),
+            }
+        )
+        used_titles.add(title_key)
+        author_counts[author.id] = author_counts.get(author.id, 0) + 1
 
     if created_posts:
         db.commit()
@@ -356,8 +466,16 @@ def run_daily_digest(
         "created": len(created_posts),
         "posts": created_posts,
         "candidates_scanned": len(candidates),
+        "selected_quality": len(selected),
         "day": str(_today_ist()),
         "authors": [a.username for a in authors],
+        "policy": {
+            "min_if_quality": MIN_POSTS_IF_QUALITY,
+            "max_per_day": max_posts,
+            "max_per_arena": MAX_POSTS_PER_ARENA,
+            "min_score": MIN_SCORE_TO_POST,
+            "arenas": list(ACTIVE_ARENA_KEYS),
+        },
     }
 
 
@@ -414,4 +532,10 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
 
     t = threading.Thread(target=loop, name="baratx-daily-digest", daemon=True)
     t.start()
-    logger.info("Daily digest scheduler started (authors=%s, IST ~09:05)", ",".join(DIGEST_AUTHORS))
+    logger.info(
+        "Daily digest scheduler started (authors=%s, target=%s-%s/day, max/arena=%s, IST ~09:05)",
+        ",".join(DIGEST_AUTHORS),
+        MIN_POSTS_IF_QUALITY,
+        MAX_POSTS_PER_DAY,
+        MAX_POSTS_PER_ARENA,
+    )
