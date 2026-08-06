@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import WelcomePanel from "../components/WelcomePanel";
 import SuggestedFollows from "../components/SuggestedFollows";
+import TodaysSquare from "../components/TodaysSquare";
 import MentionTextarea from "../components/MentionTextarea";
 import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
@@ -347,6 +348,13 @@ export default function Feed() {
         </div>
       </form>
 
+      <TodaysSquare
+        onAnswer={(question) => {
+          setText(`${question}\n\n`);
+          composeRef.current?.focus?.();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
 
       <section className="arena-home-strip" aria-label="Arenas">
         <div className="arena-home-strip-head">

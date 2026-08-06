@@ -1742,10 +1742,42 @@ async def create_post(
         image_url=image_url,
         quoted_post_id=quoted_post_id,
     )
+    # Count before insert flush so we know if this is the user's first post.
+    prior_posts = (
+        db.query(func.count(models.Post.id))
+        .filter(models.Post.author_id == current_user.id)
+        .scalar()
+        or 0
+    )
     db.add(post)
     db.flush()
     attach_hashtags(db, post, text)
     notify_mentions(db, current_user.id, text, post_id=post.id)
+
+    # Traction: first post gets an official welcome reply so the square feels alive.
+    if prior_posts == 0:
+        official = db.query(models.User).filter(models.User.username == "baratx").first()
+        if official and official.id != current_user.id:
+            welcome = models.Reply(
+                post_id=post.id,
+                author_id=official.id,
+                text=(
+                    f"Welcome to BaratX, @{current_user.username}. "
+                    "Glad you’re here — what’s your city, and what should this square never become?"
+                ),
+                parent_reply_id=None,
+            )
+            db.add(welcome)
+            db.flush()
+            create_notification(
+                db,
+                recipient_id=current_user.id,
+                actor_id=official.id,
+                kind="reply",
+                post_id=post.id,
+                reply_id=welcome.id,
+            )
+
     db.commit()
     db.refresh(post)
     return serialize_post(post, current_user)

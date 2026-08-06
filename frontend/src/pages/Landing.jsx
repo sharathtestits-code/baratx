@@ -5,27 +5,23 @@ import { IconPhone } from "../components/Icons";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 /**
- * Public GTM landing — brand-first, phone-first CTA.
+ * Public GTM landing — Google-first for trust, then email, phone last.
  */
 export default function Landing() {
   const navigate = useNavigate();
   const [emailOrUser, setEmailOrUser] = useState("");
 
-  function goSignup() {
-    navigate("/signup?method=phone");
-  }
-
   function handleNext(e) {
     e.preventDefault();
     const q = emailOrUser.trim();
     if (!q) {
-      navigate("/signup");
+      navigate("/signup?method=email");
       return;
     }
     if (q.includes("@")) {
-      navigate(`/signup?email=${encodeURIComponent(q)}`);
+      navigate(`/signup?method=email&email=${encodeURIComponent(q)}`);
     } else {
-      navigate(`/signup?username=${encodeURIComponent(q)}`);
+      navigate(`/signup?method=email&username=${encodeURIComponent(q)}`);
     }
   }
 
@@ -41,19 +37,16 @@ export default function Landing() {
       <div className="x-landing-auth">
         <div className="x-landing-auth-inner">
           <LogoMark className="x-landing-mark-sm" title="BaratX" />
-          <p className="x-landing-brand-line">BaratX</p>
-          <h1 className="x-landing-headline">Pick a fight. Not a feed.</h1>
+          <p className="x-landing-brand-line">BX · BaratX</p>
+          <h1 className="x-landing-headline">India&apos;s public square</h1>
           <p className="x-landing-support">
-            India&apos;s public square — short posts, real conversation. Join and start talking.
+            Short posts. Real replies. Start with Google — fastest and safest way in.
           </p>
 
           <div className="x-auth-stack">
-            <button type="button" className="x-btn x-btn-phone" onClick={goSignup}>
-              <IconPhone className="x-btn-icon" />
-              Continue with phone
-            </button>
-
             <GoogleSignInButton label="Continue with Google" />
+
+            <p className="x-trust-row">HTTPS · Passwords hashed · We don’t sell your data</p>
 
             <div className="x-auth-or" role="separator">
               <span>or</span>
@@ -71,12 +64,23 @@ export default function Landing() {
                 />
               </label>
               <button type="submit" className="x-btn x-btn-next">
-                Next
+                Continue with email
               </button>
             </form>
 
+            <button
+              type="button"
+              className="x-btn x-btn-phone"
+              onClick={() => navigate("/signup?method=phone")}
+            >
+              <IconPhone className="x-btn-icon" />
+              Continue with phone
+            </button>
+
             <p className="x-legal">
-              By signing up, you agree to the Terms of Service and Privacy Policy.
+              By signing up, you agree to the{" "}
+              <Link to="/terms">Terms of Service</Link> and{" "}
+              <Link to="/privacy">Privacy Policy</Link>.
             </p>
 
             <div className="x-have-account">
@@ -86,9 +90,6 @@ export default function Landing() {
               </Link>
               <Link to="/login?method=phone" className="x-create-link">
                 Sign in with phone OTP
-              </Link>
-              <Link to="/signup" className="x-create-link">
-                Create account with email
               </Link>
             </div>
           </div>

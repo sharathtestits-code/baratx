@@ -5,6 +5,8 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
@@ -95,6 +97,8 @@ function AppShell() {
           <Route path="/spaces" element={<Spaces />} />
           <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
           <Route path="/onboarding/topics" element={<OnboardingTopics />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
       </main>
@@ -134,6 +138,20 @@ export default function App() {
       </AuthChrome>
     );
   }
+  if (location.pathname === "/privacy") {
+    return (
+      <AuthChrome>
+        <Privacy />
+      </AuthChrome>
+    );
+  }
+  if (location.pathname === "/terms") {
+    return (
+      <AuthChrome>
+        <Terms />
+      </AuthChrome>
+    );
+  }
 
   if (!token) {
     return (
@@ -160,6 +178,22 @@ export default function App() {
           element={
             <AuthChrome>
               <ForgotPassword />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/privacy"
+          element={
+            <AuthChrome>
+              <Privacy />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
+            <AuthChrome>
+              <Terms />
             </AuthChrome>
           }
         />
