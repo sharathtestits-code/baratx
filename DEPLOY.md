@@ -117,12 +117,15 @@ Open and sign up with the same email:
 
 ## 5. Why uploaded images disappeared
 
-Railway (and Render) give each deploy a **fresh disk**. Images were saved under
-local `/media`, so every redeploy wiped the files while post rows stayed in
-Postgres — looks like “auto delete.”
+Railway wipes the **container disk** on every deploy/restart. Images were saved
+under local `/media`, so files vanished while post rows stayed in Postgres
+(URLs like `/media/….png` then 404).
 
-**Fix shipped in app code:** on Railway, new uploads persist in the database
-(as data URLs) until you wire Cloudflare R2. For scale, set:
+**Fix:** new uploads are stored in Postgres (`media_assets`) on Railway and
+served from `/media/{id}`. Old broken `/media/…` files from before this fix
+cannot be recovered — re-upload those.
+
+At scale, switch to Cloudflare R2:
 
 ```
 MEDIA_BACKEND=s3
@@ -133,15 +136,27 @@ S3_SECRET_ACCESS_KEY=…
 S3_PUBLIC_BASE_URL=https://media.yourdomain.com
 ```
 
-Old broken `/media/…` links from before this fix cannot be recovered.
+## 6. Video & audio (Instagram-like) — what it takes
 
-## 6. What is NOT done yet (next coding step)
+Not built yet. To add IG-style video/audio you’d need:
 
-Done already: `CORS_ORIGINS`, hide `dev_otp` in production, email verify via Resend, Google sign-in, durable media fallback + R2 support.
+1. **Object storage (required)** — R2/S3/Cloudinary. Video in Postgres is not viable.
+2. **Upload API** — accept `video/mp4`, `video/webm`, `audio/mpeg`, `audio/mp4`; caps ~50–100MB video, ~15MB audio.
+3. **Transcoding** — ffmpeg (or Cloudflare Stream / Mux) for mobile-friendly H.264 + poster thumbnails.
+4. **Feed UI** — `<video>` / `<audio>` players, mute-by-default, autoplay in viewport, progress scrubber.
+5. **CDN + range requests** — streaming, not full-file download.
+6. **Moderation** — size/duration limits, optional NSFW checks later.
+
+Rough build: storage wiring + upload endpoints + players first; transcoding/CDN next.
+
+## 7. What is NOT done yet (next coding step)
+
+Done already: durable image storage (DB blobs), arenas incl. Startups/Spirituality, topic taxonomy.
 
 Still open:
 
 - Real MSG91 OTP SMS (phone auth still demo until SMS is wired)
+- R2/S3 for images at scale + video/audio pipeline
 - Landing copy: English-only + “more languages coming”
 
-Say when you want MSG91 and we will wire that next.
+Say when you want MSG91 or video/audio and we will wire that next.

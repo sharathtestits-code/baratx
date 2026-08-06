@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -9,6 +9,19 @@ from app.database import Base
 
 def gen_uuid():
     return str(uuid.uuid4())
+
+
+class MediaAsset(Base):
+    """Durable media bytes (survives Railway redeploys when S3/R2 is not configured)."""
+
+    __tablename__ = "media_assets"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    content_type = Column(String, nullable=False, default="application/octet-stream")
+    filename = Column(String, nullable=True)
+    size = Column(Integer, nullable=False, default=0)
+    data = Column(LargeBinary, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 class User(Base):

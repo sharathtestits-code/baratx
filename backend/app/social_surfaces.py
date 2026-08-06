@@ -910,6 +910,14 @@ def register_social_surfaces(
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
+        # Self-heal when code taxonomy is ahead of DB (e.g. new Startups/Spirituality arenas).
+        try:
+            from app import topic_ops
+
+            if topic_ops.topics_need_seed(db):
+                topic_ops.seed_topics(db)
+        except Exception:  # noqa: BLE001
+            pass
         q = db.query(models.Topic)
         if arena_key:
             q = q.filter(models.Topic.arena_key == arena_key)

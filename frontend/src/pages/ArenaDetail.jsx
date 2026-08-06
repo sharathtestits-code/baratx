@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { arenasApi, communitiesApi, spacesApi } from "../api";
+import { arenasApi, communitiesApi, spacesApi, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { arenaMeta } from "../arenas";
 import PostCard from "../components/PostCard";
@@ -13,6 +13,7 @@ export default function ArenaDetail() {
   const [arena, setArena] = useState(null);
   const [debates, setDebates] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [text, setText] = useState("");
@@ -25,12 +26,14 @@ export default function ArenaDetail() {
     setLoading(true);
     setError("");
     try {
-      const [a, d] = await Promise.all([
+      const [a, d, t] = await Promise.all([
         arenasApi.get(token, arenaKey),
         spacesApi.listDebates(token, arenaKey),
+        topicsApi.list(token, arenaKey).catch(() => []),
       ]);
       setArena(a);
       setDebates(d);
+      setTopics(Array.isArray(t) ? t : []);
       if (a?.slug) {
         const feed = await communitiesApi.feed(token, a.slug);
         setPosts(feed);
@@ -144,6 +147,32 @@ export default function ArenaDetail() {
       </div>
 
       {error && <div className="error">{error}</div>}
+
+      <section className="arena-section">
+        <h2 className="section-title">Trending topics</h2>
+        <p className="hint surface-lead">
+          {topics.length
+            ? `${topics.length} India-trending lanes in ${arena.name}. Pick debates that match.`
+            : "Topics loading…"}
+        </p>
+        {topics.length > 0 && (
+          <div className="topic-chip-grid arena-topic-grid">
+            {topics.map((t) => (
+              <span key={t.id} className="topic-chip" title={t.blurb || t.name}>
+                {t.name}
+                {t.open_debate_count > 0 ? (
+                  <em className="topic-chip-count"> {t.open_debate_count}</em>
+                ) : null}
+              </span>
+            ))}
+          </div>
+        )}
+        {token && (
+          <p className="hint">
+            <Link to="/onboarding/topics">Personalize your topics</Link> for home debates.
+          </p>
+        )}
+      </section>
 
       <section className="arena-section">
         <h2 className="section-title">

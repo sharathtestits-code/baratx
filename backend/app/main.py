@@ -6,6 +6,7 @@ from typing import Optional
 
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
@@ -196,6 +197,9 @@ with SessionLocal() as _seed_db:
         from app import topic_ops
 
         topic_ops.seed_topics(_seed_db)
+        # Second pass catches any partial failure from the first boot attempt.
+        if topic_ops.topics_need_seed(_seed_db):
+            topic_ops.seed_topics(_seed_db)
     except Exception:  # noqa: BLE001
         import logging
 
@@ -242,7 +246,26 @@ app.add_middleware(
 BASE_DIR = media_store.BASE_DIR
 MEDIA_DIR = media_store.MEDIA_DIR
 os.makedirs(MEDIA_DIR, exist_ok=True)
-app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
+
+
+@app.get("/media/{name}")
+def serve_media(name: str):
+    """Serve durable DB media (and legacy local files if still present)."""
+    loaded = media_store.load_bytes(name)
+    if not loaded:
+        raise HTTPException(status_code=404, detail="Media not found")
+    data, content_type = loaded
+    return Response(
+        content=data,
+        media_type=content_type,
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
+
+# Keep StaticFiles as a secondary mount for any odd local paths during local dev.
+# Primary serving is the route above (DB-backed on Railway).
+if not media_store.use_db_store() and not media_store.s3_enabled():
+    app.mount("/media-files", StaticFiles(directory=MEDIA_DIR), name="media_files")
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
@@ -2237,6 +2260,17 @@ def admin_refresh_prompts(
     from app import topic_ops
 
     return topic_ops.refresh_debate_prompts(db, force=force, per_topic=2, max_topics=60)
+
+
+@app.post("/admin/topics/seed")
+def admin_seed_topics(
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Force-upsert the full 30×arena topic taxonomy (Startups, Spirituality, etc.)."""
+    from app import topic_ops
+
+    return topic_ops.seed_topics(db)
 
 
 register_extra_routes(
