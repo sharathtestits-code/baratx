@@ -128,7 +128,15 @@ _cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
 if _cors_raw:
     CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
 elif ENVIRONMENT == "production":
-    CORS_ORIGINS = ["https://barathx.com", "https://baratx.pages.dev"]
+    CORS_ORIGINS = [
+        "https://barathx.com",
+        "https://baratx.pages.dev",
+        # Capacitor native shells (Android https scheme / iOS capacitor scheme)
+        "https://localhost",
+        "capacitor://localhost",
+        "ionic://localhost",
+        "http://localhost",
+    ]
 else:
     CORS_ORIGINS = ["*"]
 

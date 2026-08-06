@@ -3,6 +3,24 @@ html {
   touch-action: manipulation;
 }
 
+/* Capacitor native shell */
+.native-app body {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.native-app .bottom-nav {
+  padding-bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));
+}
+
+.native-app .app-main {
+  padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.native-app.keyboard-open .bottom-nav {
+  display: none;
+}
+
+
 :root,
 [data-theme="saffron"] {
   /* Warm India-first neutrals */

@@ -13,6 +13,25 @@ frontend/dist/
 frontend/.env
 frontend/.env.local
 
+# Capacitor / native build artifacts (keep android/ + ios/ project sources)
+frontend/android/.gradle/
+frontend/android/app/build/
+frontend/android/build/
+frontend/android/local.properties/
+frontend/android/local.properties
+frontend/android/*.iml
+frontend/android/captures/
+frontend/android/.idea/
+frontend/ios/App/Pods/
+frontend/ios/App/build/
+frontend/ios/DerivedData/
+frontend/ios/App/App.xcworkspace/xcuserdata/
+frontend/ios/App/App.xcodeproj/xcuserdata/
+frontend/ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
+*.jks
+*.keystore
+keystore.properties
+
 # OS / editor
 .DS_Store
 .idea/

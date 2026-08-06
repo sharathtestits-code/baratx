@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
+import { isNativeApp } from "../native";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
  * Google sign-in that keeps the BaratX button look, but uses GIS renderButton
  * (popup account chooser next to the control) — not One Tap in the top-right.
+ *
+ * In Capacitor native shells, GIS popup/WebView OAuth is unreliable until
+ * platform OAuth clients are configured — prefer phone/email there.
  */
 export default function GoogleSignInButton({ label = "Continue with Google", onError }) {
   const { login } = useAuth();
@@ -18,6 +22,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
+  const native = isNativeApp();
 
   callbackRef.current = async (response) => {
     if (!response?.credential) return;
@@ -38,7 +43,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
   };
 
   useEffect(() => {
-    if (!CLIENT_ID) return undefined;
+    if (!CLIENT_ID || native) return undefined;
     let cancelled = false;
     let resizeTimer = null;
 
@@ -56,7 +61,6 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
         context: "signin",
       });
 
-      // Never show One Tap in the corner.
       try {
         window.google.accounts.id.cancel();
       } catch {
@@ -103,7 +107,29 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
         // ignore
       }
     };
-  }, []);
+  }, [native]);
+
+  if (native) {
+    return (
+      <div className="x-google-wrap">
+        <button
+          type="button"
+          className="x-btn x-btn-google"
+          onClick={() => {
+            const msg =
+              "In the BaratX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
+            setError(msg);
+            onError?.(msg);
+          }}
+        >
+          <GoogleG className="x-btn-icon" />
+          {label}
+        </button>
+        <p className="hint x-google-loading">App tip: phone OTP or email works best.</p>
+        {error && <p className="x-inline-error">{error}</p>}
+      </div>
+    );
+  }
 
   if (!CLIENT_ID) {
     return (
@@ -132,12 +158,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
           <GoogleG className="x-btn-icon" />
           {busy ? "Signing in…" : label}
         </div>
-        <div
-          ref={hostRef}
-          className="google-btn-host"
-          title={label}
-          aria-label={label}
-        />
+        <div ref={hostRef} className="google-btn-host" title={label} aria-label={label} />
       </div>
       {!gisReady && !error && <p className="hint x-google-loading">Loading Google…</p>}
       {error && <p className="x-inline-error">{error}</p>}
