@@ -1,4 +1,4 @@
-/** Blue / gold verification badges */
+/** Blue / gold account identity — colored names, no generic checkmark. */
 
 export function badgeOf(userOrAuthor) {
   if (!userOrAuthor) return "none";
@@ -8,22 +8,17 @@ export function badgeOf(userOrAuthor) {
   return "none";
 }
 
-export default function OfficialBadge({ user, className = "" }) {
-  const badge = badgeOf(user);
-  if (badge !== "blue" && badge !== "gold") return null;
-  const label = badge === "blue" ? "Official blue account" : "Gold account";
-  return (
-    <span
-      className={`official-badge official-badge-${badge}${className ? ` ${className}` : ""}`}
-      title={label}
-      aria-label={label}
-    >
-      <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M12 2.5l1.6 1.2 1.9-.4.9 1.8 1.9.7-.2 2 1.5 1.3-1.1 1.7.5 1.9-1.8.8-.8 1.8-2-.1L12 21.5l-1.4-1.7-2 .1-.8-1.8-1.8-.8.5-1.9-1.1-1.7 1.5-1.3-.2-2 1.9-.7.9-1.8 1.9.4L12 2.5zm-1.1 12.2l5-5-1.4-1.4-3.6 3.6-1.8-1.8-1.4 1.4 3.2 3.2z"
-        />
-      </svg>
-    </span>
-  );
+/** CSS class for a display name (and optional @handle). */
+export function badgeNameClass(userOrAuthor, base = "") {
+  const badge = badgeOf(userOrAuthor);
+  const tier =
+    badge === "blue" ? "name-badge-blue" : badge === "gold" ? "name-badge-gold" : "";
+  return [base, tier].filter(Boolean).join(" ");
+}
+
+export function badgeLabel(userOrAuthor) {
+  const badge = badgeOf(userOrAuthor);
+  if (badge === "blue") return "Blue official";
+  if (badge === "gold") return "Gold account";
+  return "";
 }
