@@ -67,6 +67,8 @@ export default function Admin() {
   const [replyDrafts, setReplyDrafts] = useState({});
   const [replyingId, setReplyingId] = useState(null);
   const [deletingId, setDeletingId] = useState("");
+  const [badgeBusyId, setBadgeBusyId] = useState("");
+  const [notifyBadge, setNotifyBadge] = useState(true);
 
   const load = useCallback(
     async (adminSecret) => {
@@ -230,6 +232,37 @@ export default function Admin() {
       setError(err.message || "Could not delete post");
     } finally {
       setDeletingId("");
+    }
+  }
+
+  async function handleSetBadge(u, badge) {
+    if (!secret) return;
+    const protectedBlue = u.username === "baratx" || u.username === "sharath";
+    if (protectedBlue && badge !== "blue") {
+      setError("Protected blue founders cannot be demoted");
+      return;
+    }
+    const labels = { none: "no color", gold: "gold", blue: "blue" };
+    if (
+      !window.confirm(
+        `Set @${u.username} badge to ${labels[badge] || badge}?${
+          notifyBadge ? " User will be notified." : " User will NOT be notified."
+        }`
+      )
+    ) {
+      return;
+    }
+    setBadgeBusyId(u.id);
+    setError("");
+    setMsg("");
+    try {
+      const updated = await adminApi.setBadge(secret, u.id, badge, notifyBadge);
+      setUsers((prev) => prev.map((row) => (row.id === updated.id ? { ...row, ...updated } : row)));
+      setMsg(`@${u.username} is now ${updated.badge}`);
+    } catch (err) {
+      setError(err.message || "Could not update badge");
+    } finally {
+      setBadgeBusyId("");
     }
   }
 
@@ -471,6 +504,14 @@ export default function Admin() {
       <p className="admin-count">
         Showing {users.length} of {total} users (newest first)
       </p>
+      <label className="badge-notify-opt admin-badge-notify">
+        <input
+          type="checkbox"
+          checked={notifyBadge}
+          onChange={(e) => setNotifyBadge(e.target.checked)}
+        />
+        Notify user when changing badge
+      </label>
 
       <div className="admin-table-wrap">
         <table className="admin-table">
@@ -484,13 +525,14 @@ export default function Admin() {
               <th>Phone</th>
               <th>Method</th>
               <th>Verified</th>
+              <th>Badge actions</th>
               <th>Moderation</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 && !busy && (
               <tr>
-                <td colSpan={9} className="admin-empty">
+                <td colSpan={10} className="admin-empty">
                   No registrations yet.
                 </td>
               </tr>
@@ -498,6 +540,7 @@ export default function Admin() {
             {users.map((u) => {
               const badge = u.badge || (u.is_official ? "blue" : "none");
               const protectedBlue = u.username === "baratx" || u.username === "sharath";
+              const busyBadge = badgeBusyId === u.id;
               return (
                 <tr
                   key={u.id}
@@ -532,6 +575,54 @@ export default function Admin() {
                   <td>{u.phone || "—"}</td>
                   <td>{u.signup_method}</td>
                   <td>{verifiedLabel(u)}</td>
+                  <td>
+                    {protectedBlue ? (
+                      <span className="admin-protected">Protected</span>
+                    ) : (
+                      <div className="admin-badge-actions">
+                        {badge !== "gold" && (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-tiny"
+                            disabled={busyBadge}
+                            onClick={() => handleSetBadge(u, "gold")}
+                          >
+                            Gold
+                          </button>
+                        )}
+                        {badge === "gold" && (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-tiny admin-btn-blue"
+                            disabled={busyBadge}
+                            onClick={() => handleSetBadge(u, "blue")}
+                          >
+                            Blue
+                          </button>
+                        )}
+                        {badge === "blue" && (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-tiny"
+                            disabled={busyBadge}
+                            onClick={() => handleSetBadge(u, "gold")}
+                          >
+                            Demote
+                          </button>
+                        )}
+                        {badge === "gold" && (
+                          <button
+                            type="button"
+                            className="admin-btn admin-btn-tiny"
+                            disabled={busyBadge}
+                            onClick={() => handleSetBadge(u, "none")}
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </td>
                   <td>
                     {protectedBlue ? (
                       <span className="admin-protected">Protected</span>

@@ -814,6 +814,71 @@ def admin_delete_post(
     return schemas.MessageResponse(message="Post deleted")
 
 
+@app.post("/admin/users/{user_id}/badge", response_model=schemas.AdminUserRow)
+def admin_set_user_badge(
+    user_id: str,
+    payload: schemas.BadgeUpdate,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Admin secret can set badges (including demote) without logging in as blue."""
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.username in seed.PROTECTED_BLUE_USERNAMES and payload.badge != "blue":
+        raise HTTPException(status_code=400, detail="Cannot demote protected blue founders")
+
+    current = (getattr(user, "badge", None) or "none").strip().lower()
+    if current not in ("none", "gold", "blue"):
+        current = "none"
+    new_badge = payload.badge
+    if new_badge != current:
+        if new_badge == "blue" and current not in ("gold", "blue"):
+            # Admin may grant blue directly for ops, but prefer gold→blue in product UI.
+            pass
+        seed._apply_badge(user, new_badge)
+        if payload.notify:
+            try:
+                # Notify as @baratx when possible.
+                actor = db.query(models.User).filter(models.User.username == "baratx").first()
+                if actor and actor.id != user.id:
+                    if current == "blue" and new_badge == "gold":
+                        msg = "demoted your blue official status to gold."
+                    elif current == "gold" and new_badge == "none":
+                        msg = "removed your gold status."
+                    elif new_badge == "gold":
+                        msg = "granted you gold status."
+                    elif new_badge == "blue":
+                        msg = "promoted you to blue official."
+                    else:
+                        msg = f"updated your account badge to {new_badge}."
+                    create_notification(
+                        db,
+                        recipient_id=user.id,
+                        actor_id=actor.id,
+                        kind="badge",
+                        message=msg,
+                    )
+            except Exception:  # noqa: BLE001
+                pass
+        db.commit()
+        db.refresh(user)
+
+    return schemas.AdminUserRow(
+        id=user.id,
+        username=user.username,
+        display_name=user.display_name,
+        email=user.email,
+        phone=user.phone,
+        is_email_verified=bool(user.is_email_verified),
+        is_phone_verified=bool(user.is_phone_verified),
+        badge=(getattr(user, "badge", None) or "none"),
+        is_official=bool(getattr(user, "is_official", False) or (getattr(user, "badge", None) == "blue")),
+        created_at=user.created_at,
+        signup_method=_signup_method(user),
+    )
+
+
 @app.post("/admin/posts", response_model=schemas.PostOut)
 def admin_create_post(
     payload: schemas.AdminPostCreate,
@@ -1322,7 +1387,12 @@ def set_user_badge(
 ):
     """Blue accounts manage badges: grant gold, promote gold→blue, demote blue→gold, gold→none."""
     actor_badge = (getattr(current_user, "badge", None) or "none").strip().lower()
-    if actor_badge != "blue" and not getattr(current_user, "is_official", False):
+    actor_ok = (
+        actor_badge == "blue"
+        or bool(getattr(current_user, "is_official", False))
+        or current_user.username in seed.PROTECTED_BLUE_USERNAMES
+    )
+    if not actor_ok:
         raise HTTPException(status_code=403, detail="Only blue official accounts can manage badges")
 
     target = db.query(models.User).filter(models.User.username == username).first()

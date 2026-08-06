@@ -4,12 +4,13 @@ import { API_BASE, api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
-import { badgeOf, badgeNameClass } from "../components/OfficialBadge";
+import { badgeOf, badgeNameClass, canManageBadges } from "../components/OfficialBadge";
 import EditProfileModal from "../components/EditProfileModal";
 import { IconCamera } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
 const PAGE_SIZE = 20;
+const PROTECTED_BLUE = new Set(["baratx", "sharath"]);
 
 export default function Profile() {
   const { username } = useParams();
@@ -135,6 +136,21 @@ export default function Profile() {
       loadProfile();
     } finally {
       setFollowBusy(false);
+    }
+  }
+
+  async function changeBadge(nextBadge, confirmMsg) {
+    if (!token || !profile || badgeBusy) return;
+    if (confirmMsg && !window.confirm(confirmMsg)) return;
+    setBadgeBusy(true);
+    setError("");
+    try {
+      const updated = await api.setBadge(token, profile.username, nextBadge, notifyBadge);
+      setProfile(updated);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBadgeBusy(false);
     }
   }
 
@@ -305,145 +321,6 @@ export default function Profile() {
                   <Link to={`/messages/${profile.username}`} className="profile-edit-btn">
                     Message
                   </Link>
-                  {badgeOf(user) === "blue" && (
-                    <div className="badge-mod-wrap">
-                      {badgeOf(profile) === "none" && (
-                        <button
-                          type="button"
-                          className="profile-edit-btn badge-grant-btn gold"
-                          disabled={badgeBusy}
-                          onClick={async () => {
-                            setBadgeBusy(true);
-                            setError("");
-                            try {
-                              const updated = await api.setBadge(
-                                token,
-                                profile.username,
-                                "gold",
-                                notifyBadge
-                              );
-                              setProfile(updated);
-                            } catch (err) {
-                              setError(err.message);
-                            } finally {
-                              setBadgeBusy(false);
-                            }
-                          }}
-                        >
-                          {badgeBusy ? "…" : "Grant gold"}
-                        </button>
-                      )}
-                      {badgeOf(profile) === "gold" && (
-                        <>
-                          <button
-                            type="button"
-                            className="profile-edit-btn badge-grant-btn blue"
-                            disabled={badgeBusy}
-                            onClick={async () => {
-                              if (
-                                !window.confirm(
-                                  `Promote @${profile.username} from gold to blue official?`
-                                )
-                              ) {
-                                return;
-                              }
-                              setBadgeBusy(true);
-                              setError("");
-                              try {
-                                const updated = await api.setBadge(
-                                  token,
-                                  profile.username,
-                                  "blue",
-                                  notifyBadge
-                                );
-                                setProfile(updated);
-                              } catch (err) {
-                                setError(err.message);
-                              } finally {
-                                setBadgeBusy(false);
-                              }
-                            }}
-                          >
-                            {badgeBusy ? "…" : "Promote to blue"}
-                          </button>
-                          <button
-                            type="button"
-                            className="profile-edit-btn badge-grant-btn demote"
-                            disabled={badgeBusy}
-                            onClick={async () => {
-                              if (
-                                !window.confirm(
-                                  `Remove gold from @${profile.username}? Their name returns to no color.`
-                                )
-                              ) {
-                                return;
-                              }
-                              setBadgeBusy(true);
-                              setError("");
-                              try {
-                                const updated = await api.setBadge(
-                                  token,
-                                  profile.username,
-                                  "none",
-                                  notifyBadge
-                                );
-                                setProfile(updated);
-                              } catch (err) {
-                                setError(err.message);
-                              } finally {
-                                setBadgeBusy(false);
-                              }
-                            }}
-                          >
-                            {badgeBusy ? "…" : "Remove gold"}
-                          </button>
-                        </>
-                      )}
-                      {badgeOf(profile) === "blue" &&
-                        profile.username !== "baratx" &&
-                        profile.username !== "sharath" && (
-                          <button
-                            type="button"
-                            className="profile-edit-btn badge-grant-btn demote"
-                            disabled={badgeBusy}
-                            onClick={async () => {
-                              if (
-                                !window.confirm(
-                                  `Demote @${profile.username} from blue to gold for security?`
-                                )
-                              ) {
-                                return;
-                              }
-                              setBadgeBusy(true);
-                              setError("");
-                              try {
-                                const updated = await api.setBadge(
-                                  token,
-                                  profile.username,
-                                  "gold",
-                                  notifyBadge
-                                );
-                                setProfile(updated);
-                              } catch (err) {
-                                setError(err.message);
-                              } finally {
-                                setBadgeBusy(false);
-                              }
-                            }}
-                          >
-                            {badgeBusy ? "…" : "Demote to gold"}
-                          </button>
-                        )}
-                      <label className="badge-notify-opt">
-                        <input
-                          type="checkbox"
-                          checked={notifyBadge}
-                          onChange={(e) => setNotifyBadge(e.target.checked)}
-                        />
-                        Notify user
-                      </label>
-                    </div>
-                  )}
                   <div className="profile-edit-wrap">
                     <button
                       type="button"
@@ -498,6 +375,99 @@ export default function Profile() {
           </div>
         </div>
 
+        {canManageBadges(user) && !isMe && profile && (
+          <div className="badge-control-panel" aria-label="Badge controls">
+            <div className="badge-control-head">
+              <strong>Badge controls</strong>
+              <span className="badge-control-status">
+                Current: {badgeOf(profile) === "none" ? "no color" : badgeOf(profile)}
+              </span>
+            </div>
+            <div className="badge-mod-wrap">
+              {badgeOf(profile) === "none" && (
+                <button
+                  type="button"
+                  className="profile-edit-btn badge-grant-btn gold"
+                  disabled={badgeBusy}
+                  onClick={() => changeBadge("gold", `Grant gold to @${profile.username}?`)}
+                >
+                  {badgeBusy ? "…" : "Grant gold"}
+                </button>
+              )}
+              {badgeOf(profile) === "gold" && (
+                <>
+                  <button
+                    type="button"
+                    className="profile-edit-btn badge-grant-btn blue"
+                    disabled={badgeBusy}
+                    onClick={() =>
+                      changeBadge("blue", `Promote @${profile.username} from gold to blue?`)
+                    }
+                  >
+                    {badgeBusy ? "…" : "Promote to blue"}
+                  </button>
+                  <button
+                    type="button"
+                    className="profile-edit-btn badge-grant-btn demote"
+                    disabled={badgeBusy}
+                    onClick={() =>
+                      changeBadge(
+                        "none",
+                        `Remove gold from @${profile.username}? Name returns to no color.`
+                      )
+                    }
+                  >
+                    {badgeBusy ? "…" : "Remove gold"}
+                  </button>
+                </>
+              )}
+              {badgeOf(profile) === "blue" &&
+                !PROTECTED_BLUE.has((profile.username || "").toLowerCase()) && (
+                  <button
+                    type="button"
+                    className="profile-edit-btn badge-grant-btn demote"
+                    disabled={badgeBusy}
+                    onClick={() =>
+                      changeBadge(
+                        "gold",
+                        `Demote @${profile.username} from blue to gold for security?`
+                      )
+                    }
+                  >
+                    {badgeBusy ? "…" : "Demote to gold"}
+                  </button>
+                )}
+              {badgeOf(profile) === "blue" &&
+                PROTECTED_BLUE.has((profile.username || "").toLowerCase()) && (
+                  <span className="badge-control-protected">Protected blue founder</span>
+                )}
+              <label className="badge-notify-opt">
+                <input
+                  type="checkbox"
+                  checked={notifyBadge}
+                  onChange={(e) => setNotifyBadge(e.target.checked)}
+                />
+                Notify user
+              </label>
+            </div>
+            <p className="badge-control-hint">
+              Open any other user’s profile (not your own) to grant, promote, or demote.
+            </p>
+          </div>
+        )}
+
+        {token && user && !canManageBadges(user) && !isMe && (
+          <p className="badge-control-hint muted">
+            Badge grant/demote is only available when logged in as a blue account (@sharath or
+            @baratx).
+          </p>
+        )}
+
+        {isMe && canManageBadges(user) && (
+          <p className="badge-control-hint">
+            You’re logged in as blue. Open another user’s profile to manage their badge.
+          </p>
+        )}
         <div className="profile-identity">
           <h2 className={badgeNameClass(profile, "profile-name")}>{profile.display_name}</h2>
           <div className={badgeNameClass(profile, "profile-username")}>@{profile.username}</div>
