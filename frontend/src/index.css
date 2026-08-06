@@ -4764,6 +4764,32 @@ a.reply-username.name-badge-gold,
   color: #0284c7;
 }
 
+.badge-grant-btn.demote {
+  border-color: #9ca3af;
+  color: #4b5563;
+}
+
+.badge-mod-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.badge-notify-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.badge-notify-opt input {
+  margin: 0;
+}
+
 /* Admin badge / moderation */
 .admin-user-blue {
   color: #1d9bf0 !important;

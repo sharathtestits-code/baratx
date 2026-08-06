@@ -122,11 +122,11 @@ export const api = {
       headers: authHeaders(token),
     }),
 
-  setBadge: (token, username, badge) =>
+  setBadge: (token, username, badge, notify = true) =>
     request(`/users/${encodeURIComponent(username)}/badge`, {
       method: "POST",
       headers: authHeaders(token),
-      body: JSON.stringify({ badge }),
+      body: JSON.stringify({ badge, notify: !!notify }),
     }),
 
   bootstrapFollows: (token) =>

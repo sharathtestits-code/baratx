@@ -91,6 +91,8 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE notifications RENAME COLUMN type TO kind"))
                 elif "kind" not in notif_cols:
                     conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
+                if "message" not in notif_cols:
+                    conn.execute(text("ALTER TABLE notifications ADD COLUMN message VARCHAR"))
         else:
             # Postgres / other: add missing columns if tables already exist.
             def cols(table: str) -> set[str]:
@@ -154,6 +156,8 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE notifications RENAME COLUMN type TO kind"))
                 else:
                     conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
+            if notif_cols and "message" not in notif_cols:
+                conn.execute(text("ALTER TABLE notifications ADD COLUMN message VARCHAR"))
 
         conn.commit()
 
@@ -532,6 +536,7 @@ def create_notification(
     kind: str,
     post_id: Optional[str] = None,
     reply_id: Optional[str] = None,
+    message: Optional[str] = None,
 ):
     if recipient_id == actor_id:
         return
@@ -542,6 +547,7 @@ def create_notification(
             kind=kind,
             post_id=post_id,
             reply_id=reply_id,
+            message=(message or None),
         )
     )
     # Retention: email when possible (never fail the social action).
@@ -550,12 +556,12 @@ def create_notification(
         actor = db.query(models.User).filter(models.User.id == actor_id).first()
         if not recipient or not actor or not recipient.email:
             return
-        preview = None
-        if reply_id:
+        preview = message
+        if not preview and reply_id:
             reply = db.query(models.Reply).filter(models.Reply.id == reply_id).first()
             if reply:
                 preview = reply.text
-        elif post_id:
+        elif not preview and post_id:
             post = db.query(models.Post).filter(models.Post.id == post_id).first()
             if post:
                 preview = post.text
@@ -599,6 +605,7 @@ def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
         post_id=n.post_id,
         post_preview=preview,
         reply_preview=reply_preview,
+        message=getattr(n, "message", None),
     )
 
 
@@ -1313,7 +1320,7 @@ def set_user_badge(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Blue accounts can grant gold, and promote gold accounts to blue."""
+    """Blue accounts manage badges: grant gold, promote gold→blue, demote blue→gold, gold→none."""
     actor_badge = (getattr(current_user, "badge", None) or "none").strip().lower()
     if actor_badge != "blue" and not getattr(current_user, "is_official", False):
         raise HTTPException(status_code=403, detail="Only blue official accounts can manage badges")
@@ -1327,22 +1334,55 @@ def set_user_badge(
         raise HTTPException(status_code=400, detail="Cannot demote protected blue founders")
 
     current = (getattr(target, "badge", None) or "none").strip().lower()
+    if current not in ("none", "gold", "blue"):
+        current = "none"
     new_badge = payload.badge
 
+    if new_badge == current:
+        return serialize_user(target, current_user)
+
     if new_badge == "blue":
-        if current not in ("gold", "blue"):
+        if current != "gold":
             raise HTTPException(
                 status_code=400,
                 detail="Only gold accounts can be promoted to blue. Grant gold first.",
             )
     elif new_badge == "gold":
-        if current == "blue" and target.username in seed.PROTECTED_BLUE_USERNAMES:
-            raise HTTPException(status_code=400, detail="Cannot demote protected blue founders")
+        # From none (grant) or from blue (demote for security) — both allowed.
+        if current not in ("none", "blue"):
+            raise HTTPException(status_code=400, detail="Cannot set gold from this status")
     elif new_badge == "none":
+        # Gold → no color. Blue must step down to gold first.
         if current == "blue":
-            raise HTTPException(status_code=400, detail="Demote blue to gold first, or leave as blue")
+            raise HTTPException(status_code=400, detail="Demote blue to gold first, then remove gold")
+        if current != "gold":
+            raise HTTPException(status_code=400, detail="Only gold accounts can be cleared to no color")
 
     seed._apply_badge(target, new_badge)
+
+    # Optional in-app notification — never block the badge change if notify fails.
+    if payload.notify:
+        try:
+            if current == "blue" and new_badge == "gold":
+                msg = "demoted your blue official status to gold."
+            elif current == "gold" and new_badge == "none":
+                msg = "removed your gold status."
+            elif current == "none" and new_badge == "gold":
+                msg = "granted you gold status."
+            elif current == "gold" and new_badge == "blue":
+                msg = "promoted you to blue official."
+            else:
+                msg = f"updated your account badge to {new_badge}."
+            create_notification(
+                db,
+                recipient_id=target.id,
+                actor_id=current_user.id,
+                kind="badge",
+                message=msg,
+            )
+        except Exception:  # noqa: BLE001
+            pass
+
     db.commit()
     db.refresh(target)
     return serialize_user(target, current_user)
