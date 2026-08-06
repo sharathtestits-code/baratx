@@ -9,7 +9,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from app import models, rss
-from app.topics_data import all_topics, debate_sides_for
+from app.topics_data import TOPICS_BY_ARENA, all_topics, debate_sides_for
 
 logger = logging.getLogger("baratx.topics")
 
@@ -23,8 +23,17 @@ _TOPIC_KEY_MIGRATIONS = {
 }
 
 
-def seed_topics(db: Session) -> None:
-    """Upsert the 30×N topic taxonomy. Safe every boot."""
+def ensure_topics(db: Session) -> dict:
+    """
+    Idempotent upsert of the full taxonomy.
+    Safe to call on boot and on /topics if the DB is behind the code.
+    """
+    return seed_topics(db)
+
+
+def seed_topics(db: Session) -> dict:
+    """Upsert the 30×N topic taxonomy. Safe every boot. Returns counts."""
+    migrated = 0
     for (arena_key, old_key), new_key in _TOPIC_KEY_MIGRATIONS.items():
         row = (
             db.query(models.Topic)
@@ -39,11 +48,30 @@ def seed_topics(db: Session) -> None:
             .first()
         )
         if clash:
+            # Move interests/debates off the old row, then drop it.
+            db.query(models.UserTopicInterest).filter(
+                models.UserTopicInterest.topic_id == row.id
+            ).update(
+                {models.UserTopicInterest.topic_id: clash.id},
+                synchronize_session=False,
+            )
+            db.query(models.Space).filter(models.Space.topic_id == row.id).update(
+                {models.Space.topic_id: clash.id},
+                synchronize_session=False,
+            )
             db.delete(row)
         else:
             row.key = new_key
+        migrated += 1
+    if migrated:
+        try:
+            db.commit()
+        except Exception:  # noqa: BLE001
+            db.rollback()
+            logger.exception("Topic key migration failed")
 
     created = 0
+    updated = 0
     for row in all_topics():
         existing = (
             db.query(models.Topic)
@@ -51,25 +79,73 @@ def seed_topics(db: Session) -> None:
             .first()
         )
         if existing:
-            existing.name = row["name"]
-            existing.blurb = row.get("blurb") or ""
-            existing.rss_query = row.get("rss_query") or ""
+            dirty = False
+            if existing.name != row["name"]:
+                existing.name = row["name"]
+                dirty = True
+            blurb = row.get("blurb") or ""
+            if (existing.blurb or "") != blurb:
+                existing.blurb = blurb
+                dirty = True
+            rss_q = row.get("rss_query") or ""
+            if (existing.rss_query or "") != rss_q:
+                existing.rss_query = rss_q
+                dirty = True
+            if dirty:
+                updated += 1
             continue
-        db.add(
-            models.Topic(
-                arena_key=row["arena_key"],
-                key=row["key"],
-                name=row["name"],
-                blurb=row.get("blurb") or "",
-                rss_query=row.get("rss_query") or "",
+        try:
+            db.add(
+                models.Topic(
+                    arena_key=row["arena_key"],
+                    key=row["key"],
+                    name=row["name"],
+                    blurb=row.get("blurb") or "",
+                    rss_query=row.get("rss_query") or "",
+                )
             )
-        )
-        created += 1
-    if created:
+            db.flush()
+            created += 1
+        except Exception:  # noqa: BLE001
+            db.rollback()
+            logger.exception(
+                "Failed to insert topic %s/%s", row.get("arena_key"), row.get("key")
+            )
+
+    try:
         db.commit()
-        logger.info("Seeded %s topics", created)
-    else:
-        db.commit()  # persist blurb/rss updates
+    except Exception:  # noqa: BLE001
+        db.rollback()
+        logger.exception("Topic seed commit failed")
+        return {"created": 0, "updated": 0, "migrated": migrated, "error": "commit_failed"}
+
+    by_arena = {
+        arena: db.query(models.Topic).filter(models.Topic.arena_key == arena).count()
+        for arena in TOPICS_BY_ARENA
+    }
+    logger.info(
+        "Topics seeded created=%s updated=%s migrated=%s by_arena=%s",
+        created,
+        updated,
+        migrated,
+        by_arena,
+    )
+    return {
+        "created": created,
+        "updated": updated,
+        "migrated": migrated,
+        "by_arena": by_arena,
+        "expected_per_arena": {k: len(v) for k, v in TOPICS_BY_ARENA.items()},
+    }
+
+
+def topics_need_seed(db: Session) -> bool:
+    """True when any arena is missing topics vs the code taxonomy."""
+    for arena_key, rows in TOPICS_BY_ARENA.items():
+        n = db.query(models.Topic).filter(models.Topic.arena_key == arena_key).count()
+        if n < len(rows):
+            return True
+    return False
 
 
 def refresh_debate_prompts(
@@ -91,6 +167,10 @@ def refresh_debate_prompts(
     host = db.query(models.User).filter(models.User.username == "baratx").first()
     if not host:
         return {"created": 0, "skipped": 0, "topics_tried": 0, "error": "no baratx host"}
+
+    # Heal taxonomy before prompting so new arenas get coverage.
+    if topics_need_seed(db):
+        seed_topics(db)
 
     arenas = {
         c.arena_key: c
