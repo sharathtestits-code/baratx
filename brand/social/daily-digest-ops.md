@@ -1,23 +1,20 @@
-# Daily digest — @sharath trending posts
+# Daily digest + welcome replies
 
-## New-user auto-reply (already live)
-On a user’s **first Home post**, `@baratx` auto-replies:
+## New-user auto-replies (first Home post only)
+Two replies — official engagement, **never counts toward Founding rewards**:
 
-> Welcome to BaratX, @{username}. Glad you’re here — what’s your city, and what should this square never become?
+1. **@baratx** — Welcome to BaratX… what’s your city…
+2. **@sharath** — Hey @{user} — Sharath here. Drop one real take…
 
-Not on signup alone — only after they post once.
+## Daily auto-posts (~09:05 IST)
+Up to **1 post each** from:
+- **@sharath** (founder voice)
+- **@baratx** (brand voice)
 
-## Daily trending job
-- **Who posts:** `@sharath`
-- **When:** ~**09:05 IST** every day (in-process scheduler on the API)
-- **How many:** **1–2** posts max (quality filter — not one per topic)
-- **Source:** Google News RSS across arenas + rotating subtopics
-- **Media:** one BaratX-branded PNG per post (saffron theme)
-- **Marker:** `#BaratXDaily` (dedupes same-day / similar headlines for 5 days)
+Each gets a BaratX-branded image. Quality filter → max 2/day total. Marker `#BaratXDaily`.
 
-## Manual run
-Admin → **Run daily digest now**  
-or `POST /admin/daily-digest?force=true` with `X-Admin-Secret`.
+## Rewards exclusion
+Likes/replies from `@baratx`, `@sharath`, other seeded officials, and any `blue` / `is_official` account are **ignored** for Founding payable + race like counts.
 
-## Disable
-Set `DISABLE_DAILY_DIGEST=1` on Railway if needed.
+## Manual
+Admin → **Run daily digest now** (`POST /admin/daily-digest?force=true`).

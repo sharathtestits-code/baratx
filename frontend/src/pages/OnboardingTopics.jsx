@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import { markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const ARENA_ORDER = ["sports", "politics", "entertainment", "news", "spirituality"];
 const ARENA_LABEL = {
@@ -75,7 +76,7 @@ export default function OnboardingTopics() {
     setError("");
     try {
       await topicsApi.setInterests(token, [...selected], true);
-      sessionStorage.setItem("bx_topics_done", "1");
+      markTopicOnboardingSeen();
       sessionStorage.setItem("bx_welcome", "1");
       navigate("/feed?welcome=1");
     } catch (err) {
@@ -86,7 +87,7 @@ export default function OnboardingTopics() {
   }
 
   function skip() {
-    sessionStorage.setItem("bx_topics_done", "1");
+    markTopicOnboardingSeen();
     navigate("/feed?welcome=1");
   }
 
@@ -98,8 +99,8 @@ export default function OnboardingTopics() {
         <h1>What do you want to fight about?</h1>
       </div>
       <p className="hint surface-lead">
-        Pick at least {MIN_PICKS} topic (up to {MAX_PICKS}). We’ll fill your home with debates
-        and prompts from those lanes — not a random firehose.
+        Pick at least {MIN_PICKS} topic once (up to {MAX_PICKS}). We won’t ask again on every login —
+        change anytime in Arenas.
       </p>
       {error && <div className="error">{error}</div>}
 

@@ -26,8 +26,10 @@ from app.topics_data import ACTIVE_ARENA_KEYS, TOPICS_BY_ARENA
 logger = logging.getLogger("baratx.daily_digest")
 
 IST = ZoneInfo("Asia/Kolkata")
-DIGEST_AUTHOR = "sharath"
-MAX_POSTS_PER_DAY = 2
+# Split voice across brand + founder so the square feels alive.
+DIGEST_AUTHORS = ("sharath", "baratx")
+MAX_POSTS_PER_AUTHOR = 1
+MAX_POSTS_PER_DAY = len(DIGEST_AUTHORS) * MAX_POSTS_PER_AUTHOR
 POST_MARKER = "#BaratXDaily"
 
 # Arena-level trending queries (broader than single subtopics).
@@ -231,15 +233,19 @@ def render_brand_card(*, headline: str, arena: str) -> bytes:
     return buf.getvalue()
 
 
-def compose_post_text(*, title: str, arena: str, link: str = "") -> str:
+def compose_post_text(*, title: str, arena: str, link: str = "", author: str = "sharath") -> str:
     take = title.strip()
     if not take.endswith("?"):
         take = f"{take} — overblown, or are we sleeping on it?"
     tag = f"#{arena.capitalize()}" if arena else "#India"
+    if author == "baratx":
+        cta = "India — argue this out. Reply with your city take."
+    else:
+        cta = "What’s your take — reply, don’t just scroll."
     parts = [
         take,
         "",
-        "What’s your take — reply, don’t just scroll.",
+        cta,
         f"{tag} {POST_MARKER}",
     ]
     if link and len(link) < 180:
@@ -258,59 +264,87 @@ def run_daily_digest(
     attach_hashtags=None,
     notify_mentions=None,
 ) -> dict:
-    """Create up to max_posts trending posts as @sharath for today (IST)."""
-    author = db.query(models.User).filter(models.User.username == DIGEST_AUTHOR).first()
-    if not author:
-        return {"ok": False, "error": "sharath_account_missing", "created": 0}
+    """Create up to max_posts trending posts as @sharath and @baratx for today (IST)."""
+    authors = []
+    for username in DIGEST_AUTHORS:
+        row = db.query(models.User).filter(models.User.username == username).first()
+        if row:
+            authors.append(row)
+    if not authors:
+        return {"ok": False, "error": "digest_accounts_missing", "created": 0}
 
-    already = posts_today_count(db, author.id)
-    if already >= max_posts and not force:
+    already_total = sum(posts_today_count(db, a.id) for a in authors)
+    if already_total >= max_posts and not force:
         return {
             "ok": True,
             "skipped": True,
             "reason": "already_posted_today",
             "created": 0,
-            "already": already,
+            "already": already_total,
         }
-
-    budget = max_posts if force else max(0, max_posts - already)
-    if budget <= 0:
-        return {"ok": True, "skipped": True, "reason": "budget_zero", "created": 0}
 
     candidates = collect_candidates(db)
     created_posts = []
-    for c in candidates:
-        if len(created_posts) >= budget:
-            break
-        if _already_posted_similar(db, author.id, c["title"]):
-            continue
-        text = compose_post_text(title=c["title"], arena=c["arena"], link=c.get("link") or "")
-        try:
-            png = render_brand_card(headline=c["title"], arena=c["arena"])
-            image_url = media_store.save_bytes(
-                png, content_type="image/png", filename="baratx-daily.png"
-            )
-        except Exception:  # noqa: BLE001
-            logger.exception("Brand card render failed")
-            image_url = None
+    used_titles = set()
 
-        post = models.Post(author_id=author.id, text=text, image_url=image_url)
-        db.add(post)
-        db.flush()
-        if attach_hashtags:
-            attach_hashtags(db, post, text)
-        if notify_mentions:
-            notify_mentions(db, author.id, text, post_id=post.id)
-        created_posts.append(
-            {
-                "id": post.id,
-                "arena": c["arena"],
-                "topic": c["topic"],
-                "title": c["title"],
-                "score": c["score"],
-                "image": bool(image_url),
-            }
-        )
+    for author in authors:
+        if len(created_posts) >= max_posts:
+            break
+        author_already = posts_today_count(db, author.id)
+        if author_already >= MAX_POSTS_PER_AUTHOR and not force:
+            continue
+        for c in candidates:
+            if len(created_posts) >= max_posts:
+                break
+            title_key = c["title"].lower()
+            if title_key in used_titles:
+                continue
+            if _already_posted_similar(db, author.id, c["title"]):
+                continue
+            # Also skip if the other official already posted this story today.
+            skip = False
+            for other in authors:
+                if other.id != author.id and _already_posted_similar(db, other.id, c["title"]):
+                    skip = True
+                    break
+            if skip:
+                continue
+
+            text = compose_post_text(
+                title=c["title"],
+                arena=c["arena"],
+                link=c.get("link") or "",
+                author=author.username,
+            )
+            try:
+                png = render_brand_card(headline=c["title"], arena=c["arena"])
+                image_url = media_store.save_bytes(
+                    png, content_type="image/png", filename="baratx-daily.png"
+                )
+            except Exception:  # noqa: BLE001
+                logger.exception("Brand card render failed")
+                image_url = None
+
+            post = models.Post(author_id=author.id, text=text, image_url=image_url)
+            db.add(post)
+            db.flush()
+            if attach_hashtags:
+                attach_hashtags(db, post, text)
+            if notify_mentions:
+                notify_mentions(db, author.id, text, post_id=post.id)
+            created_posts.append(
+                {
+                    "id": post.id,
+                    "author": author.username,
+                    "arena": c["arena"],
+                    "topic": c["topic"],
+                    "title": c["title"],
+                    "score": c["score"],
+                    "image": bool(image_url),
+                }
+            )
+            used_titles.add(title_key)
+            break  # one post per author per run
 
     if created_posts:
         db.commit()
@@ -323,7 +357,7 @@ def run_daily_digest(
         "posts": created_posts,
         "candidates_scanned": len(candidates),
         "day": str(_today_ist()),
-        "author": DIGEST_AUTHOR,
+        "authors": [a.username for a in authors],
     }
 
 
@@ -380,4 +414,4 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
 
     t = threading.Thread(target=loop, name="baratx-daily-digest", daemon=True)
     t.start()
-    logger.info("Daily digest scheduler started (author=@%s, IST ~09:05)", DIGEST_AUTHOR)
+    logger.info("Daily digest scheduler started (authors=%s, IST ~09:05)", ",".join(DIGEST_AUTHORS))

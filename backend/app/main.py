@@ -1755,17 +1755,42 @@ async def create_post(
     attach_hashtags(db, post, text)
     notify_mentions(db, current_user.id, text, post_id=post.id)
 
-    # Traction: first post gets an official welcome reply so the square feels alive.
+    # Traction: first post gets official welcome replies so the square feels alive.
+    # These are from @baratx + @sharath and never count toward Founding rewards.
     if prior_posts == 0:
-        official = db.query(models.User).filter(models.User.username == "baratx").first()
-        if official and official.id != current_user.id:
-            welcome = models.Reply(
-                post_id=post.id,
-                author_id=official.id,
-                text=(
+        welcomers = (
+            db.query(models.User)
+            .filter(models.User.username.in_(("baratx", "sharath")))
+            .all()
+        )
+        by_name = {u.username: u for u in welcomers}
+        scripts = [
+            (
+                "baratx",
+                (
                     f"Welcome to BaratX, @{current_user.username}. "
                     "Glad you’re here — what’s your city, and what should this square never become?"
                 ),
+            ),
+            (
+                "sharath",
+                (
+                    f"Hey @{current_user.username} — Sharath here. "
+                    "Drop one real take from your city. I’ll read the replies."
+                ),
+            ),
+        ]
+        for username, text in scripts:
+            official = by_name.get(username)
+            if not official or official.id == current_user.id:
+                continue
+            # Ensure blue founders stay flagged official so reward math ignores them.
+            if not getattr(official, "is_official", False):
+                official.is_official = True
+            welcome = models.Reply(
+                post_id=post.id,
+                author_id=official.id,
+                text=text,
                 parent_reply_id=None,
             )
             db.add(welcome)

@@ -40,6 +40,21 @@ RACE_PRIZE_MIN = 150
 RACE_PRIZE_MAX = 500
 RACE_MIN_LIKES_TO_WIN = 25
 
+# Official / seeded accounts never count toward reward rating.
+_OFFICIAL_USERNAMES = frozenset({"baratx", "sharath", "bharatvoices", "indiatech"})
+
+
+def _is_non_community_rater(user: models.User) -> bool:
+    """True for brand/founder accounts — their likes/replies don't count for rewards."""
+    if not user:
+        return True
+    if getattr(user, "is_official", False):
+        return True
+    badge = (getattr(user, "badge", None) or "none").strip().lower()
+    if badge == "blue":
+        return True
+    return (user.username or "").lower() in _OFFICIAL_USERNAMES
+
 
 def slots_remaining(db: Session) -> int:
     used = db.query(models.FoundingReward).count()
@@ -55,13 +70,15 @@ def my_reward(db: Session, user_id: str) -> Optional[models.FoundingReward]:
 
 
 def _post_like_count(db: Session, post_id: str, author_id: Optional[str] = None) -> int:
-    """Community likes only — exclude author self-likes and official accounts."""
+    """Community likes only — exclude author self-likes and official/brand accounts."""
     q = (
         db.query(func.count(models.Like.id))
         .join(models.User, models.User.id == models.Like.user_id)
         .filter(
             models.Like.post_id == post_id,
             models.User.is_official == False,  # noqa: E712
+            models.User.badge != "blue",
+            ~models.User.username.in_(_OFFICIAL_USERNAMES),
         )
     )
     if author_id:
@@ -70,7 +87,7 @@ def _post_like_count(db: Session, post_id: str, author_id: Optional[str] = None)
 
 
 def _post_other_reply_count(db: Session, post_id: str, author_id: str) -> int:
-    """Count human replies — exclude the author and official accounts (welcome bots)."""
+    """Human replies only — @baratx/@sharath welcome replies never count for rewards."""
     return (
         db.query(func.count(models.Reply.id))
         .join(models.User, models.User.id == models.Reply.author_id)
@@ -78,6 +95,8 @@ def _post_other_reply_count(db: Session, post_id: str, author_id: str) -> int:
             models.Reply.post_id == post_id,
             models.Reply.author_id != author_id,
             models.User.is_official == False,  # noqa: E712
+            models.User.badge != "blue",
+            ~models.User.username.in_(_OFFICIAL_USERNAMES),
         )
         .scalar()
         or 0
@@ -169,7 +188,7 @@ def status_payload(db: Session, user: Optional[models.User] = None) -> dict:
         "civic_arenas": sorted(ACTIVE_ARENA_KEYS),  # back-compat
         "eval": {
             "floor": "Civic problem (≥50 chars + flag) OR open any arena debate",
-            "rating": "Community likes / replies (or debate stances) — not self-claim alone",
+            "rating": "Community likes / replies (or debate stances) — official @baratx/@sharath replies never count",
             "min_likes": FOUNDING_MIN_LIKES,
             "min_replies": FOUNDING_MIN_REPLIES,
             "payout": "Admin pays via UPI after bar met (or after manual review)",

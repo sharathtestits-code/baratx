@@ -415,7 +415,7 @@ export default function Admin() {
                   setMsg(`Daily digest skipped — ${res.reason || "already posted"}`);
                 } else {
                   setMsg(
-                    `Daily digest (@sharath) — posted ${res.created || 0} of ${res.candidates_scanned || 0} scanned`
+                    `Daily digest — posted ${res.created || 0} (@${(res.authors || ["sharath", "baratx"]).join(", @")})`
                   );
                 }
                 load(secret);

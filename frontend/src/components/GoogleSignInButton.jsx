@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../api";
+import { api, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { isNativeApp } from "../native";
+import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -31,6 +32,21 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
     try {
       const data = await api.loginGoogle({ id_token: response.credential });
       login(data.access_token);
+      // Returning users go Home. Topic picker is one-time (Arenas for later edits).
+      if (hasSeenTopicOnboarding()) {
+        navigate("/feed");
+        return;
+      }
+      try {
+        const mine = await topicsApi.mine(data.access_token);
+        if (mine && mine.length > 0) {
+          markTopicOnboardingSeen();
+          navigate("/feed");
+          return;
+        }
+      } catch {
+        // fall through to onboarding once
+      }
       sessionStorage.setItem("bx_welcome", "1");
       navigate("/onboarding/topics");
     } catch (err) {

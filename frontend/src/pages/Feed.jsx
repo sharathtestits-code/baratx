@@ -13,6 +13,7 @@ import MentionTextarea from "../components/MentionTextarea";
 import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const MAX_LEN = 500;
 const PAGE_SIZE = 20;
@@ -130,18 +131,21 @@ export default function Feed() {
 
   useEffect(() => {
     if (!token || !user) return;
-    if (sessionStorage.getItem("bx_topics_done") === "1") return;
-    // Existing users without picks get nudged once to onboarding.
+    if (hasSeenTopicOnboarding()) return;
+    // One-time nudge only — Arenas tab is where people manage topics after this.
     topicsApi
       .mine(token)
       .then((rows) => {
         if (!rows || rows.length === 0) {
           navigate("/onboarding/topics");
         } else {
-          sessionStorage.setItem("bx_topics_done", "1");
+          markTopicOnboardingSeen();
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        // Don't trap users in a loop if topics API fails.
+        markTopicOnboardingSeen();
+      });
   }, [token, user, navigate]);
 
   useEffect(() => {
