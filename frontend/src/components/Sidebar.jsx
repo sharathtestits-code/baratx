@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
-import { IconBell, IconBookmark, IconHome, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
+import { IconArena, IconBell, IconBookmark, IconHome, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
@@ -78,6 +78,10 @@ export default function Sidebar() {
           <NavLink to="/feed" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconHome className="sidebar-icon" />
             <span>Home</span>
+          </NavLink>
+          <NavLink to="/arenas" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
+            <IconArena className="sidebar-icon" />
+            <span>Arenas</span>
           </NavLink>
           <NavLink to="/search" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconSearch className="sidebar-icon" />

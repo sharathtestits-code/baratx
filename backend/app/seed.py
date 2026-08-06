@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import secrets
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
@@ -105,6 +106,60 @@ DEFAULT_COMMUNITIES = [
     },
 ]
 
+ARENA_TOPICS = [
+    {
+        "key": "sports",
+        "slug": "sports",
+        "name": "Sports",
+        "description": "Cricket, football, and every match India argues about.",
+    },
+    {
+        "key": "politics",
+        "slug": "politics",
+        "name": "Politics",
+        "description": "Policy, parties, and the fights that shape the country.",
+    },
+    {
+        "key": "entertainment",
+        "slug": "entertainment",
+        "name": "Entertainment",
+        "description": "Bollywood, Tollywood, music, and celebrity culture.",
+    },
+    {
+        "key": "news",
+        "slug": "news",
+        "name": "News",
+        "description": "Breaking stories and the takes India can’t ignore.",
+    },
+]
+
+SAMPLE_DEBATES = [
+    {
+        "arena_key": "sports",
+        "title": "Will India win the next big series?",
+        "side_for": "Yes — India wins",
+        "side_against": "No — they fall short",
+    },
+    {
+        "arena_key": "politics",
+        "title": "Is India heading in the right direction?",
+        "side_for": "Right direction",
+        "side_against": "Wrong direction",
+    },
+    {
+        "arena_key": "entertainment",
+        "title": "Are remakes killing original Indian cinema?",
+        "side_for": "Yes — remakes dominate",
+        "side_against": "No — originals still win",
+    },
+    {
+        "arena_key": "news",
+        "title": "Do Indian news channels create more heat than light?",
+        "side_for": "More heat",
+        "side_against": "Still essential",
+    },
+]
+
 
 def seed_default_communities(db: Session) -> None:
     """Create a few starter communities owned by @baratx if missing."""
@@ -121,12 +176,90 @@ def seed_default_communities(db: Session) -> None:
             name=c["name"],
             description=c["description"],
             created_by=host.id,
+            is_arena=False,
         )
         db.add(community)
         db.flush()
         db.add(models.CommunityMember(community_id=community.id, user_id=host.id))
         created_any = True
         logger.info("Seeded community /%s", c["slug"])
+    if created_any:
+        db.commit()
+    else:
+        db.rollback()
+
+
+def seed_arenas(db: Session) -> None:
+    """Seed Sports / Politics / Entertainment / News arenas + starter debates."""
+    host = db.query(models.User).filter(models.User.username == "baratx").first()
+    if not host:
+        return
+    created_any = False
+    arenas_by_key = {}
+    for topic in ARENA_TOPICS:
+        row = (
+            db.query(models.Community)
+            .filter(
+                (models.Community.arena_key == topic["key"])
+                | (models.Community.slug == topic["slug"])
+            )
+            .first()
+        )
+        if row:
+            if not getattr(row, "is_arena", False) or row.arena_key != topic["key"]:
+                row.is_arena = True
+                row.arena_key = topic["key"]
+                row.name = topic["name"]
+                row.description = topic["description"]
+                created_any = True
+            arenas_by_key[topic["key"]] = row
+            continue
+        community = models.Community(
+            slug=topic["slug"],
+            name=topic["name"],
+            description=topic["description"],
+            created_by=host.id,
+            is_arena=True,
+            arena_key=topic["key"],
+        )
+        db.add(community)
+        db.flush()
+        db.add(models.CommunityMember(community_id=community.id, user_id=host.id))
+        arenas_by_key[topic["key"]] = community
+        created_any = True
+        logger.info("Seeded arena /%s", topic["slug"])
+
+    now = datetime.now(timezone.utc)
+    for debate in SAMPLE_DEBATES:
+        arena = arenas_by_key.get(debate["arena_key"])
+        if not arena:
+            continue
+        exists = (
+            db.query(models.Space)
+            .filter(
+                models.Space.community_id == arena.id,
+                models.Space.kind == "debate",
+                models.Space.title == debate["title"],
+            )
+            .first()
+        )
+        if exists:
+            continue
+        db.add(
+            models.Space(
+                title=debate["title"],
+                host_id=host.id,
+                status="open",
+                kind="debate",
+                community_id=arena.id,
+                side_for_label=debate["side_for"],
+                side_against_label=debate["side_against"],
+                closes_at=now + timedelta(days=7),
+            )
+        )
+        created_any = True
+        logger.info("Seeded debate: %s", debate["title"])
+
     if created_any:
         db.commit()
     else:

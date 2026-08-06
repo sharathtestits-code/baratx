@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { api } from "../api";
+import { api, arenasApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
@@ -25,6 +25,24 @@ export default function Signup() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [devOtp, setDevOtp] = useState("");
+  const preferredArena = params.get("arena") || (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_arena") : "") || "";
+
+  useEffect(() => {
+    const a = params.get("arena");
+    if (a) sessionStorage.setItem("bx_arena", a);
+  }, [params]);
+
+  async function joinArenaFromParams(accessToken) {
+    const key = (preferredArena || "").trim().toLowerCase();
+    if (!key) return;
+    try {
+      await arenasApi.join(accessToken, key);
+      sessionStorage.removeItem("bx_arena");
+    } catch {
+      // non-blocking
+    }
+  }
+
 
   function goBackFromOtp() {
     setOtpSent(false);
@@ -53,8 +71,9 @@ export default function Signup() {
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
       }
       login(res.access_token);
+      await joinArenaFromParams(res.access_token);
       sessionStorage.setItem("bx_welcome", "1");
-      navigate("/feed?welcome=1");
+      navigate(preferredArena ? `/arenas/${preferredArena}` : "/feed?welcome=1");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -104,8 +123,9 @@ export default function Signup() {
         region,
       });
       login(access_token);
+      await joinArenaFromParams(access_token);
       sessionStorage.setItem("bx_welcome", "1");
-      navigate("/feed?welcome=1");
+      navigate(preferredArena ? `/arenas/${preferredArena}` : "/feed?welcome=1");
     } catch (err) {
       setError(err.message);
     } finally {

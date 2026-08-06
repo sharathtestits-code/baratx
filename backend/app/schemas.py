@@ -244,6 +244,7 @@ class PostOut(BaseModel):
     bookmarked_by_me: bool = False
     quoted_post: Optional[QuotedPostOut] = None
     hashtags: list[str] = []
+    debate_side: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -553,19 +554,34 @@ class CommunityOut(BaseModel):
     created_at: datetime
     member_count: int
     is_member: bool = False
+    is_arena: bool = False
+    arena_key: Optional[str] = None
     creator: Optional[AuthorOut] = None
 
 
 class SpaceCreate(BaseModel):
     title: str
     duration_hours: Optional[int] = 24
+    kind: Optional[str] = "room"  # room | debate
+    arena_key: Optional[str] = None
+    community_id: Optional[str] = None
+    side_for_label: Optional[str] = "For"
+    side_against_label: Optional[str] = "Against"
 
     @field_validator("title")
     @classmethod
     def valid_title(cls, v):
         v = (v or "").strip()
-        if len(v) < 2 or len(v) > 100:
-            raise ValueError("Space title must be 2–100 characters")
+        if len(v) < 2 or len(v) > 140:
+            raise ValueError("Space title must be 2–140 characters")
+        return v
+
+    @field_validator("kind")
+    @classmethod
+    def valid_kind(cls, v):
+        v = (v or "room").strip().lower()
+        if v not in ("room", "debate"):
+            raise ValueError("kind must be room or debate")
         return v
 
 
@@ -573,15 +589,52 @@ class SpaceOut(BaseModel):
     id: str
     title: str
     status: str
+    kind: str = "room"
     created_at: datetime
     closes_at: Optional[datetime] = None
     post_count: int = 0
     is_host: bool = False
     host: Optional[AuthorOut] = None
+    community_id: Optional[str] = None
+    arena_key: Optional[str] = None
+    arena_name: Optional[str] = None
+    side_for_label: str = "For"
+    side_against_label: str = "Against"
+    for_count: int = 0
+    against_count: int = 0
+    my_side: Optional[str] = None
+
+
+class StanceCreate(BaseModel):
+    side: str
+
+    @field_validator("side")
+    @classmethod
+    def valid_side(cls, v):
+        v = (v or "").strip().lower()
+        if v not in ("for", "against"):
+            raise ValueError("side must be for or against")
+        return v
+
+
+class ArenaJoinMany(BaseModel):
+    keys: list[str]
+
+
+class ArenaOut(BaseModel):
+    key: str
+    slug: str
+    name: str
+    description: str
+    member_count: int = 0
+    is_member: bool = False
+    open_debate_count: int = 0
+    community_id: str
 
 
 class SurfacePostCreate(BaseModel):
     text: str
+    debate_side: Optional[str] = None
 
     @field_validator("text")
     @classmethod
@@ -591,4 +644,14 @@ class SurfacePostCreate(BaseModel):
             raise ValueError("Post cannot be empty")
         if len(v) > 280:
             raise ValueError("Post must be 280 characters or fewer")
+        return v
+
+    @field_validator("debate_side")
+    @classmethod
+    def valid_debate_side(cls, v):
+        if v is None or v == "":
+            return None
+        v = v.strip().lower()
+        if v not in ("for", "against"):
+            raise ValueError("debate_side must be for or against")
         return v

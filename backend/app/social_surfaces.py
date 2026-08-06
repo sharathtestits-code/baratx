@@ -278,6 +278,8 @@ def register_social_surfaces(
             created_at=c.created_at,
             member_count=member_count,
             is_member=is_member,
+            is_arena=bool(getattr(c, "is_arena", False)),
+            arena_key=getattr(c, "arena_key", None),
             creator=schemas.AuthorOut.model_validate(c.creator) if c.creator else None,
         )
 
@@ -435,19 +437,198 @@ def register_social_surfaces(
         db.refresh(post)
         return serialize_post(post, current_user)
 
+
+    # ---------- Arenas (Sports / Politics / Entertainment / News) ----------
+
+    @router.get("/arenas", response_model=list[schemas.ArenaOut])
+    def list_arenas(
+        db: Session = Depends(get_db),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
+    ):
+        rows = (
+            db.query(models.Community)
+            .filter(models.Community.is_arena == True)  # noqa: E712
+            .order_by(models.Community.name.asc())
+            .all()
+        )
+        out = []
+        for c in rows:
+            member_count = (
+                db.query(models.CommunityMember)
+                .filter(models.CommunityMember.community_id == c.id)
+                .count()
+            )
+            is_member = False
+            if current_user:
+                is_member = (
+                    db.query(models.CommunityMember)
+                    .filter(
+                        models.CommunityMember.community_id == c.id,
+                        models.CommunityMember.user_id == current_user.id,
+                    )
+                    .first()
+                    is not None
+                )
+            open_debate_count = (
+                db.query(models.Space)
+                .filter(
+                    models.Space.community_id == c.id,
+                    models.Space.kind == "debate",
+                    models.Space.status == "open",
+                )
+                .count()
+            )
+            out.append(
+                schemas.ArenaOut(
+                    key=c.arena_key or c.slug,
+                    slug=c.slug,
+                    name=c.name,
+                    description=c.description or "",
+                    member_count=member_count,
+                    is_member=is_member,
+                    open_debate_count=open_debate_count,
+                    community_id=c.id,
+                )
+            )
+        return out
+
+    @router.get("/arenas/{arena_key}", response_model=schemas.ArenaOut)
+    def get_arena(
+        arena_key: str,
+        db: Session = Depends(get_db),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
+    ):
+        c = (
+            db.query(models.Community)
+            .filter(
+                models.Community.is_arena == True,  # noqa: E712
+                (models.Community.arena_key == arena_key) | (models.Community.slug == arena_key),
+            )
+            .first()
+        )
+        if not c:
+            raise HTTPException(status_code=404, detail="Arena not found")
+        rows = list_arenas(db=db, current_user=current_user)
+        for row in rows:
+            if row.key == (c.arena_key or c.slug) or row.slug == c.slug:
+                return row
+        raise HTTPException(status_code=404, detail="Arena not found")
+
+    @router.post("/arenas/{arena_key}/join", response_model=schemas.ArenaOut)
+    def join_arena(
+        arena_key: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        c = (
+            db.query(models.Community)
+            .filter(
+                models.Community.is_arena == True,  # noqa: E712
+                (models.Community.arena_key == arena_key) | (models.Community.slug == arena_key),
+            )
+            .first()
+        )
+        if not c:
+            raise HTTPException(status_code=404, detail="Arena not found")
+        join_community(slug_or_id=c.slug, current_user=current_user, db=db)
+        return get_arena(arena_key=c.arena_key or c.slug, db=db, current_user=current_user)
+
+    @router.post("/arenas/join-many", response_model=list[schemas.ArenaOut])
+    def join_many_arenas(
+        payload: schemas.ArenaJoinMany,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        for key in payload.keys or []:
+            key = (key or "").strip().lower()
+            if not key:
+                continue
+            try:
+                join_arena(arena_key=key, current_user=current_user, db=db)
+            except HTTPException:
+                continue
+        return list_arenas(db=db, current_user=current_user)
+
+    @router.post("/spaces/{space_id}/stance", response_model=schemas.SpaceOut)
+    def set_space_stance(
+        space_id: str,
+        payload: schemas.StanceCreate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        if (getattr(s, "kind", None) or "room") != "debate":
+            raise HTTPException(status_code=400, detail="Stances are only for debates")
+        row = (
+            db.query(models.SpaceStance)
+            .filter(
+                models.SpaceStance.space_id == s.id,
+                models.SpaceStance.user_id == current_user.id,
+            )
+            .first()
+        )
+        if row:
+            row.side = payload.side
+        else:
+            db.add(
+                models.SpaceStance(space_id=s.id, user_id=current_user.id, side=payload.side)
+            )
+        db.commit()
+        db.refresh(s)
+        return _space_out(s, current_user, db)
+
     # ---------- Text Spaces ----------
 
     def _space_out(s: models.Space, current_user: Optional[models.User], db: Session) -> schemas.SpaceOut:
         post_count = db.query(models.Post).filter(models.Post.space_id == s.id).count()
+        for_count = (
+            db.query(models.SpaceStance)
+            .filter(models.SpaceStance.space_id == s.id, models.SpaceStance.side == "for")
+            .count()
+        )
+        against_count = (
+            db.query(models.SpaceStance)
+            .filter(models.SpaceStance.space_id == s.id, models.SpaceStance.side == "against")
+            .count()
+        )
+        my_side = None
+        if current_user:
+            stance = (
+                db.query(models.SpaceStance)
+                .filter(
+                    models.SpaceStance.space_id == s.id,
+                    models.SpaceStance.user_id == current_user.id,
+                )
+                .first()
+            )
+            if stance:
+                my_side = stance.side
+        arena_key = None
+        arena_name = None
+        community = getattr(s, "community", None)
+        if community is None and getattr(s, "community_id", None):
+            community = db.query(models.Community).filter(models.Community.id == s.community_id).first()
+        if community is not None:
+            arena_key = getattr(community, "arena_key", None)
+            arena_name = community.name
         return schemas.SpaceOut(
             id=s.id,
             title=s.title,
             status=s.status,
+            kind=getattr(s, "kind", None) or "room",
             created_at=s.created_at,
             closes_at=s.closes_at,
             post_count=post_count,
             is_host=bool(current_user and s.host_id == current_user.id),
             host=schemas.AuthorOut.model_validate(s.host) if s.host else None,
+            community_id=getattr(s, "community_id", None),
+            arena_key=arena_key,
+            arena_name=arena_name,
+            side_for_label=getattr(s, "side_for_label", None) or "For",
+            side_against_label=getattr(s, "side_against_label", None) or "Against",
+            for_count=for_count,
+            against_count=against_count,
+            my_side=my_side,
         )
 
     def _get_space(db: Session, space_id: str) -> models.Space:
@@ -476,6 +657,8 @@ def register_social_surfaces(
     @router.get("/spaces", response_model=list[schemas.SpaceOut])
     def list_spaces(
         status: str = "open",
+        kind: Optional[str] = None,
+        arena_key: Optional[str] = None,
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
@@ -492,6 +675,18 @@ def register_social_surfaces(
         q = db.query(models.Space).options(joinedload(models.Space.host))
         if status in ("open", "closed"):
             q = q.filter(models.Space.status == status)
+        if kind in ("room", "debate"):
+            q = q.filter(models.Space.kind == kind)
+        if arena_key:
+            arena = (
+                db.query(models.Community)
+                .filter(models.Community.arena_key == arena_key)
+                .first()
+            )
+            if arena:
+                q = q.filter(models.Space.community_id == arena.id)
+            else:
+                return []
         rows = q.order_by(models.Space.created_at.desc()).limit(50).all()
         return [_space_out(s, current_user, db) for s in rows]
 
@@ -504,10 +699,33 @@ def register_social_surfaces(
         now = datetime.now(timezone.utc)
         hours = payload.duration_hours or 24
         hours = max(1, min(hours, 168))
+        kind = payload.kind or "room"
+        community_id = payload.community_id
+        if payload.arena_key:
+            arena = (
+                db.query(models.Community)
+                .filter(
+                    models.Community.arena_key == payload.arena_key,
+                    models.Community.is_arena == True,  # noqa: E712
+                )
+                .first()
+            )
+            if not arena:
+                raise HTTPException(status_code=404, detail="Arena not found")
+            community_id = arena.id
+            kind = "debate"
+        elif community_id:
+            c = db.query(models.Community).filter(models.Community.id == community_id).first()
+            if not c:
+                raise HTTPException(status_code=404, detail="Community not found")
         s = models.Space(
             title=payload.title,
             host_id=current_user.id,
             status="open",
+            kind=kind,
+            community_id=community_id,
+            side_for_label=(payload.side_for_label or "For").strip()[:40] or "For",
+            side_against_label=(payload.side_against_label or "Against").strip()[:40] or "Against",
             closes_at=now + timedelta(hours=hours),
         )
         db.add(s)
@@ -575,10 +793,24 @@ def register_social_surfaces(
         _maybe_auto_close(db, s)
         if s.status != "open":
             raise HTTPException(status_code=400, detail="This Space is closed")
+        debate_side = payload.debate_side
+        if (getattr(s, "kind", None) or "room") == "debate":
+            stance = (
+                db.query(models.SpaceStance)
+                .filter(
+                    models.SpaceStance.space_id == s.id,
+                    models.SpaceStance.user_id == current_user.id,
+                )
+                .first()
+            )
+            if not stance:
+                raise HTTPException(status_code=400, detail="Pick For or Against before posting")
+            debate_side = debate_side or stance.side
         post = models.Post(
             author_id=current_user.id,
             text=payload.text,
             space_id=s.id,
+            debate_side=debate_side,
         )
         db.add(post)
         db.flush()

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
-import { IconBell, IconHome, IconSearch, IconUser } from "./Icons";
+import { IconArena, IconBell, IconHome, IconSearch, IconUser } from "./Icons";
 
 export default function BottomNav() {
   const { user, token } = useAuth();
@@ -34,6 +34,12 @@ export default function BottomNav() {
     <nav className="bottom-nav">
       <NavLink to="/feed" className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`} end>
         <IconHome className="bottom-nav-icon" />
+      </NavLink>
+      <NavLink
+        to="/arenas"
+        className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}
+      >
+        <IconArena className="bottom-nav-icon" />
       </NavLink>
       <NavLink to="/search" className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}>
         <IconSearch className="bottom-nav-icon" />

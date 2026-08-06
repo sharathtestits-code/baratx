@@ -3,13 +3,20 @@ import { Link, useNavigate } from "react-router-dom";
 import { LogoMark } from "../components/Logo";
 import { IconPhone } from "../components/Icons";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import { ARENA_TOPICS } from "../arenas";
 
 /**
- * Public GTM landing for logged-out visitors — brand-first, shareable, phone-first CTA.
+ * Public GTM landing — brand-first, arena acquisition, phone-first CTA.
  */
 export default function Landing() {
   const navigate = useNavigate();
   const [emailOrUser, setEmailOrUser] = useState("");
+
+  function goSignup(arenaKey) {
+    const params = new URLSearchParams({ method: "phone" });
+    if (arenaKey) params.set("arena", arenaKey);
+    navigate(`/signup?${params.toString()}`);
+  }
 
   function handleNext(e) {
     e.preventDefault();
@@ -38,17 +45,28 @@ export default function Landing() {
         <div className="x-landing-auth-inner">
           <LogoMark className="x-landing-mark-sm" title="BaratX" />
           <p className="x-landing-brand-line">BaratX</p>
-          <h1 className="x-landing-headline">India&apos;s public square</h1>
+          <h1 className="x-landing-headline">Pick a fight. Not a feed.</h1>
           <p className="x-landing-support">
-            Short posts. Real conversation. Start in English — Hindi &amp; Telugu on the way.
+            India&apos;s public square for Sports, Politics, Entertainment, and News — choose a side
+            and debate.
           </p>
 
+          <div className="landing-arena-pick" aria-label="Pick an arena">
+            {ARENA_TOPICS.map((a) => (
+              <button
+                key={a.key}
+                type="button"
+                className="landing-arena-chip"
+                style={{ "--arena-accent": a.accent }}
+                onClick={() => goSignup(a.key)}
+              >
+                {a.name}
+              </button>
+            ))}
+          </div>
+
           <div className="x-auth-stack">
-            <button
-              type="button"
-              className="x-btn x-btn-phone"
-              onClick={() => navigate("/signup?method=phone")}
-            >
+            <button type="button" className="x-btn x-btn-phone" onClick={() => goSignup()}>
               <IconPhone className="x-btn-icon" />
               Continue with phone
             </button>
