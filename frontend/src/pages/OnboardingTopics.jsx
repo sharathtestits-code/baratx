@@ -28,6 +28,11 @@ export default function OnboardingTopics() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Seeing this screen once is enough — Arenas handles later edits.
+    markTopicOnboardingSeen();
+  }, []);
+
+  useEffect(() => {
     if (!token) {
       navigate("/login");
       return;

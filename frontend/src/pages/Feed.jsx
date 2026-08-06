@@ -137,6 +137,7 @@ export default function Feed() {
       .mine(token)
       .then((rows) => {
         if (!rows || rows.length === 0) {
+          // First empty-interests visit only — OnboardingTopics marks seen on mount.
           navigate("/onboarding/topics");
         } else {
           markTopicOnboardingSeen();
