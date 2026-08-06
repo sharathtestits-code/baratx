@@ -455,4 +455,10 @@ export const adminApi = {
       method: "DELETE",
       headers: { "X-Admin-Secret": adminSecret },
     }),
+  setBadge: (adminSecret, userId, badge, notify = true) =>
+    request(`/admin/users/${encodeURIComponent(userId)}/badge`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify({ badge, notify: !!notify }),
+    }),
 };

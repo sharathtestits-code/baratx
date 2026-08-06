@@ -13,6 +13,14 @@ export function badgeOf(userOrAuthor) {
   return "none";
 }
 
+/** Blue founders / blue badge holders can manage other accounts' badges. */
+export function canManageBadges(user) {
+  if (!user) return false;
+  if (badgeOf(user) === "blue") return true;
+  const u = (user.username || "").toLowerCase();
+  return u === "sharath" || u === "baratx";
+}
+
 /** CSS class for a display name (and optional @handle). Empty tier = normal theme color. */
 export function badgeNameClass(userOrAuthor, base = "") {
   const badge = badgeOf(userOrAuthor);
