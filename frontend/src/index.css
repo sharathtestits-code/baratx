@@ -3934,7 +3934,7 @@ button.admin-btn-ghost:hover:not(:disabled),
 }
 
 .admin-user-link {
-  color: #000080;
+  color: inherit;
   font-weight: 700;
   text-decoration: none;
 }
@@ -4774,7 +4774,8 @@ a.reply-username.name-badge-gold,
 }
 
 .admin-user-reg {
-  color: #000080 !important;
+  color: inherit !important;
+  font-weight: 600;
 }
 
 .admin-badge-pill {

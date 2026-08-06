@@ -916,6 +916,8 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
         email=payload.email,
         password_hash=auth.hash_password(payload.password),
         is_email_verified=False,
+        badge="none",
+        is_official=False,
     )
     db.add(user)
     db.commit()
@@ -1120,6 +1122,8 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
             password_hash=auth.hash_password(secrets.token_urlsafe(24)),
             is_email_verified=True,
             avatar_url=picture,
+            badge="none",
+            is_official=False,
         )
         db.add(user)
         db.commit()
@@ -1176,6 +1180,8 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         phone=payload.phone,
         password_hash=auth.hash_password(auth.generate_otp() + payload.phone),  # unused placeholder hash
         is_phone_verified=True,
+        badge="none",
+        is_official=False,
     )
     db.add(user)
     db.commit()
