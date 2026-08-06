@@ -19,7 +19,7 @@ class EmailSignupRequest(BaseModel):
     def valid_username(cls, v):
         if not USERNAME_RE.match(v):
             raise ValueError("Username must be 3-20 chars: letters, numbers, underscore only")
-        return v
+        return v.lower()
 
     @field_validator("password")
     @classmethod
@@ -65,7 +65,7 @@ class PhoneSignupVerify(BaseModel):
     def valid_username(cls, v):
         if not USERNAME_RE.match(v):
             raise ValueError("Username must be 3-20 chars: letters, numbers, underscore only")
-        return v
+        return v.lower()
 
 
 class PhoneLoginVerify(BaseModel):

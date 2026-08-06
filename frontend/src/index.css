@@ -2683,6 +2683,20 @@ a.post-username:hover {
   outline: none;
 }
 
+.field-hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.auth-card .auth-back-link {
+  margin-top: 0.35rem;
+  width: 100%;
+  text-align: center;
+}
+
 .modal-form select {
   padding: 0.65rem 0.8rem;
   border: 1px solid var(--border-strong);

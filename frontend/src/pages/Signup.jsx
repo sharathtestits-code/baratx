@@ -4,6 +4,21 @@ import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
+const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+
+function normalizeUsername(value) {
+  return (value || "").trim().replace(/^@/, "").toLowerCase();
+}
+
+function usernameError(value) {
+  const u = normalizeUsername(value);
+  if (!u) return "Choose a username";
+  if (!USERNAME_RE.test(u)) {
+    return "Username must be 3–20 characters: letters, numbers, underscore only (no spaces or dashes)";
+  }
+  return "";
+}
+
 export default function Signup() {
   const [params] = useSearchParams();
   const [method, setMethod] = useState(params.get("method") === "email" ? "email" : "phone");
@@ -11,7 +26,7 @@ export default function Signup() {
   const { login } = useAuth();
 
   // shared fields
-  const [username, setUsername] = useState(params.get("username") || "");
+  const [username, setUsername] = useState(normalizeUsername(params.get("username") || ""));
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -29,16 +44,20 @@ export default function Signup() {
   async function handleEmailSignup(e) {
     e.preventDefault();
     setError("");
+    const uErr = usernameError(username);
+    if (uErr) {
+      setError(uErr);
+      return;
+    }
     setBusy(true);
     try {
       const res = await api.signupEmail({
         email,
         password,
-        username,
-        display_name: displayName,
+        username: normalizeUsername(username),
+        display_name: displayName.trim(),
       });
       if (res.dev_verify_url) {
-        // Local/dev without SMTP — keep link available after redirect via sessionStorage
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
       }
       login(res.access_token);
@@ -54,9 +73,18 @@ export default function Signup() {
   async function handleRequestOtp(e) {
     e.preventDefault();
     setError("");
+    const uErr = usernameError(username);
+    if (uErr) {
+      setError(uErr);
+      return;
+    }
+    if (!displayName.trim()) {
+      setError("Enter your display name");
+      return;
+    }
     setBusy(true);
     try {
-      const res = await api.signupPhoneRequestOtp(phone);
+      const res = await api.signupPhoneRequestOtp(phone.trim());
       setOtpSent(true);
       setDevOtp(res.dev_otp || "");
     } catch (err) {
@@ -69,13 +97,22 @@ export default function Signup() {
   async function handleVerifyOtp(e) {
     e.preventDefault();
     setError("");
+    const uErr = usernameError(username);
+    if (uErr) {
+      setError(uErr);
+      return;
+    }
+    if (!displayName.trim()) {
+      setError("Enter your display name");
+      return;
+    }
     setBusy(true);
     try {
       const { access_token } = await api.signupPhoneVerify({
-        phone,
-        otp,
-        username,
-        display_name: displayName,
+        phone: phone.trim(),
+        otp: otp.trim(),
+        username: normalizeUsername(username),
+        display_name: displayName.trim(),
       });
       login(access_token);
       sessionStorage.setItem("bx_welcome", "1");
@@ -85,6 +122,30 @@ export default function Signup() {
     } finally {
       setBusy(false);
     }
+  }
+
+  function usernameField() {
+    return (
+      <label>
+        Username
+        <div className="username-field">
+          <span className="username-prefix" aria-hidden="true">
+            @
+          </span>
+          <input
+            value={username}
+            onChange={(e) => setUsername(normalizeUsername(e.target.value))}
+            autoComplete="username"
+            inputMode="text"
+            pattern="[A-Za-z0-9_]{3,20}"
+            title="3–20 characters: letters, numbers, underscore only"
+            placeholder="yourname"
+            required
+          />
+        </div>
+        <span className="hint field-hint">Letters, numbers, underscore only · 3–20 chars</span>
+      </label>
+    );
   }
 
   return (
@@ -128,10 +189,7 @@ export default function Signup() {
             Display name
             <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
           </label>
-          <label>
-            Username
-            <input value={username} onChange={(e) => setUsername(e.target.value)} required />
-          </label>
+          {usernameField()}
           <label>
             Email
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -156,13 +214,15 @@ export default function Signup() {
             Display name
             <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
           </label>
-          <label>
-            Username
-            <input value={username} onChange={(e) => setUsername(e.target.value)} required />
-          </label>
+          {usernameField()}
           <label>
             Phone number
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+919876543210" required />
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="+919876543210"
+              required
+            />
           </label>
           <button type="submit" disabled={busy}>
             {busy ? "Sending OTP..." : "Send OTP"}
@@ -171,14 +231,35 @@ export default function Signup() {
       ) : (
         <form onSubmit={handleVerifyOtp}>
           <p className="hint">
-            OTP sent to {phone}. {devOtp && <>(Demo mode — no SMS provider wired up yet, your code is <b>{devOtp}</b>)</>}
+            OTP sent to {phone}.{" "}
+            {devOtp && (
+              <>
+                (Demo mode — no SMS provider wired up yet, your code is <b>{devOtp}</b>)
+              </>
+            )}
           </p>
+          <label>
+            Display name
+            <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+          </label>
+          {usernameField()}
           <label>
             Enter OTP
             <input value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6} required />
           </label>
           <button type="submit" disabled={busy}>
             {busy ? "Verifying..." : "Verify & create account"}
+          </button>
+          <button
+            type="button"
+            className="btn-ghost auth-back-link"
+            onClick={() => {
+              setOtpSent(false);
+              setOtp("");
+              setError("");
+            }}
+          >
+            ← Edit phone / username
           </button>
         </form>
       )}
