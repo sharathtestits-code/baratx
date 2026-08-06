@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, models, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, media_store, models, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -239,8 +239,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MEDIA_DIR = os.path.join(BASE_DIR, "media")
+BASE_DIR = media_store.BASE_DIR
+MEDIA_DIR = media_store.MEDIA_DIR
 os.makedirs(MEDIA_DIR, exist_ok=True)
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
@@ -352,23 +352,15 @@ async def save_upload_image(image: UploadFile, max_bytes: int) -> str:
     if len(contents) > max_bytes:
         raise HTTPException(status_code=400, detail=f"Image must be {max_bytes // (1024 * 1024)}MB or smaller")
 
-    ext = os.path.splitext(image.filename or "")[1] or ".jpg"
-    filename = f"{uuid.uuid4().hex}{ext}"
-    filepath = os.path.join(MEDIA_DIR, filename)
-    with open(filepath, "wb") as f:
-        f.write(contents)
-    return f"/media/{filename}"
+    return media_store.save_bytes(
+        contents,
+        content_type=image.content_type or "application/octet-stream",
+        filename=image.filename,
+    )
 
 
 def delete_media_file(url: Optional[str]):
-    if not url:
-        return
-    filepath = os.path.join(BASE_DIR, url.lstrip("/"))
-    if os.path.exists(filepath):
-        try:
-            os.remove(filepath)
-        except OSError:
-            pass
+    media_store.delete_url(url)
 
 
 def get_current_user(
@@ -1715,12 +1707,11 @@ async def create_post(
         if len(contents) > MAX_IMAGE_BYTES:
             raise HTTPException(status_code=400, detail="Image must be 5MB or smaller")
 
-        ext = os.path.splitext(image.filename)[1] or ".jpg"
-        filename = f"{uuid.uuid4().hex}{ext}"
-        filepath = os.path.join(MEDIA_DIR, filename)
-        with open(filepath, "wb") as f:
-            f.write(contents)
-        image_url = f"/media/{filename}"
+        image_url = media_store.save_bytes(
+            contents,
+            content_type=image.content_type or "application/octet-stream",
+            filename=image.filename,
+        )
 
     post = models.Post(
         author_id=current_user.id,
@@ -1825,12 +1816,7 @@ def delete_post(
         raise HTTPException(status_code=403, detail="You can only delete your own posts")
 
     if post.image_url:
-        filepath = os.path.join(BASE_DIR, post.image_url.lstrip("/"))
-        if os.path.exists(filepath):
-            try:
-                os.remove(filepath)
-            except OSError:
-                pass
+        delete_media_file(post.image_url)
 
     reply_ids = [
         r[0]

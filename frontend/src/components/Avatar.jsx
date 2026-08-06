@@ -1,4 +1,4 @@
-import { API_BASE } from "../api";
+import { mediaUrl } from "../api";
 
 const PALETTE = [
   "#ff671f",
@@ -33,7 +33,7 @@ export default function Avatar({ name, username, url = null, size = 44 }) {
     return (
       <img
         className="avatar avatar-photo"
-        src={url.startsWith("http") ? url : `${API_BASE}${url}`}
+        src={mediaUrl(url)}
         alt=""
         style={{ width: size, height: size, minWidth: size }}
       />

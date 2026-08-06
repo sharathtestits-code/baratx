@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { API_BASE, api, socialApi } from "../api";
+import { api, socialApi, mediaUrl } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
@@ -218,7 +218,7 @@ export default function Profile() {
 
       <div
         className={`profile-cover${profile.cover_url ? " has-photo" : ""}`}
-        style={profile.cover_url ? { backgroundImage: `url(${API_BASE}${profile.cover_url})` } : undefined}
+        style={profile.cover_url ? { backgroundImage: `url(${mediaUrl(profile.cover_url)})` } : undefined}
       >
         {isMe && (
           <button

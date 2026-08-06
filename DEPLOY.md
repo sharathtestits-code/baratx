@@ -115,14 +115,33 @@ Open and sign up with the same email:
 | MSG91 OTP tests | ~₹200–500 to start |
 | **Total to go live** | **~₹2–4K first month** |
 
-## 5. What is NOT done yet (next coding step)
+## 5. Why uploaded images disappeared
 
-Done already: `CORS_ORIGINS`, hide `dev_otp` in production, email verify via Resend, Google sign-in.
+Railway (and Render) give each deploy a **fresh disk**. Images were saved under
+local `/media`, so every redeploy wiped the files while post rows stayed in
+Postgres — looks like “auto delete.”
+
+**Fix shipped in app code:** on Railway, new uploads persist in the database
+(as data URLs) until you wire Cloudflare R2. For scale, set:
+
+```
+MEDIA_BACKEND=s3
+S3_BUCKET=baratx-media
+S3_ENDPOINT_URL=https://<accountid>.r2.cloudflarestorage.com
+S3_ACCESS_KEY_ID=…
+S3_SECRET_ACCESS_KEY=…
+S3_PUBLIC_BASE_URL=https://media.yourdomain.com
+```
+
+Old broken `/media/…` links from before this fix cannot be recovered.
+
+## 6. What is NOT done yet (next coding step)
+
+Done already: `CORS_ORIGINS`, hide `dev_otp` in production, email verify via Resend, Google sign-in, durable media fallback + R2 support.
 
 Still open:
 
 - Real MSG91 OTP SMS (phone auth still demo until SMS is wired)
-- R2/S3 media uploads instead of local `/media`
 - Landing copy: English-only + “more languages coming”
 
-Say when you want MSG91 or R2 and we will wire those next.
+Say when you want MSG91 and we will wire that next.
