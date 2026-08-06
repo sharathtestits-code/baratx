@@ -204,7 +204,7 @@ with SessionLocal() as _seed_db:
         from app import topic_ops
 
         # Best-effort unpaid RSS prompts on boot (non-blocking if network fails).
-        topic_ops.refresh_debate_prompts(_seed_db, force=False, per_topic=1, max_topics=12)
+        topic_ops.refresh_debate_prompts(_seed_db, force=False, per_topic=1, max_topics=24)
     except Exception:  # noqa: BLE001
         import logging
 
@@ -2236,7 +2236,7 @@ def admin_refresh_prompts(
     """Pull unpaid Google News RSS into debate prompts."""
     from app import topic_ops
 
-    return topic_ops.refresh_debate_prompts(db, force=force, per_topic=2, max_topics=40)
+    return topic_ops.refresh_debate_prompts(db, force=force, per_topic=2, max_topics=60)
 
 
 register_extra_routes(

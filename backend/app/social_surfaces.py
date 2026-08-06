@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app import models, schemas
 from app.database import get_db
+from app.topics_data import debate_sides_for
 
 router = APIRouter()
 
@@ -761,14 +762,21 @@ def register_social_surfaces(
             c = db.query(models.Community).filter(models.Community.id == community_id).first()
             if not c:
                 raise HTTPException(status_code=404, detail="Community not found")
+        default_for, default_against = debate_sides_for(payload.arena_key)
+        if payload.arena_key:
+            side_for = (payload.side_for_label or default_for).strip()[:40] or default_for
+            side_against = (payload.side_against_label or default_against).strip()[:40] or default_against
+        else:
+            side_for = (payload.side_for_label or "For").strip()[:40] or "For"
+            side_against = (payload.side_against_label or "Against").strip()[:40] or "Against"
         s = models.Space(
             title=payload.title,
             host_id=current_user.id,
             status="open",
             kind=kind,
             community_id=community_id,
-            side_for_label=(payload.side_for_label or "For").strip()[:40] or "For",
-            side_against_label=(payload.side_against_label or "Against").strip()[:40] or "Against",
+            side_for_label=side_for,
+            side_against_label=side_against,
             closes_at=now + timedelta(hours=hours),
         )
         db.add(s)

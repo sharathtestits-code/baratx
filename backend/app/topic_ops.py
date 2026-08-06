@@ -9,7 +9,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from app import models, rss
-from app.topics_data import all_topics
+from app.topics_data import all_topics, debate_sides_for
 
 logger = logging.getLogger("baratx.topics")
 
@@ -17,9 +17,32 @@ logger = logging.getLogger("baratx.topics")
 _LAST_PROMPT_REFRESH: Optional[datetime] = None
 _REFRESH_COOLDOWN = timedelta(minutes=20)
 
+# Renames when topic keys change between deploys.
+_TOPIC_KEY_MIGRATIONS = {
+    ("news", "startups"): "startup-news",
+}
+
 
 def seed_topics(db: Session) -> None:
-    """Upsert the ~80 topic taxonomy. Safe every boot."""
+    """Upsert the 30×N topic taxonomy. Safe every boot."""
+    for (arena_key, old_key), new_key in _TOPIC_KEY_MIGRATIONS.items():
+        row = (
+            db.query(models.Topic)
+            .filter(models.Topic.arena_key == arena_key, models.Topic.key == old_key)
+            .first()
+        )
+        if not row:
+            continue
+        clash = (
+            db.query(models.Topic)
+            .filter(models.Topic.arena_key == arena_key, models.Topic.key == new_key)
+            .first()
+        )
+        if clash:
+            db.delete(row)
+        else:
+            row.key = new_key
+
     created = 0
     for row in all_topics():
         existing = (
@@ -122,6 +145,7 @@ def refresh_debate_prompts(
             if recent:
                 skipped += 1
                 continue
+            side_for, side_against = debate_sides_for(topic.arena_key)
             db.add(
                 models.Space(
                     title=title,
@@ -131,8 +155,8 @@ def refresh_debate_prompts(
                     community_id=arena.id,
                     topic_id=topic.id,
                     source_url=link or None,
-                    side_for_label="Agree",
-                    side_against_label="Disagree",
+                    side_for_label=side_for,
+                    side_against_label=side_against,
                     closes_at=now + timedelta(days=3),
                 )
             )

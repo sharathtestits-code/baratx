@@ -192,6 +192,18 @@ ARENA_TOPICS = [
         "name": "News",
         "description": "Breaking stories and the takes India can’t ignore.",
     },
+    {
+        "key": "startups",
+        "slug": "startups",
+        "name": "Startups",
+        "description": "India’s idea square — pitch like YC, crowd votes Fund it or Pass.",
+    },
+    {
+        "key": "spirituality",
+        "slug": "spirituality",
+        "name": "Spirituality",
+        "description": "Faith, yoga, festivals, and the searches shaping modern India.",
+    },
 ]
 
 SAMPLE_DEBATES = [
@@ -219,11 +231,35 @@ SAMPLE_DEBATES = [
         "side_for": "More heat",
         "side_against": "Still essential",
     },
+    {
+        "arena_key": "startups",
+        "title": "Should every Indian founder apply to YC before raising locally?",
+        "side_for": "Fund it",
+        "side_against": "Pass",
+    },
+    {
+        "arena_key": "startups",
+        "title": "Pitch: AI tutor for Bharat vernacular exams — Fund it or Pass?",
+        "side_for": "Fund it",
+        "side_against": "Pass",
+    },
+    {
+        "arena_key": "spirituality",
+        "title": "Is bhajan clubbing devotion — or just a new nightlife product?",
+        "side_for": "Resonates",
+        "side_against": "Skeptical",
+    },
+    {
+        "arena_key": "spirituality",
+        "title": "Can apps replace ashrams for daily spiritual practice?",
+        "side_for": "Resonates",
+        "side_against": "Skeptical",
+    },
 ]
 
 
 def seed_arenas(db: Session) -> None:
-    """Seed Sports / Politics / Entertainment / News arenas + starter debates."""
+    """Seed all arenas + starter debates (incl. Startups & Spirituality)."""
     host = db.query(models.User).filter(models.User.username == "baratx").first()
     if not host:
         return
@@ -239,11 +275,16 @@ def seed_arenas(db: Session) -> None:
             .first()
         )
         if row:
+            changed = False
             if not getattr(row, "is_arena", False) or row.arena_key != topic["key"]:
                 row.is_arena = True
                 row.arena_key = topic["key"]
+                changed = True
+            if row.name != topic["name"] or row.description != topic["description"]:
                 row.name = topic["name"]
                 row.description = topic["description"]
+                changed = True
+            if changed:
                 created_any = True
             arenas_by_key[topic["key"]] = row
             continue
