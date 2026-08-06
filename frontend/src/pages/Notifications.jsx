@@ -32,6 +32,8 @@ function notificationCopy(n) {
       return "mentioned you";
     case "message":
       return "sent you a message";
+    case "badge":
+      return n.message || "updated your account badge";
     default:
       return "interacted with you";
   }

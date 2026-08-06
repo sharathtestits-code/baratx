@@ -298,13 +298,14 @@ class SearchResults(BaseModel):
 
 class NotificationOut(BaseModel):
     id: str
-    type: str  # follow | like | reply | repost | mention | message
+    type: str  # follow | like | reply | repost | mention | message | badge
     created_at: datetime
     is_read: bool
     actor: AuthorOut
     post_id: Optional[str] = None
     post_preview: Optional[str] = None
     reply_preview: Optional[str] = None
+    message: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -412,6 +413,8 @@ class AdminUsersOut(BaseModel):
 
 class BadgeUpdate(BaseModel):
     badge: str
+    # When false, badge still changes but the target is not notified.
+    notify: bool = True
 
     @field_validator("badge")
     @classmethod

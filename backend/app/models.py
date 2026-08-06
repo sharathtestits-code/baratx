@@ -189,16 +189,17 @@ class Repost(Base):
 
 
 class Notification(Base):
-    """In-app notifications for follow / like / reply / repost / mention / message."""
+    """In-app notifications for follow / like / reply / repost / mention / message / badge."""
 
     __tablename__ = "notifications"
 
     id = Column(String, primary_key=True, default=gen_uuid)
     recipient_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     actor_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
-    kind = Column(String, nullable=False)  # follow | like | reply | repost | mention | message
+    kind = Column(String, nullable=False)  # follow | like | reply | repost | mention | message | badge
     post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
     reply_id = Column(String, ForeignKey("replies.id"), nullable=True)
+    message = Column(String, nullable=True)  # optional free-text (e.g. badge changes)
     is_read = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
