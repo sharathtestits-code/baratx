@@ -377,6 +377,23 @@ export const spacesApi = {
       `/spaces?status=open&kind=debate${arenaKey ? `&arena_key=${encodeURIComponent(arenaKey)}` : ""}`,
       { headers: authHeaders(token) }
     ),
+  listForYou: (token) =>
+    request(`/spaces?status=open&kind=debate&for_you=true`, { headers: authHeaders(token) }),
+};
+
+export const topicsApi = {
+  list: (token, arenaKey) =>
+    request(
+      `/topics${arenaKey ? `?arena_key=${encodeURIComponent(arenaKey)}` : ""}`,
+      { headers: authHeaders(token) }
+    ),
+  mine: (token) => request("/topics/mine", { headers: authHeaders(token) }),
+  setInterests: (token, topicIds, replace = true) =>
+    request("/topics/interests", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ topic_ids: topicIds, replace }),
+    }),
 };
 
 export const arenasApi = {
@@ -444,6 +461,11 @@ export const adminApi = {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify(body),
+    }),
+  refreshPrompts: (adminSecret, force = true) =>
+    request(`/admin/prompts/refresh?force=${force ? "true" : "false"}`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
     }),
   deleteUser: (adminSecret, userId) =>
     request(`/admin/users/${encodeURIComponent(userId)}`, {

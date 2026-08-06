@@ -32,7 +32,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
       const data = await api.loginGoogle({ id_token: response.credential });
       login(data.access_token);
       sessionStorage.setItem("bx_welcome", "1");
-      navigate("/feed?welcome=1");
+      navigate("/onboarding/topics");
     } catch (err) {
       const msg = err.message || "Google sign-in failed";
       setError(msg);

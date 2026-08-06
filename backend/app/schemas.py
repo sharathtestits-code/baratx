@@ -619,6 +619,10 @@ class SpaceOut(BaseModel):
     community_id: Optional[str] = None
     arena_key: Optional[str] = None
     arena_name: Optional[str] = None
+    topic_id: Optional[str] = None
+    topic_key: Optional[str] = None
+    topic_name: Optional[str] = None
+    source_url: Optional[str] = None
     side_for_label: str = "For"
     side_against_label: str = "Against"
     for_count: int = 0
@@ -636,6 +640,21 @@ class StanceCreate(BaseModel):
         if v not in ("for", "against"):
             raise ValueError("side must be for or against")
         return v
+
+
+class TopicOut(BaseModel):
+    id: str
+    arena_key: str
+    key: str
+    name: str
+    blurb: str = ""
+    is_following: bool = False
+    open_debate_count: int = 0
+
+
+class TopicInterestUpdate(BaseModel):
+    topic_ids: list[str]
+    replace: bool = True
 
 
 class ArenaJoinMany(BaseModel):

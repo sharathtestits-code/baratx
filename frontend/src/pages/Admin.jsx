@@ -316,6 +316,29 @@ export default function Admin() {
           <button
             type="button"
             className="admin-btn admin-btn-ghost"
+            onClick={async () => {
+              setBusy(true);
+              setError("");
+              setMsg("");
+              try {
+                const res = await adminApi.refreshPrompts(secret, true);
+                setMsg(
+                  `Prompts refreshed — created ${res.created || 0}, skipped ${res.skipped || 0}`
+                );
+                load(secret);
+              } catch (err) {
+                setError(err.message || "Refresh failed");
+              } finally {
+                setBusy(false);
+              }
+            }}
+            disabled={busy}
+          >
+            Refresh debate prompts
+          </button>
+          <button
+            type="button"
+            className="admin-btn admin-btn-ghost"
             onClick={() => load(secret)}
             disabled={busy}
           >
