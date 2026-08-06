@@ -183,8 +183,14 @@ export default function ArenaDetail() {
         )}
         {(arenaKey === "politics" || arenaKey === "news") && (
           <p className="hint surface-lead">
-            Open one real debate from your city or beat. First 100 people who do (or post one real
-            problem on Home) get ₹150 via UPI.
+            Open a real debate. Founding 100 pays ₹150 after India rates it (likes / stances) — any
+            arena counts, not only this one.
+          </p>
+        )}
+        {(arenaKey === "sports" || arenaKey === "entertainment" || arenaKey === "spirituality") && (
+          <p className="hint surface-lead">
+            Open a sharp debate here. First 100 people who do (any arena) land on Founding ₹150 after
+            the room shows real engagement.
           </p>
         )}
         <form className="surface-create" onSubmit={startDebate}>

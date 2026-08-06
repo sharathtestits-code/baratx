@@ -587,6 +587,9 @@ def register_social_surfaces(
             db.add(
                 models.SpaceStance(space_id=s.id, user_id=current_user.id, side=payload.side)
             )
+        from app import rewards
+
+        rewards.bump_founding_for_space(db, s.id)
         db.commit()
         db.refresh(s)
         return _space_out(s, current_user, db)
@@ -798,12 +801,12 @@ def register_social_surfaces(
         )
         db.add(s)
         db.flush()
-        # Founding 100: one Politics/News debate qualifies for the quiet UPI reward.
+        # Founding 100: opening a debate in any active arena qualifies (floor).
         if payload.arena_key:
-            from app.topics_data import CIVIC_ARENA_KEYS
+            from app.topics_data import ACTIVE_ARENA_KEYS
             from app import rewards
 
-            if payload.arena_key in CIVIC_ARENA_KEYS:
+            if payload.arena_key in ACTIVE_ARENA_KEYS:
                 rewards.try_award(
                     db, user=current_user, kind="debate", space_id=s.id
                 )
@@ -894,6 +897,9 @@ def register_social_surfaces(
         db.flush()
         attach_hashtags(db, post, payload.text)
         notify_mentions(db, current_user.id, payload.text, post_id=post.id)
+        from app import rewards
+
+        rewards.bump_founding_for_space(db, s.id)
         db.commit()
         db.refresh(post)
         return serialize_post(post, current_user)

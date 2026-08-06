@@ -713,9 +713,12 @@ class FoundingStatusOut(BaseModel):
     min_problem_chars: int
     slots_remaining: int
     open: bool
-    my_status: Optional[str] = None  # eligible | paid | None
+    my_status: Optional[str] = None  # eligible | payable | paid | None
     my_kind: Optional[str] = None  # problem | debate
+    my_quality: Optional[dict] = None
+    qualify_arenas: list[str] = []
     civic_arenas: list[str] = []
+    eval: Optional[dict] = None
 
 
 class FoundingRewardRow(BaseModel):
@@ -731,6 +734,7 @@ class FoundingRewardRow(BaseModel):
     note: str = ""
     created_at: datetime
     paid_at: Optional[datetime] = None
+    quality: Optional[dict] = None
 
 
 class FoundingRewardsOut(BaseModel):
@@ -738,9 +742,69 @@ class FoundingRewardsOut(BaseModel):
     amount_inr: int
     slots_remaining: int
     eligible_count: int
+    payable_count: int = 0
     paid_count: int
     rewards: list[FoundingRewardRow]
+    eval: Optional[dict] = None
 
 
 class FoundingMarkPaid(BaseModel):
+    note: Optional[str] = ""
+
+
+class RaceLeaderRow(BaseModel):
+    post_id: str
+    text: str
+    like_count: int
+    prize_inr: int
+    author_id: str
+    username: str
+    display_name: str
+    created_at: datetime
+
+
+class RaceStatusOut(BaseModel):
+    period_key: str
+    starts_at: datetime
+    ends_at: datetime
+    cadence_days: int
+    prize_min: int
+    prize_max: int
+    min_likes_to_win: int
+    eval: str
+    leader: Optional[RaceLeaderRow] = None
+    leaderboard: list[RaceLeaderRow] = []
+    my_best: Optional[RaceLeaderRow] = None
+    period_paid: bool = False
+    period_winner_username: Optional[str] = None
+
+
+class RaceRewardRow(BaseModel):
+    id: str
+    period_key: str
+    user_id: str
+    username: str
+    post_id: str
+    like_count: int
+    amount_inr: int
+    status: str
+    note: str = ""
+    created_at: datetime
+    paid_at: Optional[datetime] = None
+    period_starts_at: datetime
+    period_ends_at: datetime
+
+
+class RaceRewardsOut(BaseModel):
+    current: RaceStatusOut
+    rewards: list[RaceRewardRow]
+
+
+class RaceCloseRequest(BaseModel):
+    period_key: Optional[str] = None
+    post_id: Optional[str] = None
+    note: Optional[str] = ""
+
+
+class RaceMarkPaid(BaseModel):
     note: Optional[str] = ""

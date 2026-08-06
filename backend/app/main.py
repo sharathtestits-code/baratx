@@ -1951,6 +1951,7 @@ def like_post(
             kind="like",
             post_id=post.id,
         )
+        rewards.bump_founding_for_post(db, post_id)
         db.commit()
         db.refresh(post)
 
@@ -2099,6 +2100,7 @@ def create_reply(
         reply_id=reply.id,
         exclude_ids=notified,
     )
+    rewards.bump_founding_for_post(db, post_id)
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, current_user)
@@ -2320,6 +2322,36 @@ def founding_status(
     return rewards.status_payload(db, current_user)
 
 
+@app.get("/rewards/race", response_model=schemas.RaceStatusOut)
+def race_status(
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """Biweekly Square Race — highest likes win ₹150–₹500."""
+    data = rewards.race_status_for_user(db, current_user)
+    return schemas.RaceStatusOut(**data)
+
+
+def _founding_row_out(r: models.FoundingReward, u: Optional[models.User], db: Session):
+    if r.status == "eligible":
+        rewards.refresh_founding_payable(db, r)
+    return schemas.FoundingRewardRow(
+        id=r.id,
+        user_id=r.user_id,
+        username=u.username if u else "?",
+        display_name=u.display_name if u else "?",
+        kind=r.kind,
+        amount_inr=r.amount_inr,
+        status=r.status,
+        qualifying_post_id=r.qualifying_post_id,
+        qualifying_space_id=r.qualifying_space_id,
+        note=r.note or "",
+        created_at=r.created_at,
+        paid_at=r.paid_at,
+        quality=rewards.quality_snapshot(db, r),
+    )
+
+
 @app.get("/admin/founding-rewards", response_model=schemas.FoundingRewardsOut)
 def admin_founding_rewards(
     status: Optional[str] = None,
@@ -2327,7 +2359,7 @@ def admin_founding_rewards(
     db: Session = Depends(get_db),
 ):
     q = db.query(models.FoundingReward).order_by(models.FoundingReward.created_at.asc())
-    if status in ("eligible", "paid"):
+    if status in ("eligible", "payable", "paid"):
         q = q.filter(models.FoundingReward.status == status)
     rows = q.all()
     user_ids = [r.user_id for r in rows]
@@ -2335,38 +2367,32 @@ def admin_founding_rewards(
         u.id: u
         for u in db.query(models.User).filter(models.User.id.in_(user_ids)).all()
     } if user_ids else {}
+    out_rows = []
+    for r in rows:
+        out_rows.append(_founding_row_out(r, users.get(r.user_id), db))
+    db.commit()
     eligible_count = (
         db.query(models.FoundingReward).filter(models.FoundingReward.status == "eligible").count()
+    )
+    payable_count = (
+        db.query(models.FoundingReward).filter(models.FoundingReward.status == "payable").count()
     )
     paid_count = (
         db.query(models.FoundingReward).filter(models.FoundingReward.status == "paid").count()
     )
-    out_rows = []
-    for r in rows:
-        u = users.get(r.user_id)
-        out_rows.append(
-            schemas.FoundingRewardRow(
-                id=r.id,
-                user_id=r.user_id,
-                username=u.username if u else "?",
-                display_name=u.display_name if u else "?",
-                kind=r.kind,
-                amount_inr=r.amount_inr,
-                status=r.status,
-                qualifying_post_id=r.qualifying_post_id,
-                qualifying_space_id=r.qualifying_space_id,
-                note=r.note or "",
-                created_at=r.created_at,
-                paid_at=r.paid_at,
-            )
-        )
     return schemas.FoundingRewardsOut(
         cap=rewards.FOUNDING_CAP,
         amount_inr=rewards.FOUNDING_AMOUNT_INR,
         slots_remaining=rewards.slots_remaining(db),
         eligible_count=eligible_count,
+        payable_count=payable_count,
         paid_count=paid_count,
         rewards=out_rows,
+        eval={
+            "floor": "Problem post (≥50 chars + flag) OR any-arena debate",
+            "rating": f"≥{rewards.FOUNDING_MIN_LIKES} likes OR ≥{rewards.FOUNDING_MIN_REPLIES} reply from others (debates: stances/posts)",
+            "payout": "Pay when status=payable (or after manual review)",
+        },
     )
 
 
@@ -2384,19 +2410,103 @@ def admin_mark_founding_paid(
     db.commit()
     db.refresh(row)
     u = db.query(models.User).filter(models.User.id == row.user_id).first()
-    return schemas.FoundingRewardRow(
+    return _founding_row_out(row, u, db)
+
+
+@app.get("/admin/race-rewards", response_model=schemas.RaceRewardsOut)
+def admin_race_rewards(
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    current = schemas.RaceStatusOut(**rewards.race_status_for_user(db, None))
+    rows = db.query(models.RaceReward).order_by(models.RaceReward.created_at.desc()).limit(40).all()
+    out = [
+        schemas.RaceRewardRow(
+            id=r.id,
+            period_key=r.period_key,
+            user_id=r.user_id,
+            username=r.username_snapshot or "?",
+            post_id=r.post_id,
+            like_count=r.like_count,
+            amount_inr=r.amount_inr,
+            status=r.status,
+            note=r.note or "",
+            created_at=r.created_at,
+            paid_at=r.paid_at,
+            period_starts_at=r.period_starts_at,
+            period_ends_at=r.period_ends_at,
+        )
+        for r in rows
+    ]
+    return schemas.RaceRewardsOut(current=current, rewards=out)
+
+
+@app.post("/admin/race-rewards/close", response_model=schemas.RaceRewardRow)
+def admin_close_race(
+    payload: schemas.RaceCloseRequest,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        row = rewards.close_race_winner(
+            db,
+            period_key=payload.period_key,
+            post_id=payload.post_id,
+            note=payload.note or "",
+        )
+    except LookupError as exc:
+        detail = {
+            "no_qualifying_leader": "No post with enough likes yet",
+            "post_not_in_period": "Post not in this race period",
+            "bad_period": "Invalid period key",
+        }.get(str(exc), "Could not close race")
+        raise HTTPException(status_code=400, detail=detail)
+    db.commit()
+    db.refresh(row)
+    return schemas.RaceRewardRow(
         id=row.id,
+        period_key=row.period_key,
         user_id=row.user_id,
-        username=u.username if u else "?",
-        display_name=u.display_name if u else "?",
-        kind=row.kind,
+        username=row.username_snapshot or "?",
+        post_id=row.post_id,
+        like_count=row.like_count,
         amount_inr=row.amount_inr,
         status=row.status,
-        qualifying_post_id=row.qualifying_post_id,
-        qualifying_space_id=row.qualifying_space_id,
         note=row.note or "",
         created_at=row.created_at,
         paid_at=row.paid_at,
+        period_starts_at=row.period_starts_at,
+        period_ends_at=row.period_ends_at,
+    )
+
+
+@app.post("/admin/race-rewards/{reward_id}/paid", response_model=schemas.RaceRewardRow)
+def admin_mark_race_paid(
+    reward_id: str,
+    payload: schemas.RaceMarkPaid,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        row = rewards.mark_race_paid(db, reward_id, note=payload.note or "")
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Race reward not found")
+    db.commit()
+    db.refresh(row)
+    return schemas.RaceRewardRow(
+        id=row.id,
+        period_key=row.period_key,
+        user_id=row.user_id,
+        username=row.username_snapshot or "?",
+        post_id=row.post_id,
+        like_count=row.like_count,
+        amount_inr=row.amount_inr,
+        status=row.status,
+        note=row.note or "",
+        created_at=row.created_at,
+        paid_at=row.paid_at,
+        period_starts_at=row.period_starts_at,
+        period_ends_at=row.period_ends_at,
     )
 
 

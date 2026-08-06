@@ -433,7 +433,7 @@ class UserTopicInterest(Base):
 
 
 class FoundingReward(Base):
-    """First-N incentive: one real civic problem post or Politics/News debate."""
+    """First-N incentive: one real problem post or any-arena debate."""
 
     __tablename__ = "founding_rewards"
 
@@ -441,7 +441,8 @@ class FoundingReward(Base):
     user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False, index=True)
     kind = Column(String, nullable=False)  # problem | debate
     amount_inr = Column(Integer, nullable=False, default=150)
-    status = Column(String, nullable=False, default="eligible", index=True)  # eligible | paid
+    # eligible (floor met) → payable (community rating bar) → paid
+    status = Column(String, nullable=False, default="eligible", index=True)
     qualifying_post_id = Column(String, ForeignKey("posts.id"), nullable=True)
     qualifying_space_id = Column(String, ForeignKey("spaces.id"), nullable=True)
     note = Column(String, default="", nullable=False)
@@ -449,3 +450,26 @@ class FoundingReward(Base):
     paid_at = Column(DateTime, nullable=True)
 
     user = relationship("User", foreign_keys=[user_id])
+
+
+class RaceReward(Base):
+    """Biweekly Square Race — highest-liked Home post wins ₹150–₹500."""
+
+    __tablename__ = "race_rewards"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    period_key = Column(String, unique=True, nullable=False, index=True)
+    period_starts_at = Column(DateTime, nullable=False)
+    period_ends_at = Column(DateTime, nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    post_id = Column(String, ForeignKey("posts.id"), nullable=False)
+    like_count = Column(Integer, nullable=False, default=0)
+    amount_inr = Column(Integer, nullable=False, default=150)
+    username_snapshot = Column(String, nullable=False, default="")
+    status = Column(String, nullable=False, default="payable", index=True)  # payable | paid
+    note = Column(String, default="", nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    paid_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", foreign_keys=[user_id])
+    post = relationship("Post", foreign_keys=[post_id])

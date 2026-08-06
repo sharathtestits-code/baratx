@@ -510,9 +510,26 @@ export const adminApi = {
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify({ note }),
     }),
+  raceRewards: (adminSecret) =>
+    request("/admin/race-rewards", {
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
+  closeRace: (adminSecret, body = {}) =>
+    request("/admin/race-rewards/close", {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify(body),
+    }),
+  markRacePaid: (adminSecret, rewardId, note = "") =>
+    request(`/admin/race-rewards/${encodeURIComponent(rewardId)}/paid`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify({ note }),
+    }),
 };
 
 export const rewardsApi = {
   founding: (token) =>
     request("/rewards/founding", { headers: authHeaders(token) }),
+  race: (token) => request("/rewards/race", { headers: authHeaders(token) }),
 };

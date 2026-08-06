@@ -1,22 +1,29 @@
-# Traction ops — Founding 100 (quiet civic pull)
+# Traction ops — rewards evaluation
 
-Arenas now: Sports · Politics · Entertainment · News · Spirituality (Startups retired).
+Arenas: Sports · Politics · Entertainment · News · Spirituality
 
-## Offer (do not blast as ads)
-First **100** people who do **one** of these get **₹150 via UPI**:
-1. Post a real civic/city problem on Home (≥50 chars + check “real civic / city problem”), or
-2. Open one Politics or News debate
+## How we evaluate (not AI, not self-claim alone)
 
-One payout per person. No pay for bare signup.
+| Step | Signal | What it means |
+|------|--------|----------------|
+| 1. Floor | Problem post ≥50 chars + flag, OR open any arena debate | They did a real action |
+| 2. Community rating | Likes / replies (problems) or stances / debate posts | India cared — this is the rating |
+| 3. Admin payout | You send UPI + Mark paid | Human veto for spam / self-like rings |
 
-## Your daily loop
-1. https://barathx.com/admin → reply to new posts as @baratx
-2. Check **Founding 100 — UPI payouts** → mark paid after you send UPI
-3. Soft invite copy (WhatsApp / DM):
+**Founding 100 (₹150, first 100 people, once):**
+- Status `eligible` = floor cleared
+- Status `payable` = rating bar met (≥3 likes **or** ≥1 reply from someone else; debates: ≥2 stances **or** ≥3 posts)
+- Pay when `payable` (or after manual review if you intentionally override)
 
-> Got a real problem in your city? Post it on BaratX (or open one Politics/News debate). First 100 people get ₹150. barathx.com
+**Square Race (every 14 days, ₹150–₹500):**
+- Ranking = highest likes on a Home post in the fortnight
+- Prize scales with likes (min 3 likes to win; caps at ₹500)
+- Admin → Lock current leader → Mark paid after UPI
+
+## Soft invite
+> Post a real city problem or open any arena debate. First 100 get ₹150 after people engage. Every 2 weeks the highest-liked Home post wins up to ₹500. barathx.com
 
 ## Don’t
-- Pay for signups
-- Turn the feed into a bounty board
-- Promise election data or politician dashboards yet
+- Pay for bare signup
+- Promise “we verify your problem with officials”
+- Ignore admin Mark paid — that’s the anti-fraud step

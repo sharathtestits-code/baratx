@@ -8,6 +8,7 @@ import WelcomePanel from "../components/WelcomePanel";
 import SuggestedFollows from "../components/SuggestedFollows";
 import TodaysSquare from "../components/TodaysSquare";
 import FoundingStrip from "../components/FoundingStrip";
+import RaceStrip from "../components/RaceStrip";
 import MentionTextarea from "../components/MentionTextarea";
 import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
@@ -373,6 +374,8 @@ export default function Feed() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
+
+      <RaceStrip key={`race-${foundingRefresh}`} />
 
       <TodaysSquare
         onAnswer={(question) => {

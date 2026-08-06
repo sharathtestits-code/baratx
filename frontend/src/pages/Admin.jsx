@@ -70,7 +70,9 @@ export default function Admin() {
   const [badgeBusyId, setBadgeBusyId] = useState("");
   const [notifyBadge, setNotifyBadge] = useState(true);
   const [founding, setFounding] = useState(null);
+  const [race, setRace] = useState(null);
   const [payingId, setPayingId] = useState("");
+  const [raceBusy, setRaceBusy] = useState(false);
 
   const load = useCallback(
     async (adminSecret) => {
@@ -78,7 +80,7 @@ export default function Admin() {
       setBusy(true);
       setError("");
       try {
-        const [s, u, posts, fr] = await Promise.all([
+        const [s, u, posts, fr, rr] = await Promise.all([
           adminApi.stats(adminSecret),
           adminApi.users(adminSecret, { limit: 100, offset: 0 }),
           adminApi.recentPosts(adminSecret, {
@@ -87,6 +89,7 @@ export default function Admin() {
             days: 7,
           }),
           adminApi.foundingRewards(adminSecret),
+          adminApi.raceRewards(adminSecret),
         ]);
         setStats(s);
         setUsers(u.users || []);
@@ -94,6 +97,7 @@ export default function Admin() {
         setRecentPosts(posts.posts || []);
         setRecentTotal(posts.total || 0);
         setFounding(fr);
+        setRace(rr);
       } catch (err) {
         setStats(null);
         setUsers([]);
@@ -101,6 +105,7 @@ export default function Admin() {
         setRecentPosts([]);
         setRecentTotal(0);
         setFounding(null);
+        setRace(null);
         setError(err.message || "Could not load admin data");
       } finally {
         setBusy(false);
@@ -134,6 +139,7 @@ export default function Admin() {
     setRecentPosts([]);
     setRecentTotal(0);
     setFounding(null);
+    setRace(null);
     setError("");
     setMsg("");
     setReplyDrafts({});
@@ -152,6 +158,42 @@ export default function Admin() {
       load(secret);
     } catch (err) {
       setError(err.message || "Could not mark paid");
+    } finally {
+      setPayingId("");
+    }
+  }
+
+  async function handleCloseRace() {
+    if (!secret) return;
+    setRaceBusy(true);
+    setError("");
+    setMsg("");
+    try {
+      const row = await adminApi.closeRace(secret, {});
+      setMsg(
+        `Locked Square Race winner @${row.username} — ${row.like_count} likes → ₹${row.amount_inr}`
+      );
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not close race");
+    } finally {
+      setRaceBusy(false);
+    }
+  }
+
+  async function handleMarkRacePaid(row) {
+    if (!secret || !row?.id) return;
+    const note = window.prompt("UPI reference / note (optional)", row.note || "") ?? null;
+    if (note === null) return;
+    setPayingId(row.id);
+    setError("");
+    setMsg("");
+    try {
+      await adminApi.markRacePaid(secret, row.id, note);
+      setMsg(`Race paid @${row.username} ₹${row.amount_inr}`);
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not mark race paid");
     } finally {
       setPayingId("");
     }
@@ -381,10 +423,13 @@ export default function Admin() {
         <section className="admin-compose" aria-labelledby="admin-founding-title">
           <h2 id="admin-founding-title">Founding {founding.cap} — UPI payouts</h2>
           <p className="admin-lead">
-            ₹{founding.amount_inr} for one real problem post or Politics/News debate.{" "}
-            {founding.slots_remaining} slots left · {founding.eligible_count} unpaid ·{" "}
-            {founding.paid_count} paid.
+            ₹{founding.amount_inr} for one problem post or any-arena debate. Floor → community rating
+            (likes/replies) → you pay. {founding.slots_remaining} slots left · {founding.eligible_count}{" "}
+            waiting on rating · {founding.payable_count || 0} payable · {founding.paid_count} paid.
           </p>
+          {founding.eval?.rating && (
+            <p className="admin-muted">Rating bar: {founding.eval.rating}</p>
+          )}
           {(founding.rewards || []).length === 0 ? (
             <p className="admin-empty-inline">No qualifying posts yet.</p>
           ) : (
@@ -395,39 +440,157 @@ export default function Admin() {
                     <th>User</th>
                     <th>Kind</th>
                     <th>Status</th>
+                    <th>Rating</th>
                     <th>When</th>
                     <th />
                   </tr>
                 </thead>
                 <tbody>
-                  {founding.rewards.map((r) => (
-                    <tr key={r.id}>
+                  {founding.rewards.map((r) => {
+                    const q = r.quality || {};
+                    const rating =
+                      r.kind === "debate"
+                        ? `${q.stance_count ?? 0} stances · ${q.post_count ?? 0} posts`
+                        : `${q.like_count ?? 0} likes · ${q.reply_count ?? 0} replies`;
+                    return (
+                      <tr key={r.id}>
+                        <td>
+                          <Link to={`/${r.username}`}>@{r.username}</Link>
+                          <div className="admin-muted">{r.display_name}</div>
+                        </td>
+                        <td>{r.kind}</td>
+                        <td>{r.status}</td>
+                        <td>
+                          {rating}
+                          {q.meets_bar ? " ✓" : ""}
+                        </td>
+                        <td>{formatWhen(r.created_at)}</td>
+                        <td>
+                          {r.status === "paid" ? (
+                            <span className="admin-muted">{r.note || "Paid"}</span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-btn admin-btn-primary"
+                              disabled={payingId === r.id}
+                              onClick={() => handleMarkFoundingPaid(r)}
+                              title={
+                                r.status === "eligible"
+                                  ? "Bar not met yet — only pay after review if intentional"
+                                  : "Ready to pay"
+                              }
+                            >
+                              {payingId === r.id ? "Saving…" : "Mark paid"}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
+
+      {race && (
+        <section className="admin-compose" aria-labelledby="admin-race-title">
+          <h2 id="admin-race-title">Square Race — biweekly likes</h2>
+          <p className="admin-lead">
+            Highest-liked Home post each {race.current?.cadence_days || 14} days wins ₹
+            {race.current?.prize_min || 150}–₹{race.current?.prize_max || 500} (scaled by likes).
+            Period {race.current?.period_key}.
+          </p>
+          {race.current?.leader ? (
+            <p className="admin-muted">
+              Current leader: @{race.current.leader.username} · {race.current.leader.like_count} likes ·
+              ~₹{race.current.leader.prize_inr}
+            </p>
+          ) : (
+            <p className="admin-muted">No qualifying leader yet (need enough likes).</p>
+          )}
+          <div className="admin-actions" style={{ marginBottom: "0.75rem" }}>
+            <button
+              type="button"
+              className="admin-btn admin-btn-primary"
+              disabled={raceBusy}
+              onClick={handleCloseRace}
+            >
+              {raceBusy ? "Locking…" : "Lock current leader as winner"}
+            </button>
+          </div>
+          {(race.current?.leaderboard || []).length > 0 && (
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Likes</th>
+                    <th>Prize</th>
+                    <th>Post</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {race.current.leaderboard.slice(0, 8).map((row, i) => (
+                    <tr key={row.post_id}>
+                      <td>{i + 1}</td>
                       <td>
-                        <Link to={`/${r.username}`}>@{r.username}</Link>
-                        <div className="admin-muted">{r.display_name}</div>
+                        <Link to={`/${row.username}`}>@{row.username}</Link>
                       </td>
-                      <td>{r.kind}</td>
-                      <td>{r.status}</td>
-                      <td>{formatWhen(r.created_at)}</td>
-                      <td>
-                        {r.status === "eligible" ? (
-                          <button
-                            type="button"
-                            className="admin-btn admin-btn-primary"
-                            disabled={payingId === r.id}
-                            onClick={() => handleMarkFoundingPaid(r)}
-                          >
-                            {payingId === r.id ? "Saving…" : "Mark paid"}
-                          </button>
-                        ) : (
-                          <span className="admin-muted">{r.note || "Paid"}</span>
-                        )}
-                      </td>
+                      <td>{row.like_count}</td>
+                      <td>₹{row.prize_inr || "—"}</td>
+                      <td className="admin-muted">{row.text}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          )}
+          {(race.rewards || []).length > 0 && (
+            <>
+              <h3 className="admin-subhead">Locked winners</h3>
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Period</th>
+                      <th>User</th>
+                      <th>Likes</th>
+                      <th>₹</th>
+                      <th>Status</th>
+                      <th />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {race.rewards.map((r) => (
+                      <tr key={r.id}>
+                        <td>{r.period_key}</td>
+                        <td>@{r.username}</td>
+                        <td>{r.like_count}</td>
+                        <td>{r.amount_inr}</td>
+                        <td>{r.status}</td>
+                        <td>
+                          {r.status === "payable" ? (
+                            <button
+                              type="button"
+                              className="admin-btn admin-btn-primary"
+                              disabled={payingId === r.id}
+                              onClick={() => handleMarkRacePaid(r)}
+                            >
+                              {payingId === r.id ? "Saving…" : "Mark paid"}
+                            </button>
+                          ) : (
+                            <span className="admin-muted">{r.note || "Paid"}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </section>
       )}
