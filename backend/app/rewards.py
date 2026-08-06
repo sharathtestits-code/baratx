@@ -29,8 +29,8 @@ FOUNDING_AMOUNT_INR = 150
 MIN_PROBLEM_CHARS = 50
 
 # Quality bar before Founding payout (community rating).
-FOUNDING_MIN_LIKES = 11  # more than 10 community likes
-FOUNDING_MIN_REPLIES = 1  # from someone other than author
+FOUNDING_MIN_LIKES = 25
+FOUNDING_MIN_REPLIES = 5  # human replies (official welcome excluded)
 FOUNDING_DEBATE_MIN_STANCES = 2
 FOUNDING_DEBATE_MIN_POSTS = 3
 
@@ -38,7 +38,7 @@ FOUNDING_DEBATE_MIN_POSTS = 3
 RACE_CADENCE_DAYS = 14
 RACE_PRIZE_MIN = 150
 RACE_PRIZE_MAX = 500
-RACE_MIN_LIKES_TO_WIN = 11  # more than 10 likes to qualify
+RACE_MIN_LIKES_TO_WIN = 25
 
 
 def slots_remaining(db: Session) -> int:

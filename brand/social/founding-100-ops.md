@@ -12,12 +12,12 @@ Arenas: Sports · Politics · Entertainment · News · Spirituality
 
 **Founding 100 (₹150, first 100 people, once):**
 - Status `eligible` = floor cleared
-- Status `payable` = rating bar met (≥11 likes **or** ≥1 reply from someone else; debates: ≥2 stances **or** ≥3 posts)
+- Status `payable` = rating bar met (≥25 likes **or** ≥5 replies from someone else; debates: ≥2 stances **or** ≥3 posts)
 - Pay when `payable` (or after manual review if you intentionally override)
 
 **Square Race (every 14 days, ₹150–₹500):**
 - Ranking = highest likes on a Home post in the fortnight
-- Prize scales with likes (min 11 likes to win; caps at ₹500)
+- Prize scales with likes (min 25 likes to win; caps at ₹500)
 - Admin → Lock current leader → Mark paid after UPI
 
 ## Who sees what

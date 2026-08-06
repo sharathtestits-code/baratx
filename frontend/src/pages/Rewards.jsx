@@ -79,10 +79,10 @@ export default function Rewards() {
 
   return (
     <div className="feed-wrap surface-page rewards-page">
-      <div className="feed-header">
-        <h1>Rewards</h1>
-      </div>
-      <p className="hint surface-lead">
+      <header className="feed-topbar">
+        <h1 className="feed-title">Rewards</h1>
+      </header>
+      <p className="hint surface-lead rewards-lead">
         You don’t rate yourself. India rates with likes and replies — this page shows your progress.
       </p>
       {error && <div className="error">{error}</div>}
@@ -108,8 +108,8 @@ export default function Rewards() {
                 status === "eligible"
                   ? founding.my_kind === "debate"
                     ? `Need ${q.need_stances || 2} stances or ${q.need_posts || 3} posts — now ${q.stance_count || 0} / ${q.post_count || 0}.`
-                    : `Need ${q.need_likes || 11} likes or ${q.need_replies || 1} reply — now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
-                  : "≥11 likes or 1 human reply (official welcome doesn’t count)."
+                    : `Need ${q.need_likes || 25} likes or ${q.need_replies || 5} replies — now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
+                  : `≥${founding.eval?.min_likes || 25} likes or ≥${founding.eval?.min_replies || 5} human replies (official welcome doesn’t count).`
               }
             />
             <Step

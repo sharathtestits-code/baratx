@@ -164,8 +164,16 @@ export function IconQuote({ className = "" }) {
 
 export function IconArena({ className = "" }) {
   return (
-    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 19h16M6 19V9l6-4 6 4v10M9 19v-5h6v5" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      className={`icon ${className}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 19h16M6 19V9l6-4 6 4v10M9 19v-5h6v5" />
     </svg>
   );
 }
