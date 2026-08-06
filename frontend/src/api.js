@@ -1,6 +1,20 @@
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 const DEFAULT_TIMEOUT_MS = 15000;
 
+/** Resolve post/avatar/cover media paths (relative, absolute, or data URLs). */
+export function mediaUrl(path) {
+  if (!path) return null;
+  if (
+    path.startsWith("http://") ||
+    path.startsWith("https://") ||
+    path.startsWith("data:") ||
+    path.startsWith("blob:")
+  ) {
+    return path;
+  }
+  return `${API_BASE}${path}`;
+}
+
 async function request(path, options = {}) {
   const { timeoutMs = DEFAULT_TIMEOUT_MS, headers: extraHeaders, signal: externalSignal, ...rest } =
     options;

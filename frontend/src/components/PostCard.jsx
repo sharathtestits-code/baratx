@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { API_BASE, postsApi, socialApi } from "../api";
+import { postsApi, socialApi, mediaUrl } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
 import { badgeNameClass } from "./OfficialBadge";
@@ -171,7 +171,7 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
           </div>
           <p className="post-text">{linkifyText(post.text)}</p>
           {post.image_url && (
-            <img className="post-image" src={`${API_BASE}${post.image_url}`} alt="" />
+            <img className="post-image" src={mediaUrl(post.image_url)} alt="" />
           )}
           {post.quoted_post && (
             <Link to={`/posts/${post.quoted_post.id}`} className="quoted-post" onClick={(e) => e.stopPropagation()}>

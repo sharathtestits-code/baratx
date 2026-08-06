@@ -10,7 +10,7 @@ const ARENA_LABEL = {
   entertainment: "Entertainment",
   news: "News",
 };
-const MIN_PICKS = 3;
+const MIN_PICKS = 1;
 const MAX_PICKS = 12;
 
 /**
@@ -97,8 +97,8 @@ export default function OnboardingTopics() {
         <h1>What do you want to fight about?</h1>
       </div>
       <p className="hint surface-lead">
-        Pick {MIN_PICKS}–{MAX_PICKS} topics. We’ll fill your home with debates and prompts from
-        those lanes — not a random firehose.
+        Pick at least {MIN_PICKS} topic (up to {MAX_PICKS}). We’ll fill your home with debates
+        and prompts from those lanes — not a random firehose.
       </p>
       {error && <div className="error">{error}</div>}
 
