@@ -1,3 +1,8 @@
+html {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
 :root,
 [data-theme="saffron"] {
   /* Warm India-first neutrals */
@@ -376,7 +381,7 @@ button {
   border-left: 1px solid var(--border);
   border-right: 1px solid var(--border);
   background: var(--surface);
-  padding-bottom: 4rem;
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
   flex: 1 1 auto;
 }
 
@@ -728,7 +733,7 @@ button {
   background: var(--surface);
   border-top: 1px solid var(--border);
   z-index: 20;
-  padding: 0.35rem 0;
+  padding: 0.35rem 0 calc(0.35rem + env(safe-area-inset-bottom, 0px));
 }
 
 .bottom-nav-link {
@@ -857,6 +862,52 @@ button {
   display: block;
   margin: 0.35rem 0 0;
 }
+
+.auth-back-btn {
+  margin-top: 0.25rem;
+  padding: 0.65rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-back-btn:hover:not(:disabled) {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.phone-region,
+.phone-number {
+  font-size: 1rem; /* avoid iOS input zoom */
+  min-height: 2.75rem;
+}
+
+@media (max-width: 420px) {
+  .phone-field {
+    flex-direction: column;
+  }
+
+  .phone-region {
+    max-width: none;
+    width: 100%;
+  }
+
+  .auth-card {
+    padding: 1.35rem 1.1rem;
+    border-radius: var(--radius-md);
+    box-shadow: none;
+    border: none;
+  }
+
+  .page-auth main {
+    padding: 0.75rem 0.75rem 2rem;
+  }
+}
+
 
 form {
   display: flex;
@@ -1703,6 +1754,8 @@ a.post-username:hover {
   justify-content: flex-end;
   padding-bottom: 0.35rem;
   min-height: 40px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .profile-edit-wrap {
@@ -2021,6 +2074,35 @@ a.post-username:hover {
   justify-content: flex-end;
 }
 
+@media (max-width: 640px) {
+  .profile-card-top {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .profile-actions {
+    width: 100%;
+    justify-content: flex-start;
+    padding-top: 0.35rem;
+    padding-bottom: 0;
+  }
+
+  .profile-action-row {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .profile-action-row .follow-btn {
+    flex: 1 1 auto;
+    min-width: 7rem;
+    text-align: center;
+  }
+
+  .profile-action-row .profile-edit-btn {
+    flex: 0 0 auto;
+  }
+}
+
 .reply-nested {
   margin-left: 1.5rem;
   border-left: 2px solid var(--border);
@@ -2151,9 +2233,14 @@ a.post-username:hover {
 }
 
 .follow-btn {
-  border: none;
-  background: var(--text) !important;
+  border: none !important;
+  /* Brand fill — readable on light and midnight themes (avoid var(--text) + white label) */
+  background: var(--brand) !important;
   color: #fff !important;
+}
+
+.follow-btn:hover:not(:disabled) {
+  background: var(--brand-hover) !important;
 }
 
 .follow-btn.following {
@@ -2165,6 +2252,7 @@ a.post-username:hover {
 .follow-btn.following:hover {
   border-color: #f4b3b3 !important;
   color: var(--danger) !important;
+  background: var(--surface) !important;
 }
 
 .profile-tabs .feed-tab {
@@ -2486,6 +2574,153 @@ a.post-username:hover {
 .welcome-follow-msg {
   margin: 0.45rem 0 0;
 }
+
+/* ---------- Who to follow (mobile + rail) ---------- */
+
+.suggested-follows-mobile {
+  display: block;
+  padding: 0.75rem 1rem 0;
+}
+
+@media (min-width: 1100px) {
+  /* Right rail already shows suggestions on wide screens */
+  .suggested-follows-mobile {
+    display: none;
+  }
+}
+
+.suggested-follows {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 0.9rem 0.75rem;
+}
+
+.rail-card-suggested {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.rail-card-suggested .suggested-follows {
+  margin: 0;
+}
+
+.suggested-follows-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.suggested-follows-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.suggested-follows-note {
+  margin: 0.25rem 0 0;
+}
+
+.suggested-follows-dismiss {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+}
+
+.suggested-follows-dismiss:hover {
+  color: var(--text);
+}
+
+.suggested-follows-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.suggested-follows-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.suggested-follows-person {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.suggested-follows-info {
+  min-width: 0;
+}
+
+.suggested-follows-name {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.suggested-follows-username {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.suggested-follows-blurb {
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  margin-top: 0.1rem;
+  line-height: 1.35;
+}
+
+.suggested-follow-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.suggested-follows-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.suggested-follows-actions .welcome-follow-btn {
+  width: 100%;
+}
+
+.suggested-explore {
+  text-align: center;
+}
+
+.suggested-follows-error {
+  margin: 0.5rem 0 0;
+}
+
+.search-empty .suggested-follows {
+  margin: 1rem 0 1.25rem;
+}
+
+.profile-action-row .follow-btn {
+  order: -1;
+}
+
 
 .user-results {
   display: flex;
@@ -4181,4 +4416,32 @@ button.admin-btn-ghost:hover:not(:disabled),
   .theme-picker-compact {
     grid-template-columns: 1fr;
   }
+}
+
+
+.user-result-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.user-result-row .user-result-main {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.user-results .user-result-row {
+  border-bottom: 1px solid var(--border);
+}
+
+.user-results .user-result-row:hover {
+  background: rgba(15, 20, 25, 0.03);
 }

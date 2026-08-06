@@ -4,6 +4,7 @@ import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
+import { validateUsername } from "../username";
 
 export default function Signup() {
   const [params] = useSearchParams();
@@ -25,8 +26,20 @@ export default function Signup() {
   const [otp, setOtp] = useState("");
   const [devOtp, setDevOtp] = useState("");
 
+  function goBackFromOtp() {
+    setOtpSent(false);
+    setOtp("");
+    setDevOtp("");
+    setError("");
+  }
+
   async function handleEmailSignup(e) {
     e.preventDefault();
+    const userErr = validateUsername(username);
+    if (userErr) {
+      setError(userErr);
+      return;
+    }
     setError("");
     setBusy(true);
     try {
@@ -51,6 +64,15 @@ export default function Signup() {
 
   async function handleRequestOtp(e) {
     e.preventDefault();
+    if (!displayName.trim()) {
+      setError("Enter your display name");
+      return;
+    }
+    const userErr = validateUsername(username);
+    if (userErr) {
+      setError(userErr);
+      return;
+    }
     setError("");
     setBusy(true);
     try {
@@ -66,6 +88,11 @@ export default function Signup() {
 
   async function handleVerifyOtp(e) {
     e.preventDefault();
+    const userErr = validateUsername(username);
+    if (userErr) {
+      setError(userErr);
+      return;
+    }
     setError("");
     setBusy(true);
     try {
@@ -94,34 +121,38 @@ export default function Signup() {
     <div className="auth-card auth-card-x">
       <h1>Create your account</h1>
 
-      <GoogleSignInButton label="Sign up with Google" onError={setError} />
+      {!otpSent && (
+        <>
+          <GoogleSignInButton label="Sign up with Google" onError={setError} />
 
-      <div className="x-auth-or" role="separator">
-        <span>or</span>
-      </div>
+          <div className="x-auth-or" role="separator">
+            <span>or</span>
+          </div>
 
-      <div className="method-toggle">
-        <button
-          className={method === "phone" ? "active" : ""}
-          onClick={() => {
-            setMethod("phone");
-            setError("");
-          }}
-          type="button"
-        >
-          Phone
-        </button>
-        <button
-          className={method === "email" ? "active" : ""}
-          onClick={() => {
-            setMethod("email");
-            setError("");
-          }}
-          type="button"
-        >
-          Email
-        </button>
-      </div>
+          <div className="method-toggle">
+            <button
+              className={method === "phone" ? "active" : ""}
+              onClick={() => {
+                setMethod("phone");
+                setError("");
+              }}
+              type="button"
+            >
+              Phone
+            </button>
+            <button
+              className={method === "email" ? "active" : ""}
+              onClick={() => {
+                setMethod("email");
+                setError("");
+              }}
+              type="button"
+            >
+              Email
+            </button>
+          </div>
+        </>
+      )}
 
       {error && <div className="error">{error}</div>}
 
@@ -129,7 +160,12 @@ export default function Signup() {
         <form onSubmit={handleEmailSignup}>
           <label>
             Display name
-            <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              autoComplete="name"
+              required
+            />
           </label>
           <label>
             Username
@@ -138,13 +174,20 @@ export default function Signup() {
               onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
               placeholder="rahul_99"
               autoComplete="username"
+              inputMode="text"
               required
             />
           </label>
           {usernameHint}
           <label>
             Email
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
           </label>
           <label>
             Password
@@ -153,6 +196,7 @@ export default function Signup() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={8}
+              autoComplete="new-password"
               required
             />
           </label>
@@ -164,7 +208,12 @@ export default function Signup() {
         <form onSubmit={handleRequestOtp}>
           <label>
             Display name
-            <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+            <input
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              autoComplete="name"
+              required
+            />
           </label>
           <label>
             Username
@@ -173,6 +222,7 @@ export default function Signup() {
               onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
               placeholder="rahul_99"
               autoComplete="username"
+              inputMode="text"
               required
             />
           </label>
@@ -190,19 +240,41 @@ export default function Signup() {
       ) : (
         <form onSubmit={handleVerifyOtp}>
           <p className="hint">
-            OTP sent to {phone}.{" "}
+            OTP sent to <strong>{phone}</strong>.{" "}
             {devOtp && (
               <>
-                (Demo mode — no SMS provider wired up yet, your code is <b>{devOtp}</b>)
+                (Demo mode — your code is <b>{devOtp}</b>)
               </>
             )}
           </p>
           <label>
+            Username
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+              placeholder="rahul_99"
+              autoComplete="username"
+              required
+            />
+          </label>
+          {usernameHint}
+          <label>
             Enter OTP
-            <input value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6} required />
+            <input
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              pattern="[0-9]{6}"
+              required
+            />
           </label>
           <button type="submit" disabled={busy}>
             {busy ? "Verifying..." : "Verify & create account"}
+          </button>
+          <button type="button" className="auth-back-btn" onClick={goBackFromOtp} disabled={busy}>
+            ← Change phone or details
           </button>
         </form>
       )}

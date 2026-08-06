@@ -280,6 +280,7 @@ class UserSearchOut(BaseModel):
     display_name: str
     bio: str
     avatar_url: Optional[str] = None
+    is_following: bool = False
 
     class Config:
         from_attributes = True

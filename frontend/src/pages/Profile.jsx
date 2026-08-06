@@ -23,6 +23,7 @@ export default function Profile() {
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
   const [followBusy, setFollowBusy] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [editMenuOpen, setEditMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -301,36 +302,54 @@ export default function Profile() {
                   <Link to={`/messages/${profile.username}`} className="profile-edit-btn">
                     Message
                   </Link>
-                  <button
-                    type="button"
-                    className="profile-edit-btn"
-                    onClick={async () => {
-                      try {
-                        await socialApi.mute(token, profile.username);
-                        window.alert(`Muted @${profile.username}`);
-                      } catch (err) {
-                        setError(err.message);
-                      }
-                    }}
-                  >
-                    Mute
-                  </button>
-                  <button
-                    type="button"
-                    className="profile-edit-btn"
-                    onClick={async () => {
-                      if (!window.confirm(`Block @${profile.username}?`)) return;
-                      try {
-                        await socialApi.block(token, profile.username);
-                        window.alert(`Blocked @${profile.username}`);
-                        navigate("/feed");
-                      } catch (err) {
-                        setError(err.message);
-                      }
-                    }}
-                  >
-                    Block
-                  </button>
+                  <div className="profile-edit-wrap">
+                    <button
+                      type="button"
+                      className="profile-edit-btn"
+                      onClick={() => setMoreMenuOpen((open) => !open)}
+                      aria-expanded={moreMenuOpen}
+                      aria-haspopup="menu"
+                      aria-label="More actions"
+                    >
+                      More
+                    </button>
+                    {moreMenuOpen && (
+                      <div className="profile-edit-menu" role="menu">
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={async () => {
+                            setMoreMenuOpen(false);
+                            try {
+                              await socialApi.mute(token, profile.username);
+                              window.alert(`Muted @${profile.username}`);
+                            } catch (err) {
+                              setError(err.message);
+                            }
+                          }}
+                        >
+                          Mute
+                        </button>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={async () => {
+                            setMoreMenuOpen(false);
+                            if (!window.confirm(`Block @${profile.username}?`)) return;
+                            try {
+                              await socialApi.block(token, profile.username);
+                              window.alert(`Blocked @${profile.username}`);
+                              navigate("/feed");
+                            } catch (err) {
+                              setError(err.message);
+                            }
+                          }}
+                        >
+                          Block
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             )}

@@ -1753,8 +1753,22 @@ def search(
         .all()
     )
 
+    following_ids = set()
+    if current_user is not None:
+        following_ids = {f.followed_id for f in current_user.following}
+
     return schemas.SearchResults(
-        users=[schemas.UserSearchOut.model_validate(u) for u in users],
+        users=[
+            schemas.UserSearchOut(
+                id=u.id,
+                username=u.username,
+                display_name=u.display_name,
+                bio=u.bio or "",
+                avatar_url=u.avatar_url,
+                is_following=u.id in following_ids,
+            )
+            for u in users
+        ],
         posts=[serialize_post(p, current_user) for p in posts],
     )
 

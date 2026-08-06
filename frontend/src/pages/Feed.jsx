@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import WelcomePanel from "../components/WelcomePanel";
+import SuggestedFollows from "../components/SuggestedFollows";
 import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
@@ -292,6 +293,14 @@ export default function Feed() {
       {showWelcome && (
         <WelcomePanel token={token} text={text} setText={setText} onPostedFlag composeRef={composeRef} />
       )}
+
+      <div className="suggested-follows-mobile">
+        <SuggestedFollows
+          title="Who to follow"
+          note="Start with official BaratX accounts — then Explore for more."
+          dismissible
+        />
+      </div>
 
       <div className="feed-tabs">
         <button

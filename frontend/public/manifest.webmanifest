@@ -3,11 +3,32 @@
   "short_name": "BaratX",
   "description": "India's public square — short posts, real conversation.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#faf8f5",
   "theme_color": "#FF671F",
   "lang": "en",
+  "categories": ["social", "news"],
   "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/favicon.svg",
       "sizes": "any",

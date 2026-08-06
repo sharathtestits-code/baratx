@@ -1,28 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Avatar from "./Avatar";
 import { IconSearch } from "./Icons";
-
-const SUGGESTED_PEOPLE = [
-  {
-    display_name: "BaratX",
-    username: "baratx",
-    blurb: "Official — product updates & India conversation prompts",
-    official: true,
-  },
-  {
-    display_name: "Bharat Voices",
-    username: "bharatvoices",
-    blurb: "Official BaratX — culture, ideas, everyday India",
-    official: true,
-  },
-  {
-    display_name: "India Tech Daily",
-    username: "indiatech",
-    blurb: "Official BaratX — startups, policy & builders",
-    official: true,
-  },
-];
+import SuggestedFollows from "./SuggestedFollows";
 
 const TRENDING_TOPICS = [
   { label: "BaratX", query: "BaratX", meta: "On BaratX" },
@@ -68,30 +47,12 @@ export default function RightRail() {
           ) : null}
         </form>
 
-        <section className="rail-card">
-          <h2 className="rail-card-title">Official BaratX</h2>
-          <p className="rail-card-note">Seed accounts run by BaratX — not organic third parties.</p>
-          <ul className="rail-people">
-            {SUGGESTED_PEOPLE.map((person) => (
-              <li key={person.username}>
-                <Link to={`/u/${encodeURIComponent(person.username)}`} className="rail-person">
-                  <Avatar name={person.display_name} username={person.username} size={40} />
-                  <div className="rail-person-info">
-                    <div className="rail-person-name">
-                      {person.display_name}
-                      {person.official && <span className="rail-official-badge">Official</span>}
-                    </div>
-                    <div className="rail-person-username">@{person.username}</div>
-                    <div className="rail-person-blurb">{person.blurb}</div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <Link to="/search" className="rail-card-more">
-            Explore people
-          </Link>
-        </section>
+        <div className="rail-card rail-card-suggested">
+          <SuggestedFollows
+            title="Official BaratX"
+            note="Seed accounts run by BaratX — not organic third parties."
+          />
+        </div>
 
         <section className="rail-card">
           <h2 className="rail-card-title">Trending topics</h2>

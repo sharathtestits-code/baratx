@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
-
-const USERNAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]{2,19}$/;
+import { normalizeUsernameInput, validateUsername } from "../username";
 
 export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   const { token, updateUser } = useAuth();
@@ -34,15 +33,10 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!token || busy) return;
-    const nextUsername = username.trim().replace(/^@/, "").toLowerCase();
-    if (
-      !USERNAME_RE.test(nextUsername) ||
-      nextUsername.includes("..") ||
-      nextUsername.includes("--") ||
-      nextUsername.endsWith(".") ||
-      nextUsername.endsWith("-")
-    ) {
-      setError("Username must be 3–20 chars: letters, numbers, underscore, period, or hyphen");
+    const nextUsername = normalizeUsernameInput(username);
+    const userErr = validateUsername(nextUsername);
+    if (userErr) {
+      setError(userErr);
       return;
     }
     setBusy(true);
