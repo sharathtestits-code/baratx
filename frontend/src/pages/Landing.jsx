@@ -3,19 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { LogoMark } from "../components/Logo";
 import { IconPhone } from "../components/Icons";
 import GoogleSignInButton from "../components/GoogleSignInButton";
-import { ARENA_TOPICS } from "../arenas";
 
 /**
- * Public GTM landing — brand-first, arena acquisition, phone-first CTA.
+ * Public GTM landing — brand-first, phone-first CTA.
  */
 export default function Landing() {
   const navigate = useNavigate();
   const [emailOrUser, setEmailOrUser] = useState("");
 
-  function goSignup(arenaKey) {
-    const params = new URLSearchParams({ method: "phone" });
-    if (arenaKey) params.set("arena", arenaKey);
-    navigate(`/signup?${params.toString()}`);
+  function goSignup() {
+    navigate("/signup?method=phone");
   }
 
   function handleNext(e) {
@@ -47,26 +44,11 @@ export default function Landing() {
           <p className="x-landing-brand-line">BaratX</p>
           <h1 className="x-landing-headline">Pick a fight. Not a feed.</h1>
           <p className="x-landing-support">
-            India&apos;s public square for Sports, Politics, Entertainment, and News — choose a side
-            and debate.
+            India&apos;s public square — short posts, real conversation. Join and start talking.
           </p>
 
-          <div className="landing-arena-pick" aria-label="Pick an arena">
-            {ARENA_TOPICS.map((a) => (
-              <button
-                key={a.key}
-                type="button"
-                className="landing-arena-chip"
-                style={{ "--arena-accent": a.accent }}
-                onClick={() => goSignup(a.key)}
-              >
-                {a.name}
-              </button>
-            ))}
-          </div>
-
           <div className="x-auth-stack">
-            <button type="button" className="x-btn x-btn-phone" onClick={() => goSignup()}>
+            <button type="button" className="x-btn x-btn-phone" onClick={goSignup}>
               <IconPhone className="x-btn-icon" />
               Continue with phone
             </button>
