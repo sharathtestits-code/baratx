@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 
-MENTION_RE = re.compile(r"(?<![A-Za-z0-9_])@([A-Za-z0-9_]{3,20})\b")
+MENTION_RE = re.compile(r"(?<![A-Za-z0-9_])@([A-Za-z0-9][A-Za-z0-9._-]{2,19})\b")
 HASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])#([A-Za-z0-9_]{2,40})\b")
 
 

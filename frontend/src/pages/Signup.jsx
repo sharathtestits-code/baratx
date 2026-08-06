@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import PhoneField from "../components/PhoneField";
 
 export default function Signup() {
   const [params] = useSearchParams();
@@ -10,17 +11,15 @@ export default function Signup() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  // shared fields
   const [username, setUsername] = useState(params.get("username") || "");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // email fields
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
 
-  // phone fields
+  const [region, setRegion] = useState("IN");
   const [phone, setPhone] = useState("+91");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -38,7 +37,6 @@ export default function Signup() {
         display_name: displayName,
       });
       if (res.dev_verify_url) {
-        // Local/dev without SMTP — keep link available after redirect via sessionStorage
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
       }
       login(res.access_token);
@@ -56,7 +54,7 @@ export default function Signup() {
     setError("");
     setBusy(true);
     try {
-      const res = await api.signupPhoneRequestOtp(phone);
+      const res = await api.signupPhoneRequestOtp(phone, region);
       setOtpSent(true);
       setDevOtp(res.dev_otp || "");
     } catch (err) {
@@ -76,6 +74,7 @@ export default function Signup() {
         otp,
         username,
         display_name: displayName,
+        region,
       });
       login(access_token);
       sessionStorage.setItem("bx_welcome", "1");
@@ -86,6 +85,10 @@ export default function Signup() {
       setBusy(false);
     }
   }
+
+  const usernameHint = (
+    <span className="hint">3–20 chars. Letters, numbers, _ . - (e.g. rahul_99 or john.doe)</span>
+  );
 
   return (
     <div className="auth-card auth-card-x">
@@ -130,8 +133,15 @@ export default function Signup() {
           </label>
           <label>
             Username
-            <input value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+              placeholder="rahul_99"
+              autoComplete="username"
+              required
+            />
           </label>
+          {usernameHint}
           <label>
             Email
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -158,12 +168,21 @@ export default function Signup() {
           </label>
           <label>
             Username
-            <input value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value.replace(/\s/g, ""))}
+              placeholder="rahul_99"
+              autoComplete="username"
+              required
+            />
           </label>
-          <label>
-            Phone number
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+919876543210" required />
-          </label>
+          {usernameHint}
+          <PhoneField
+            region={region}
+            phone={phone}
+            onRegionChange={setRegion}
+            onPhoneChange={setPhone}
+          />
           <button type="submit" disabled={busy}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>
@@ -171,7 +190,12 @@ export default function Signup() {
       ) : (
         <form onSubmit={handleVerifyOtp}>
           <p className="hint">
-            OTP sent to {phone}. {devOtp && <>(Demo mode — no SMS provider wired up yet, your code is <b>{devOtp}</b>)</>}
+            OTP sent to {phone}.{" "}
+            {devOtp && (
+              <>
+                (Demo mode — no SMS provider wired up yet, your code is <b>{devOtp}</b>)
+              </>
+            )}
           </p>
           <label>
             Enter OTP

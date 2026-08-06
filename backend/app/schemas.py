@@ -2,10 +2,24 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
-USERNAME_RE = re.compile(r"^[a-zA-Z0-9_]{3,20}$")
-PHONE_RE = re.compile(r"^\+?[1-9]\d{9,14}$")  # loose E.164-ish check
+from app.phoneutil import normalize_phone
+
+# Letters/numbers first; allow . _ - (Instagram/Twitter-style handles)
+USERNAME_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]{2,19}$")
+
+
+def normalize_username(v: str) -> str:
+    v = (v or "").strip().lstrip("@")
+    if not USERNAME_RE.match(v):
+        raise ValueError(
+            "Username must be 3–20 characters: start with a letter or number; "
+            "letters, numbers, underscore, period, or hyphen only"
+        )
+    if ".." in v or "--" in v or v.endswith(".") or v.endswith("-"):
+        raise ValueError("Username can’t end with . or - or contain .. / --")
+    return v.lower()
 
 
 class EmailSignupRequest(BaseModel):
@@ -17,9 +31,7 @@ class EmailSignupRequest(BaseModel):
     @field_validator("username")
     @classmethod
     def valid_username(cls, v):
-        if not USERNAME_RE.match(v):
-            raise ValueError("Username must be 3-20 chars: letters, numbers, underscore only")
-        return v
+        return normalize_username(v)
 
     @field_validator("password")
     @classmethod
@@ -45,13 +57,13 @@ class EmailLoginRequest(BaseModel):
 
 class PhoneOtpRequest(BaseModel):
     phone: str
+    # Optional UI hint: "IN" | "US" when number is entered without +country
+    region: Optional[str] = None
 
-    @field_validator("phone")
-    @classmethod
-    def valid_phone(cls, v):
-        if not PHONE_RE.match(v):
-            raise ValueError("Enter a valid phone number with country code, e.g. +919876543210")
-        return v
+    @model_validator(mode="after")
+    def normalize(self):
+        self.phone = normalize_phone(self.phone, default_region=self.region)
+        return self
 
 
 class PhoneSignupVerify(BaseModel):
@@ -59,18 +71,28 @@ class PhoneSignupVerify(BaseModel):
     otp: str
     username: str
     display_name: str
+    region: Optional[str] = None
 
     @field_validator("username")
     @classmethod
     def valid_username(cls, v):
-        if not USERNAME_RE.match(v):
-            raise ValueError("Username must be 3-20 chars: letters, numbers, underscore only")
-        return v
+        return normalize_username(v)
+
+    @model_validator(mode="after")
+    def normalize(self):
+        self.phone = normalize_phone(self.phone, default_region=self.region)
+        return self
 
 
 class PhoneLoginVerify(BaseModel):
     phone: str
     otp: str
+    region: Optional[str] = None
+
+    @model_validator(mode="after")
+    def normalize(self):
+        self.phone = normalize_phone(self.phone, default_region=self.region)
+        return self
 
 
 class TokenResponse(BaseModel):
@@ -135,10 +157,7 @@ class UserUpdate(BaseModel):
     def valid_username(cls, v):
         if v is None:
             return v
-        v = v.strip().lstrip("@")
-        if not USERNAME_RE.match(v):
-            raise ValueError("Username must be 3-20 chars: letters, numbers, underscore only")
-        return v.lower()
+        return normalize_username(v)
 
     @field_validator("bio")
     @classmethod

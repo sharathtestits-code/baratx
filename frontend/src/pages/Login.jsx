@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import PhoneField from "../components/PhoneField";
 
 export default function Login() {
   const [params] = useSearchParams();
@@ -18,6 +19,7 @@ export default function Login() {
   const [email, setEmail] = useState(initialId);
   const [password, setPassword] = useState("");
 
+  const [region, setRegion] = useState("IN");
   const [phone, setPhone] = useState("+91");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -43,7 +45,7 @@ export default function Login() {
     setError("");
     setBusy(true);
     try {
-      const res = await api.loginPhoneRequestOtp(phone);
+      const res = await api.loginPhoneRequestOtp(phone, region);
       setOtpSent(true);
       setDevOtp(res.dev_otp || "");
     } catch (err) {
@@ -58,7 +60,7 @@ export default function Login() {
     setError("");
     setBusy(true);
     try {
-      const { access_token } = await api.loginPhoneVerify({ phone, otp });
+      const { access_token } = await api.loginPhoneVerify({ phone, otp, region });
       login(access_token);
       navigate("/feed");
     } catch (err) {
@@ -134,10 +136,12 @@ export default function Login() {
         </form>
       ) : !otpSent ? (
         <form onSubmit={handleRequestOtp}>
-          <label>
-            Phone number
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+919876543210" required />
-          </label>
+          <PhoneField
+            region={region}
+            phone={phone}
+            onRegionChange={setRegion}
+            onPhoneChange={setPhone}
+          />
           <button type="submit" disabled={busy}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>

@@ -76,13 +76,19 @@ export const api = {
   resetPassword: (body) =>
     request("/auth/reset-password", { method: "POST", body: JSON.stringify(body) }),
 
-  signupPhoneRequestOtp: (phone) =>
-    request("/auth/signup/phone/request-otp", { method: "POST", body: JSON.stringify({ phone }) }),
+  signupPhoneRequestOtp: (phone, region) =>
+    request("/auth/signup/phone/request-otp", {
+      method: "POST",
+      body: JSON.stringify({ phone, region: region || undefined }),
+    }),
   signupPhoneVerify: (body) =>
     request("/auth/signup/phone/verify", { method: "POST", body: JSON.stringify(body) }),
 
-  loginPhoneRequestOtp: (phone) =>
-    request("/auth/login/phone/request-otp", { method: "POST", body: JSON.stringify({ phone }) }),
+  loginPhoneRequestOtp: (phone, region) =>
+    request("/auth/login/phone/request-otp", {
+      method: "POST",
+      body: JSON.stringify({ phone, region: region || undefined }),
+    }),
   loginPhoneVerify: (body) =>
     request("/auth/login/phone/verify", { method: "POST", body: JSON.stringify(body) }),
 

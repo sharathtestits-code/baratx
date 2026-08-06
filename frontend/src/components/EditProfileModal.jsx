@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 
-const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/;
+const USERNAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]{2,19}$/;
 
 export default function EditProfileModal({ open, profile, onClose, onSaved }) {
   const { token, updateUser } = useAuth();
@@ -35,8 +35,14 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
     e.preventDefault();
     if (!token || busy) return;
     const nextUsername = username.trim().replace(/^@/, "").toLowerCase();
-    if (!USERNAME_RE.test(nextUsername)) {
-      setError("Username must be 3–20 characters: letters, numbers, underscore only");
+    if (
+      !USERNAME_RE.test(nextUsername) ||
+      nextUsername.includes("..") ||
+      nextUsername.includes("--") ||
+      nextUsername.endsWith(".") ||
+      nextUsername.endsWith("-")
+    ) {
+      setError("Username must be 3–20 chars: letters, numbers, underscore, period, or hyphen");
       return;
     }
     setBusy(true);
@@ -102,7 +108,7 @@ export default function EditProfileModal({ open, profile, onClose, onSaved }) {
             </div>
           </label>
           <p className="hint modal-hint">
-            3–20 characters. Letters, numbers, underscore. Your profile URL changes with this.
+            3–20 characters. Letters, numbers, _ . - allowed. Your profile URL changes with this.
           </p>
 
           <label>

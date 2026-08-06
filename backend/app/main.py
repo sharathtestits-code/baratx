@@ -192,6 +192,14 @@ def issue_otp(db: Session, phone: str, purpose: str) -> dict:
     sms_sent = sms.send_otp_sms(phone, code)
     if not sms_sent:
         print(f"[otp] {purpose} for {phone}: {code} (SMS not sent)")
+        # MSG91 configured but send failed — don't silently fall back to leaking OTP in prod UI
+        if ENVIRONMENT == "production" and sms.sms_configured():
+            raise HTTPException(
+                status_code=502,
+                detail="Could not send SMS OTP. Check the number and try again, or use Google/email.",
+            )
+        if ENVIRONMENT == "production" and not sms.sms_configured():
+            print("[otp] WARNING: MSG91 not configured — returning demo OTP in response")
     return _otp_response(code, sms_sent=sms_sent)
 
 

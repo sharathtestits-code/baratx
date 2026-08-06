@@ -831,6 +831,33 @@ button {
   box-shadow: 0 1px 3px rgba(15, 20, 25, 0.12);
 }
 
+.phone-field-label {
+  display: block;
+}
+
+.phone-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.phone-region {
+  flex: 0 0 auto;
+  max-width: 9.5rem;
+  padding: 0.65rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.phone-number {
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-hint {
+  display: block;
+  margin: 0.35rem 0 0;
+}
+
 form {
   display: flex;
   flex-direction: column;
