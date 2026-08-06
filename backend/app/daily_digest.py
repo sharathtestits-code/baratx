@@ -494,7 +494,11 @@ def _seconds_until_next_run(hour: int = 9, minute: int = 5) -> float:
 
 
 def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
-    """Fire once near 09:05 IST every day inside the API process."""
+    """Fire once near 09:05 IST every day inside the API process.
+
+    Also catch up shortly after boot if today's digest has not run yet
+    (so a deploy / restart can start posts without waiting for morning).
+    """
     global _scheduler_started
     with _scheduler_lock:
         if _scheduler_started:
@@ -504,36 +508,44 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
             return
         _scheduler_started = True
 
-    def loop():
+    def _run_once(*, label: str) -> None:
         from app.database import SessionLocal
 
+        db = SessionLocal()
+        try:
+            result = run_daily_digest(
+                db,
+                force=False,
+                attach_hashtags=attach_hashtags,
+                notify_mentions=notify_mentions,
+            )
+            logger.info("Daily digest %s result: %s", label, result)
+        except Exception:  # noqa: BLE001
+            logger.exception("Daily digest %s failed", label)
+            try:
+                db.rollback()
+            except Exception:  # noqa: BLE001
+                pass
+        finally:
+            db.close()
+
+    def boot_catchup():
+        # Let migrations/seed settle, then fill today's slots if empty.
+        time.sleep(45)
+        _run_once(label="boot-catchup")
+
+    def loop():
         while True:
             wait = _seconds_until_next_run()
             logger.info("Daily digest sleeping %.0fs until next IST run", wait)
             time.sleep(wait)
-            db = SessionLocal()
-            try:
-                result = run_daily_digest(
-                    db,
-                    force=False,
-                    attach_hashtags=attach_hashtags,
-                    notify_mentions=notify_mentions,
-                )
-                logger.info("Daily digest result: %s", result)
-            except Exception:  # noqa: BLE001
-                logger.exception("Daily digest run failed")
-                try:
-                    db.rollback()
-                except Exception:  # noqa: BLE001
-                    pass
-            finally:
-                db.close()
+            _run_once(label="scheduled")
             time.sleep(60)  # avoid double-fire in the same minute
 
-    t = threading.Thread(target=loop, name="baratx-daily-digest", daemon=True)
-    t.start()
+    threading.Thread(target=boot_catchup, name="baratx-daily-digest-boot", daemon=True).start()
+    threading.Thread(target=loop, name="baratx-daily-digest", daemon=True).start()
     logger.info(
-        "Daily digest scheduler started (authors=%s, target=%s-%s/day, max/arena=%s, IST ~09:05)",
+        "Daily digest scheduler started (authors=%s, target=%s-%s/day, max/arena=%s, IST ~09:05 + boot catch-up)",
         ",".join(DIGEST_AUTHORS),
         MIN_POSTS_IF_QUALITY,
         MAX_POSTS_PER_DAY,
