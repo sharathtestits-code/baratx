@@ -5,9 +5,10 @@ import { adminApi } from "../api";
 const SECRET_KEY = "baratx_admin_secret";
 
 const OFFICIAL_OPTIONS = [
-  { value: "baratx", label: "@baratx — BaratX" },
-  { value: "bharatvoices", label: "@bharatvoices — Bharat Voices" },
-  { value: "indiatech", label: "@indiatech — India Tech Daily" },
+  { value: "baratx", label: "@baratx — BaratX (blue)" },
+  { value: "sharath", label: "@sharath — Sharath (blue)" },
+  { value: "bharatvoices", label: "@bharatvoices — Bharat Voices (gold)" },
+  { value: "indiatech", label: "@indiatech — India Tech Daily (gold)" },
 ];
 
 const WELCOME_PROMPTS = [
@@ -65,6 +66,7 @@ export default function Admin() {
   const [replyAs, setReplyAs] = useState("baratx");
   const [replyDrafts, setReplyDrafts] = useState({});
   const [replyingId, setReplyingId] = useState(null);
+  const [deletingId, setDeletingId] = useState("");
 
   const load = useCallback(
     async (adminSecret) => {
@@ -179,6 +181,56 @@ export default function Admin() {
 
   function usePrompt(postId, prompt) {
     setReplyDrafts((prev) => ({ ...prev, [postId]: prompt }));
+  }
+
+  async function handleDeleteUser(u) {
+    if (!secret) return;
+    if (u.username === "baratx" || u.username === "sharath") {
+      setError("Protected blue founders cannot be deleted");
+      return;
+    }
+    if (
+      !window.confirm(
+        `Delete @${u.username}? This removes their account and posts if they are misleading.`
+      )
+    ) {
+      return;
+    }
+    setDeletingId(`user:${u.id}`);
+    setError("");
+    setMsg("");
+    try {
+      const res = await adminApi.deleteUser(secret, u.id);
+      setMsg(res.message || `Deleted @${u.username}`);
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not delete user");
+    } finally {
+      setDeletingId("");
+    }
+  }
+
+  async function handleDeletePost(post) {
+    if (!secret) return;
+    if (
+      !window.confirm(
+        `Delete this post by @${post.author?.username}? Use this for misleading content.`
+      )
+    ) {
+      return;
+    }
+    setDeletingId(`post:${post.id}`);
+    setError("");
+    setMsg("");
+    try {
+      const res = await adminApi.deletePost(secret, post.id);
+      setMsg(res.message || "Post deleted");
+      load(secret);
+    } catch (err) {
+      setError(err.message || "Could not delete post");
+    } finally {
+      setDeletingId("");
+    }
   }
 
   if (!secret) {
@@ -326,7 +378,13 @@ export default function Admin() {
               <li key={post.id} className="admin-post-card">
                 <div className="admin-post-meta">
                   <Link
-                    className="admin-user-link"
+                    className={`admin-user-link${
+                      post.author?.badge === "blue" || post.author?.is_official
+                        ? " admin-user-blue"
+                        : post.author?.badge === "gold"
+                          ? " admin-user-gold"
+                          : " admin-user-reg"
+                    }`}
                     to={`/u/${encodeURIComponent(post.author?.username || "")}`}
                   >
                     @{post.author?.username}
@@ -336,6 +394,14 @@ export default function Admin() {
                   <Link className="admin-post-open" to={`/posts/${post.id}`}>
                     Open
                   </Link>
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-danger admin-btn-tiny"
+                    disabled={deletingId === `post:${post.id}`}
+                    onClick={() => handleDeletePost(post)}
+                  >
+                    {deletingId === `post:${post.id}` ? "Deleting…" : "Delete post"}
+                  </button>
                 </div>
                 <p className="admin-post-text">{post.text}</p>
                 <p className="admin-post-stats">
@@ -413,35 +479,76 @@ export default function Admin() {
               <th>Joined</th>
               <th>Username</th>
               <th>Name</th>
+              <th>Badge</th>
               <th>Email</th>
               <th>Phone</th>
               <th>Method</th>
               <th>Verified</th>
+              <th>Moderation</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 && !busy && (
               <tr>
-                <td colSpan={7} className="admin-empty">
+                <td colSpan={9} className="admin-empty">
                   No registrations yet.
                 </td>
               </tr>
             )}
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td>{formatWhen(u.created_at)}</td>
-                <td>
-                  <Link className="admin-user-link" to={`/u/${encodeURIComponent(u.username)}`}>
-                    @{u.username}
-                  </Link>
-                </td>
-                <td>{u.display_name}</td>
-                <td>{u.email || "—"}</td>
-                <td>{u.phone || "—"}</td>
-                <td>{u.signup_method}</td>
-                <td>{verifiedLabel(u)}</td>
-              </tr>
-            ))}
+            {users.map((u) => {
+              const badge = u.badge || (u.is_official ? "blue" : "none");
+              const protectedBlue = u.username === "baratx" || u.username === "sharath";
+              return (
+                <tr
+                  key={u.id}
+                  className={
+                    badge === "blue"
+                      ? "admin-row-blue"
+                      : badge === "gold"
+                        ? "admin-row-gold"
+                        : "admin-row-reg"
+                  }
+                >
+                  <td>{formatWhen(u.created_at)}</td>
+                  <td>
+                    <Link
+                      className={`admin-user-link${
+                        badge === "blue"
+                          ? " admin-user-blue"
+                          : badge === "gold"
+                            ? " admin-user-gold"
+                            : " admin-user-reg"
+                      }`}
+                      to={`/u/${encodeURIComponent(u.username)}`}
+                    >
+                      @{u.username}
+                    </Link>
+                  </td>
+                  <td>{u.display_name}</td>
+                  <td>
+                    <span className={`admin-badge-pill admin-badge-${badge}`}>{badge}</span>
+                  </td>
+                  <td>{u.email || "—"}</td>
+                  <td>{u.phone || "—"}</td>
+                  <td>{u.signup_method}</td>
+                  <td>{verifiedLabel(u)}</td>
+                  <td>
+                    {protectedBlue ? (
+                      <span className="admin-protected">Protected</span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-danger admin-btn-tiny"
+                        disabled={deletingId === `user:${u.id}`}
+                        onClick={() => handleDeleteUser(u)}
+                      >
+                        {deletingId === `user:${u.id}` ? "Deleting…" : "Delete"}
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

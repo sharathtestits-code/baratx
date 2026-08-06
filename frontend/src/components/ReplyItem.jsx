@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
+import OfficialBadge from "./OfficialBadge";
 import { IconHeart } from "./Icons";
 
 export default function ReplyItem({ reply, onReplyTo }) {
@@ -41,6 +42,7 @@ export default function ReplyItem({ reply, onReplyTo }) {
           <Link to={`/u/${reply.author.username}`} className="reply-author">
             {reply.author.display_name}
           </Link>
+          <OfficialBadge user={reply.author} />
           <Link to={`/u/${reply.author.username}`} className="reply-username">
             @{reply.author.username}
           </Link>

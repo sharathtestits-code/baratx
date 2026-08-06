@@ -4710,3 +4710,115 @@ button.admin-btn-ghost:hover:not(:disabled),
 .surface-compose {
   padding: 0.75rem 1.25rem;
 }
+
+/* Official blue / gold badges */
+.official-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.2rem;
+  vertical-align: middle;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.official-badge svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.official-badge-blue {
+  color: #1d9bf0;
+}
+
+.official-badge-gold {
+  color: #ca8a04;
+}
+
+.profile-name .official-badge {
+  margin-left: 0.35rem;
+  font-size: 1.05rem;
+}
+
+.post-head .official-badge,
+.reply-head .official-badge,
+.suggested-follows-name .official-badge {
+  font-size: 0.95rem;
+}
+
+.badge-grant-btn.gold {
+  border-color: #ca8a04;
+  color: #a16207;
+}
+
+.badge-grant-btn.blue {
+  border-color: #1d9bf0;
+  color: #0284c7;
+}
+
+/* Admin badge / moderation */
+.admin-user-blue {
+  color: #1d9bf0 !important;
+}
+
+.admin-user-gold {
+  color: #ca8a04 !important;
+}
+
+.admin-user-reg {
+  color: #000080 !important;
+}
+
+.admin-badge-pill {
+  display: inline-block;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-badge-blue {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.admin-badge-gold {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.admin-badge-none {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.admin-row-blue td {
+  background: #f0f9ff;
+}
+
+.admin-row-gold td {
+  background: #fffbeb;
+}
+
+.admin-btn-danger {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.admin-btn-danger:hover:not(:disabled) {
+  background: #ffe4e6;
+}
+
+.admin-btn-tiny {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+}
+
+.admin-protected {
+  color: #0369a1;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
