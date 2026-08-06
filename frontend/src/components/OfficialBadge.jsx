@@ -1,14 +1,19 @@
-/** Blue / gold account identity — colored names, no generic checkmark. */
+/** Blue / gold account identity — colored names only. New users stay default (no tint). */
 
 export function badgeOf(userOrAuthor) {
   if (!userOrAuthor) return "none";
-  const b = (userOrAuthor.badge || "").toLowerCase();
-  if (b === "blue" || b === "gold") return b;
-  if (userOrAuthor.is_official) return "blue";
+  const b = (userOrAuthor.badge || "").toLowerCase().trim();
+  if (b === "blue") return "blue";
+  if (b === "gold") return "gold";
+  // Legacy: is_official alone only counts when badge is missing/none and explicitly official.
+  if (!b || b === "none") {
+    if (userOrAuthor.is_official) return "blue";
+    return "none";
+  }
   return "none";
 }
 
-/** CSS class for a display name (and optional @handle). */
+/** CSS class for a display name (and optional @handle). Empty tier = normal theme color. */
 export function badgeNameClass(userOrAuthor, base = "") {
   const badge = badgeOf(userOrAuthor);
   const tier =
