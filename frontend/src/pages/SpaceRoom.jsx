@@ -4,6 +4,7 @@ import { spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
+import MentionTextarea from "../components/MentionTextarea";
 
 export default function SpaceRoom() {
   const { spaceId } = useParams();
@@ -197,17 +198,17 @@ export default function SpaceRoom() {
           <div className="compose-row">
             <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={40} />
             <div className="compose-body">
-              <textarea
+              <MentionTextarea
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={setText}
                 placeholder={
                   isDebate
                     ? space.my_side
                       ? `Argue for ${
                           space.my_side === "for" ? space.side_for_label : space.side_against_label
-                        }…`
+                        }… type @ to tag`
                       : "Pick a side above, then post"
-                    : "Say something in this Space"
+                    : "Say something in this Space — type @ to tag"
                 }
                 maxLength={280}
                 rows={3}

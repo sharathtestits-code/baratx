@@ -4,6 +4,7 @@ import { communitiesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
+import MentionTextarea from "../components/MentionTextarea";
 
 export default function CommunityDetail() {
   const { slug } = useParams();
@@ -120,10 +121,10 @@ export default function CommunityDetail() {
               size={40}
             />
             <div className="compose-body">
-              <textarea
-                placeholder={`Share with ${community.name}…`}
+              <MentionTextarea
+                placeholder={`Share with ${community.name}… type @ to tag`}
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={setText}
                 maxLength={280}
                 rows={3}
               />

@@ -258,6 +258,16 @@ class ReplyCreate(BaseModel):
     text: str
     parent_reply_id: Optional[str] = None
 
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = (v or "").strip()
+        if not v:
+            raise ValueError("Reply cannot be empty")
+        if len(v) > 220:
+            raise ValueError("Reply must be 220 characters or fewer")
+        return v
+
 
 class ReplyOut(BaseModel):
     id: str
@@ -458,8 +468,8 @@ class AdminReplyCreate(BaseModel):
         v = (v or "").strip()
         if not v:
             raise ValueError("Reply cannot be empty")
-        if len(v) > 500:
-            raise ValueError("Reply must be 500 characters or fewer")
+        if len(v) > 220:
+            raise ValueError("Reply must be 220 characters or fewer")
         return v
 
     @field_validator("username")

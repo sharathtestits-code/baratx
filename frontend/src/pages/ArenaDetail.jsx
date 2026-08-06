@@ -4,6 +4,7 @@ import { arenasApi, communitiesApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { arenaMeta } from "../arenas";
 import PostCard from "../components/PostCard";
+import MentionTextarea from "../components/MentionTextarea";
 
 export default function ArenaDetail() {
   const { arenaKey } = useParams();
@@ -183,10 +184,10 @@ export default function ArenaDetail() {
       <section className="arena-section">
         <h2 className="section-title">Arena talk</h2>
         <form className="compose surface-compose" onSubmit={submitPost}>
-          <textarea
+          <MentionTextarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder={`What’s your take on ${arena.name}?`}
+            onChange={setText}
+            placeholder={`What’s your take on ${arena.name}? Type @ to tag`}
             maxLength={280}
             rows={3}
           />

@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
 import { badgeNameClass } from "./OfficialBadge";
 import { IconBookmark, IconHeart, IconQuote, IconReply, IconRepost, IconTrash } from "./Icons";
+import { linkifyText } from "./linkifyText";
 
 function timeAgo(dateStr) {
   const date = new Date(dateStr);
@@ -18,29 +19,6 @@ function timeAgo(dateStr) {
   const day = Math.floor(hr / 24);
   if (day < 7) return `${day}d`;
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
-
-function linkifyText(text) {
-  const parts = text.split(/([@#][A-Za-z0-9_]{2,40})/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("@") && part.length > 3) {
-      const u = part.slice(1);
-      return (
-        <Link key={i} to={`/u/${u}`} className="text-link" onClick={(e) => e.stopPropagation()}>
-          {part}
-        </Link>
-      );
-    }
-    if (part.startsWith("#") && part.length > 2) {
-      const tag = part.slice(1);
-      return (
-        <Link key={i} to={`/hashtag/${tag}`} className="text-link" onClick={(e) => e.stopPropagation()}>
-          {part}
-        </Link>
-      );
-    }
-    return <span key={i}>{part}</span>;
-  });
 }
 
 export default function PostCard({ post, repostedBy = null, onDeleted = () => {}, detailMode = false }) {

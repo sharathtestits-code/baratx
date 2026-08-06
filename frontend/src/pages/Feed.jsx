@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import WelcomePanel from "../components/WelcomePanel";
 import SuggestedFollows from "../components/SuggestedFollows";
+import MentionTextarea from "../components/MentionTextarea";
 import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
@@ -165,7 +166,15 @@ export default function Feed() {
       }
       try {
         const post = await postsApi.get(quotePostId, token);
-        if (!cancelled) setQuotePreview(post);
+        if (cancelled) return;
+        setQuotePreview(post);
+        // Prefill @tag so quote/repost can notify the original author.
+        setText((prev) => {
+          const tag = `@${post.author.username} `;
+          if (!prev.trim()) return tag;
+          if (prev.includes(`@${post.author.username}`)) return prev;
+          return `${tag}${prev}`.slice(0, MAX_LEN);
+        });
       } catch {
         if (!cancelled) setQuotePreview(null);
       }
@@ -277,11 +286,17 @@ export default function Feed() {
         <div className="compose-row">
           <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
           <div className="compose-body">
-            <textarea
+            <MentionTextarea
               ref={composeRef}
-              placeholder={showWelcome ? "Say hello with your city…" : "What is happening?"}
+              placeholder={
+                quotePreview
+                  ? "Add a comment and tag people with @…"
+                  : showWelcome
+                    ? "Say hello with your city…"
+                    : "What is happening? Type @ to tag someone"
+              }
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={setText}
               maxLength={MAX_LEN}
               rows={3}
             />
