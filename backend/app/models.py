@@ -356,6 +356,8 @@ class Space(Base):
     status = Column(String, default="open", nullable=False, index=True)  # open | closed
     kind = Column(String, default="room", nullable=False, index=True)  # room | debate
     community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
+    topic_id = Column(String, ForeignKey("topics.id"), nullable=True, index=True)
+    source_url = Column(String, nullable=True, index=True)  # RSS / news link for prompts
     side_for_label = Column(String, default="For", nullable=False)
     side_against_label = Column(String, default="Against", nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
@@ -363,6 +365,7 @@ class Space(Base):
 
     host = relationship("User", foreign_keys=[host_id])
     community = relationship("Community", back_populates="debates", foreign_keys=[community_id])
+    topic = relationship("Topic", back_populates="debates", foreign_keys=[topic_id])
     posts = relationship("Post", back_populates="space", foreign_keys="Post.space_id")
     stances = relationship("SpaceStance", back_populates="space", cascade="all, delete-orphan")
 
@@ -381,3 +384,36 @@ class SpaceStance(Base):
 
     space = relationship("Space", back_populates="stances")
     user = relationship("User", foreign_keys=[user_id])
+
+
+class Topic(Base):
+    """Subtopic under an arena (e.g. IPL under Sports)."""
+
+    __tablename__ = "topics"
+    __table_args__ = (UniqueConstraint("arena_key", "key", name="uq_topic_arena_key"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    arena_key = Column(String, nullable=False, index=True)
+    key = Column(String, nullable=False, index=True)
+    name = Column(String, nullable=False)
+    blurb = Column(String, default="", nullable=False)
+    rss_query = Column(String, default="", nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    interests = relationship("UserTopicInterest", back_populates="topic", cascade="all, delete-orphan")
+    debates = relationship("Space", back_populates="topic", foreign_keys="Space.topic_id")
+
+
+class UserTopicInterest(Base):
+    """Topics a user chose — drives personalized debate prompts."""
+
+    __tablename__ = "user_topic_interests"
+    __table_args__ = (UniqueConstraint("user_id", "topic_id", name="uq_user_topic"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    topic_id = Column(String, ForeignKey("topics.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User", foreign_keys=[user_id])
+    topic = relationship("Topic", back_populates="interests")

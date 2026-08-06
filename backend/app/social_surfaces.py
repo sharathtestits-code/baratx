@@ -611,6 +611,16 @@ def register_social_surfaces(
         if community is not None:
             arena_key = getattr(community, "arena_key", None)
             arena_name = community.name
+        topic_id = getattr(s, "topic_id", None)
+        topic_key = None
+        topic_name = None
+        if topic_id:
+            topic = getattr(s, "topic", None)
+            if topic is None:
+                topic = db.query(models.Topic).filter(models.Topic.id == topic_id).first()
+            if topic is not None:
+                topic_key = topic.key
+                topic_name = topic.name
         return schemas.SpaceOut(
             id=s.id,
             title=s.title,
@@ -624,6 +634,10 @@ def register_social_surfaces(
             community_id=getattr(s, "community_id", None),
             arena_key=arena_key,
             arena_name=arena_name,
+            topic_id=topic_id,
+            topic_key=topic_key,
+            topic_name=topic_name,
+            source_url=getattr(s, "source_url", None),
             side_for_label=getattr(s, "side_for_label", None) or "For",
             side_against_label=getattr(s, "side_against_label", None) or "Against",
             for_count=for_count,
@@ -659,9 +673,20 @@ def register_social_surfaces(
         status: str = "open",
         kind: Optional[str] = None,
         arena_key: Optional[str] = None,
+        topic_key: Optional[str] = None,
+        for_you: bool = False,
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
+        # Soft refresh unpaid prompts occasionally when debates are listed.
+        if kind == "debate" or for_you:
+            try:
+                from app import topic_ops
+
+                topic_ops.refresh_debate_prompts(db, force=False, per_topic=1, max_topics=8)
+            except Exception:  # noqa: BLE001
+                pass
+
         # Auto-close expired open spaces first.
         open_rows = (
             db.query(models.Space)
@@ -687,6 +712,24 @@ def register_social_surfaces(
                 q = q.filter(models.Space.community_id == arena.id)
             else:
                 return []
+        if topic_key:
+            topic = db.query(models.Topic).filter(models.Topic.key == topic_key).first()
+            if topic:
+                q = q.filter(models.Space.topic_id == topic.id)
+            else:
+                return []
+        if for_you and current_user:
+            interest_ids = [
+                r.topic_id
+                for r in db.query(models.UserTopicInterest)
+                .filter(models.UserTopicInterest.user_id == current_user.id)
+                .all()
+            ]
+            if interest_ids:
+                q = q.filter(models.Space.topic_id.in_(interest_ids))
+            else:
+                # No interests yet — fall back to all open debates
+                pass
         rows = q.order_by(models.Space.created_at.desc()).limit(50).all()
         return [_space_out(s, current_user, db) for s in rows]
 
@@ -819,5 +862,117 @@ def register_social_surfaces(
         db.commit()
         db.refresh(post)
         return serialize_post(post, current_user)
+
+    # ---------- Topics (Path C — unpaid interest feeds) ----------
+
+    def _topic_out(t: models.Topic, db: Session, current_user: Optional[models.User]) -> schemas.TopicOut:
+        is_following = False
+        if current_user:
+            is_following = (
+                db.query(models.UserTopicInterest)
+                .filter(
+                    models.UserTopicInterest.user_id == current_user.id,
+                    models.UserTopicInterest.topic_id == t.id,
+                )
+                .first()
+                is not None
+            )
+        open_debate_count = (
+            db.query(models.Space)
+            .filter(
+                models.Space.topic_id == t.id,
+                models.Space.kind == "debate",
+                models.Space.status == "open",
+            )
+            .count()
+        )
+        return schemas.TopicOut(
+            id=t.id,
+            arena_key=t.arena_key,
+            key=t.key,
+            name=t.name,
+            blurb=t.blurb or "",
+            is_following=is_following,
+            open_debate_count=open_debate_count,
+        )
+
+    @router.get("/topics", response_model=list[schemas.TopicOut])
+    def list_topics(
+        arena_key: Optional[str] = None,
+        db: Session = Depends(get_db),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
+    ):
+        q = db.query(models.Topic)
+        if arena_key:
+            q = q.filter(models.Topic.arena_key == arena_key)
+        rows = q.order_by(models.Topic.arena_key.asc(), models.Topic.name.asc()).all()
+        return [_topic_out(t, db, current_user) for t in rows]
+
+    @router.get("/topics/mine", response_model=list[schemas.TopicOut])
+    def my_topics(
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        rows = (
+            db.query(models.Topic)
+            .join(models.UserTopicInterest, models.UserTopicInterest.topic_id == models.Topic.id)
+            .filter(models.UserTopicInterest.user_id == current_user.id)
+            .order_by(models.Topic.arena_key.asc(), models.Topic.name.asc())
+            .all()
+        )
+        return [_topic_out(t, db, current_user) for t in rows]
+
+    @router.post("/topics/interests", response_model=list[schemas.TopicOut])
+    def set_topic_interests(
+        payload: schemas.TopicInterestUpdate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        ids = [i for i in (payload.topic_ids or []) if i]
+        # Cap at 20 picks for focus
+        ids = ids[:20]
+        valid = {
+            t.id: t
+            for t in db.query(models.Topic).filter(models.Topic.id.in_(ids)).all()
+        } if ids else {}
+        if payload.replace:
+            db.query(models.UserTopicInterest).filter(
+                models.UserTopicInterest.user_id == current_user.id
+            ).delete(synchronize_session=False)
+        existing = {
+            r.topic_id
+            for r in db.query(models.UserTopicInterest)
+            .filter(models.UserTopicInterest.user_id == current_user.id)
+            .all()
+        }
+        joined_arenas = {
+            r.community_id
+            for r in db.query(models.CommunityMember)
+            .filter(models.CommunityMember.user_id == current_user.id)
+            .all()
+        }
+        for tid in ids:
+            if tid not in valid or tid in existing:
+                continue
+            db.add(models.UserTopicInterest(user_id=current_user.id, topic_id=tid))
+            existing.add(tid)
+            # Also join parent arena community when picking a topic
+            arena = (
+                db.query(models.Community)
+                .filter(models.Community.arena_key == valid[tid].arena_key)
+                .first()
+            )
+            if arena and arena.id not in joined_arenas:
+                db.add(models.CommunityMember(community_id=arena.id, user_id=current_user.id))
+                joined_arenas.add(arena.id)
+        db.commit()
+        rows = (
+            db.query(models.Topic)
+            .join(models.UserTopicInterest, models.UserTopicInterest.topic_id == models.Topic.id)
+            .filter(models.UserTopicInterest.user_id == current_user.id)
+            .order_by(models.Topic.arena_key.asc(), models.Topic.name.asc())
+            .all()
+        )
+        return [_topic_out(t, db, current_user) for t in rows]
 
     app.include_router(router)

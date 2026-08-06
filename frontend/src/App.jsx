@@ -25,6 +25,7 @@ import Arenas from "./pages/Arenas";
 import ArenaDetail from "./pages/ArenaDetail";
 import Spaces from "./pages/Spaces";
 import SpaceRoom from "./pages/SpaceRoom";
+import OnboardingTopics from "./pages/OnboardingTopics";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
@@ -93,6 +94,7 @@ function AppShell() {
           <Route path="/arenas/:arenaKey" element={<ArenaDetail />} />
           <Route path="/spaces" element={<Spaces />} />
           <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
+          <Route path="/onboarding/topics" element={<OnboardingTopics />} />
           <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
       </main>

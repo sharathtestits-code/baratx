@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { api, postsApi, spacesApi } from "../api";
+import { api, postsApi, spacesApi, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
@@ -102,16 +102,41 @@ export default function Feed() {
   useEffect(() => {
     if (!token) return undefined;
     let cancelled = false;
+    // Prefer debates matched to the user's topic picks; fall back to all open debates.
     spacesApi
-      .listDebates(token)
+      .listForYou(token)
       .then((rows) => {
-        if (!cancelled) setLiveDebates(rows || []);
+        if (cancelled) return;
+        if (rows && rows.length > 0) {
+          setLiveDebates(rows);
+          return;
+        }
+        return spacesApi.listDebates(token);
+      })
+      .then((rows) => {
+        if (!cancelled && Array.isArray(rows)) setLiveDebates(rows);
       })
       .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [token]);
+
+  useEffect(() => {
+    if (!token || !user) return;
+    if (sessionStorage.getItem("bx_topics_done") === "1") return;
+    // Existing users without picks get nudged once to onboarding.
+    topicsApi
+      .mine(token)
+      .then((rows) => {
+        if (!rows || rows.length === 0) {
+          navigate("/onboarding/topics");
+        } else {
+          sessionStorage.setItem("bx_topics_done", "1");
+        }
+      })
+      .catch(() => {});
+  }, [token, user, navigate]);
 
   useEffect(() => {
     if (wantWelcome) {
@@ -324,16 +349,23 @@ export default function Feed() {
         </div>
         {liveDebates.length > 0 && (
           <ul className="debate-list debate-list-compact">
-            {liveDebates.slice(0, 3).map((d) => (
+            {liveDebates.slice(0, 5).map((d) => (
               <li key={d.id}>
                 <Link to={`/spaces/${d.id}`} className="debate-row">
-                  <span className="debate-arena-tag">{d.arena_name || "Debate"}</span>
+                  <span className="debate-arena-tag">
+                    {d.topic_name || d.arena_name || "Debate"}
+                  </span>
                   <span className="debate-title">{d.title}</span>
                 </Link>
               </li>
             ))}
           </ul>
         )}
+        <div className="arena-home-strip-foot">
+          <Link to="/onboarding/topics" className="rail-card-more">
+            Edit topics
+          </Link>
+        </div>
       </section>
 
       {showWelcome && (

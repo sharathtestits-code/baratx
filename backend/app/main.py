@@ -72,6 +72,10 @@ def run_migrations():
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
                     if "side_against_label" not in space_cols:
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+                    if "topic_id" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN topic_id VARCHAR"))
+                    if "source_url" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN source_url VARCHAR"))
             except Exception:
                 pass
 
@@ -145,6 +149,10 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
                 if "side_against_label" not in space_cols:
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+                if "topic_id" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN topic_id VARCHAR"))
+                if "source_url" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN source_url VARCHAR"))
 
             reply_cols = cols("replies")
             if reply_cols and "parent_reply_id" not in reply_cols:
@@ -184,6 +192,23 @@ with SessionLocal() as _seed_db:
         import logging
 
         logging.getLogger("baratx").exception("Arena seed failed")
+    try:
+        from app import topic_ops
+
+        topic_ops.seed_topics(_seed_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Topic seed failed")
+    try:
+        from app import topic_ops
+
+        # Best-effort unpaid RSS prompts on boot (non-blocking if network fails).
+        topic_ops.refresh_debate_prompts(_seed_db, force=False, per_topic=1, max_topics=12)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Prompt refresh on boot failed")
 
 
 app = FastAPI(title="BaratX API", version="0.5.0")
@@ -2181,6 +2206,18 @@ def mark_notifications_read(
     )
     db.commit()
     return schemas.UnreadCountOut(unread_count=0)
+
+
+@app.post("/admin/prompts/refresh")
+def admin_refresh_prompts(
+    force: bool = True,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Pull unpaid Google News RSS into debate prompts."""
+    from app import topic_ops
+
+    return topic_ops.refresh_debate_prompts(db, force=force, per_topic=2, max_topics=40)
 
 
 register_extra_routes(
