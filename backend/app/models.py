@@ -320,7 +320,7 @@ class Community(Base):
     slug = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, default="", nullable=False)
-    # Arena topic homes: sports | politics | entertainment | news
+    # Arena topic homes: sports | politics | entertainment | news | startups | spirituality
     is_arena = Column(Boolean, default=False, nullable=False, index=True)
     arena_key = Column(String, nullable=True, unique=True, index=True)
     created_by = Column(String, ForeignKey("users.id"), nullable=False, index=True)

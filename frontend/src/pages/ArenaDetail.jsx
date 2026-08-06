@@ -146,11 +146,24 @@ export default function ArenaDetail() {
       {error && <div className="error">{error}</div>}
 
       <section className="arena-section">
-        <h2 className="section-title">Live debates</h2>
+        <h2 className="section-title">
+          {arenaKey === "startups" ? "Idea validation debates" : "Live debates"}
+        </h2>
+        {arenaKey === "startups" && (
+          <p className="hint surface-lead">
+            BaratX’s YC-style square: pitch a startup idea or thesis. India picks{" "}
+            <strong>Fund it</strong> or <strong>Pass</strong> — then argue why.
+          </p>
+        )}
+        {arenaKey === "spirituality" && (
+          <p className="hint surface-lead">
+            Faith, wellness, and modern practice — debate what resonates in India right now.
+          </p>
+        )}
         <form className="surface-create" onSubmit={startDebate}>
           <input
             type="text"
-            placeholder={`Start a ${arena.name} debate…`}
+            placeholder={meta?.composeHint || `Start a ${arena.name} debate…`}
             value={debateTitle}
             onChange={(e) => setDebateTitle(e.target.value)}
             maxLength={140}
@@ -160,7 +173,9 @@ export default function ArenaDetail() {
             className="btn btn-primary"
             disabled={creatingDebate || !debateTitle.trim()}
           >
-            {creatingDebate ? "Opening…" : "Open For vs Against"}
+            {creatingDebate
+              ? "Opening…"
+              : meta?.openDebateLabel || "Open For vs Against"}
           </button>
         </form>
         {debates.length === 0 ? (
