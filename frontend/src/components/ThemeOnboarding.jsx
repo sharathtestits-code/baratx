@@ -55,7 +55,9 @@ export default function ThemeOnboarding() {
         aria-labelledby="theme-onboard-title"
       >
         <h2 id="theme-onboard-title">Choose your look</h2>
-        <p className="hint">Pick a theme for BaratX. Change it anytime in Settings → Appearance.</p>
+        <p className="hint">
+          BaratX defaults to Tri-Color Midnight (dark). Pick another look anytime in Settings → Appearance.
+        </p>
         <ThemePicker
           value={theme}
           onChange={(id) => {

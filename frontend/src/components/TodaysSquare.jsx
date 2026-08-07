@@ -20,6 +20,9 @@ export default function TodaysSquare({ onAnswer }) {
 
   return (
     <section className="todays-square" aria-label="Today’s Square">
+      <span className="for-you-chip" aria-hidden="true">
+        For You Now
+      </span>
       <div className="todays-square-head">
         <div>
           <p className="todays-square-label">Today’s Square</p>

@@ -194,7 +194,8 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               type="button"
               className="action-btn reply-action"
               onClick={handleReplyClick}
-              title={detailMode ? "Reply" : "View post & reply"}
+              title={detailMode ? "Join conversation" : "Join conversation"}
+              aria-label="Join conversation"
             >
               <span className="action-icon-wrap">
                 <IconReply />
@@ -206,7 +207,8 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               className={`action-btn repost-action ${reposted ? "active" : ""}`}
               onClick={toggleRepost}
               disabled={!token || repostBusy}
-              title={token ? "Repost" : "Log in to repost"}
+              title={token ? "Echo" : "Log in to echo"}
+              aria-label="Echo"
             >
               <span className="action-icon-wrap">
                 <IconRepost />
@@ -229,7 +231,8 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               className={`action-btn like-action ${liked ? "active" : ""}`}
               onClick={toggleLike}
               disabled={!token || likeBusy}
-              title={token ? "Like" : "Log in to like"}
+              title={token ? "Spark" : "Log in to spark"}
+              aria-label="Spark"
             >
               <span className="action-icon-wrap">
                 <IconHeart filled={liked} />

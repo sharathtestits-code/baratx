@@ -426,7 +426,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         email=user.email,
         phone=user.phone,
         language=user.language,
-        theme=getattr(user, "theme", None) or "saffron",
+        theme=getattr(user, "theme", None) or "midnight",
         bio=user.bio,
         is_email_verified=user.is_email_verified,
         is_phone_verified=user.is_phone_verified,

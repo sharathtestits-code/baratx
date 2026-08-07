@@ -98,7 +98,9 @@ export default function Settings() {
 
       <section className="settings-section">
         <h2>Appearance</h2>
-        <p className="hint">Choose how BaratX looks for you. Changes apply instantly.</p>
+        <p className="hint">
+          Default is Tri-Color Midnight (dark). Switch to Saffron, Monsoon, or Ink anytime.
+        </p>
         <ThemePicker value={theme} onChange={saveTheme} compact />
         {themeSaving && <p className="hint">Saving…</p>}
       </section>

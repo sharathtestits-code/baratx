@@ -35,6 +35,7 @@ import BottomNav from "./components/BottomNav";
 import EmailVerifyBanner from "./components/EmailVerifyBanner";
 import Logo from "./components/Logo";
 import ThemeOnboarding from "./components/ThemeOnboarding";
+import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 
 function AuthChrome({ children }) {
@@ -105,6 +106,7 @@ function AppShell() {
         </Routes>
       </main>
       <RightRail />
+      <ComposeFab />
       <BottomNav />
     </div>
   );

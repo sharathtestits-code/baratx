@@ -340,6 +340,43 @@ export default function Feed() {
               </div>
             )}
             {postError && <div className="error">{postError}</div>}
+            <div className="compose-studio-tiles" aria-label="Create studio">
+              <button
+                type="button"
+                className="compose-tile"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Media
+              </button>
+              <button
+                type="button"
+                className="compose-tile"
+                onClick={() => {
+                  if (!text.includes("?")) setText((t) => `${t.trim()}\n\nA) \nB) `.trimStart());
+                  composeRef.current?.focus?.();
+                }}
+              >
+                Poll
+              </button>
+              <Link to="/spaces" className="compose-tile">
+                Live Room
+              </Link>
+              <Link to="/communities" className="compose-tile">
+                Community Drop
+              </Link>
+              <button
+                type="button"
+                className="compose-tile compose-tile-ai"
+                onClick={() => {
+                  if (!text.trim()) {
+                    setText("In my city, the real take is ");
+                  }
+                  composeRef.current?.focus?.();
+                }}
+              >
+                AI Assist
+              </button>
+            </div>
             <label className="compose-civic">
               <input
                 type="checkbox"

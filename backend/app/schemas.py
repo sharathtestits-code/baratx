@@ -194,7 +194,7 @@ class UserOut(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     language: str
-    theme: str = "saffron"
+    theme: str = "midnight"
     bio: str
     avatar_url: Optional[str] = None
     cover_url: Optional[str] = None

@@ -27,12 +27,12 @@ export function LogoMark({ className = "", title = "BaratX" }) {
       <defs>
         <linearGradient id={ringId} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#3D2314" />
-          <stop offset="55%" stopColor="#C45A12" />
-          <stop offset="100%" stopColor="#FF671F" />
+          <stop offset="45%" stopColor="#C45A12" />
+          <stop offset="100%" stopColor="#FF9933" />
         </linearGradient>
       </defs>
       <circle cx="16" cy="16" r="15.25" fill={`url(#${ringId})`} />
-      <circle cx="16" cy="16" r="12.1" fill="#FF671F" />
+      <circle cx="16" cy="16" r="12.1" fill="#FF9933" />
       <text
         x="16"
         y="20.6"
