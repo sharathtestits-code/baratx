@@ -9,7 +9,7 @@ import MentionTextarea from "../components/MentionTextarea";
 export default function ArenaDetail() {
   const { arenaKey } = useParams();
   const navigate = useNavigate();
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const meta = arenaMeta(arenaKey);
   const [arena, setArena] = useState(null);
   const [debates, setDebates] = useState([]);

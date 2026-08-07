@@ -5338,6 +5338,10 @@ a.reply-username.name-badge-gold,
   margin-left: 0.15rem;
 }
 
+.topic-arena-block.is-focus-arena .topic-arena-title {
+  color: var(--brand, #ff671f);
+}
+
 .topic-onboarding-actions {
   position: sticky;
   bottom: 0;
