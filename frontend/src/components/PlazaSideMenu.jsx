@@ -1,25 +1,33 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { ARENA_TOPICS } from "../arenas";
 
 /**
- * Change Arena drawer — portaled to document.body so stacking / overflow
- * never block open/close on Square, Explore, or other plaza pages.
+ * Change Arena drawer — Bharat header is a real dropdown that expands arenas.
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
   const location = useLocation();
+  const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
+  const listId = useId();
+  const [pickerOpen, setPickerOpen] = useState(true);
+  const switchRef = useRef(null);
 
-  // Close only when the route actually changes (not on first mount).
+  // Close drawer only when the route actually changes (not on first mount).
   useEffect(() => {
     if (pathRef.current !== location.pathname) {
       pathRef.current = location.pathname;
       close();
     }
   }, [location.pathname, close]);
+
+  // Reset picker open whenever the drawer opens.
+  useEffect(() => {
+    if (open) setPickerOpen(true);
+  }, [open]);
 
   useEffect(() => {
     document.body.classList.toggle("plaza-menu-is-open", open);
@@ -29,7 +37,13 @@ export default function PlazaSideMenu() {
   useEffect(() => {
     if (!open) return undefined;
     function onKey(e) {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") {
+        if (pickerOpen) {
+          setPickerOpen(false);
+          return;
+        }
+        close();
+      }
     }
     window.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
@@ -38,9 +52,25 @@ export default function PlazaSideMenu() {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, close]);
+  }, [open, close, pickerOpen]);
+
+  function goArena(key) {
+    setPickerOpen(false);
+    close();
+    navigate(`/arenas/${key}`);
+  }
+
+  function goMyArenas() {
+    setPickerOpen(false);
+    close();
+    navigate("/arenas");
+  }
 
   if (typeof document === "undefined") return null;
+
+  const activeKey = location.pathname.startsWith("/arenas/")
+    ? location.pathname.split("/")[2]
+    : "";
 
   return createPortal(
     <>
@@ -57,10 +87,21 @@ export default function PlazaSideMenu() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="plaza-side-head">
-          <div className="plaza-side-arena-switch">
+          <button
+            ref={switchRef}
+            type="button"
+            className={`plaza-side-arena-switch${pickerOpen ? " is-open" : ""}`}
+            aria-expanded={pickerOpen}
+            aria-controls={listId}
+            onClick={() => setPickerOpen((v) => !v)}
+          >
             <span className="plaza-side-arena-name">
               Bharat
-              <svg className="plaza-side-chevron" viewBox="0 0 16 16" aria-hidden="true">
+              <svg
+                className={`plaza-side-chevron${pickerOpen ? " is-open" : ""}`}
+                viewBox="0 0 16 16"
+                aria-hidden="true"
+              >
                 <path
                   d="M4 6l4 4 4-4"
                   fill="none"
@@ -72,31 +113,43 @@ export default function PlazaSideMenu() {
               </svg>
             </span>
             <span className="plaza-side-change">Change Arena</span>
-          </div>
+          </button>
           <button type="button" className="plaza-side-close" onClick={close} aria-label="Close menu">
             ×
           </button>
         </div>
 
-        <nav className="plaza-side-arenas" aria-label="Arenas">
+        <nav
+          id={listId}
+          className={`plaza-side-arenas${pickerOpen ? " is-open" : ""}`}
+          aria-label="Arenas"
+          hidden={!pickerOpen}
+        >
           <ul className="plaza-side-arena-list">
-            {ARENA_TOPICS.map((a) => (
-              <li key={a.key}>
-                <NavLink
-                  to={`/arenas/${a.key}`}
-                  className={({ isActive }) => `plaza-side-arena${isActive ? " is-active" : ""}`}
-                  style={{ "--arena-accent": a.accent }}
-                  onClick={close}
-                >
-                  <span className="plaza-side-arena-bar" aria-hidden="true" />
-                  <strong>{a.name}</strong>
-                </NavLink>
-              </li>
-            ))}
+            {ARENA_TOPICS.map((a) => {
+              const isActive = activeKey === a.key;
+              return (
+                <li key={a.key}>
+                  <button
+                    type="button"
+                    className={`plaza-side-arena${isActive ? " is-active" : ""}`}
+                    style={{ "--arena-accent": a.accent }}
+                    onClick={() => goArena(a.key)}
+                  >
+                    <span className="plaza-side-arena-bar" aria-hidden="true" />
+                    <strong>{a.name}</strong>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
-        <Link to="/arenas" className="plaza-side-manage" onClick={close}>
+        {!pickerOpen && (
+          <p className="plaza-side-picker-hint">Tap Change Arena to pick Sports, Politics, and more.</p>
+        )}
+
+        <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
           <span className="plaza-side-manage-copy">
             <strong>My Arenas</strong>
             <em>Manage your favourite arenas</em>
@@ -111,7 +164,7 @@ export default function PlazaSideMenu() {
               strokeLinejoin="round"
             />
           </svg>
-        </Link>
+        </button>
       </aside>
     </>,
     document.body
