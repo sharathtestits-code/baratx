@@ -1,15 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "bx_plaza_menu_open_v2";
+/** Option B: menu starts collapsed; hamburger opens Change Arena drawer. */
+const STORAGE_KEY = "bx_plaza_menu_open_v3";
 const PlazaMenuContext = createContext(null);
-
-function desktopMenuPreferred() {
-  try {
-    return window.matchMedia("(min-width: 900px)").matches;
-  } catch {
-    return true;
-  }
-}
 
 function readStoredOpen() {
   try {
@@ -19,8 +12,7 @@ function readStoredOpen() {
   } catch {
     // ignore
   }
-  // First visit: show the Change Arena rail on desktop (matches mockup).
-  return desktopMenuPreferred();
+  return false;
 }
 
 export function PlazaMenuProvider({ children }) {

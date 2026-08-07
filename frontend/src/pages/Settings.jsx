@@ -88,7 +88,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="feed-wrap surface-page">
+    <div className="feed-wrap surface-page plaza-page">
       <div className="feed-header">
         <h1>Settings and privacy</h1>
       </div>

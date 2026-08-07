@@ -1,52 +1,35 @@
-import { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { ARENA_TOPICS } from "../arenas";
 
 /**
- * Change Arena left rail — docked on desktop (matches mockup), overlay on mobile.
- * Collapse/expand via the top-bar hamburger.
+ * Change Arena drawer (Option B): closed by default, opens from hamburger.
+ * Same chrome on every plaza page (Option C).
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
-  const [isNarrow, setIsNarrow] = useState(() => {
-    try {
-      return window.matchMedia("(max-width: 899px)").matches;
-    } catch {
-      return false;
-    }
-  });
+  const location = useLocation();
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 899px)");
-    function onChange(e) {
-      setIsNarrow(e.matches);
-    }
-    setIsNarrow(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+    close();
+  }, [location.pathname, close]);
 
   useEffect(() => {
-    if (!open || !isNarrow) return undefined;
+    if (!open) return undefined;
     function onKey(e) {
       if (e.key === "Escape") close();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, isNarrow, close]);
-
-  function onNavigate() {
-    // Only auto-close on narrow screens (drawer). Keep docked rail open on desktop.
-    if (isNarrow) close();
-  }
+  }, [open, close]);
 
   return (
     <>
       <div
-        className={`plaza-menu-backdrop${open && isNarrow ? " is-open" : ""}`}
+        className={`plaza-menu-backdrop${open ? " is-open" : ""}`}
         onClick={close}
-        aria-hidden={!open || !isNarrow}
+        aria-hidden={!open}
       />
       <aside
         className={`plaza-side-menu${open ? " is-open" : ""}`}
@@ -70,7 +53,7 @@ export default function PlazaSideMenu() {
             </span>
             <span className="plaza-side-change">Change Arena</span>
           </button>
-          <button type="button" className="plaza-side-close" onClick={close} aria-label="Collapse menu">
+          <button type="button" className="plaza-side-close" onClick={close} aria-label="Close menu">
             ×
           </button>
         </div>
@@ -83,7 +66,7 @@ export default function PlazaSideMenu() {
                   to={`/arenas/${a.key}`}
                   className={({ isActive }) => `plaza-side-arena${isActive ? " is-active" : ""}`}
                   style={{ "--arena-accent": a.accent }}
-                  onClick={onNavigate}
+                  onClick={close}
                 >
                   <span className="plaza-side-arena-bar" aria-hidden="true" />
                   <strong>{a.name}</strong>
@@ -93,7 +76,7 @@ export default function PlazaSideMenu() {
           </ul>
         </nav>
 
-        <Link to="/arenas" className="plaza-side-manage" onClick={onNavigate}>
+        <Link to="/arenas" className="plaza-side-manage" onClick={close}>
           <span className="plaza-side-manage-copy">
             <strong>My Arenas</strong>
             <em>Manage your favourite arenas</em>

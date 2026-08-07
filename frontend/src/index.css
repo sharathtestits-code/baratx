@@ -6582,11 +6582,11 @@ a.reply-username.name-badge-gold,
   margin-bottom: 0.55rem;
 }
 
-/* ---------- Plaza shell (anti-X) ---------- */
+/* ---------- Plaza shell (Option B+C: top bar on all pages) ---------- */
 
 .app-shell-plaza {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: stretch;
   justify-content: flex-start;
   max-width: none;
@@ -6594,8 +6594,10 @@ a.reply-username.name-badge-gold,
   min-height: 100vh;
   min-height: 100dvh;
   background:
-    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255, 153, 51, 0.12), transparent 55%),
+    radial-gradient(ellipse 80% 40% at 50% -10%, color-mix(in srgb, var(--brand) 14%, transparent), transparent 55%),
     var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans, inherit);
 }
 
 .app-shell-plaza .sidebar,
@@ -6606,6 +6608,7 @@ a.reply-username.name-badge-gold,
 .plaza-shell-body {
   flex: 1;
   min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -6618,7 +6621,25 @@ a.reply-username.name-badge-gold,
   border-left: none;
   border-right: none;
   background: transparent;
+  color: var(--text);
   padding: 0 1rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Secondary pages inherit plaza chrome without looking like old X columns */
+.app-shell-plaza .feed-wrap,
+.app-shell-plaza .surface-page {
+  max-width: none;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.app-shell-plaza .feed-wrap > h1,
+.app-shell-plaza .surface-page > h1,
+.app-shell-plaza .search-title {
+  color: var(--text);
+  letter-spacing: -0.02em;
 }
 
 .plaza-top {
@@ -6658,12 +6679,6 @@ a.reply-username.name-badge-gold,
 
 .plaza-brand-logo .logo-wordmark {
   font-size: 1.15rem;
-  color: #ffffff;
-}
-
-[data-theme="saffron"] .plaza-brand-logo .logo-wordmark,
-[data-theme="monsoon"] .plaza-brand-logo .logo-wordmark,
-[data-theme="ink"] .plaza-brand-logo .logo-wordmark {
   color: var(--text);
 }
 
@@ -6755,7 +6770,7 @@ a.reply-username.name-badge-gold,
 }
 
 .plaza-orbit-live {
-  --arena-accent: #ff9933;
+  --arena-accent: var(--brand);
   color: var(--brand);
 }
 
@@ -7031,7 +7046,7 @@ a.reply-username.name-badge-gold,
   display: none;
 }
 
-/* ---------- Collapsible plaza side menu (Change Arena rail) ---------- */
+/* ---------- Change Arena drawer (Option B: overlay, closed by default) ---------- */
 
 .plaza-menu-toggle {
   width: 2.35rem;
@@ -7039,6 +7054,7 @@ a.reply-username.name-badge-gold,
   border-radius: 0.7rem;
   border: 1px solid var(--border);
   background: var(--surface);
+  color: var(--text);
   display: inline-flex;
   flex-direction: column;
   align-items: center;
@@ -7073,41 +7089,44 @@ a.reply-username.name-badge-gold,
 }
 
 .plaza-menu-backdrop {
-  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: color-mix(in srgb, var(--bg) 35%, rgba(0, 0, 0, 0.55));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.plaza-menu-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .plaza-side-menu {
-  position: sticky;
+  position: fixed;
   top: 0;
-  align-self: flex-start;
-  z-index: 40;
-  width: 0;
+  left: 0;
+  z-index: 90;
+  width: min(17.5rem, 86vw);
   height: 100vh;
   height: 100dvh;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1.15rem 0 1.1rem;
-  background: #0e0e12;
-  border-right: 1px solid transparent;
-  overflow: hidden;
+  padding: 1.15rem 0.85rem 1.1rem;
+  background: var(--surface);
+  color: var(--text);
+  border-right: 1px solid var(--border);
+  box-shadow: 16px 0 48px color-mix(in srgb, var(--bg) 40%, rgba(0, 0, 0, 0.35));
+  transform: translateX(-105%);
+  transition: transform 0.22s ease;
   overflow-y: auto;
-  flex-shrink: 0;
-  opacity: 0;
   pointer-events: none;
-  transition:
-    width 0.22s ease,
-    padding 0.22s ease,
-    opacity 0.18s ease,
-    border-color 0.22s ease;
 }
 
-.app-shell-plaza.is-menu-open .plaza-side-menu,
 .plaza-side-menu.is-open {
-  width: 17.5rem;
-  padding: 1.15rem 0.85rem 1.1rem;
-  border-right-color: rgba(255, 255, 255, 0.06);
-  opacity: 1;
+  transform: translateX(0);
   pointer-events: auto;
 }
 
@@ -7128,6 +7147,7 @@ a.reply-username.name-badge-gold,
   text-align: left;
   cursor: default;
   padding: 0;
+  font: inherit;
 }
 
 .plaza-side-arena-name {
@@ -7145,12 +7165,13 @@ a.reply-username.name-badge-gold,
   width: 0.95rem;
   height: 0.95rem;
   opacity: 0.7;
+  color: var(--text-secondary);
 }
 
 .plaza-side-change {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #22c55e;
+  color: var(--india-green, var(--chakra, #138808));
   letter-spacing: 0.01em;
 }
 
@@ -7159,7 +7180,7 @@ a.reply-username.name-badge-gold,
   height: 2rem;
   border: none;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--hover-overlay);
   color: var(--text);
   font-size: 1.35rem;
   line-height: 1;
@@ -7190,16 +7211,16 @@ a.reply-username.name-badge-gold,
   border-radius: 0.7rem;
   text-decoration: none;
   color: var(--text);
-  background: #16161c;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--bg) 55%, var(--surface));
+  border: 1px solid var(--border);
   overflow: hidden;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .plaza-side-arena:hover,
 .plaza-side-arena.is-active {
-  background: #1c1c24;
-  border-color: color-mix(in srgb, var(--arena-accent, var(--brand)) 35%, transparent);
+  background: var(--hover-overlay);
+  border-color: color-mix(in srgb, var(--arena-accent, var(--brand)) 35%, var(--border));
 }
 
 .plaza-side-arena-bar {
@@ -7211,8 +7232,8 @@ a.reply-username.name-badge-gold,
   border-radius: 0 99px 99px 0;
   background: var(--arena-accent, var(--brand));
   box-shadow:
-    0 0 8px color-mix(in srgb, var(--arena-accent, var(--brand)) 85%, transparent),
-    0 0 18px color-mix(in srgb, var(--arena-accent, var(--brand)) 45%, transparent);
+    0 0 8px color-mix(in srgb, var(--arena-accent, var(--brand)) 70%, transparent),
+    0 0 18px color-mix(in srgb, var(--arena-accent, var(--brand)) 35%, transparent);
 }
 
 .plaza-side-arena strong {
@@ -7220,6 +7241,7 @@ a.reply-username.name-badge-gold,
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+  color: var(--text);
 }
 
 .plaza-side-manage {
@@ -7230,15 +7252,15 @@ a.reply-username.name-badge-gold,
   gap: 0.75rem;
   padding: 0.95rem 1rem;
   border-radius: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: #16161c;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 55%, var(--surface));
   text-decoration: none;
   color: var(--text);
 }
 
 .plaza-side-manage:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: #1c1c24;
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--border));
+  background: var(--hover-overlay);
 }
 
 .plaza-side-manage-copy {
@@ -7249,6 +7271,7 @@ a.reply-username.name-badge-gold,
 .plaza-side-manage-copy strong {
   font-size: 0.95rem;
   font-weight: 800;
+  color: var(--text);
 }
 
 .plaza-side-manage-copy em {
@@ -7263,6 +7286,7 @@ a.reply-username.name-badge-gold,
   height: 1rem;
   flex-shrink: 0;
   opacity: 0.55;
+  color: var(--text-secondary);
 }
 
 .plaza-hero-compact {
@@ -7271,6 +7295,16 @@ a.reply-username.name-badge-gold,
 
 .plaza-hero-compact .plaza-hero-title {
   font-size: clamp(1.6rem, 3vw, 2rem);
+  color: var(--text);
+}
+
+.plaza-hero-kicker,
+.plaza-hero-sub {
+  color: var(--text-secondary);
+}
+
+.plaza-hero-title {
+  color: var(--text);
 }
 
 .plaza-search-form {
@@ -7279,46 +7313,4 @@ a.reply-username.name-badge-gold,
 
 .plaza-explore-empty .search-empty-lead {
   display: none;
-}
-
-@media (max-width: 899px) {
-  .plaza-menu-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 80;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .plaza-menu-backdrop.is-open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .plaza-side-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 90;
-    width: min(17.5rem, 86vw);
-    height: 100vh;
-    height: 100dvh;
-    padding: 1.15rem 0.85rem 1.1rem;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 16px 0 48px rgba(0, 0, 0, 0.55);
-    transform: translateX(-105%);
-    opacity: 1;
-    pointer-events: none;
-    transition: transform 0.22s ease;
-  }
-
-  .app-shell-plaza.is-menu-open .plaza-side-menu,
-  .plaza-side-menu.is-open {
-    width: min(17.5rem, 86vw);
-    transform: translateX(0);
-    pointer-events: auto;
-  }
 }

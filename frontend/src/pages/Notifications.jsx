@@ -89,7 +89,7 @@ export default function Notifications() {
   }
 
   return (
-    <div className="feed-wrap">
+    <div className="feed-wrap plaza-page">
       <div className="feed-header">
         <h1>Notifications</h1>
       </div>

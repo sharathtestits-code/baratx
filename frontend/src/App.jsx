@@ -73,7 +73,6 @@ function PlazaShell() {
   const { open } = usePlazaMenu();
   return (
     <div className={`app-shell app-shell-plaza${open ? " is-menu-open" : ""}`}>
-      <PlazaSideMenu />
       <div className="plaza-shell-body">
         <PlazaTopBar />
         <main className="app-main app-main-plaza">
@@ -84,6 +83,7 @@ function PlazaShell() {
         <ComposeFab />
         <BottomNav />
       </div>
+      <PlazaSideMenu />
     </div>
   );
 }
