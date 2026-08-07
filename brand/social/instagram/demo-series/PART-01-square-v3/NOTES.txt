@@ -1,8 +1,8 @@
 # Part 1 Square — v3
 
 ## Changes vs v2
-- **Taller UI frames**: zoom callouts letterboxed to full 1080×1920 with ~1500px content height (was short strips).
-- **Audio**: synthetic Indian pulse bed (`indian_pulse.wav`) — **not Faah-only**. In IG, attach a **different trending India audio** (desi beat / trending reel sound) — rotate away from Faah.
+- **Bigger UI screenshots**: zoom callouts fill ~70–75% of reel height (was ~30–40%), full width, so compose / AI Assist / actions are easier to read.
+- **Audio**: synthetic Indian pulse bed (`indian_pulse.wav`) — **not Faah-only**. In IG, attach a **different trending India audio**.
 
 ## Files
 - Latest cut: `/opt/cursor/artifacts/downloads/baratx-demo-PART1-LATEST.mp4`
