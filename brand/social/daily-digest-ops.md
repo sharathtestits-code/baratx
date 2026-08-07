@@ -1,4 +1,4 @@
-# Daily digest + welcome replies
+# Daily peak digest + welcome replies
 
 ## New-user auto-replies (first Home post only)
 Two replies — official engagement, **never counts toward Founding rewards**:
@@ -6,26 +6,28 @@ Two replies — official engagement, **never counts toward Founding rewards**:
 1. **@baratx** — Welcome to BaratX… what’s your city…
 2. **@sharath** — Hey @{user} — Sharath here. Drop one real take…
 
-## Daily auto-posts (~09:05 IST)
-Target **3–5 posts/day** when quality exists (never pad with junk):
+## Peak auto-posts (3×/day IST — not all day)
+Slots: **09:00 · 13:30 · 20:00 IST**
 
-- Voices: **@sharath** (founder) + **@baratx** (brand), round-robin
-- Arenas: Sports · Politics · Entertainment · News · Spirituality  
-  (politics weighted slightly for civic pulse — **not** politics-only)
-- Cap: **max 2 posts per arena** so one floor doesn’t own Home
-- Score gate: India / civic / debate-shaped headlines; soft-penalize horoscope, listicles, clickbait
-- Each post: BaratX-branded PNG + `#BaratXDaily`
+Per slot (2 arenas, rotated so every floor including **Startups** gets coverage):
 
-If fewer than 3 headlines clear the bar, we post only what passes.
+1. **@baratx** — Daily glimpse (headline + named publisher only)
+2. **@sharath** — Response take on the same story
+3. **@sharath** replies on the admin post
+4. **@baratx** replies on Sharath’s post
+5. **Mutual likes** on both posts and both replies
+
+### Credibility rules
+- Google News RSS, **credible publishers only** (PIB / PTI / ANI / Reuters / The Hindu / Indian Express / ET / LiveMint / Inc42 / etc.)
+- Soft-penalize horoscope, listicles, rumours, clickbait
+- **No invented facts** — copy is headline + source + debate CTA only
+- Markers: `#BaratXDaily` + `#BXMorning` / `#BXMidday` / `#BXEvening`
 
 ## Rewards exclusion
 Likes/replies from `@baratx`, `@sharath`, other seeded officials, and any `blue` / `is_official` account are **ignored** for Founding payable + race like counts.
 
 ## Manual
-Admin → **Run daily digest now** (`POST /admin/daily-digest?force=true`).
+Admin → **Run peak digest now** (`POST /admin/daily-digest?force=true&slot=morning|midday|evening`).
 
-## Infra note (when to expand)
-At 3–5 posts/day + PNG cards, **no new server/DB needed**. Scale later when:
-- media volume / user uploads grow → object storage (R2/S3) instead of local disk
-- concurrent users climb → managed Postgres + connection pooling
-- digest reliability matters on multi-instance deploys → move scheduler off the API process (cron / worker)
+## Infra note
+Scheduler runs in the API process. For multi-instance Railway deploys, move to a single worker / cron later.
