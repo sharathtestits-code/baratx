@@ -5,12 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import WelcomePanel from "../components/WelcomePanel";
-import SuggestedFollows from "../components/SuggestedFollows";
 import TodaysSquare from "../components/TodaysSquare";
 import FoundingStrip from "../components/FoundingStrip";
 import RaceStrip from "../components/RaceStrip";
 import MentionTextarea from "../components/MentionTextarea";
-import { ARENA_TOPICS } from "../arenas";
 import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
@@ -24,7 +22,7 @@ function feedItemKey(item) {
 }
 
 export default function Feed() {
-  const { token, user, logout, loading } = useAuth();
+  const { token, user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const quotePostId = searchParams.get("quote");
@@ -280,62 +278,14 @@ export default function Feed() {
   const charCountClass = remaining < 20 ? "char-count char-count-low" : "char-count";
 
   return (
-    <div className="feed-wrap square-home">
-      <aside className="square-arena-rail" aria-label="Arenas">
-        <p className="square-arena-rail-label">Arenas</p>
-        {ARENA_TOPICS.map((a) => (
-          <Link
-            key={a.key}
-            to={`/arenas/${a.key}`}
-            className="square-arena-tab"
-            style={{ "--arena-accent": a.accent }}
-          >
-            {a.name}
-          </Link>
-        ))}
-        <Link to="/spaces" className="square-arena-tab square-arena-tab-live">
-          Live
-        </Link>
-      </aside>
+    <div className="plaza-page plaza-square">
+      <section className="plaza-hero">
+        <p className="plaza-hero-kicker">India&apos;s public square</p>
+        <h1 className="plaza-hero-title">The Square</h1>
+        <p className="plaza-hero-sub">One question. Your take. Real replies — not a firehose.</p>
+      </section>
 
-      <div className="square-home-main">
-      <div className="feed-topbar">
-        <div>
-          <p className="square-eyebrow">BaratX</p>
-          <h1 className="feed-title">The Square</h1>
-        </div>
-        <button
-          type="button"
-          className="mobile-logout"
-          onClick={() => {
-            logout();
-            navigate("/login");
-          }}
-        >
-          Log out
-        </button>
-      </div>
-
-      <nav className="orbit-chip-rail" aria-label="Orbits">
-        {ARENA_TOPICS.map((a) => (
-          <Link
-            key={a.key}
-            to={`/arenas/${a.key}`}
-            className="orbit-chip"
-            style={{ "--arena-accent": a.accent }}
-          >
-            {a.name}
-          </Link>
-        ))}
-        <Link to="/spaces" className="orbit-chip orbit-chip-live">
-          Live
-        </Link>
-        <Link to="/arenas" className="orbit-chip orbit-chip-more">
-          All arenas
-        </Link>
-      </nav>
-
-      <div className="square-stage">
+      <div className="plaza-stage">
         <TodaysSquare
           onAnswer={(question) => {
             setText(`${question}\n\n`);
@@ -345,112 +295,110 @@ export default function Feed() {
         />
       </div>
 
-      <form className="compose" onSubmit={handlePost}>
-        <div className="compose-row">
+      <form className="plaza-studio compose" onSubmit={handlePost}>
+        <div className="plaza-studio-head">
           <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
-          <div className="compose-body">
-            <MentionTextarea
-              ref={composeRef}
-              placeholder={
-                quotePreview
-                  ? "Add a comment and tag people with @…"
-                  : showWelcome
-                    ? "Say hello with your city…"
-                    : "What is happening? Type @ to tag someone"
-              }
-              value={text}
-              onChange={setText}
-              maxLength={MAX_LEN}
-              rows={3}
-            />
-            {imagePreview && (
-              <div className="image-preview">
-                <img src={imagePreview} alt="attachment preview" />
-                <button type="button" className="remove-image" onClick={clearImage}>
+          <div>
+            <p className="plaza-studio-label">Create Studio</p>
+            <p className="hint">Drop a viewpoint for the square</p>
+          </div>
+        </div>
+        <div className="compose-body">
+          <MentionTextarea
+            ref={composeRef}
+            placeholder={
+              quotePreview
+                ? "Add a comment and tag people with @…"
+                : showWelcome
+                  ? "Say hello with your city…"
+                  : "What should India hear from you?"
+            }
+            value={text}
+            onChange={setText}
+            maxLength={MAX_LEN}
+            rows={3}
+          />
+          {imagePreview && (
+            <div className="image-preview">
+              <img src={imagePreview} alt="attachment preview" />
+              <button type="button" className="remove-image" onClick={clearImage}>
+                <IconClose />
+              </button>
+            </div>
+          )}
+          {quotePreview && (
+            <div className="quoted-post compose-quote">
+              <div className="quoted-head">
+                Quoting @{quotePreview.author.username}
+                <button
+                  type="button"
+                  className="remove-image"
+                  onClick={() => {
+                    setSearchParams({});
+                    setQuotePreview(null);
+                  }}
+                >
                   <IconClose />
                 </button>
               </div>
-            )}
-            {quotePreview && (
-              <div className="quoted-post compose-quote">
-                <div className="quoted-head">
-                  Quoting @{quotePreview.author.username}
-                  <button
-                    type="button"
-                    className="remove-image"
-                    onClick={() => {
-                      setSearchParams({});
-                      setQuotePreview(null);
-                    }}
-                  >
-                    <IconClose />
-                  </button>
-                </div>
-                <p>{quotePreview.text}</p>
-              </div>
-            )}
-            {postError && <div className="error">{postError}</div>}
-            <div className="compose-studio-tiles" aria-label="Create studio">
-              <button
-                type="button"
-                className="compose-tile"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Media
-              </button>
-              <button
-                type="button"
-                className="compose-tile"
-                onClick={() => {
-                  if (!text.includes("?")) setText((t) => `${t.trim()}\n\nA) \nB) `.trimStart());
-                  composeRef.current?.focus?.();
-                }}
-              >
-                Poll
-              </button>
-              <Link to="/spaces" className="compose-tile">
-                Live Room
-              </Link>
-              <Link to="/communities" className="compose-tile">
-                Community Drop
-              </Link>
-              <button
-                type="button"
-                className="compose-tile compose-tile-ai"
-                onClick={() => {
-                  if (!text.trim()) {
-                    setText("In my city, the real take is ");
-                  }
-                  composeRef.current?.focus?.();
-                }}
-              >
-                AI Assist
-              </button>
+              <p>{quotePreview.text}</p>
             </div>
-            <label className="compose-civic">
+          )}
+          {postError && <div className="error">{postError}</div>}
+          <div className="compose-studio-tiles" aria-label="Create studio">
+            <button type="button" className="compose-tile" onClick={() => fileInputRef.current?.click()}>
+              Media
+            </button>
+            <button
+              type="button"
+              className="compose-tile"
+              onClick={() => {
+                if (!text.includes("?")) setText((t) => `${t.trim()}\n\nA) \nB) `.trimStart());
+                composeRef.current?.focus?.();
+              }}
+            >
+              Poll
+            </button>
+            <Link to="/spaces" className="compose-tile">
+              Live Room
+            </Link>
+            <Link to="/communities" className="compose-tile">
+              Community Drop
+            </Link>
+            <button
+              type="button"
+              className="compose-tile compose-tile-ai"
+              onClick={() => {
+                if (!text.trim()) setText("In my city, the real take is ");
+                composeRef.current?.focus?.();
+              }}
+            >
+              AI Assist
+            </button>
+          </div>
+          <label className="compose-civic">
+            <input
+              type="checkbox"
+              checked={civicProblem}
+              onChange={(e) => setCivicProblem(e.target.checked)}
+            />
+            <span>This is a real civic / city problem</span>
+          </label>
+          <div className="compose-footer">
+            <label className="attach-btn" title="Add image">
+              <IconImage />
               <input
-                type="checkbox"
-                checked={civicProblem}
-                onChange={(e) => setCivicProblem(e.target.checked)}
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                onChange={handleImageChange}
+                hidden
               />
-              <span>This is a real civic / city problem</span>
             </label>
-            <div className="compose-footer">
-              <label className="attach-btn" title="Add image">
-                <IconImage />
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/gif,image/webp"
-                  onChange={handleImageChange}
-                  hidden
-                />
-              </label>
-              {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
-              <button type="submit" className="post-btn" disabled={posting || !text.trim()}>
-                {posting ? "Posting..." : "Post"}
-              </button>
-            </div>
+            {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
+            <button type="submit" className="post-btn" disabled={posting || !text.trim()}>
+              {posting ? "Posting..." : "Post viewpoint"}
+            </button>
           </div>
         </div>
       </form>
@@ -459,9 +407,7 @@ export default function Feed() {
         key={foundingRefresh}
         onPostProblem={() => {
           setCivicProblem(true);
-          if (!text.trim()) {
-            setText("In my city, the real problem is ");
-          }
+          if (!text.trim()) setText("In my city, the real problem is ");
           composeRef.current?.focus?.();
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
@@ -470,21 +416,18 @@ export default function Feed() {
       <RaceStrip key={`race-${foundingRefresh}`} />
 
       {liveDebates.length > 0 && (
-        <section className="arena-home-strip" aria-label="Live debates">
-          <div className="arena-home-strip-head">
+        <section className="plaza-onair" aria-label="Live debates">
+          <div className="plaza-onair-head">
             <h2>On air now</h2>
-            <Link to="/spaces" className="rail-card-more">
-              All live
-            </Link>
+            <Link to="/spaces">Enter Live</Link>
           </div>
-          <ul className="debate-list debate-list-compact">
-            {liveDebates.slice(0, 5).map((d) => (
+          <ul className="plaza-onair-list">
+            {liveDebates.slice(0, 4).map((d) => (
               <li key={d.id}>
-                <Link to={`/spaces/${d.id}`} className="debate-row">
-                  <span className="debate-arena-tag">
-                    {d.topic_name || d.arena_name || "Debate"}
-                  </span>
-                  <span className="debate-title">{d.title}</span>
+                <Link to={`/spaces/${d.id}`} className="plaza-onair-card">
+                  <span className="live-pill">Live</span>
+                  <strong>{d.title}</strong>
+                  <span className="hint">{d.topic_name || d.arena_name || "Debate"}</span>
                 </Link>
               </li>
             ))}
@@ -496,79 +439,72 @@ export default function Feed() {
         <WelcomePanel token={token} text={text} setText={setText} onPostedFlag composeRef={composeRef} />
       )}
 
-      <div className="suggested-follows-mobile">
-        <SuggestedFollows
-          title="Who to follow"
-          note="Start with official BaratX accounts — then Explore for more."
-          dismissible
-        />
-      </div>
+      <section className="plaza-takes">
+        <div className="plaza-takes-head">
+          <h2>Takes from the square</h2>
+          <div className="plaza-takes-tabs">
+            <button
+              type="button"
+              className={tab === "global" ? "is-active" : ""}
+              onClick={() => setTab("global")}
+            >
+              For you
+            </button>
+            <button
+              type="button"
+              className={tab === "following" ? "is-active" : ""}
+              onClick={() => setTab("following")}
+            >
+              Following
+            </button>
+          </div>
+        </div>
 
-      <div className="feed-tabs">
-        <button
-          type="button"
-          className={tab === "global" ? "feed-tab active" : "feed-tab"}
-          onClick={() => setTab("global")}
-        >
-          For you
-        </button>
-        <button
-          type="button"
-          className={tab === "following" ? "feed-tab active" : "feed-tab"}
-          onClick={() => setTab("following")}
-        >
-          Following
-        </button>
-        <Link to="/onboarding/topics" className="feed-tab feed-tab-link">
-          Topics
-        </Link>
-      </div>
-
-      {feedError && <div className="error">{feedError}</div>}
-      {feedLoading ? (
-        <div className="skeleton-list">
-          {[1, 2, 3].map((i) => (
-            <div className="skeleton-post" key={i}>
-              <div className="skeleton-avatar" />
-              <div className="skeleton-lines">
-                <div className="skeleton-line short" />
-                <div className="skeleton-line" />
-                <div className="skeleton-line medium" />
+        {feedError && <div className="error">{feedError}</div>}
+        {feedLoading ? (
+          <div className="skeleton-list">
+            {[1, 2, 3].map((i) => (
+              <div className="skeleton-post" key={i}>
+                <div className="skeleton-avatar" />
+                <div className="skeleton-lines">
+                  <div className="skeleton-line short" />
+                  <div className="skeleton-line" />
+                  <div className="skeleton-line medium" />
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      ) : items.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">
-            {tab === "following" ? "Nothing here yet" : "No posts yet"}
-          </p>
-          <p className="hint">
-            {tab === "following"
-              ? "Tap Follow official BaratX above, or find people in Explore."
-              : "Be the first to say something."}
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="post-list">
-            {items.map((item) => (
-              <PostCard
-                key={feedItemKey(item)}
-                post={item.post}
-                repostedBy={item.reposted_by}
-                onDeleted={handleDeleted}
-              />
             ))}
           </div>
-          <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
-          {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
-          {!hasMore && items.length > 0 && (
-            <p className="hint load-more-hint">You are all caught up.</p>
-          )}
-        </>
-      )}
-      </div>
+        ) : items.length === 0 ? (
+          <div className="empty-state">
+            <p className="empty-state-title">
+              {tab === "following" ? "Nothing here yet" : "No takes yet"}
+            </p>
+            <p className="hint">
+              {tab === "following"
+                ? "Follow people in Explore, then come back."
+                : "Be the first voice in the square."}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="post-list plaza-take-list">
+              {items.map((item) => (
+                <PostCard
+                  key={feedItemKey(item)}
+                  post={item.post}
+                  repostedBy={item.reposted_by}
+                  onDeleted={handleDeleted}
+                />
+              ))}
+            </div>
+            <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
+            {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
+            {!hasMore && items.length > 0 && (
+              <p className="hint load-more-hint">You are all caught up.</p>
+            )}
+          </>
+        )}
+      </section>
     </div>
   );
 }

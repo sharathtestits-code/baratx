@@ -48,18 +48,19 @@ export default function Spaces() {
   const featured = items[0];
 
   return (
-    <div className="feed-wrap surface-page live-airwaves">
-      <div className="feed-header live-airwaves-header">
-        <div>
-          <p className="live-eyebrow">Airwaves</p>
-          <h1>Live</h1>
-        </div>
-        <span className="live-pill" aria-hidden="true">
-          On air
-        </span>
-      </div>
-
-      <section className="live-hero-stage" aria-label="Live stage">
+    <div className="plaza-page plaza-live">
+      <section className="live-amphitheatre">
+        <div className="live-amphitheatre-glow" aria-hidden="true" />
+        <span className="live-pill">On air</span>
+        <p className="live-eyebrow">Airwaves</p>
+        <h1 className="live-amphitheatre-title">
+          {featured ? featured.title : "Start a room India can join"}
+        </h1>
+        <p className="live-amphitheatre-sub">
+          {featured
+            ? `Hosted by @${featured.host?.username} · ${featured.post_count} takes in the room`
+            : "Timed discussion rooms — amphitheatre energy, not another timeline."}
+        </p>
         <div className="live-stage-wave" aria-hidden="true">
           <span />
           <span />
@@ -69,23 +70,20 @@ export default function Spaces() {
           <span />
           <span />
         </div>
-        <p className="live-hero-kicker">Now on BaratX</p>
-        <h2 className="live-hero-title">
-          {featured ? featured.title : "Start a room India can join"}
-        </h2>
-        <p className="hint">
-          {featured
-            ? `Hosted by @${featured.host?.username} · ${featured.post_count} posts`
-            : "Timed discussion rooms for real-time text conversation."}
-        </p>
-        {featured ? (
-          <Link to={`/spaces/${featured.id}`} className="btn btn-primary live-hero-cta">
-            Join conversation
-          </Link>
-        ) : null}
+        <div className="live-amphitheatre-actions">
+          {featured ? (
+            <Link to={`/spaces/${featured.id}`} className="btn btn-primary">
+              Join conversation
+            </Link>
+          ) : null}
+          <a href="#go-live" className="btn btn-secondary">
+            Go live
+          </a>
+        </div>
       </section>
 
-      <form className="surface-create live-create" onSubmit={createSpace}>
+      <form id="go-live" className="plaza-studio live-create" onSubmit={createSpace}>
+        <p className="plaza-studio-label">Open a live room</p>
         <input
           type="text"
           placeholder="What should India hear right now?"
@@ -101,32 +99,34 @@ export default function Spaces() {
 
       {error && <div className="error">{error}</div>}
 
-      {loading ? (
-        <p className="hint">Loading…</p>
-      ) : items.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No rooms on air</p>
-          <p className="hint">Start a live room for a real-time text conversation.</p>
+      <section className="plaza-takes">
+        <div className="plaza-takes-head">
+          <h2>Rooms on air</h2>
         </div>
-      ) : (
-        <ul className="surface-card-list live-room-list">
-          {items.map((s) => (
-            <li key={s.id}>
-              <Link to={`/spaces/${s.id}`} className="surface-card-link live-room-card">
-                <span className="live-room-dot" aria-hidden="true" />
-                <strong>{s.title}</strong>
-                <span className="hint">
-                  Hosted by @{s.host?.username}
-                  {s.is_host ? " (you)" : ""}
-                </span>
-                <span className="surface-meta">
-                  {s.post_count} posts · {s.status}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+        {loading ? (
+          <p className="hint">Loading…</p>
+        ) : items.length === 0 ? (
+          <div className="empty-state">
+            <p className="empty-state-title">No rooms on air</p>
+            <p className="hint">Be the first host tonight.</p>
+          </div>
+        ) : (
+          <ul className="plaza-onair-list live-room-grid">
+            {items.map((s) => (
+              <li key={s.id}>
+                <Link to={`/spaces/${s.id}`} className="plaza-onair-card">
+                  <span className="live-room-dot" aria-hidden="true" />
+                  <strong>{s.title}</strong>
+                  <span className="hint">
+                    @{s.host?.username}
+                    {s.is_host ? " · you" : ""} · {s.post_count} posts
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

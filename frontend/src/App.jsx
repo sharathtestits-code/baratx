@@ -32,11 +32,21 @@ import Rewards from "./pages/Rewards";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
+import PlazaTopBar from "./components/PlazaTopBar";
 import EmailVerifyBanner from "./components/EmailVerifyBanner";
 import Logo from "./components/Logo";
 import ThemeOnboarding from "./components/ThemeOnboarding";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
+
+/** Routes that use the plaza shell (not the X-style 3-column chrome). */
+function usePlazaMode(pathname) {
+  if (pathname === "/feed" || pathname.startsWith("/feed/")) return true;
+  if (pathname === "/spaces" || pathname.startsWith("/spaces/")) return true;
+  if (pathname.startsWith("/u/")) return true;
+  if (pathname === "/arenas" || pathname.startsWith("/arenas/")) return true;
+  return false;
+}
 
 function AuthChrome({ children }) {
   return (
@@ -69,10 +79,13 @@ function AdminChrome({ children }) {
 }
 
 function AppShell() {
+  const location = useLocation();
+  const plaza = usePlazaMode(location.pathname);
+
   return (
-    <div className="app-shell">
-      <Sidebar />
-      <main className="app-main">
+    <div className={`app-shell${plaza ? " app-shell-plaza" : ""}`}>
+      {plaza ? <PlazaTopBar /> : <Sidebar />}
+      <main className={`app-main${plaza ? " app-main-plaza" : ""}`}>
         <EmailVerifyBanner />
         <ThemeOnboarding />
         <Routes>
@@ -105,7 +118,7 @@ function AppShell() {
           <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
       </main>
-      <RightRail />
+      {!plaza && <RightRail />}
       <ComposeFab />
       <BottomNav />
     </div>

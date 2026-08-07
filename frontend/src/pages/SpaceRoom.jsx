@@ -115,23 +115,20 @@ export default function SpaceRoom() {
       : posts.filter((p) => p.debate_side === filter);
 
   return (
-    <div className={`feed-wrap surface-page live-stage-page${isDebate ? " debate-room" : ""}`}>
-      <div className="live-stage" aria-label="Live room stage">
+    <div className={`plaza-page plaza-live-room${isDebate ? " debate-room" : ""}`}>
+      <div className="live-amphitheatre live-amphitheatre-room" aria-label="Live room stage">
+        <div className="live-amphitheatre-glow" aria-hidden="true" />
         <div className="live-stage-top">
           <Link to={space.arena_key ? `/arenas/${space.arena_key}` : "/spaces"} className="back-link">
             ← {space.arena_name || (isDebate ? "Arenas" : "Live")}
           </Link>
-          {open && (
-            <span className="live-pill" aria-hidden="true">
-              Live
-            </span>
-          )}
+          {open && <span className="live-pill">Live</span>}
         </div>
         {isDebate && space.arena_name && (
           <div className="debate-arena-tag">{space.arena_name} debate</div>
         )}
-        <h1 className="live-stage-title">{space.title}</h1>
-        <p className="hint live-stage-meta">
+        <h1 className="live-amphitheatre-title">{space.title}</h1>
+        <p className="live-amphitheatre-sub">
           Hosted by @{space.host?.username} · {space.status}
           {space.closes_at ? ` · closes ${new Date(space.closes_at).toLocaleString()}` : ""}
         </p>

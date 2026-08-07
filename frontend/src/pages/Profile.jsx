@@ -211,7 +211,7 @@ export default function Profile() {
   const postLabel = postsLoading ? "…" : `${posts.length}${hasMore ? "+" : ""} post${posts.length === 1 ? "" : "s"}`;
 
   return (
-    <div className="feed-wrap profile-cinematic">
+    <div className="plaza-page plaza-profile profile-cinematic">
       <div className="profile-topbar">
         <div className="profile-topbar-text">
           <h1 className="profile-topbar-name">{profile.display_name}</h1>

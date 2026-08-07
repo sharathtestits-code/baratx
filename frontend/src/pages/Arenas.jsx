@@ -61,7 +61,7 @@ export default function Arenas() {
   const byKey = Object.fromEntries(arenas.map((a) => [a.key, a]));
 
   return (
-    <div className="feed-wrap surface-page arenas-page">
+    <div className="feed-wrap surface-page arenas-page plaza-page">
       <div className="feed-header">
         <h1>Arenas</h1>
       </div>

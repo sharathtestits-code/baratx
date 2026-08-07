@@ -6544,3 +6544,439 @@ a.reply-username.name-badge-gold,
   background: var(--surface);
   margin-bottom: 0.55rem;
 }
+
+/* ---------- Plaza shell (anti-X) ---------- */
+
+.app-shell-plaza {
+  flex-direction: column;
+  align-items: stretch;
+  max-width: none;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(255, 153, 51, 0.12), transparent 55%),
+    var(--bg);
+}
+
+.app-shell-plaza .sidebar,
+.app-shell-plaza .right-rail {
+  display: none !important;
+}
+
+.app-main-plaza {
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+  border-left: none;
+  border-right: none;
+  background: transparent;
+  padding: 0 1rem calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.plaza-top {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom: 1px solid var(--border);
+}
+
+.plaza-top-inner {
+  max-width: 920px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem 0.45rem;
+}
+
+.plaza-brand {
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.plaza-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.plaza-brand-logo .logo-mark {
+  width: 2rem;
+  height: 2rem;
+}
+
+.plaza-brand-logo .logo-wordmark {
+  font-size: 1.15rem;
+  color: #ffffff;
+}
+
+[data-theme="saffron"] .plaza-brand-logo .logo-wordmark,
+[data-theme="monsoon"] .plaza-brand-logo .logo-wordmark,
+[data-theme="ink"] .plaza-brand-logo .logo-wordmark {
+  color: var(--text);
+}
+
+.plaza-brand-logo .logo-wordmark-x {
+  color: var(--brand);
+}
+
+.plaza-primary {
+  display: none;
+  gap: 0.35rem;
+  margin-left: 0.5rem;
+}
+
+.plaza-link {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.plaza-link:hover {
+  color: var(--text);
+  background: var(--hover-overlay);
+}
+
+.plaza-link.is-active {
+  color: var(--text);
+  background: var(--brand-tint);
+  color: var(--brand);
+}
+
+.plaza-top-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.plaza-search-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.plaza-search-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.plaza-avatar-link {
+  display: inline-flex;
+  border-radius: 999px;
+  outline: 2px solid transparent;
+}
+
+.plaza-orbits {
+  max-width: 920px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.15rem 1rem 0.75rem;
+  scrollbar-width: none;
+}
+
+.plaza-orbits::-webkit-scrollbar {
+  display: none;
+}
+
+.plaza-orbit {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--arena-accent, var(--brand)) 50%, var(--border));
+  background: color-mix(in srgb, var(--arena-accent, var(--brand)) 12%, transparent);
+}
+
+.plaza-orbit-live {
+  --arena-accent: #ff9933;
+  color: var(--brand);
+}
+
+@media (min-width: 760px) {
+  .plaza-primary {
+    display: flex;
+  }
+}
+
+.plaza-page {
+  padding-top: 0.75rem;
+}
+
+.plaza-hero {
+  text-align: center;
+  padding: 1.25rem 0.5rem 0.5rem;
+}
+
+.plaza-hero-kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.plaza-hero-title {
+  margin: 0.35rem 0 0.4rem;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.plaza-hero-sub {
+  margin: 0 auto;
+  max-width: 28rem;
+  color: var(--text-secondary);
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+.plaza-stage {
+  margin: 1rem 0 1.15rem;
+}
+
+.plaza-stage .todays-square {
+  margin: 0;
+  padding: 1.4rem 1.25rem 1.3rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  border-bottom-width: 1px;
+  background:
+    radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, color-mix(in srgb, var(--india-green, #138808) 14%, transparent), transparent 45%),
+    var(--surface);
+  box-shadow: var(--shadow-card, none);
+}
+
+.plaza-stage .todays-square-title {
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+}
+
+.plaza-studio {
+  margin: 0 0 1.1rem;
+  padding: 1rem 1.05rem 1.05rem;
+  border-radius: 1.15rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-card, none);
+}
+
+.plaza-studio-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.plaza-studio-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.plaza-studio .compose-body {
+  width: 100%;
+}
+
+.plaza-studio.live-create {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.plaza-studio.live-create input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.plaza-onair {
+  margin: 0 0 1.25rem;
+}
+
+.plaza-onair-head,
+.plaza-takes-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.plaza-onair-head h2,
+.plaza-takes-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.plaza-onair-head a {
+  color: var(--brand);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.plaza-onair-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+@media (min-width: 700px) {
+  .live-room-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.plaza-onair-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.plaza-onair-card strong {
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+}
+
+.plaza-takes-tabs {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.plaza-takes-tabs button {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.plaza-takes-tabs button.is-active {
+  background: var(--brand-tint);
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--border));
+  color: var(--brand);
+}
+
+.plaza-take-list .post-card {
+  border-radius: 1rem;
+  margin-bottom: 0.65rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+/* Live amphitheatre */
+
+.live-amphitheatre {
+  position: relative;
+  overflow: hidden;
+  margin: 0.5rem 0 1.15rem;
+  padding: 1.75rem 1.2rem 1.6rem;
+  border-radius: 1.35rem;
+  border: 1px solid var(--border);
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 153, 51, 0.22), transparent 55%),
+    radial-gradient(ellipse at 20% 100%, rgba(19, 136, 8, 0.14), transparent 45%),
+    #0d0d12;
+  color: #fff;
+}
+
+.live-amphitheatre-glow {
+  position: absolute;
+  inset: auto 10% -40% 10%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(255, 153, 51, 0.25), transparent 70%);
+  pointer-events: none;
+}
+
+.live-amphitheatre-title {
+  position: relative;
+  margin: 0.55rem auto 0.45rem;
+  max-width: 34rem;
+  font-size: clamp(1.45rem, 4vw, 2.1rem);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.live-amphitheatre-sub {
+  position: relative;
+  margin: 0 auto 0.85rem;
+  max-width: 30rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.live-amphitheatre-actions,
+.live-stage-actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+}
+
+.live-amphitheatre .live-stage-wave {
+  margin: 0.35rem auto 1rem;
+}
+
+.live-amphitheatre .back-link {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.live-amphitheatre-room .live-stage-top {
+  position: relative;
+}
+
+.app-shell-plaza .bottom-nav {
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+/* Profile in plaza: full-bleed cinematic */
+.app-shell-plaza .plaza-profile .profile-cover {
+  margin-inline: -1rem;
+  width: calc(100% + 2rem);
+  border-radius: 0;
+}
+
+.app-shell-plaza .plaza-profile .profile-topbar {
+  display: none;
+}
