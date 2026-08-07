@@ -20,7 +20,9 @@ export default function SpaceRoom() {
   const [filter, setFilter] = useState("all"); // all | for | against
   const [error, setError] = useState("");
   const [stanceHint, setStanceHint] = useState(false);
+  const [talkJoinToken, setTalkJoinToken] = useState(0);
   const composeRef = useRef(null);
+  const talkRef = useRef(null);
 
   const isDebate = space?.kind === "debate";
 
@@ -97,14 +99,17 @@ export default function SpaceRoom() {
   }
 
   async function leaveConversation() {
-    if (!token || stanceBusy || !space?.my_side) return;
+    if (!token || stanceBusy) return;
     setStanceBusy(true);
     setError("");
     setStanceHint(false);
-    setSpace((prev) => (prev ? { ...prev, my_side: null } : prev));
     try {
-      const updated = await spacesApi.clearStance(token, spaceId);
-      setSpace(updated);
+      if (isDebate && space?.my_side) {
+        setSpace((prev) => (prev ? { ...prev, my_side: null } : prev));
+        const updated = await spacesApi.clearStance(token, spaceId);
+        setSpace(updated);
+      }
+      if (talkRef.current?.leave) await talkRef.current.leave();
     } catch (err) {
       setError(err.message || "Could not leave conversation");
       load();
@@ -114,6 +119,10 @@ export default function SpaceRoom() {
   }
 
   function joinConversation() {
+    if (!token) {
+      setError("Log in to join the conversation");
+      return;
+    }
     if (isDebate && !space?.my_side) {
       setStanceHint(true);
       document.getElementById("debate-stance-panel")?.scrollIntoView({
@@ -122,13 +131,8 @@ export default function SpaceRoom() {
       });
       return;
     }
-    document.getElementById("live-compose")?.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-    });
-    requestAnimationFrame(() => {
-      if (typeof composeRef.current?.focus === "function") composeRef.current.focus();
-    });
+    setTalkJoinToken((n) => n + 1);
+    talkRef.current?.scrollIntoView?.();
   }
 
   async function closeSpace() {
@@ -183,7 +187,7 @@ export default function SpaceRoom() {
         )}
         <h1 className="live-amphitheatre-title">{space.title}</h1>
         <p className="live-amphitheatre-sub">
-          Hosted by @{space.host?.username} · {space.status}
+          Hosted by @{space.host?.username} · audio & video conversation
           {space.closes_at ? ` · closes ${new Date(space.closes_at).toLocaleString()}` : ""}
         </p>
         <div className="live-stage-wave" aria-hidden="true">
@@ -196,12 +200,12 @@ export default function SpaceRoom() {
           <span />
         </div>
         <div className="live-stage-actions">
-          {open && (
+          {open && token && (
             <button type="button" className="btn btn-primary" onClick={joinConversation}>
-              {isDebate && space.my_side ? "Back to compose" : "Join conversation"}
+              Join conversation
             </button>
           )}
-          {open && isDebate && space.my_side && (
+          {open && (
             <button
               type="button"
               className="profile-edit-btn live-leave-btn"
@@ -222,7 +226,13 @@ export default function SpaceRoom() {
       {error && <div className="error">{error}</div>}
 
       {open && token && (
-        <LiveTalkPanel spaceId={spaceId} token={token} isHost={!!space.is_host} />
+        <LiveTalkPanel
+          ref={talkRef}
+          spaceId={spaceId}
+          token={token}
+          isHost={!!space.is_host}
+          autoJoinToken={talkJoinToken}
+        />
       )}
 
       {isDebate && (

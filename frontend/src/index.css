@@ -7711,3 +7711,174 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   padding: 0.55rem 0.75rem;
   font: inherit;
 }
+
+/* Live Talk meeting bar + reactions */
+.live-talk.is-live {
+  border-color: color-mix(in srgb, var(--accent, #e85d3a) 45%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent, #e85d3a) 18%, transparent);
+}
+
+.live-talk-stage {
+  position: relative;
+}
+
+.live-talk-seat.is-speaking .live-talk-seat-btn {
+  box-shadow: 0 0 0 2px color-mix(in srgb, #22c55e 55%, transparent);
+  border-radius: 0.85rem;
+}
+
+.live-talk-seat-video {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+  background: #0b1220;
+}
+
+.live-talk-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: center;
+  margin: 0.85rem 0 0.55rem;
+}
+
+.live-talk-react-btn {
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.live-talk-react-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  border-color: color-mix(in srgb, var(--accent, #e85d3a) 50%, var(--border));
+}
+
+.live-talk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--bg) 55%, var(--surface));
+  border: 1px solid var(--border);
+  position: sticky;
+  bottom: 0.75rem;
+  z-index: 8;
+}
+
+.live-talk-bar-btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 2.6rem;
+}
+
+.live-talk-bar-btn.primary.is-on {
+  background: color-mix(in srgb, #22c55e 22%, var(--surface));
+  border-color: color-mix(in srgb, #22c55e 45%, var(--border));
+}
+
+.live-talk-bar-btn.primary.is-off {
+  background: color-mix(in srgb, #ef4444 18%, var(--surface));
+  border-color: color-mix(in srgb, #ef4444 40%, var(--border));
+}
+
+.live-talk-bar-btn.more {
+  min-width: 2.6rem;
+  padding-inline: 0.85rem;
+  letter-spacing: 0.12em;
+}
+
+.live-talk-dots {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.live-talk-bar-btn.leave {
+  background: color-mix(in srgb, #ef4444 28%, transparent);
+  border-color: color-mix(in srgb, #ef4444 50%, var(--border));
+  color: var(--text);
+}
+
+.live-talk-more-wrap {
+  position: relative;
+}
+
+.live-talk-more-menu {
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 11.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  box-shadow: 0 10px 28px color-mix(in srgb, #000 20%, transparent);
+  z-index: 12;
+}
+
+.live-talk-more-menu button {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.5rem;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.live-talk-more-menu button:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.live-talk-more-menu button.danger {
+  color: #ef4444;
+}
+
+.live-talk-float-reacts {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.live-talk-float-react {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  font-size: 1.75rem;
+  animation: live-react-float 2.4s ease-out forwards;
+}
+
+.live-talk-float-react:nth-child(2) { left: 35%; animation-delay: 0.05s; }
+.live-talk-float-react:nth-child(3) { left: 65%; animation-delay: 0.1s; }
+.live-talk-float-react:nth-child(4) { left: 42%; animation-delay: 0.08s; }
+.live-talk-float-react:nth-child(5) { left: 58%; animation-delay: 0.12s; }
+
+@keyframes live-react-float {
+  0% { transform: translate(-50%, 0) scale(0.7); opacity: 0; }
+  15% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); }
+  100% { transform: translate(-50%, -140px) scale(1); opacity: 0; }
+}

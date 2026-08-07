@@ -276,6 +276,9 @@ def purge_user(db: Session, user: models.User) -> None:
     db.query(models.LiveTalkMessage).filter(models.LiveTalkMessage.sender_id == uid).delete(
         synchronize_session=False
     )
+    db.query(models.LiveTalkReaction).filter(models.LiveTalkReaction.user_id == uid).delete(
+        synchronize_session=False
+    )
     db.query(models.ModerationStrike).filter(models.ModerationStrike.user_id == uid).delete(
         synchronize_session=False
     )

@@ -1128,6 +1128,19 @@ def register_social_surfaces(
             u = db.query(models.User).filter(models.User.id == pid).first()
             if u:
                 pinned_usernames.append(u.username)
+        # Keep recent reactions (last ~30s window, max 24)
+        since = datetime.now(timezone.utc) - timedelta(seconds=45)
+        reaction_rows = (
+            db.query(models.LiveTalkReaction)
+            .options(joinedload(models.LiveTalkReaction.user))
+            .filter(
+                models.LiveTalkReaction.space_id == space.id,
+                models.LiveTalkReaction.created_at >= since,
+            )
+            .order_by(models.LiveTalkReaction.created_at.desc())
+            .limit(24)
+            .all()
+        )
         return schemas.LiveTalkStateOut(
             space_id=space.id,
             max_participants=mod.LIVE_TALK_MAX,
@@ -1147,6 +1160,15 @@ def register_social_surfaces(
                     sender=schemas.AuthorOut.model_validate(m.sender),
                 )
                 for m in msgs
+            ],
+            reactions=[
+                schemas.LiveTalkReactionOut(
+                    id=r.id,
+                    emoji=r.emoji,
+                    created_at=r.created_at,
+                    user=schemas.AuthorOut.model_validate(r.user),
+                )
+                for r in reversed(reaction_rows)
             ],
             pinned_usernames=pinned_usernames,
         )
@@ -1359,6 +1381,31 @@ def register_social_surfaces(
                 space_id=s.id,
                 sender_id=current_user.id,
                 text=payload.text,
+            )
+        )
+        db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.post("/spaces/{space_id}/talk/reactions", response_model=schemas.LiveTalkStateOut)
+    def post_live_talk_reaction(
+        space_id: str,
+        payload: schemas.LiveTalkReactionCreate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        me = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        if not me:
+            raise HTTPException(status_code=403, detail="Join the conversation to react")
+        db.add(
+            models.LiveTalkReaction(
+                space_id=s.id,
+                user_id=current_user.id,
+                emoji=payload.emoji,
             )
         )
         db.commit()

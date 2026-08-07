@@ -433,6 +433,12 @@ export const spacesApi = {
       headers: authHeaders(token),
       body: JSON.stringify({ reason }),
     }),
+  talkReact: (token, id, emoji) =>
+    request(`/spaces/${id}/talk/reactions`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ emoji }),
+    }),
 };
 
 export const topicsApi = {

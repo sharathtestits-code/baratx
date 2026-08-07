@@ -729,6 +729,26 @@ class LiveTalkMessageOut(BaseModel):
     sender: AuthorOut
 
 
+class LiveTalkReactionCreate(BaseModel):
+    emoji: str
+
+    @field_validator("emoji")
+    @classmethod
+    def valid_emoji(cls, v):
+        v = (v or "").strip()
+        allowed = {"👍", "👎", "❤️", "😂", "👏", "🔥", "😮", "🎉"}
+        if v not in allowed:
+            raise ValueError("Pick a supported reaction")
+        return v
+
+
+class LiveTalkReactionOut(BaseModel):
+    id: str
+    emoji: str
+    created_at: datetime
+    user: AuthorOut
+
+
 class LiveTalkStateOut(BaseModel):
     space_id: str
     max_participants: int = 15
@@ -738,6 +758,7 @@ class LiveTalkStateOut(BaseModel):
     my_video: bool = False
     participants: list[LiveTalkParticipantOut] = []
     messages: list[LiveTalkMessageOut] = []
+    reactions: list[LiveTalkReactionOut] = []
     pinned_usernames: list[str] = []
 
 

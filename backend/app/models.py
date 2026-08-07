@@ -448,6 +448,20 @@ class LiveTalkMessage(Base):
     sender = relationship("User", foreign_keys=[sender_id])
 
 
+class LiveTalkReaction(Base):
+    """Ephemeral in-call reactions (👍 ❤️ 😂 …) shown to people on the Talk."""
+
+    __tablename__ = "live_talk_reactions"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    emoji = Column(String, nullable=False, default="👍")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    user = relationship("User", foreign_keys=[user_id])
+
+
 class ModerationStrike(Base):
     """Auto-moderation strikes — stack toward account removal."""
 
