@@ -183,7 +183,7 @@ export default function SpaceRoom() {
         )}
         <h1 className="live-amphitheatre-title">{space.title}</h1>
         <p className="live-amphitheatre-sub">
-          Hosted by @{space.host?.username} · audio & video conversation
+          Hosted by @{space.host?.username} · tap Join for mute, video & reactions
           {space.closes_at ? ` · closes ${new Date(space.closes_at).toLocaleString()}` : ""}
         </p>
         <div className="live-stage-wave" aria-hidden="true">
