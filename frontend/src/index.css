@@ -7167,6 +7167,19 @@ button.topic-chip.selected {
   background: color-mix(in srgb, #fff 18%, transparent) !important;
 }
 
+.live-amphitheatre .live-leave-btn,
+.live-amphitheatre-room .live-leave-btn {
+  background: color-mix(in srgb, #fff 8%, transparent) !important;
+  color: #fff !important;
+  border: 1px solid color-mix(in srgb, #fff 40%, transparent) !important;
+}
+
+.live-amphitheatre .live-leave-btn:hover:not(:disabled),
+.live-amphitheatre-room .live-leave-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, #ff5c5c 28%, transparent) !important;
+  border-color: color-mix(in srgb, #ff5c5c 55%, #fff) !important;
+}
+
 .app-shell-plaza .plaza-profile .profile-cover {
   margin-inline: -1rem;
   width: calc(100% + 2rem);

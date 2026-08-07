@@ -387,6 +387,11 @@ export const spacesApi = {
       headers: authHeaders(token),
       body: JSON.stringify({ side }),
     }),
+  clearStance: (token, id) =>
+    request(`/spaces/${id}/stance`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
   listDebates: (token, arenaKey) =>
     request(
       `/spaces?status=open&kind=debate${arenaKey ? `&arena_key=${encodeURIComponent(arenaKey)}` : ""}`,
