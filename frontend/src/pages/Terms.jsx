@@ -12,7 +12,7 @@ export default function Terms() {
 
       <h2>The basics</h2>
       <ul>
-        <li>You must be old enough to use social apps in your region</li>
+        <li>You must be 18 or older to create a BaratX account</li>
         <li>You’re responsible for what you post</li>
         <li>Don’t impersonate others or spam the square</li>
         <li>Don’t post illegal content, harassment, or doxxing</li>

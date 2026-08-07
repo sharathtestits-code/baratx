@@ -1,22 +1,28 @@
 import { useEffect } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, useLocation } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { ARENA_TOPICS } from "../arenas";
-import { IconHome, IconLive, IconArena, IconSearch, IconUser, IconMore } from "./Icons";
 
 /**
- * Collapsible plaza side menu — arenas + primary links.
- * Opens/closes from the top-bar control; not a fixed Twitter rail.
+ * Collapsible plaza side menu — matches the Change Arena rail mockup.
+ * Opens/closes from the top-bar hamburger; not a fixed Twitter rail.
  */
 export default function PlazaSideMenu() {
-  const { user } = useAuth();
   const { open, close } = usePlazaMenu();
   const location = useLocation();
 
   useEffect(() => {
     close();
   }, [location.pathname, close]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    function onKey(e) {
+      if (e.key === "Escape") close();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, close]);
 
   return (
     <>
@@ -25,51 +31,34 @@ export default function PlazaSideMenu() {
         onClick={close}
         aria-hidden={!open}
       />
-      <aside className={`plaza-side-menu${open ? " is-open" : ""}`} aria-hidden={!open} aria-label="Menu">
+      <aside
+        className={`plaza-side-menu${open ? " is-open" : ""}`}
+        aria-hidden={!open}
+        aria-label="Change arena"
+      >
         <div className="plaza-side-head">
-          <div>
-            <p className="plaza-side-eyebrow">Arenas</p>
-            <p className="plaza-side-title">{user?.display_name || "BaratX"}</p>
-          </div>
+          <button type="button" className="plaza-side-arena-switch" aria-label="Current arena">
+            <span className="plaza-side-arena-name">
+              Bharat
+              <svg className="plaza-side-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M4 6l4 4 4-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            <span className="plaza-side-change">Change Arena</span>
+          </button>
           <button type="button" className="plaza-side-close" onClick={close} aria-label="Close menu">
             ×
           </button>
         </div>
 
-        <nav className="plaza-side-primary" aria-label="Primary">
-          <NavLink to="/feed" className={({ isActive }) => `plaza-side-link${isActive ? " is-active" : ""}`} end>
-            <IconHome className="plaza-side-icon" />
-            Square
-          </NavLink>
-          <NavLink to="/spaces" className={({ isActive }) => `plaza-side-link${isActive ? " is-active" : ""}`}>
-            <IconLive className="plaza-side-icon" />
-            Live
-          </NavLink>
-          <NavLink to="/arenas" className={({ isActive }) => `plaza-side-link${isActive ? " is-active" : ""}`}>
-            <IconArena className="plaza-side-icon" />
-            Arenas
-          </NavLink>
-          <NavLink to="/search" className={({ isActive }) => `plaza-side-link${isActive ? " is-active" : ""}`}>
-            <IconSearch className="plaza-side-icon" />
-            Explore
-          </NavLink>
-          {user && (
-            <NavLink
-              to={`/u/${user.username}`}
-              className={({ isActive }) => `plaza-side-link${isActive ? " is-active" : ""}`}
-            >
-              <IconUser className="plaza-side-icon" />
-              Profile
-            </NavLink>
-          )}
-          <NavLink to="/settings" className={({ isActive }) => `plaza-side-link${isActive ? " is-active" : ""}`}>
-            <IconMore className="plaza-side-icon" />
-            More
-          </NavLink>
-        </nav>
-
-        <div className="plaza-side-arenas">
-          <p className="plaza-side-section-label">Change arena</p>
+        <nav className="plaza-side-arenas" aria-label="Arenas">
           <ul className="plaza-side-arena-list">
             {ARENA_TOPICS.map((a) => (
               <li key={a.key}>
@@ -80,33 +69,28 @@ export default function PlazaSideMenu() {
                   onClick={close}
                 >
                   <span className="plaza-side-arena-bar" aria-hidden="true" />
-                  <span>
-                    <strong>{a.name}</strong>
-                    <em>{a.blurb}</em>
-                  </span>
+                  <strong>{a.name}</strong>
                 </Link>
               </li>
             ))}
-            <li>
-              <Link
-                to="/spaces"
-                className="plaza-side-arena plaza-side-arena-live"
-                style={{ "--arena-accent": "#ff9933" }}
-                onClick={close}
-              >
-                <span className="plaza-side-arena-bar" aria-hidden="true" />
-                <span>
-                  <strong>Live / On air</strong>
-                  <em>Airwaves rooms happening now</em>
-                </span>
-              </Link>
-            </li>
           </ul>
-        </div>
+        </nav>
 
         <Link to="/arenas" className="plaza-side-manage" onClick={close}>
-          <span>My Arenas</span>
-          <span className="hint">Manage your favourite arenas →</span>
+          <span className="plaza-side-manage-copy">
+            <strong>My Arenas</strong>
+            <em>Manage your favourite arenas</em>
+          </span>
+          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M6 4l4 4-4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </Link>
       </aside>
     </>

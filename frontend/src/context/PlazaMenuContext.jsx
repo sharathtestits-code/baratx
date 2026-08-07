@@ -1,10 +1,16 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "bx_plaza_menu_open";
 const PlazaMenuContext = createContext(null);
 
 export function PlazaMenuProvider({ children }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     try {
@@ -14,19 +20,20 @@ export function PlazaMenuProvider({ children }) {
     }
   }, [open]);
 
-  function toggle() {
+  const toggle = useCallback(() => {
     setOpen((v) => !v);
-  }
+  }, []);
 
-  function close() {
+  const close = useCallback(() => {
     setOpen(false);
-  }
+  }, []);
 
-  return (
-    <PlazaMenuContext.Provider value={{ open, setOpen, toggle, close }}>
-      {children}
-    </PlazaMenuContext.Provider>
+  const value = useMemo(
+    () => ({ open, setOpen, toggle, close }),
+    [open, toggle, close]
   );
+
+  return <PlazaMenuContext.Provider value={value}>{children}</PlazaMenuContext.Provider>;
 }
 
 export function usePlazaMenu() {

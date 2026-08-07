@@ -27,6 +27,7 @@ class EmailSignupRequest(BaseModel):
     password: str
     username: str
     display_name: str
+    confirm_age_18: bool = False
 
     @field_validator("username")
     @classmethod
@@ -39,6 +40,13 @@ class EmailSignupRequest(BaseModel):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
         return v
+
+    @field_validator("confirm_age_18")
+    @classmethod
+    def must_confirm_age(cls, v):
+        if not v:
+            raise ValueError("You must be 18 or older to join BaratX")
+        return True
 
 
 class EmailLoginRequest(BaseModel):
@@ -72,11 +80,19 @@ class PhoneSignupVerify(BaseModel):
     username: str
     display_name: str
     region: Optional[str] = None
+    confirm_age_18: bool = False
 
     @field_validator("username")
     @classmethod
     def valid_username(cls, v):
         return normalize_username(v)
+
+    @field_validator("confirm_age_18")
+    @classmethod
+    def must_confirm_age(cls, v):
+        if not v:
+            raise ValueError("You must be 18 or older to join BaratX")
+        return True
 
     @model_validator(mode="after")
     def normalize(self):
@@ -125,6 +141,8 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
+    # Required only when Google creates a new BaratX account (18+ gate).
+    confirm_age_18: Optional[bool] = None
 
 
 class MessageResponse(BaseModel):

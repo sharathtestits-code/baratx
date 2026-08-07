@@ -1242,6 +1242,11 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
 
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user:
+        if not payload.confirm_age_18:
+            raise HTTPException(
+                status_code=400,
+                detail="You must be 18 or older to join BaratX. Confirm your age to continue.",
+            )
         base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
         username = base
         n = 0

@@ -14,23 +14,41 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
  * In Capacitor native shells, GIS popup/WebView OAuth is unreliable until
  * platform OAuth clients are configured — prefer phone/email there.
  */
-export default function GoogleSignInButton({ label = "Continue with Google", onError }) {
+export default function GoogleSignInButton({
+  label = "Continue with Google",
+  onError,
+  confirmAge18 = false,
+  requireAgeConfirm = false,
+}) {
   const { login } = useAuth();
   const navigate = useNavigate();
   const wrapRef = useRef(null);
   const hostRef = useRef(null);
   const callbackRef = useRef(null);
+  const ageRef = useRef({ confirmAge18, requireAgeConfirm });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
   const native = isNativeApp();
 
+  ageRef.current = { confirmAge18, requireAgeConfirm };
+
   callbackRef.current = async (response) => {
     if (!response?.credential) return;
+    const { confirmAge18: ageOk, requireAgeConfirm: needAge } = ageRef.current;
+    if (needAge && !ageOk) {
+      const msg = "You must be 18 or older to join BaratX. Confirm your age to continue.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
     setBusy(true);
     setError("");
     try {
-      const data = await api.loginGoogle({ id_token: response.credential });
+      const data = await api.loginGoogle({
+        id_token: response.credential,
+        confirm_age_18: ageOk || undefined,
+      });
       login(data.access_token);
       // Returning users go Home. Topic picker is one-time (Arenas for later edits).
       if (hasSeenTopicOnboarding()) {
@@ -167,16 +185,31 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
     );
   }
 
+  const ageBlocked = requireAgeConfirm && !confirmAge18;
+
   return (
-    <div className="x-google-wrap" ref={wrapRef}>
-      <div className={`x-google-shell ${busy ? "is-busy" : ""} ${gisReady ? "is-ready" : ""}`}>
+    <div className={`x-google-wrap${ageBlocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
+      <div
+        className={`x-google-shell ${busy ? "is-busy" : ""} ${gisReady ? "is-ready" : ""}${
+          ageBlocked ? " is-age-blocked" : ""
+        }`}
+      >
         <div className="x-btn x-btn-google x-google-face" aria-hidden="true">
           <GoogleG className="x-btn-icon" />
           {busy ? "Signing in…" : label}
         </div>
-        <div ref={hostRef} className="google-btn-host" title={label} aria-label={label} />
+        <div
+          ref={hostRef}
+          className="google-btn-host"
+          title={ageBlocked ? "Confirm you are 18+ first" : label}
+          aria-label={label}
+          aria-disabled={ageBlocked}
+        />
       </div>
-      {!gisReady && !error && <p className="hint x-google-loading">Loading Google…</p>}
+      {ageBlocked && (
+        <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
+      )}
+      {!gisReady && !error && !ageBlocked && <p className="hint x-google-loading">Loading Google…</p>}
       {error && <p className="x-inline-error">{error}</p>}
     </div>
   );
