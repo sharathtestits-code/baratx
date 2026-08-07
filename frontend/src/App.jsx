@@ -33,11 +33,13 @@ import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
 import PlazaTopBar from "./components/PlazaTopBar";
+import PlazaSideMenu from "./components/PlazaSideMenu";
 import EmailVerifyBanner from "./components/EmailVerifyBanner";
 import Logo from "./components/Logo";
 import ThemeOnboarding from "./components/ThemeOnboarding";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
+import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
 
 /** Routes that use the plaza shell (not the X-style 3-column chrome). */
 function usePlazaMode(pathname) {
@@ -82,46 +84,77 @@ function AppShell() {
   const location = useLocation();
   const plaza = usePlazaMode(location.pathname);
 
+  if (!plaza) {
+    return (
+      <div className="app-shell">
+        <Sidebar />
+        <main className="app-main">
+          <EmailVerifyBanner />
+          <ThemeOnboarding />
+          <AppRoutes />
+        </main>
+        <RightRail />
+        <ComposeFab />
+        <BottomNav />
+      </div>
+    );
+  }
+
   return (
-    <div className={`app-shell${plaza ? " app-shell-plaza" : ""}`}>
-      {plaza ? <PlazaTopBar /> : <Sidebar />}
-      <main className={`app-main${plaza ? " app-main-plaza" : ""}`}>
+    <PlazaMenuProvider>
+      <PlazaShell />
+    </PlazaMenuProvider>
+  );
+}
+
+function PlazaShell() {
+  const { open } = usePlazaMenu();
+  return (
+    <div className={`app-shell app-shell-plaza${open ? " is-menu-open" : ""}`}>
+      <PlazaTopBar />
+      <PlazaSideMenu />
+      <main className="app-main app-main-plaza">
         <EmailVerifyBanner />
         <ThemeOnboarding />
-        <Routes>
-          <Route path="/" element={<Navigate to="/feed" replace />} />
-          <Route path="/signup" element={<Navigate to="/feed" replace />} />
-          <Route path="/login" element={<Navigate to="/feed" replace />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/bookmarks" element={<Bookmarks />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/messages/:username" element={<MessageThread />} />
-          <Route path="/hashtag/:tag" element={<Hashtag />} />
-          <Route path="/posts/:postId" element={<PostDetail />} />
-          <Route path="/u/:username" element={<Profile />} />
-          <Route path="/u/:username/:kind" element={<FollowList />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/lists" element={<Lists />} />
-          <Route path="/lists/:listId" element={<ListDetail />} />
-          <Route path="/communities" element={<Communities />} />
-          <Route path="/communities/:slug" element={<CommunityDetail />} />
-          <Route path="/arenas" element={<Arenas />} />
-          <Route path="/arenas/:arenaKey" element={<ArenaDetail />} />
-          <Route path="/spaces" element={<Spaces />} />
-          <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
-          <Route path="/onboarding/topics" element={<OnboardingTopics />} />
-          <Route path="/rewards" element={<Rewards />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="*" element={<Navigate to="/feed" replace />} />
-        </Routes>
+        <AppRoutes />
       </main>
-      {!plaza && <RightRail />}
       <ComposeFab />
       <BottomNav />
     </div>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/feed" replace />} />
+      <Route path="/signup" element={<Navigate to="/feed" replace />} />
+      <Route path="/login" element={<Navigate to="/feed" replace />} />
+      <Route path="/feed" element={<Feed />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/bookmarks" element={<Bookmarks />} />
+      <Route path="/messages" element={<Messages />} />
+      <Route path="/messages/:username" element={<MessageThread />} />
+      <Route path="/hashtag/:tag" element={<Hashtag />} />
+      <Route path="/posts/:postId" element={<PostDetail />} />
+      <Route path="/u/:username" element={<Profile />} />
+      <Route path="/u/:username/:kind" element={<FollowList />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/lists" element={<Lists />} />
+      <Route path="/lists/:listId" element={<ListDetail />} />
+      <Route path="/communities" element={<Communities />} />
+      <Route path="/communities/:slug" element={<CommunityDetail />} />
+      <Route path="/arenas" element={<Arenas />} />
+      <Route path="/arenas/:arenaKey" element={<ArenaDetail />} />
+      <Route path="/spaces" element={<Spaces />} />
+      <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
+      <Route path="/onboarding/topics" element={<OnboardingTopics />} />
+      <Route path="/rewards" element={<Rewards />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="*" element={<Navigate to="/feed" replace />} />
+    </Routes>
   );
 }
 

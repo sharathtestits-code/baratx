@@ -1,21 +1,34 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { usePlazaMenu } from "../context/PlazaMenuContext";
 import Logo from "./Logo";
 import Avatar from "./Avatar";
 import { ARENA_TOPICS } from "../arenas";
 import { IconSearch } from "./Icons";
 
 /**
- * BaratX plaza chrome — top brand + orbit nav.
- * Replaces the Twitter-style left icon rail on Square / Profile / Live.
+ * BaratX plaza chrome — top brand + orbit nav + menu toggle.
  */
 export default function PlazaTopBar() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { open, toggle } = usePlazaMenu();
 
   return (
     <header className="plaza-top">
       <div className="plaza-top-inner">
+        <button
+          type="button"
+          className={`plaza-menu-toggle${open ? " is-open" : ""}`}
+          onClick={toggle}
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
         <Link to="/feed" className="plaza-brand" aria-label="BaratX Square">
           <Logo variant="full" className="plaza-brand-logo" title="BaratX" />
         </Link>
