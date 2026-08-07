@@ -6015,6 +6015,34 @@ a.reply-username.name-badge-gold,
   font-weight: 600;
 }
 
+.bx-login-card .bx-landing-phone {
+  margin-top: 0.15rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.bx-login-card .bx-landing-phone:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.bx-login-card .bx-landing-phone .x-btn-icon {
+  color: #ffffff;
+}
+
+.bx-login-legal {
+  margin: 0.35rem 0 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.bx-login-legal a {
+  color: rgba(255, 255, 255, 0.78);
+}
+
 @media (max-width: 860px) {
   .bx-login-page {
     grid-template-columns: 1fr;

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { LogoMark } from "../components/Logo";
+import Logo, { LogoMark } from "../components/Logo";
 import { IconPhone } from "../components/Icons";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 /**
- * Public GTM landing — Google-first for trust, then email, phone last.
+ * Public GTM entry — same split brand shell as Login (plain dark + orange BX).
  */
 export default function Landing() {
   const navigate = useNavigate();
@@ -33,77 +33,88 @@ export default function Landing() {
   }
 
   return (
-    <div className="x-landing">
-      <div className="x-landing-auth">
-        <div className="x-landing-auth-inner">
-          <LogoMark className="x-landing-mark-sm" title="BaratX" />
-          <p className="x-landing-brand-line">BX · BaratX</p>
-          <h1 className="x-landing-headline">India&apos;s public square</h1>
-          <p className="x-landing-support">
-            Short posts. Real replies. Start with Google — fastest and safest way in.
-          </p>
+    <div className="bx-login-page">
+      <aside className="bx-login-brand">
+        <div className="bx-login-brand-inner">
+          <Logo variant="full" className="bx-login-brand-logo" title="BaratX" />
+          <p className="bx-login-tagline">India&apos;s public square</p>
+        </div>
+        <div className="bx-login-brand-dots" aria-hidden="true" />
+      </aside>
+
+      <main className="bx-login-main">
+        <div className="bx-login-card">
+          <div className="bx-login-card-head">
+            <span className="bx-login-accent-line brand" aria-hidden="true" />
+            <LogoMark className="bx-login-card-mark" title="" />
+            <span className="bx-login-accent-line green" aria-hidden="true" />
+          </div>
+
+          <h1 className="bx-login-title">Join BaratX</h1>
+          <p className="bx-login-sub">Short posts. Real replies. Start with Google.</p>
 
           <div className="x-auth-stack">
             <GoogleSignInButton label="Continue with Google" />
 
-            <p className="x-trust-row">HTTPS · Passwords hashed · We don’t sell your data</p>
-
-            <div className="x-auth-or" role="separator">
-              <span>or</span>
+            <div className="x-auth-or bx-login-or" role="separator">
+              <span>or continue with email</span>
             </div>
 
-            <form className="x-auth-email-form" onSubmit={handleNext}>
-              <label className="x-field-simple">
+            <form className="bx-login-form" onSubmit={handleNext}>
+              <label className="bx-field">
                 Email or username
-                <input
-                  type="text"
-                  value={emailOrUser}
-                  onChange={(e) => setEmailOrUser(e.target.value)}
-                  autoComplete="username"
-                  placeholder="name@email.com"
-                />
+                <span className="bx-field-control">
+                  <span className="bx-field-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path d="M3 7l9 7 9-7" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    value={emailOrUser}
+                    onChange={(e) => setEmailOrUser(e.target.value)}
+                    autoComplete="username"
+                    placeholder="name@email.com"
+                  />
+                </span>
               </label>
-              <button type="submit" className="x-btn x-btn-next">
+              <button type="submit" className="bx-login-submit">
                 Continue with email
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+                  <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
             </form>
 
             <button
               type="button"
-              className="x-btn x-btn-phone"
+              className="x-btn x-btn-phone bx-landing-phone"
               onClick={() => navigate("/signup?method=phone")}
             >
               <IconPhone className="x-btn-icon" />
               Continue with phone
             </button>
 
-            <p className="x-legal">
+            <p className="x-legal bx-login-legal">
               By signing up, you agree to the{" "}
               <Link to="/terms">Terms of Service</Link> and{" "}
               <Link to="/privacy">Privacy Policy</Link>.
             </p>
 
-            <div className="x-have-account">
-              <p>Already have an account?</p>
-              <Link to={signInPath()} className="x-btn x-btn-outline">
-                Sign in
-              </Link>
-              <Link to="/login?method=phone" className="x-create-link">
-                Sign in with phone OTP
-              </Link>
-            </div>
+            <p className="bx-login-switch">
+              Already have an account? <Link to={signInPath()}>Sign in</Link>
+            </p>
           </div>
         </div>
-      </div>
 
-      <div className="x-landing-brand" aria-hidden="true">
-        <div className="x-landing-brand-glow" />
-        <LogoMark className="x-landing-mark-xl" title="" />
-        <div className="x-landing-word">
-          Barat<span className="x-landing-word-x">X</span>
-        </div>
-        <p className="x-landing-brand-tag">barathx.com</p>
-      </div>
+        <p className="bx-login-trust">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z" />
+          </svg>
+          HTTPS · Passwords hashed · We don&apos;t sell your data
+        </p>
+      </main>
     </div>
   );
 }
