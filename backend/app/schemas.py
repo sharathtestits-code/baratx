@@ -614,6 +614,7 @@ class SpaceCreate(BaseModel):
     kind: Optional[str] = "room"  # room | debate
     arena_key: Optional[str] = None
     community_id: Optional[str] = None
+    topic_id: Optional[str] = None
     side_for_label: Optional[str] = "For"
     side_against_label: Optional[str] = "Against"
 

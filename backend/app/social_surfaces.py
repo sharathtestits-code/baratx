@@ -789,12 +789,22 @@ def register_social_surfaces(
         else:
             side_for = (payload.side_for_label or "For").strip()[:40] or "For"
             side_against = (payload.side_against_label or "Against").strip()[:40] or "Against"
+
+        topic_id = payload.topic_id
+        if topic_id:
+            topic = db.query(models.Topic).filter(models.Topic.id == topic_id).first()
+            if not topic:
+                raise HTTPException(status_code=400, detail="Topic not found")
+            if payload.arena_key and topic.arena_key != payload.arena_key:
+                raise HTTPException(status_code=400, detail="Topic does not belong to this arena")
+
         s = models.Space(
             title=payload.title,
             host_id=current_user.id,
             status="open",
             kind=kind,
             community_id=community_id,
+            topic_id=topic_id,
             side_for_label=side_for,
             side_against_label=side_against,
             closes_at=now + timedelta(hours=hours),
