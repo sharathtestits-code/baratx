@@ -1,0 +1,5 @@
+v2 fixes:
+- Text centered in safe inner box (margins top/bottom/corners)
+- UI screens letterboxed FIT (not cropped/cut)
+- Actually shows WHERE like/reply/repost/save live
+- Shows 6 arenas on top orbits + in hamburger menu
