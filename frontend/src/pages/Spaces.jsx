@@ -45,6 +45,8 @@ export default function Spaces() {
     }
   }
 
+  const featured = items[0];
+
   return (
     <div className="feed-wrap surface-page live-airwaves">
       <div className="feed-header live-airwaves-header">
@@ -56,9 +58,32 @@ export default function Spaces() {
           On air
         </span>
       </div>
-      <p className="hint surface-lead">
-        Timed discussion rooms. Host a topic, invite people in, close when you&apos;re done.
-      </p>
+
+      <section className="live-hero-stage" aria-label="Live stage">
+        <div className="live-stage-wave" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+        <p className="live-hero-kicker">Now on BaratX</p>
+        <h2 className="live-hero-title">
+          {featured ? featured.title : "Start a room India can join"}
+        </h2>
+        <p className="hint">
+          {featured
+            ? `Hosted by @${featured.host?.username} · ${featured.post_count} posts`
+            : "Timed discussion rooms for real-time text conversation."}
+        </p>
+        {featured ? (
+          <Link to={`/spaces/${featured.id}`} className="btn btn-primary live-hero-cta">
+            Join conversation
+          </Link>
+        ) : null}
+      </section>
 
       <form className="surface-create live-create" onSubmit={createSpace}>
         <input

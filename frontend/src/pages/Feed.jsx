@@ -281,8 +281,29 @@ export default function Feed() {
 
   return (
     <div className="feed-wrap square-home">
+      <aside className="square-arena-rail" aria-label="Arenas">
+        <p className="square-arena-rail-label">Arenas</p>
+        {ARENA_TOPICS.map((a) => (
+          <Link
+            key={a.key}
+            to={`/arenas/${a.key}`}
+            className="square-arena-tab"
+            style={{ "--arena-accent": a.accent }}
+          >
+            {a.name}
+          </Link>
+        ))}
+        <Link to="/spaces" className="square-arena-tab square-arena-tab-live">
+          Live
+        </Link>
+      </aside>
+
+      <div className="square-home-main">
       <div className="feed-topbar">
-        <h1 className="feed-title">The Square</h1>
+        <div>
+          <p className="square-eyebrow">BaratX</p>
+          <h1 className="feed-title">The Square</h1>
+        </div>
         <button
           type="button"
           className="mobile-logout"
@@ -547,6 +568,7 @@ export default function Feed() {
           )}
         </>
       )}
+      </div>
     </div>
   );
 }

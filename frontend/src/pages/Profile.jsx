@@ -478,6 +478,20 @@ export default function Profile() {
 
         {profile.bio && <p className="profile-bio">{profile.bio}</p>}
 
+        <div className="profile-orbit-row" aria-label="Orbits">
+          <span className="profile-orbit-label">In their orbits</span>
+          <div className="profile-orbit-chips">
+            {["Sports", "Politics", "News", "Spirituality"].map((label) => (
+              <Link key={label} to={`/search?q=${encodeURIComponent(label)}`} className="profile-orbit-chip">
+                {label}
+              </Link>
+            ))}
+            <Link to="/arenas" className="profile-orbit-chip profile-orbit-chip-more">
+              Arenas
+            </Link>
+          </div>
+        </div>
+
         {error && <div className="error">{error}</div>}
 
         <div className="profile-stats">

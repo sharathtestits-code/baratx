@@ -144,11 +144,18 @@ export default function SpaceRoom() {
           <span />
           <span />
         </div>
-        {space.is_host && open && (
-          <button type="button" className="profile-edit-btn live-close-btn" onClick={closeSpace} disabled={closing}>
-            {closing ? "Closing…" : "Close room"}
-          </button>
-        )}
+        <div className="live-stage-actions">
+          {open && (
+            <a href="#live-compose" className="btn btn-primary">
+              Join conversation
+            </a>
+          )}
+          {space.is_host && open && (
+            <button type="button" className="profile-edit-btn live-close-btn" onClick={closeSpace} disabled={closing}>
+              {closing ? "Closing…" : "Close room"}
+            </button>
+          )}
+        </div>
       </div>
 
       {error && <div className="error">{error}</div>}
@@ -208,7 +215,7 @@ export default function SpaceRoom() {
       )}
 
       {open ? (
-        <form className="compose surface-compose" onSubmit={submitPost}>
+        <form id="live-compose" className="compose surface-compose" onSubmit={submitPost}>
           <div className="compose-row">
             <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={40} />
             <div className="compose-body">
