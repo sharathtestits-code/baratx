@@ -115,24 +115,38 @@ export default function SpaceRoom() {
       : posts.filter((p) => p.debate_side === filter);
 
   return (
-    <div className={`feed-wrap surface-page${isDebate ? " debate-room" : ""}`}>
-      <div className="feed-header surface-header-row">
-        <div>
+    <div className={`feed-wrap surface-page live-stage-page${isDebate ? " debate-room" : ""}`}>
+      <div className="live-stage" aria-label="Live room stage">
+        <div className="live-stage-top">
           <Link to={space.arena_key ? `/arenas/${space.arena_key}` : "/spaces"} className="back-link">
-            ← {space.arena_name || (isDebate ? "Arenas" : "Spaces")}
+            ← {space.arena_name || (isDebate ? "Arenas" : "Live")}
           </Link>
-          {isDebate && space.arena_name && (
-            <div className="debate-arena-tag">{space.arena_name} debate</div>
+          {open && (
+            <span className="live-pill" aria-hidden="true">
+              Live
+            </span>
           )}
-          <h1>{space.title}</h1>
-          <p className="hint">
-            Hosted by @{space.host?.username} · {space.status}
-            {space.closes_at ? ` · closes ${new Date(space.closes_at).toLocaleString()}` : ""}
-          </p>
+        </div>
+        {isDebate && space.arena_name && (
+          <div className="debate-arena-tag">{space.arena_name} debate</div>
+        )}
+        <h1 className="live-stage-title">{space.title}</h1>
+        <p className="hint live-stage-meta">
+          Hosted by @{space.host?.username} · {space.status}
+          {space.closes_at ? ` · closes ${new Date(space.closes_at).toLocaleString()}` : ""}
+        </p>
+        <div className="live-stage-wave" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
         </div>
         {space.is_host && open && (
-          <button type="button" className="profile-edit-btn" onClick={closeSpace} disabled={closing}>
-            {closing ? "Closing…" : "Close"}
+          <button type="button" className="profile-edit-btn live-close-btn" onClick={closeSpace} disabled={closing}>
+            {closing ? "Closing…" : "Close room"}
           </button>
         )}
       </div>

@@ -46,25 +46,31 @@ export default function Spaces() {
   }
 
   return (
-    <div className="feed-wrap surface-page">
-      <div className="feed-header">
-        <h1>Spaces</h1>
+    <div className="feed-wrap surface-page live-airwaves">
+      <div className="feed-header live-airwaves-header">
+        <div>
+          <p className="live-eyebrow">Airwaves</p>
+          <h1>Live</h1>
+        </div>
+        <span className="live-pill" aria-hidden="true">
+          On air
+        </span>
       </div>
       <p className="hint surface-lead">
-        Timed text discussion rooms. Host a topic, invite people in, close when you’re done.
+        Timed discussion rooms. Host a topic, invite people in, close when you&apos;re done.
       </p>
 
-      <form className="surface-create" onSubmit={createSpace}>
+      <form className="surface-create live-create" onSubmit={createSpace}>
         <input
           type="text"
-          placeholder="What is this Space about?"
+          placeholder="What should India hear right now?"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={100}
           required
         />
         <button type="submit" className="btn btn-primary" disabled={creating || !title.trim()}>
-          {creating ? "Opening…" : "Create your Space"}
+          {creating ? "Opening…" : "Go live"}
         </button>
       </form>
 
@@ -74,14 +80,15 @@ export default function Spaces() {
         <p className="hint">Loading…</p>
       ) : items.length === 0 ? (
         <div className="empty-state">
-          <p className="empty-state-title">No open Spaces</p>
-          <p className="hint">Start a room for a live text conversation.</p>
+          <p className="empty-state-title">No rooms on air</p>
+          <p className="hint">Start a live room for a real-time text conversation.</p>
         </div>
       ) : (
-        <ul className="surface-card-list">
+        <ul className="surface-card-list live-room-list">
           {items.map((s) => (
             <li key={s.id}>
-              <Link to={`/spaces/${s.id}`} className="surface-card-link">
+              <Link to={`/spaces/${s.id}`} className="surface-card-link live-room-card">
+                <span className="live-room-dot" aria-hidden="true" />
                 <strong>{s.title}</strong>
                 <span className="hint">
                   Hosted by @{s.host?.username}

@@ -38,11 +38,14 @@ export default function Profile() {
   const editMenuRef = useRef(null);
   const loadingMoreRef = useRef(false);
 
+  const [profileTab, setProfileTab] = useState("square");
+
   useEffect(() => {
     loadProfile();
     loadPosts();
     setEditMenuOpen(false);
     setEditModalOpen(false);
+    setProfileTab("square");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
 
@@ -208,7 +211,7 @@ export default function Profile() {
   const postLabel = postsLoading ? "…" : `${posts.length}${hasMore ? "+" : ""} post${posts.length === 1 ? "" : "s"}`;
 
   return (
-    <div className="feed-wrap">
+    <div className="feed-wrap profile-cinematic">
       <div className="profile-topbar">
         <div className="profile-topbar-text">
           <h1 className="profile-topbar-name">{profile.display_name}</h1>
@@ -488,30 +491,80 @@ export default function Profile() {
       </div>
 
       <div className="feed-tabs profile-tabs" role="tablist" aria-label="Profile sections">
-        <button type="button" className="feed-tab active" role="tab" aria-selected="true">
-          Posts
+        <button
+          type="button"
+          className={`feed-tab${profileTab === "square" ? " active" : ""}`}
+          role="tab"
+          aria-selected={profileTab === "square"}
+          onClick={() => setProfileTab("square")}
+        >
+          Square
         </button>
+        <button
+          type="button"
+          className={`feed-tab${profileTab === "echoes" ? " active" : ""}`}
+          role="tab"
+          aria-selected={profileTab === "echoes"}
+          onClick={() => setProfileTab("echoes")}
+        >
+          Echoes
+        </button>
+        <button
+          type="button"
+          className={`feed-tab${profileTab === "media" ? " active" : ""}`}
+          role="tab"
+          aria-selected={profileTab === "media"}
+          onClick={() => setProfileTab("media")}
+        >
+          Media
+        </button>
+        <Link to="/arenas" className="feed-tab feed-tab-link">
+          Arenas
+        </Link>
       </div>
 
       {postsLoading ? (
         <p className="hint profile-posts-hint">Loading posts...</p>
-      ) : posts.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No posts yet</p>
-          <p className="hint">{isMe ? "Share your first post from Home." : "This account hasn’t posted yet."}</p>
-        </div>
-      ) : (
-        <>
-          <div className="post-list">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} onDeleted={handleDeleted} />
-            ))}
-          </div>
-          <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
-          {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
-          {!hasMore && posts.length > 0 && <p className="hint load-more-hint">End of posts.</p>}
-        </>
-      )}
+      ) : (() => {
+        const visible =
+          profileTab === "media"
+            ? posts.filter((p) => p.image_url)
+            : profileTab === "echoes"
+              ? posts.filter((p) => (p.repost_count || 0) > 0 || (p.reply_count || 0) > 0)
+              : posts;
+        if (visible.length === 0) {
+          return (
+            <div className="empty-state">
+              <p className="empty-state-title">
+                {profileTab === "media"
+                  ? "No media yet"
+                  : profileTab === "echoes"
+                    ? "No echoes yet"
+                    : "No posts yet"}
+              </p>
+              <p className="hint">
+                {isMe ? "Share your first post from The Square." : "Nothing here yet."}
+              </p>
+            </div>
+          );
+        }
+        return (
+          <>
+            <div className="post-list">
+              {visible.map((post) => (
+                <PostCard key={post.id} post={post} onDeleted={handleDeleted} />
+              ))}
+            </div>
+            {profileTab === "square" && (
+              <>
+                <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
+                {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
+                {!hasMore && posts.length > 0 && <p className="hint load-more-hint">End of posts.</p>}
+              </>
+            )}
+          </>
+        );
+      })()}
 
       {isMe && (
         <EditProfileModal

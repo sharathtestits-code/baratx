@@ -280,9 +280,9 @@ export default function Feed() {
   const charCountClass = remaining < 20 ? "char-count char-count-low" : "char-count";
 
   return (
-    <div className="feed-wrap">
+    <div className="feed-wrap square-home">
       <div className="feed-topbar">
-        <h1 className="feed-title">Home</h1>
+        <h1 className="feed-title">The Square</h1>
         <button
           type="button"
           className="mobile-logout"
@@ -293,6 +293,35 @@ export default function Feed() {
         >
           Log out
         </button>
+      </div>
+
+      <nav className="orbit-chip-rail" aria-label="Orbits">
+        {ARENA_TOPICS.map((a) => (
+          <Link
+            key={a.key}
+            to={`/arenas/${a.key}`}
+            className="orbit-chip"
+            style={{ "--arena-accent": a.accent }}
+          >
+            {a.name}
+          </Link>
+        ))}
+        <Link to="/spaces" className="orbit-chip orbit-chip-live">
+          Live
+        </Link>
+        <Link to="/arenas" className="orbit-chip orbit-chip-more">
+          All arenas
+        </Link>
+      </nav>
+
+      <div className="square-stage">
+        <TodaysSquare
+          onAnswer={(question) => {
+            setText(`${question}\n\n`);
+            composeRef.current?.focus?.();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
       </div>
 
       <form className="compose" onSubmit={handlePost}>
@@ -419,29 +448,14 @@ export default function Feed() {
 
       <RaceStrip key={`race-${foundingRefresh}`} />
 
-      <TodaysSquare
-        onAnswer={(question) => {
-          setText(`${question}\n\n`);
-          composeRef.current?.focus?.();
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      />
-
-      <section className="arena-home-strip" aria-label="Arenas">
-        <div className="arena-home-strip-head">
-          <h2>Arenas</h2>
-          <Link to="/arenas" className="rail-card-more">
-            See all
-          </Link>
-        </div>
-        <div className="arena-home-chips">
-          {ARENA_TOPICS.map((a) => (
-            <Link key={a.key} to={`/arenas/${a.key}`} className="arena-home-chip" style={{ "--arena-accent": a.accent }}>
-              {a.name}
+      {liveDebates.length > 0 && (
+        <section className="arena-home-strip" aria-label="Live debates">
+          <div className="arena-home-strip-head">
+            <h2>On air now</h2>
+            <Link to="/spaces" className="rail-card-more">
+              All live
             </Link>
-          ))}
-        </div>
-        {liveDebates.length > 0 && (
+          </div>
           <ul className="debate-list debate-list-compact">
             {liveDebates.slice(0, 5).map((d) => (
               <li key={d.id}>
@@ -454,13 +468,8 @@ export default function Feed() {
               </li>
             ))}
           </ul>
-        )}
-        <div className="arena-home-strip-foot">
-          <Link to="/onboarding/topics" className="rail-card-more">
-            Edit topics
-          </Link>
-        </div>
-      </section>
+        </section>
+      )}
 
       {showWelcome && (
         <WelcomePanel token={token} text={text} setText={setText} onPostedFlag composeRef={composeRef} />
@@ -489,6 +498,9 @@ export default function Feed() {
         >
           Following
         </button>
+        <Link to="/onboarding/topics" className="feed-tab feed-tab-link">
+          Topics
+        </Link>
       </div>
 
       {feedError && <div className="error">{feedError}</div>}

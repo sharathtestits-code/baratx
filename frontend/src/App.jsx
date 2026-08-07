@@ -169,14 +169,7 @@ export default function App() {
             </AuthChrome>
           }
         />
-        <Route
-          path="/login"
-          element={
-            <AuthChrome>
-              <Login />
-            </AuthChrome>
-          }
-        />
+        <Route path="/login" element={<Login />} />
         <Route
           path="/forgot-password"
           element={

@@ -10,7 +10,7 @@ const MORE_LINKS = [
   { to: "/rewards", label: "Rewards progress" },
   { to: "/lists", label: "Lists" },
   { to: "/communities", label: "Communities" },
-  { to: "/spaces", label: "Spaces" },
+  { to: "/spaces", label: "Live rooms" },
   { to: "/settings", label: "Settings and privacy" },
 ];
 
@@ -78,7 +78,7 @@ export default function Sidebar() {
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLink to="/feed" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconHome className="sidebar-icon" />
-            <span>Home</span>
+            <span>Square</span>
           </NavLink>
           <NavLink to="/arenas" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconArena className="sidebar-icon" />
