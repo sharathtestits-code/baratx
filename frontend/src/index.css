@@ -1375,16 +1375,28 @@ button:disabled {
   outline: none;
   padding: 0.4rem 0;
   background: transparent;
+  color: var(--text);
+  pointer-events: auto;
+  caret-color: var(--brand);
+}
+
+.compose textarea:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .mention-textarea-wrap {
   position: relative;
   width: 100%;
+  z-index: 1;
 }
 
 .mention-textarea-wrap textarea {
   width: 100%;
   box-sizing: border-box;
+  color: var(--text);
+  background: transparent;
+  pointer-events: auto;
 }
 
 .mention-suggest {
