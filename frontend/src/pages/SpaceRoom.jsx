@@ -123,16 +123,12 @@ export default function SpaceRoom() {
       setError("Log in to join the conversation");
       return;
     }
-    if (isDebate && !space?.my_side) {
-      setStanceHint(true);
-      document.getElementById("debate-stance-panel")?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      return;
-    }
+    // Always join Live Talk (mute / video / reactions). Stance is only required to post text.
     setTalkJoinToken((n) => n + 1);
     talkRef.current?.scrollIntoView?.();
+    if (isDebate && !space?.my_side) {
+      setStanceHint(true);
+    }
   }
 
   async function closeSpace() {
