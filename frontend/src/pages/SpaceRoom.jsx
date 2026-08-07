@@ -95,6 +95,41 @@ export default function SpaceRoom() {
     }
   }
 
+  async function leaveConversation() {
+    if (!token || stanceBusy || !space?.my_side) return;
+    setStanceBusy(true);
+    setError("");
+    setStanceHint(false);
+    setSpace((prev) => (prev ? { ...prev, my_side: null } : prev));
+    try {
+      const updated = await spacesApi.clearStance(token, spaceId);
+      setSpace(updated);
+    } catch (err) {
+      setError(err.message || "Could not leave conversation");
+      load();
+    } finally {
+      setStanceBusy(false);
+    }
+  }
+
+  function joinConversation() {
+    if (isDebate && !space?.my_side) {
+      setStanceHint(true);
+      document.getElementById("debate-stance-panel")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      return;
+    }
+    document.getElementById("live-compose")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+    requestAnimationFrame(() => {
+      if (typeof composeRef.current?.focus === "function") composeRef.current.focus();
+    });
+  }
+
   async function closeSpace() {
     if (!window.confirm("Close this debate? People won’t be able to post anymore.")) return;
     setClosing(true);
@@ -161,9 +196,19 @@ export default function SpaceRoom() {
         </div>
         <div className="live-stage-actions">
           {open && (
-            <a href="#live-compose" className="btn btn-primary">
-              Join conversation
-            </a>
+            <button type="button" className="btn btn-primary" onClick={joinConversation}>
+              {isDebate && space.my_side ? "Back to compose" : "Join conversation"}
+            </button>
+          )}
+          {open && isDebate && space.my_side && (
+            <button
+              type="button"
+              className="profile-edit-btn live-leave-btn"
+              onClick={leaveConversation}
+              disabled={stanceBusy}
+            >
+              {stanceBusy ? "Leaving…" : "Leave conversation"}
+            </button>
           )}
           {space.is_host && open && (
             <button type="button" className="profile-edit-btn live-close-btn" onClick={closeSpace} disabled={closing}>

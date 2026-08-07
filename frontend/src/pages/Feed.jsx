@@ -369,9 +369,19 @@ export default function Feed() {
               type="button"
               className="compose-tile compose-tile-ai"
               onClick={() => {
-                if (!text.trim()) setText("In my city, the real take is ");
+                // Local prompt starter only (no model yet) — cycles India-first hooks.
+                const starters = [
+                  "In my city, the real take is ",
+                  "Hot take: India needs to stop pretending ",
+                  "Nobody talks about this enough — ",
+                  "From the street: the problem isn’t X, it’s ",
+                  "Ask BaratX: should we ",
+                ];
+                const pick = starters[Math.floor(Math.random() * starters.length)];
+                setText((prev) => (prev.trim() ? prev : pick));
                 composeRef.current?.focus?.();
               }}
+              title="Drops a starter line — full AI drafts can plug in later"
             >
               AI Assist
             </button>

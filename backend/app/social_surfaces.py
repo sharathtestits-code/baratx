@@ -594,6 +594,31 @@ def register_social_surfaces(
         db.refresh(s)
         return _space_out(s, current_user, db)
 
+    @router.delete("/spaces/{space_id}/stance", response_model=schemas.SpaceOut)
+    def leave_space_stance(
+        space_id: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        """Leave the debate conversation (clear For/Against stance)."""
+        s = _get_space(db, space_id)
+        if (getattr(s, "kind", None) or "room") != "debate":
+            raise HTTPException(status_code=400, detail="Stances are only for debates")
+        deleted = (
+            db.query(models.SpaceStance)
+            .filter(
+                models.SpaceStance.space_id == s.id,
+                models.SpaceStance.user_id == current_user.id,
+            )
+            .delete(synchronize_session=False)
+        )
+        if not deleted:
+            # Idempotent — already not in the fight
+            return _space_out(s, current_user, db)
+        db.commit()
+        db.refresh(s)
+        return _space_out(s, current_user, db)
+
     # ---------- Text Spaces ----------
 
     def _space_out(s: models.Space, current_user: Optional[models.User], db: Session) -> schemas.SpaceOut:
