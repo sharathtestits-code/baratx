@@ -482,11 +482,16 @@ export const adminApi = {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
     }),
-  dailyDigest: (adminSecret, force = false) =>
-    request(`/admin/daily-digest?force=${force ? "true" : "false"}`, {
-      method: "POST",
-      headers: { "X-Admin-Secret": adminSecret },
-    }),
+  dailyDigest: (adminSecret, force = false, slot = "") =>
+    request(
+      `/admin/daily-digest?force=${force ? "true" : "false"}${
+        slot ? `&slot=${encodeURIComponent(slot)}` : ""
+      }`,
+      {
+        method: "POST",
+        headers: { "X-Admin-Secret": adminSecret },
+      }
+    ),
   instagramCarousel: (adminSecret, pack = "evening") =>
     request(`/admin/instagram-carousel?pack=${encodeURIComponent(pack)}`, {
       method: "POST",

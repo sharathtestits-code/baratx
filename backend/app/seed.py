@@ -198,6 +198,12 @@ ARENA_TOPICS = [
         "name": "Spirituality",
         "description": "Faith, yoga, festivals, and the searches shaping modern India.",
     },
+    {
+        "key": "startups",
+        "slug": "startups",
+        "name": "Startups",
+        "description": "Funding, founders, and the India builder economy — Fund it or Pass.",
+    },
 ]
 
 SAMPLE_DEBATES = [
@@ -237,25 +243,20 @@ SAMPLE_DEBATES = [
         "side_for": "Resonates",
         "side_against": "Skeptical",
     },
+    {
+        "arena_key": "startups",
+        "title": "Should India prioritize profitability over growth-at-all-costs?",
+        "side_for": "Fund it",
+        "side_against": "Pass",
+    },
 ]
 
 
 def seed_arenas(db: Session) -> None:
-    """Seed active arenas + starter debates. Retires Startups from the public square."""
+    """Seed active arenas + starter debates (including Startups)."""
     host = db.query(models.User).filter(models.User.username == "baratx").first()
     if not host:
         return
-    # Hide retired Startups arena if it still exists from older seeds.
-    retired = (
-        db.query(models.Community)
-        .filter(
-            models.Community.is_arena == True,  # noqa: E712
-            (models.Community.arena_key == "startups") | (models.Community.slug == "startups"),
-        )
-        .all()
-    )
-    for row in retired:
-        row.is_arena = False
     created_any = False
     arenas_by_key = {}
     for topic in ARENA_TOPICS:

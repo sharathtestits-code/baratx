@@ -2346,15 +2346,19 @@ def admin_seed_topics(
 @app.post("/admin/daily-digest")
 def admin_daily_digest(
     force: bool = False,
+    slot: str | None = None,
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Post 1–2 trending news takes as @sharath with a BaratX-branded image."""
+    """Run a peak digest slot (morning/midday/evening): @baratx glimpse + @sharath take,
+    cross-replies, and mutual likes — credible news sources only.
+    """
     from app import daily_digest
 
     return daily_digest.run_daily_digest(
         db,
         force=force,
+        slot=slot,
         attach_hashtags=attach_hashtags,
         notify_mentions=notify_mentions,
     )

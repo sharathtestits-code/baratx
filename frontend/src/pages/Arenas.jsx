@@ -65,7 +65,7 @@ export default function Arenas() {
     <div className="feed-wrap surface-page arenas-page plaza-page">
       <PlazaPageHeader
         title="Arenas"
-        sub="Pick a topic, pick a side — Sports, Politics, Entertainment, News, or Spirituality."
+        sub="Pick a topic, pick a side — Sports, Politics, Entertainment, News, Spirituality, or Startups."
       />
 
       {error && <div className="error">{error}</div>}

@@ -412,16 +412,17 @@ export default function Admin() {
               try {
                 const res = await adminApi.dailyDigest(secret, true);
                 if (res.skipped) {
-                  setMsg(`Daily digest skipped — ${res.reason || "already posted"}`);
+                  setMsg(`Peak digest skipped — ${res.reason || "already posted"} (${res.slot || "slot"})`);
                 } else {
-                  const arenas = (res.posts || [])
+                  const arenas = (res.pairs || res.posts || [])
                     .map((p) => p.arena)
                     .filter(Boolean)
                     .join(", ");
                   setMsg(
-                    `Daily digest — posted ${res.created || 0}/5` +
+                    `Peak digest · ${res.slot || "slot"} — ${res.created_pairs || 0} topic pair(s)` +
+                      ` (${res.created || 0} posts)` +
                       (arenas ? ` · ${arenas}` : "") +
-                      ` (@${(res.authors || ["sharath", "baratx"]).join(", @")})`
+                      " · @baratx + @sharath replies + likes"
                   );
                 }
                 load(secret);
@@ -433,7 +434,7 @@ export default function Admin() {
             }}
             disabled={busy}
           >
-            Run daily digest now
+            Run peak digest now
           </button>
           <button
             type="button"

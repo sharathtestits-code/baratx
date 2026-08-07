@@ -1,8 +1,12 @@
-"""Daily trending digest — multi-arena posts as @sharath + @baratx.
+"""Daily peak digest — credible arena glimpses + @baratx / @sharath engagement.
 
-Pulls Google News RSS across all arenas, scores for BaratX motto fit
-(India's public square — real civic takes, not spam), and posts 3–5
-quality items/day with a per-arena cap so politics doesn't own the feed.
+Posts only at 3 IST peak windows (morning / midday / evening):
+  1) @baratx posts a news glimpse (credible sources only)
+  2) @sharath posts a response take on the same story
+  3) @sharath replies on the admin post; @baratx replies on Sharath's post
+  4) Mutual likes on both posts and both replies
+
+We never invent facts beyond the headline + named publisher.
 """
 
 from __future__ import annotations
@@ -27,34 +31,50 @@ from app.topics_data import ACTIVE_ARENA_KEYS, TOPICS_BY_ARENA
 logger = logging.getLogger("baratx.daily_digest")
 
 IST = ZoneInfo("Asia/Kolkata")
-# Split voice across brand + founder so the square feels alive.
-DIGEST_AUTHORS = ("sharath", "baratx")
 
-# Volume: post 3–5 when quality exists. Max 2 per arena so all floors get airtime.
-MIN_POSTS_IF_QUALITY = 3
-MAX_POSTS_PER_DAY = 5
-MAX_POSTS_PER_ARENA = 2
-MAX_POSTS_PER_AUTHOR = 3  # within the daily 5, split across both voices
+ADMIN_USERNAME = "baratx"
+SHARATH_USERNAME = "sharath"
+DIGEST_AUTHORS = (ADMIN_USERNAME, SHARATH_USERNAME)
+
+# Three peak windows — do not spray the feed all day.
+PEAK_SLOTS = (
+    (9, 0, "morning"),
+    (13, 30, "midday"),
+    (20, 0, "evening"),
+)
+SLOT_MARKERS = {
+    "morning": "#BXMorning",
+    "midday": "#BXMidday",
+    "evening": "#BXEvening",
+}
 POST_MARKER = "#BaratXDaily"
 
-# Soft floor — below this we skip (never pad with junk to hit the min).
+# Per peak slot: cover this many arenas (rotated so every arena gets airtime).
+ARENAS_PER_SLOT = 2
+# Soft floors for headline selection (tests + collector).
+MIN_POSTS_IF_QUALITY = 3
+MAX_POSTS_PER_DAY = 12  # 3 slots × 2 arenas × 2 voices
+MAX_POSTS_PER_ARENA = 2
+MAX_POSTS_PER_AUTHOR = 6
 MIN_SCORE_TO_POST = 12.0
-# Slight prefer politics (civic pulse) without excluding other arenas.
+
 ARENA_WEIGHT = {
     "politics": 2.5,
     "news": 1.5,
+    "startups": 2.0,
     "sports": 1.0,
     "entertainment": 0.5,
     "spirituality": 1.0,
 }
 
-# Arena-level trending queries (broader than single subtopics).
+# Prefer press / wire / named desk queries — then filter by credible publisher.
 ARENA_TRENDING_QUERIES = {
-    "sports": "India sports news today",
-    "politics": "India politics news today",
-    "entertainment": "Bollywood entertainment news today India",
-    "news": "India breaking news today",
-    "spirituality": "India spirituality religion news today",
+    "sports": "India sports news today PTI OR ANI OR The Hindu",
+    "politics": "India politics Parliament press conference PIB OR PTI",
+    "entertainment": "Bollywood entertainment news India The Hindu OR Indian Express",
+    "news": "India breaking news today PTI OR Reuters OR PIB",
+    "spirituality": "India temple festival spirituality news The Hindu",
+    "startups": "India startup funding Economic Times OR LiveMint OR Inc42 OR PIB",
 }
 
 BRAND_ORANGE = (255, 103, 31)
@@ -62,7 +82,6 @@ BRAND_NAVY = (15, 23, 42)
 BRAND_CREAM = (255, 248, 242)
 BRAND_WHITE = (255, 255, 255)
 
-# BaratX motto keywords — civic debate / India public square.
 _MOTTO_BOOST = (
     "india",
     "bharat",
@@ -78,36 +97,19 @@ _MOTTO_BOOST = (
     "parliament",
     "lok sabha",
     "election",
-    "vote",
-    "voter",
-    "constitution",
     "supreme court",
-    "high court",
     "policy",
     "budget",
-    "rupee",
     "gst",
-    "farmers",
-    "civic",
-    "municipal",
-    "mayor",
-    "cm ",
-    "governor",
+    "startup",
+    "funding",
+    "unicorn",
     "isro",
     "ipl",
     "cricket",
-    "world cup",
-    "olympics",
-    "protest",
-    "bill",
-    "act ",
-    "rti",
-    "corruption",
-    "scam",
-    "temple",
-    "mosque",
-    "church",
-    "faith",
+    "press conference",
+    "pib",
+    "minister",
 )
 _SOFT_PENALTY = (
     "tips to",
@@ -121,6 +123,9 @@ _SOFT_PENALTY = (
     "netflix top",
     "recipe",
     "weight loss",
+    "rumour",
+    "rumor",
+    "allegedly unconfirmed",
 )
 
 
@@ -145,13 +150,12 @@ def _wrap(text: str, width: int) -> list[str]:
     return lines
 
 
-def _score_headline(title: str, arena: str = "") -> float:
-    """Higher = more post-worthy and closer to BaratX motto (civic square)."""
+def _score_headline(title: str, arena: str = "", *, credible: bool = False) -> float:
+    """Higher = more post-worthy. Credible publishers get a hard boost."""
     t = (title or "").strip()
     if len(t) < 28:
         return 0.0
     score = 10.0
-    # Prefer mid-length (mobile readable)
     if 40 <= len(t) <= 110:
         score += 8
     elif len(t) > 140:
@@ -165,16 +169,18 @@ def _score_headline(title: str, arena: str = "") -> float:
             score -= 8
     if "?" in t:
         score += 2
-    # Debate-shaped language
     for cue in ("should", "why", "vs", "versus", "debate", "controversy", "row over", "slams"):
         if cue in low:
             score += 1.5
     score += ARENA_WEIGHT.get(arena, 0.0)
+    if credible:
+        score += 10.0
+    else:
+        score -= 6.0  # prefer named desks; unknown sources rarely clear the bar
     return score
 
 
 def _already_posted_similar(db: Session, author_id: str, title: str) -> bool:
-    """Avoid re-posting the same story in the last 5 days."""
     key = re.sub(r"[^a-z0-9]+", " ", (title or "").lower()).strip()[:60]
     if not key:
         return True
@@ -191,7 +197,7 @@ def _already_posted_similar(db: Session, author_id: str, title: str) -> bool:
     return False
 
 
-def posts_today_count(db: Session, author_id: Optional[str] = None) -> int:
+def posts_today_count(db: Session, author_id: Optional[str] = None, *, slot: str | None = None) -> int:
     start = datetime.combine(_today_ist(), datetime.min.time(), tzinfo=IST).astimezone(
         timezone.utc
     )
@@ -201,54 +207,75 @@ def posts_today_count(db: Session, author_id: Optional[str] = None) -> int:
     )
     if author_id:
         q = q.filter(models.Post.author_id == author_id)
+    if slot:
+        marker = SLOT_MARKERS.get(slot)
+        if marker:
+            q = q.filter(models.Post.text.contains(marker))
     return q.count()
 
 
-def collect_candidates(db: Session, *, per_arena: int = 5) -> list[dict]:
-    """Scan all arenas + rotating topics; return motto-scored candidates."""
+def arenas_for_slot(slot: str) -> list[str]:
+    """Rotate arenas across peak slots so every floor gets daily coverage."""
+    arenas = sorted(ACTIVE_ARENA_KEYS)
+    if not arenas:
+        return []
+    day = _today_ist().toordinal()
+    slot_idx = {"morning": 0, "midday": 1, "evening": 2}.get(slot, 0)
+    start = (day + slot_idx * ARENAS_PER_SLOT) % len(arenas)
+    picked = []
+    for i in range(min(ARENAS_PER_SLOT, len(arenas))):
+        picked.append(arenas[(start + i) % len(arenas)])
+    return picked
+
+
+def collect_candidates(db: Session, *, per_arena: int = 6, arenas: list[str] | None = None) -> list[dict]:
+    """Scan arenas for credible headlines only."""
     day = _today_ist().toordinal()
     candidates: list[dict] = []
+    arena_list = arenas or sorted(ACTIVE_ARENA_KEYS)
 
-    for arena in sorted(ACTIVE_ARENA_KEYS):
-        query = ARENA_TRENDING_QUERIES.get(arena) or f"India {arena} news"
-        for item in rss.fetch_rss_items(query, limit=per_arena):
+    for arena in arena_list:
+        query = ARENA_TRENDING_QUERIES.get(arena) or f"India {arena} news PTI OR The Hindu"
+        for item in rss.fetch_rss_items(query, limit=per_arena, credible_only=True):
             title = item.get("title") or ""
-            score = _score_headline(title, arena)
+            score = _score_headline(title, arena, credible=bool(item.get("credible")))
             if score < 8:
                 continue
             candidates.append(
                 {
                     "title": title,
                     "link": item.get("link") or "",
+                    "source": item.get("source") or "",
                     "arena": arena,
                     "topic": arena,
                     "score": score,
                     "query": query,
+                    "credible": True,
                 }
             )
 
-        # One rotating subtopic per arena for fresher beats
         topics = TOPICS_BY_ARENA.get(arena) or []
         if topics:
             pick = topics[day % len(topics)]
             q = pick.get("rss_query") or pick.get("name") or arena
-            for item in rss.fetch_rss_items(q, limit=3):
+            for item in rss.fetch_rss_items(q, limit=4, credible_only=True):
                 title = item.get("title") or ""
-                score = _score_headline(title, arena) + 1.5
+                score = _score_headline(title, arena, credible=True) + 1.5
                 if score < 8:
                     continue
                 candidates.append(
                     {
                         "title": title,
                         "link": item.get("link") or "",
+                        "source": item.get("source") or "",
                         "arena": arena,
                         "topic": pick.get("key") or arena,
                         "score": score,
                         "query": q,
+                        "credible": True,
                     }
                 )
 
-    # Dedup by title fingerprint
     seen = set()
     uniq = []
     for c in sorted(candidates, key=lambda x: -x["score"]):
@@ -267,7 +294,6 @@ def select_posts(
     max_per_arena: int = MAX_POSTS_PER_ARENA,
     min_score: float = MIN_SCORE_TO_POST,
 ) -> list[dict]:
-    """Pick up to max_posts with arena diversity. Never pad weak stories."""
     arena_counts: dict[str, int] = {}
     picked: list[dict] = []
     for c in candidates:
@@ -283,19 +309,13 @@ def select_posts(
     return picked
 
 
-def render_brand_card(*, headline: str, arena: str) -> bytes:
-    """1080×1080 BaratX saffron card — one image per digest post."""
+def render_brand_card(*, headline: str, arena: str, source: str = "") -> bytes:
     w = h = 1080
     img = Image.new("RGB", (w, h), BRAND_CREAM)
     draw = ImageDraw.Draw(img)
-
-    # Top brand bar
     draw.rectangle([0, 0, w, 140], fill=BRAND_ORANGE)
-    # Bottom navy strip
     draw.rectangle([0, h - 120, w, h], fill=BRAND_NAVY)
-    # Accent rail
     draw.rectangle([0, 140, 28, h - 120], fill=BRAND_ORANGE)
-
     try:
         font_brand = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 54)
         font_arena = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36)
@@ -305,42 +325,268 @@ def render_brand_card(*, headline: str, arena: str) -> bytes:
         font_brand = font_arena = font_body = font_foot = ImageFont.load_default()
 
     draw.text((48, 42), "BaratX", fill=BRAND_WHITE, font=font_brand)
-    draw.text((48, 180), (arena or "news").upper(), fill=BRAND_ORANGE, font=font_arena)
-
+    label = (arena or "news").upper()
+    if source:
+        label = f"{label} · {source[:28].upper()}"
+    draw.text((48, 180), label, fill=BRAND_ORANGE, font=font_arena)
     lines = _wrap(headline, 28)[:7]
     y = 280
     for line in lines:
         draw.text((56, y), line, fill=BRAND_NAVY, font=font_body)
         y += 70
-
     draw.text((48, h - 78), "India’s public square · barathx.com", fill=BRAND_WHITE, font=font_foot)
-
     buf = io.BytesIO()
     img.save(buf, format="PNG", optimize=True)
     return buf.getvalue()
 
 
-def compose_post_text(*, title: str, arena: str, link: str = "", author: str = "sharath") -> str:
-    take = title.strip()
-    if not take.endswith("?"):
-        take = f"{take} — overblown, or are we sleeping on it?"
+def compose_admin_glimpse(*, title: str, arena: str, source: str, slot: str) -> str:
+    """Admin morning/peak glimpse — stick to the headline + named source only."""
+    slot_marker = SLOT_MARKERS.get(slot, "#BXMorning")
     tag = f"#{arena.capitalize()}" if arena else "#India"
-    if author == "baratx":
-        cta = "India — argue this out. Reply with your city take."
-    else:
-        cta = "What’s your take — reply, don’t just scroll."
+    source_line = f"Source: {source}" if source else "Source: wire / national desk"
     parts = [
-        take,
+        f"Daily glimpse · {(arena or 'news').title()}",
         "",
-        cta,
-        f"{tag} {POST_MARKER}",
+        title.strip(),
+        "",
+        source_line,
+        "",
+        "India — what should the square debate here?",
+        f"{tag} {POST_MARKER} {slot_marker}",
     ]
-    if link and len(link) < 180:
-        # Google News links are long redirects; skip if noisy
-        if "news.google.com" not in link:
-            parts.insert(2, link)
-    text = "\n".join(parts).strip()
+    return "\n".join(parts).strip()[:500]
+
+
+def compose_sharath_take(*, title: str, arena: str, source: str, slot: str) -> str:
+    """Sharath response post — opinion framing only; no invented facts."""
+    slot_marker = SLOT_MARKERS.get(slot, "#BXMorning")
+    tag = f"#{arena.capitalize()}" if arena else "#India"
+    parts = [
+        f"My take on this {arena or 'news'} story:",
+        "",
+        title.strip(),
+        "",
+        f"(via {source})" if source else "",
+        "Reply with evidence — not just heat.",
+        f"{tag} {POST_MARKER} {slot_marker}",
+    ]
+    text = "\n".join(p for p in parts if p is not None).strip()
+    # collapse accidental blank runs
+    text = re.sub(r"\n{3,}", "\n\n", text)
     return text[:500]
+
+
+def compose_sharath_reply_to_admin() -> str:
+    return (
+        "Adding my view: this belongs on the square — debate the claim, cite the source, "
+        "don’t just pile on. What’s your city reading into it?"
+    )
+
+
+def compose_admin_reply_to_sharath() -> str:
+    return (
+        "Fair. BaratX stays on the record: headline + publisher only, then your take. "
+        "Reply with receipts. #BaratXDaily"
+    )
+
+
+def compose_post_text(*, title: str, arena: str, link: str = "", author: str = "sharath") -> str:
+    """Legacy helper kept for compatibility / tests."""
+    if author == ADMIN_USERNAME:
+        return compose_admin_glimpse(title=title, arena=arena, source="", slot="morning")
+    return compose_sharath_take(title=title, arena=arena, source="", slot="morning")
+
+
+def _user_by_username(db: Session, username: str) -> Optional[models.User]:
+    return db.query(models.User).filter(models.User.username == username).first()
+
+
+def _ensure_post_like(db: Session, user_id: str, post_id: str) -> None:
+    exists = (
+        db.query(models.Like)
+        .filter(models.Like.user_id == user_id, models.Like.post_id == post_id)
+        .first()
+    )
+    if not exists:
+        db.add(models.Like(user_id=user_id, post_id=post_id))
+
+
+def _ensure_reply_like(db: Session, user_id: str, reply_id: str) -> None:
+    exists = (
+        db.query(models.ReplyLike)
+        .filter(models.ReplyLike.user_id == user_id, models.ReplyLike.reply_id == reply_id)
+        .first()
+    )
+    if not exists:
+        db.add(models.ReplyLike(user_id=user_id, reply_id=reply_id))
+
+
+def _create_post(
+    db: Session,
+    *,
+    author: models.User,
+    text: str,
+    headline: str,
+    arena: str,
+    source: str,
+    attach_hashtags,
+    notify_mentions,
+) -> models.Post:
+    try:
+        png = render_brand_card(headline=headline, arena=arena, source=source)
+        image_url = media_store.save_bytes(
+            png, content_type="image/png", filename="baratx-daily.png"
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Brand card render failed")
+        image_url = None
+    post = models.Post(author_id=author.id, text=text, image_url=image_url)
+    db.add(post)
+    db.flush()
+    if attach_hashtags:
+        attach_hashtags(db, post, text)
+    if notify_mentions:
+        notify_mentions(db, author.id, text, post_id=post.id)
+    return post
+
+
+def _create_reply(db: Session, *, author: models.User, post: models.Post, text: str) -> models.Reply:
+    reply = models.Reply(post_id=post.id, author_id=author.id, text=text, parent_reply_id=None)
+    db.add(reply)
+    db.flush()
+    return reply
+
+
+def run_peak_digest(
+    db: Session,
+    *,
+    slot: str,
+    force: bool = False,
+    attach_hashtags=None,
+    notify_mentions=None,
+) -> dict:
+    """Run one peak window: admin glimpse + Sharath take + cross replies + likes."""
+    if slot not in SLOT_MARKERS:
+        return {"ok": False, "error": "invalid_slot", "slot": slot}
+
+    admin = _user_by_username(db, ADMIN_USERNAME)
+    sharath = _user_by_username(db, SHARATH_USERNAME)
+    if not admin or not sharath:
+        return {"ok": False, "error": "digest_accounts_missing", "created": 0}
+
+    # Each voice posts once per arena in the slot → 2 * arenas_per_slot posts.
+    expected = ARENAS_PER_SLOT * 2
+    already = posts_today_count(db, slot=slot)
+    if already >= expected and not force:
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "slot_already_posted",
+            "slot": slot,
+            "created": 0,
+            "already": already,
+        }
+
+    arenas = arenas_for_slot(slot)
+    candidates = collect_candidates(db, arenas=arenas)
+    # One best credible story per arena
+    selected = select_posts(candidates, max_posts=len(arenas), max_per_arena=1)
+    if not selected:
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "no_credible_headlines",
+            "slot": slot,
+            "arenas": arenas,
+            "created": 0,
+            "candidates_scanned": len(candidates),
+        }
+
+    created = []
+    for c in selected:
+        title = c["title"]
+        arena = c["arena"]
+        source = c.get("source") or ""
+
+        if _already_posted_similar(db, admin.id, title) or _already_posted_similar(
+            db, sharath.id, title
+        ):
+            continue
+
+        admin_text = compose_admin_glimpse(
+            title=title, arena=arena, source=source, slot=slot
+        )
+        sharath_text = compose_sharath_take(
+            title=title, arena=arena, source=source, slot=slot
+        )
+
+        admin_post = _create_post(
+            db,
+            author=admin,
+            text=admin_text,
+            headline=title,
+            arena=arena,
+            source=source,
+            attach_hashtags=attach_hashtags,
+            notify_mentions=notify_mentions,
+        )
+        sharath_post = _create_post(
+            db,
+            author=sharath,
+            text=sharath_text,
+            headline=title,
+            arena=arena,
+            source=source,
+            attach_hashtags=attach_hashtags,
+            notify_mentions=notify_mentions,
+        )
+
+        sharath_on_admin = _create_reply(
+            db, author=sharath, post=admin_post, text=compose_sharath_reply_to_admin()
+        )
+        admin_on_sharath = _create_reply(
+            db, author=admin, post=sharath_post, text=compose_admin_reply_to_sharath()
+        )
+
+        # Mutual likes: posts + replies
+        _ensure_post_like(db, sharath.id, admin_post.id)
+        _ensure_post_like(db, admin.id, sharath_post.id)
+        _ensure_reply_like(db, admin.id, sharath_on_admin.id)
+        _ensure_reply_like(db, sharath.id, admin_on_sharath.id)
+
+        created.append(
+            {
+                "arena": arena,
+                "title": title,
+                "source": source,
+                "admin_post_id": admin_post.id,
+                "sharath_post_id": sharath_post.id,
+                "score": c["score"],
+            }
+        )
+
+    if created:
+        db.commit()
+    else:
+        db.rollback()
+
+    return {
+        "ok": True,
+        "slot": slot,
+        "created_pairs": len(created),
+        "created": len(created) * 2,
+        "pairs": created,
+        "arenas": arenas,
+        "candidates_scanned": len(candidates),
+        "day": str(_today_ist()),
+        "policy": {
+            "peak_slots": [s[2] for s in PEAK_SLOTS],
+            "arenas_per_slot": ARENAS_PER_SLOT,
+            "credible_only": True,
+            "engagement": "admin_post+sharath_post+cross_replies+mutual_likes",
+        },
+    }
 
 
 def run_daily_digest(
@@ -350,142 +596,41 @@ def run_daily_digest(
     max_posts: int = MAX_POSTS_PER_DAY,
     attach_hashtags=None,
     notify_mentions=None,
+    slot: str | None = None,
 ) -> dict:
-    """Create 3–5 motto-aligned posts across arenas as @sharath and @baratx."""
-    authors = []
-    for username in DIGEST_AUTHORS:
-        row = db.query(models.User).filter(models.User.username == username).first()
-        if row:
-            authors.append(row)
-    if not authors:
-        return {"ok": False, "error": "digest_accounts_missing", "created": 0}
-
-    already_total = posts_today_count(db)
-    if already_total >= max_posts and not force:
-        return {
-            "ok": True,
-            "skipped": True,
-            "reason": "already_posted_today",
-            "created": 0,
-            "already": already_total,
-            "target": f"{MIN_POSTS_IF_QUALITY}-{max_posts}",
-        }
-
-    remaining_slots = max_posts if force else max(0, max_posts - already_total)
-    if remaining_slots <= 0:
-        return {
-            "ok": True,
-            "skipped": True,
-            "reason": "slots_full",
-            "created": 0,
-            "already": already_total,
-        }
-
-    candidates = collect_candidates(db)
-    selected = select_posts(candidates, max_posts=remaining_slots)
-
-    # Prefer hitting the min when enough quality exists; select_posts already
-    # quality-gates — if we have fewer than MIN, we still post what passed.
-    created_posts = []
-    used_titles = set()
-    author_counts = {a.id: posts_today_count(db, a.id) for a in authors}
-    author_idx = 0
-
-    for c in selected:
-        title_key = c["title"].lower()
-        if title_key in used_titles:
-            continue
-
-        # Round-robin authors, respecting per-author cap.
-        author = None
-        for offset in range(len(authors)):
-            candidate_author = authors[(author_idx + offset) % len(authors)]
-            if author_counts.get(candidate_author.id, 0) >= MAX_POSTS_PER_AUTHOR and not force:
-                continue
-            if _already_posted_similar(db, candidate_author.id, c["title"]):
-                continue
-            # Skip if any digest author already covered this story recently.
-            other_hit = False
-            for other in authors:
-                if other.id != candidate_author.id and _already_posted_similar(
-                    db, other.id, c["title"]
-                ):
-                    other_hit = True
-                    break
-            if other_hit:
-                continue
-            author = candidate_author
-            author_idx = (author_idx + offset + 1) % len(authors)
-            break
-        if not author:
-            continue
-
-        text = compose_post_text(
-            title=c["title"],
-            arena=c["arena"],
-            link=c.get("link") or "",
-            author=author.username,
+    """Back-compat entry: run a specific slot, or the current/next due peak slot."""
+    if slot:
+        return run_peak_digest(
+            db,
+            slot=slot,
+            force=force,
+            attach_hashtags=attach_hashtags,
+            notify_mentions=notify_mentions,
         )
-        try:
-            png = render_brand_card(headline=c["title"], arena=c["arena"])
-            image_url = media_store.save_bytes(
-                png, content_type="image/png", filename="baratx-daily.png"
-            )
-        except Exception:  # noqa: BLE001
-            logger.exception("Brand card render failed")
-            image_url = None
 
-        post = models.Post(author_id=author.id, text=text, image_url=image_url)
-        db.add(post)
-        db.flush()
-        if attach_hashtags:
-            attach_hashtags(db, post, text)
-        if notify_mentions:
-            notify_mentions(db, author.id, text, post_id=post.id)
-        created_posts.append(
-            {
-                "id": post.id,
-                "author": author.username,
-                "arena": c["arena"],
-                "topic": c["topic"],
-                "title": c["title"],
-                "score": c["score"],
-                "image": bool(image_url),
-            }
-        )
-        used_titles.add(title_key)
-        author_counts[author.id] = author_counts.get(author.id, 0) + 1
-
-    if created_posts:
-        db.commit()
-    else:
-        db.rollback()
-
-    return {
-        "ok": True,
-        "created": len(created_posts),
-        "posts": created_posts,
-        "candidates_scanned": len(candidates),
-        "selected_quality": len(selected),
-        "day": str(_today_ist()),
-        "authors": [a.username for a in authors],
-        "policy": {
-            "min_if_quality": MIN_POSTS_IF_QUALITY,
-            "max_per_day": max_posts,
-            "max_per_arena": MAX_POSTS_PER_ARENA,
-            "min_score": MIN_SCORE_TO_POST,
-            "arenas": list(ACTIVE_ARENA_KEYS),
-        },
-    }
+    now = datetime.now(IST)
+    # Pick the latest peak slot that has already started today; else morning.
+    due = "morning"
+    for hour, minute, name in PEAK_SLOTS:
+        edge = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+        if now >= edge:
+            due = name
+    return run_peak_digest(
+        db,
+        slot=due,
+        force=force,
+        attach_hashtags=attach_hashtags,
+        notify_mentions=notify_mentions,
+    )
 
 
-# ---------- In-process daily scheduler (IST morning) ----------
+# ---------- In-process peak scheduler (IST) ----------
 
 _scheduler_started = False
 _scheduler_lock = threading.Lock()
 
 
-def _seconds_until_next_run(hour: int = 9, minute: int = 5) -> float:
+def _seconds_until(hour: int, minute: int) -> float:
     now = datetime.now(IST)
     target = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
     if now >= target:
@@ -494,11 +639,7 @@ def _seconds_until_next_run(hour: int = 9, minute: int = 5) -> float:
 
 
 def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
-    """Fire once near 09:05 IST every day inside the API process.
-
-    Also catch up shortly after boot if today's digest has not run yet
-    (so a deploy / restart can start posts without waiting for morning).
-    """
+    """Fire at 09:00 / 13:30 / 20:00 IST. Catch up missing slots after boot."""
     global _scheduler_started
     with _scheduler_lock:
         if _scheduler_started:
@@ -508,20 +649,21 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
             return
         _scheduler_started = True
 
-    def _run_once(*, label: str) -> None:
+    def _run_slot(slot: str, *, label: str) -> None:
         from app.database import SessionLocal
 
         db = SessionLocal()
         try:
-            result = run_daily_digest(
+            result = run_peak_digest(
                 db,
+                slot=slot,
                 force=False,
                 attach_hashtags=attach_hashtags,
                 notify_mentions=notify_mentions,
             )
-            logger.info("Daily digest %s result: %s", label, result)
+            logger.info("Peak digest %s/%s result: %s", label, slot, result)
         except Exception:  # noqa: BLE001
-            logger.exception("Daily digest %s failed", label)
+            logger.exception("Peak digest %s/%s failed", label, slot)
             try:
                 db.rollback()
             except Exception:  # noqa: BLE001
@@ -530,24 +672,29 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
             db.close()
 
     def boot_catchup():
-        # Let migrations/seed settle, then fill today's slots if empty.
         time.sleep(45)
-        _run_once(label="boot-catchup")
+        now = datetime.now(IST)
+        for hour, minute, slot in PEAK_SLOTS:
+            edge = now.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            if now >= edge:
+                _run_slot(slot, label="boot-catchup")
 
     def loop():
         while True:
-            wait = _seconds_until_next_run()
-            logger.info("Daily digest sleeping %.0fs until next IST run", wait)
+            waits = [(_seconds_until(h, m), name) for h, m, name in PEAK_SLOTS]
+            waits.sort(key=lambda x: x[0])
+            wait, slot = waits[0]
+            logger.info("Peak digest sleeping %.0fs until %s IST", wait, slot)
             time.sleep(wait)
-            _run_once(label="scheduled")
-            time.sleep(60)  # avoid double-fire in the same minute
+            _run_slot(slot, label="scheduled")
+            time.sleep(60)
 
-    threading.Thread(target=boot_catchup, name="baratx-daily-digest-boot", daemon=True).start()
-    threading.Thread(target=loop, name="baratx-daily-digest", daemon=True).start()
+    threading.Thread(target=boot_catchup, name="baratx-peak-digest-boot", daemon=True).start()
+    threading.Thread(target=loop, name="baratx-peak-digest", daemon=True).start()
     logger.info(
-        "Daily digest scheduler started (authors=%s, target=%s-%s/day, max/arena=%s, IST ~09:05 + boot catch-up)",
-        ",".join(DIGEST_AUTHORS),
-        MIN_POSTS_IF_QUALITY,
-        MAX_POSTS_PER_DAY,
-        MAX_POSTS_PER_ARENA,
+        "Peak digest scheduler started (slots=%s, arenas/slot=%s, voices=%s+%s)",
+        ",".join(f"{h:02d}:{m:02d}/{s}" for h, m, s in PEAK_SLOTS),
+        ARENAS_PER_SLOT,
+        ADMIN_USERNAME,
+        SHARATH_USERNAME,
     )

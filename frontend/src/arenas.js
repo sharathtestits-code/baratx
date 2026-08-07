@@ -35,6 +35,16 @@ export const ARENA_TOPICS = [
     composeHint: "Start a spirituality debate…",
     openDebateLabel: "Open Resonates vs Skeptical",
   },
+  {
+    key: "startups",
+    name: "Startups",
+    blurb: "Funding, founders, and the India builder economy.",
+    accent: "#059669",
+    debateFor: "Fund it",
+    debateAgainst: "Pass",
+    composeHint: "Fund it or Pass — make your case…",
+    openDebateLabel: "Open Fund it vs Pass",
+  },
 ];
 
 export function arenaMeta(key) {
