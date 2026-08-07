@@ -74,7 +74,9 @@ Log file: `brand/social/instagram/demo-series/INSIGHTS_LOG.md` (append daily).
 ## Asset folders
 ```
 brand/social/instagram/demo-series/
-  PART-01-square/
+  PART-01-square-v2/ (safe-margin + UI callouts; replaces v1)
+  PART-01-square/  # archived draft
+  
   PART-02-arenas/
   …
   INSIGHTS_LOG.md
