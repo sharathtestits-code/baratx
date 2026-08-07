@@ -213,8 +213,22 @@ def register_extra_routes(app, *, get_current_user, get_current_user_optional, s
                 details=payload.details or "",
             )
         )
+        db.flush()
+        msg = "Report submitted. Thanks for helping keep BaratX safe."
+        if target_user_id:
+            from app import moderation as mod
+
+            target = db.query(models.User).filter(models.User.id == target_user_id).first()
+            if target:
+                msg = mod.apply_report_auto_mod(
+                    db,
+                    target=target,
+                    reason=payload.reason,
+                    details=payload.details or "",
+                    purge_fn=mod.purge_user,
+                )
         db.commit()
-        return schemas.MessageResponse(message="Report submitted. Thanks for helping keep BaratX safe.")
+        return schemas.MessageResponse(message=msg)
 
     @router.get("/hashtags/{tag}", response_model=list[schemas.PostOut])
     def hashtag_posts(

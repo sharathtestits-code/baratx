@@ -12,11 +12,11 @@ Music is attached **in the IG app** (trending India audio matched to the topic).
 
 | Day | Reel | Covers | Music vibe | End card |
 |-----|------|--------|------------|----------|
-| **1** | Features on BaratX · **Part 1 — Square** | Compose, AI Assist starter, Post, Like, Reply, Repost, Save | Faah / shock-hot-take | Wait for Part 2 — Arenas |
+| **1** | Features on BaratX · **Part 1 — Square** | Compose, AI Assist starter, Post, Like, Reply, Repost, Save | **Rotate** trending India audio (desi pulse / hot-take — not Faah-only) | Wait for Part 2 — Arenas |
 | **2** | **Part 2 — Arenas & debates** | Arenas, topics, Join, For/Against, Leave, Live | Debate / siren energy | Wait for Part 3 — Profile |
 | **3** | **Part 3 — You** | Profile, Edit, photo, cover, Follow/Message | Softer / identity | Wait for Part 4 — Look |
 | **4** | **Part 4 — Look & explore** | Appearance themes, Explore, Search | Chill / aesthetic | Wait for Part 5 — Live |
-| **5** | **Part 5 — Live rooms** | Spaces, go live, room chat | Pulse / on-air | Wait for Part 6 — Rewards |
+| **5** | **Part 5 — Live rooms** | Spaces, go live, **Talk** (audio seats, mute, pin, in-call chat) | Pulse / on-air | Wait for Part 6 — Rewards |
 | **6** | **Part 6 — Founding & civic** | Civic checkbox, Founding strip, city takes | Civic / proud India | Wait for Part 7 — Pro tips |
 | **7** | **Part 7 — Pro tips** | Bookmarks, mute/block, notifications, Settings | Upbeat wrap | Follow @getbaratx · barathx.com |
 

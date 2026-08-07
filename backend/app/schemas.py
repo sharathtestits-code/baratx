@@ -671,6 +671,76 @@ class StanceCreate(BaseModel):
         return v
 
 
+class LiveTalkStateUpdate(BaseModel):
+    muted: Optional[bool] = None
+    video_enabled: Optional[bool] = None
+
+
+class LiveTalkPinBody(BaseModel):
+    username: str
+
+    @field_validator("username")
+    @classmethod
+    def valid_username(cls, v):
+        v = (v or "").strip().lstrip("@").lower()
+        if len(v) < 2:
+            raise ValueError("username required")
+        return v
+
+
+class LiveTalkMessageCreate(BaseModel):
+    text: str
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = (v or "").strip()
+        if len(v) < 1 or len(v) > 500:
+            raise ValueError("Message must be 1–500 characters")
+        return v
+
+
+class LiveTalkRemoveBody(BaseModel):
+    reason: str = "community guidelines"
+
+    @field_validator("reason")
+    @classmethod
+    def valid_reason(cls, v):
+        v = (v or "community guidelines").strip()
+        if len(v) < 3 or len(v) > 120:
+            raise ValueError("Reason must be 3–120 characters")
+        return v
+
+
+class LiveTalkParticipantOut(BaseModel):
+    user: AuthorOut
+    muted: bool = True
+    video_enabled: bool = False
+    joined_at: datetime
+    is_self: bool = False
+    is_pinned: bool = False
+    is_host: bool = False
+
+
+class LiveTalkMessageOut(BaseModel):
+    id: str
+    text: str
+    created_at: datetime
+    sender: AuthorOut
+
+
+class LiveTalkStateOut(BaseModel):
+    space_id: str
+    max_participants: int = 15
+    participant_count: int = 0
+    in_talk: bool = False
+    my_muted: bool = True
+    my_video: bool = False
+    participants: list[LiveTalkParticipantOut] = []
+    messages: list[LiveTalkMessageOut] = []
+    pinned_usernames: list[str] = []
+
+
 class TopicOut(BaseModel):
     id: str
     arena_key: str

@@ -399,6 +399,40 @@ export const spacesApi = {
     ),
   listForYou: (token) =>
     request(`/spaces?status=open&kind=debate&for_you=true`, { headers: authHeaders(token) }),
+  talkGet: (token, id) => request(`/spaces/${id}/talk`, { headers: authHeaders(token) }),
+  talkJoin: (token, id) =>
+    request(`/spaces/${id}/talk/join`, { method: "POST", headers: authHeaders(token) }),
+  talkLeave: (token, id) =>
+    request(`/spaces/${id}/talk/leave`, { method: "POST", headers: authHeaders(token) }),
+  talkUpdateMe: (token, id, body) =>
+    request(`/spaces/${id}/talk/me`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  talkPin: (token, id, username) =>
+    request(`/spaces/${id}/talk/pin`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ username }),
+    }),
+  talkUnpin: (token, id, username) =>
+    request(`/spaces/${id}/talk/pin/${encodeURIComponent(username)}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
+  talkMessage: (token, id, text) =>
+    request(`/spaces/${id}/talk/messages`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ text }),
+    }),
+  talkRemove: (token, id, username, reason) =>
+    request(`/spaces/${id}/talk/participants/${encodeURIComponent(username)}/remove`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ reason }),
+    }),
 };
 
 export const topicsApi = {

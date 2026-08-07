@@ -52,7 +52,7 @@ export default function Spaces() {
     <div className="plaza-page plaza-live">
       <PlazaPageHeader
         title="Live"
-        sub="Timed discussion rooms — amphitheatre energy, not another timeline."
+        sub="Timed rooms with Talk — join audio, mute, pin seats, in-call chat (max 15)."
       />
       <section className="live-amphitheatre">
         <div className="live-amphitheatre-glow" aria-hidden="true" />
@@ -64,7 +64,7 @@ export default function Spaces() {
         <p className="live-amphitheatre-sub">
           {featured
             ? `Hosted by @${featured.host?.username} · ${featured.post_count} takes in the room`
-            : "Pick a room below or go live with a new conversation."}
+            : "Pick a room below or go live — then Join Talk for audio."}
         </p>
         <div className="live-stage-wave" aria-hidden="true">
           <span />

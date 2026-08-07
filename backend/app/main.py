@@ -780,67 +780,24 @@ def admin_users(
     )
 
 
-def _purge_user(db: Session, user: models.User) -> None:
-    """Remove a user and dependent rows that lack cascade-from-user."""
-    uid = user.id
-    # Follows where this user is the followed account (incoming).
-    db.query(models.Follow).filter(
-        (models.Follow.follower_id == uid) | (models.Follow.followed_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Notification).filter(
-        (models.Notification.recipient_id == uid) | (models.Notification.actor_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Bookmark).filter(models.Bookmark.user_id == uid).delete(synchronize_session=False)
-    db.query(models.Block).filter(
-        (models.Block.blocker_id == uid) | (models.Block.blocked_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Mute).filter(
-        (models.Mute.muter_id == uid) | (models.Mute.muted_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Report).filter(
-        (models.Report.reporter_id == uid) | (models.Report.target_user_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.DirectMessage).filter(
-        (models.DirectMessage.sender_id == uid) | (models.DirectMessage.recipient_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.ListMember).filter(models.ListMember.user_id == uid).delete(synchronize_session=False)
-    db.query(models.UserList).filter(models.UserList.owner_id == uid).delete(synchronize_session=False)
-    db.query(models.CommunityMember).filter(models.CommunityMember.user_id == uid).delete(
-        synchronize_session=False
-    )
-    db.query(models.SpaceStance).filter(models.SpaceStance.user_id == uid).delete(
-        synchronize_session=False
-    )
-    # Spaces hosted by user: close ownership by reassigning to baratx when possible.
-    host = db.query(models.User).filter(models.User.username == "baratx").first()
-    if host and host.id != uid:
-        db.query(models.Space).filter(models.Space.host_id == uid).update(
-            {models.Space.host_id: host.id}, synchronize_session=False
-        )
-    else:
-        db.query(models.Space).filter(models.Space.host_id == uid).delete(synchronize_session=False)
-    # Communities created_by — reassign to baratx
-    if host and host.id != uid:
-        db.query(models.Community).filter(models.Community.created_by == uid).update(
-            {models.Community.created_by: host.id}, synchronize_session=False
-        )
-    db.delete(user)
-
-
 @app.delete("/admin/users/{user_id}", response_model=schemas.MessageResponse)
 def admin_delete_user(
     user_id: str,
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Remove a misleading / abusive account. Protected blue founders cannot be deleted."""
+    """Remove a misleading / abusive account. Protected blue founders cannot be deleted.
+    Admins can act immediately — no queue wait. Auto-mod also deletes after repeated reports.
+    """
+    from app.moderation import purge_user
+
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if user.username in seed.PROTECTED_BLUE_USERNAMES:
         raise HTTPException(status_code=400, detail="Cannot delete protected blue official accounts")
     username = user.username
-    _purge_user(db, user)
+    purge_user(db, user)
     db.commit()
     return schemas.MessageResponse(message=f"Deleted @{username}")
 

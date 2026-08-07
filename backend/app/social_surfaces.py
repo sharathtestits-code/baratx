@@ -1063,4 +1063,363 @@ def register_social_surfaces(
         )
         return [_topic_out(t, db, current_user) for t in rows]
 
+    # ---------- Live Talk (audio room under a Space) ----------
+
+    from app import moderation as mod
+
+    def _active_talk_q(db: Session, space_id: str):
+        return db.query(models.LiveTalkParticipant).filter(
+            models.LiveTalkParticipant.space_id == space_id,
+            models.LiveTalkParticipant.left_at.is_(None),
+            models.LiveTalkParticipant.removed_at.is_(None),
+        )
+
+    def _talk_participant_out(
+        row: models.LiveTalkParticipant,
+        *,
+        current_user: models.User,
+        host_id: str,
+        pinned_ids: set[str],
+    ) -> schemas.LiveTalkParticipantOut:
+        u = row.user
+        return schemas.LiveTalkParticipantOut(
+            user=schemas.AuthorOut.model_validate(u),
+            muted=bool(row.muted),
+            video_enabled=bool(row.video_enabled),
+            joined_at=row.joined_at,
+            is_self=u.id == current_user.id,
+            is_pinned=u.id in pinned_ids,
+            is_host=u.id == host_id,
+        )
+
+    def _talk_state(db: Session, space: models.Space, current_user: models.User) -> schemas.LiveTalkStateOut:
+        pinned_rows = (
+            db.query(models.LiveTalkPin)
+            .filter(
+                models.LiveTalkPin.space_id == space.id,
+                models.LiveTalkPin.viewer_id == current_user.id,
+            )
+            .all()
+        )
+        pinned_ids = {r.pinned_user_id for r in pinned_rows}
+        rows = (
+            _active_talk_q(db, space.id)
+            .options(joinedload(models.LiveTalkParticipant.user))
+            .order_by(models.LiveTalkParticipant.joined_at.asc())
+            .all()
+        )
+        # Pinned first (viewer preference), then join order
+        rows_sorted = sorted(
+            rows,
+            key=lambda r: (0 if r.user_id in pinned_ids else 1, r.joined_at or datetime.now(timezone.utc)),
+        )
+        me = next((r for r in rows if r.user_id == current_user.id), None)
+        msgs = (
+            db.query(models.LiveTalkMessage)
+            .options(joinedload(models.LiveTalkMessage.sender))
+            .filter(models.LiveTalkMessage.space_id == space.id)
+            .order_by(models.LiveTalkMessage.created_at.desc())
+            .limit(80)
+            .all()
+        )
+        msgs = list(reversed(msgs))
+        pinned_usernames = []
+        for pid in pinned_ids:
+            u = db.query(models.User).filter(models.User.id == pid).first()
+            if u:
+                pinned_usernames.append(u.username)
+        return schemas.LiveTalkStateOut(
+            space_id=space.id,
+            max_participants=mod.LIVE_TALK_MAX,
+            participant_count=len(rows),
+            in_talk=me is not None,
+            my_muted=bool(me.muted) if me else True,
+            my_video=bool(me.video_enabled) if me else False,
+            participants=[
+                _talk_participant_out(r, current_user=current_user, host_id=space.host_id, pinned_ids=pinned_ids)
+                for r in rows_sorted
+            ],
+            messages=[
+                schemas.LiveTalkMessageOut(
+                    id=m.id,
+                    text=m.text,
+                    created_at=m.created_at,
+                    sender=schemas.AuthorOut.model_validate(m.sender),
+                )
+                for m in msgs
+            ],
+            pinned_usernames=pinned_usernames,
+        )
+
+    @router.get("/spaces/{space_id}/talk", response_model=schemas.LiveTalkStateOut)
+    def get_live_talk(
+        space_id: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        _maybe_auto_close(db, s)
+        return _talk_state(db, s, current_user)
+
+    @router.post("/spaces/{space_id}/talk/join", response_model=schemas.LiveTalkStateOut)
+    def join_live_talk(
+        space_id: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        _maybe_auto_close(db, s)
+        if s.status != "open":
+            raise HTTPException(status_code=400, detail="This room is closed")
+        existing = (
+            db.query(models.LiveTalkParticipant)
+            .filter(
+                models.LiveTalkParticipant.space_id == s.id,
+                models.LiveTalkParticipant.user_id == current_user.id,
+            )
+            .first()
+        )
+        active_count = _active_talk_q(db, s.id).count()
+        if existing and existing.left_at is None and existing.removed_at is None:
+            return _talk_state(db, s, current_user)
+        if active_count >= mod.LIVE_TALK_MAX and not (
+            existing and existing.left_at is None and existing.removed_at is None
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Talk is full ({mod.LIVE_TALK_MAX} people). Try again when a seat opens.",
+            )
+        now = datetime.now(timezone.utc)
+        if existing:
+            existing.left_at = None
+            existing.removed_at = None
+            existing.removed_reason = ""
+            existing.muted = True
+            existing.video_enabled = False
+            existing.joined_at = now
+        else:
+            db.add(
+                models.LiveTalkParticipant(
+                    space_id=s.id,
+                    user_id=current_user.id,
+                    muted=True,
+                    video_enabled=False,
+                    joined_at=now,
+                )
+            )
+        db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.post("/spaces/{space_id}/talk/leave", response_model=schemas.LiveTalkStateOut)
+    def leave_live_talk(
+        space_id: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        row = (
+            db.query(models.LiveTalkParticipant)
+            .filter(
+                models.LiveTalkParticipant.space_id == s.id,
+                models.LiveTalkParticipant.user_id == current_user.id,
+                models.LiveTalkParticipant.left_at.is_(None),
+            )
+            .first()
+        )
+        if row:
+            row.left_at = datetime.now(timezone.utc)
+            row.muted = True
+            row.video_enabled = False
+            db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.patch("/spaces/{space_id}/talk/me", response_model=schemas.LiveTalkStateOut)
+    def update_live_talk_me(
+        space_id: str,
+        payload: schemas.LiveTalkStateUpdate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        row = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        if not row:
+            raise HTTPException(status_code=400, detail="Join Talk first")
+        if payload.muted is not None:
+            row.muted = bool(payload.muted)
+        if payload.video_enabled is not None:
+            row.video_enabled = bool(payload.video_enabled)
+        db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.post("/spaces/{space_id}/talk/pin", response_model=schemas.LiveTalkStateOut)
+    def pin_live_talk_participant(
+        space_id: str,
+        payload: schemas.LiveTalkPinBody,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        target = db.query(models.User).filter(models.User.username == payload.username).first()
+        if not target:
+            raise HTTPException(status_code=404, detail="User not found")
+        on_call = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == target.id)
+            .first()
+        )
+        if not on_call:
+            raise HTTPException(status_code=400, detail="They are not on this Talk")
+        exists = (
+            db.query(models.LiveTalkPin)
+            .filter(
+                models.LiveTalkPin.space_id == s.id,
+                models.LiveTalkPin.viewer_id == current_user.id,
+                models.LiveTalkPin.pinned_user_id == target.id,
+            )
+            .first()
+        )
+        if not exists:
+            db.add(
+                models.LiveTalkPin(
+                    space_id=s.id,
+                    viewer_id=current_user.id,
+                    pinned_user_id=target.id,
+                )
+            )
+            db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.delete("/spaces/{space_id}/talk/pin/{username}", response_model=schemas.LiveTalkStateOut)
+    def unpin_live_talk_participant(
+        space_id: str,
+        username: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        uname = (username or "").strip().lstrip("@").lower()
+        target = db.query(models.User).filter(models.User.username == uname).first()
+        if not target:
+            raise HTTPException(status_code=404, detail="User not found")
+        db.query(models.LiveTalkPin).filter(
+            models.LiveTalkPin.space_id == s.id,
+            models.LiveTalkPin.viewer_id == current_user.id,
+            models.LiveTalkPin.pinned_user_id == target.id,
+        ).delete(synchronize_session=False)
+        db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.get("/spaces/{space_id}/talk/messages", response_model=list[schemas.LiveTalkMessageOut])
+    def list_live_talk_messages(
+        space_id: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        me = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        if not me:
+            raise HTTPException(status_code=403, detail="Join Talk to see in-call messages")
+        return _talk_state(db, s, current_user).messages
+
+    @router.post("/spaces/{space_id}/talk/messages", response_model=schemas.LiveTalkStateOut)
+    def post_live_talk_message(
+        space_id: str,
+        payload: schemas.LiveTalkMessageCreate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        me = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        if not me:
+            raise HTTPException(status_code=403, detail="Join Talk to message people on the call")
+        blocked = mod.apply_talk_message_moderation(
+            db,
+            space_id=s.id,
+            sender=current_user,
+            text=payload.text,
+            purge_fn=mod.purge_user,
+        )
+        if blocked:
+            db.commit()
+            raise HTTPException(status_code=400, detail=blocked)
+        db.add(
+            models.LiveTalkMessage(
+                space_id=s.id,
+                sender_id=current_user.id,
+                text=payload.text,
+            )
+        )
+        db.commit()
+        return _talk_state(db, s, current_user)
+
+    @router.post("/spaces/{space_id}/talk/participants/{username}/remove", response_model=schemas.LiveTalkStateOut)
+    def remove_live_talk_participant(
+        space_id: str,
+        username: str,
+        payload: schemas.LiveTalkRemoveBody,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        """Host or any caller can remove someone for guideline violations — no admin wait."""
+        s = _get_space(db, space_id)
+        uname = (username or "").strip().lstrip("@").lower()
+        target = db.query(models.User).filter(models.User.username == uname).first()
+        if not target:
+            raise HTTPException(status_code=404, detail="User not found")
+        if target.id == current_user.id:
+            raise HTTPException(status_code=400, detail="Leave Talk instead of removing yourself")
+        me = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        is_host = s.host_id == current_user.id
+        if not is_host and not me:
+            raise HTTPException(status_code=403, detail="Join Talk or be the host to remove someone")
+        if not is_host and not mod.reason_is_guideline(payload.reason):
+            raise HTTPException(
+                status_code=400,
+                detail="Cite a community guideline reason (harassment, spam, misleading, …)",
+            )
+        row = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == target.id)
+            .first()
+        )
+        now = datetime.now(timezone.utc)
+        if row:
+            row.removed_at = now
+            row.left_at = now
+            row.removed_reason = payload.reason[:200]
+        db.add(
+            models.Report(
+                reporter_id=current_user.id,
+                target_user_id=target.id,
+                reason=payload.reason[:80],
+                details=f"Removed from Live Talk in space {s.id}",
+            )
+        )
+        mod.add_strike(
+            db,
+            user_id=target.id,
+            kind="talk_remove",
+            detail=payload.reason[:200],
+            space_id=s.id,
+        )
+        mod.maybe_auto_delete_user(db, target, purge_fn=mod.purge_user)
+        db.commit()
+        return _talk_state(db, s, current_user)
+
     app.include_router(router)

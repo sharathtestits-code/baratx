@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import MentionTextarea from "../components/MentionTextarea";
+import LiveTalkPanel from "../components/LiveTalkPanel";
 
 export default function SpaceRoom() {
   const { spaceId } = useParams();
@@ -219,6 +220,10 @@ export default function SpaceRoom() {
       </div>
 
       {error && <div className="error">{error}</div>}
+
+      {open && token && (
+        <LiveTalkPanel spaceId={spaceId} token={token} isHost={!!space.is_host} />
+      )}
 
       {isDebate && (
         <div

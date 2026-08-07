@@ -827,6 +827,10 @@ export default function Admin() {
       <p className="admin-count">
         Showing {users.length} of {total} users (newest first)
       </p>
+      <p className="hint">
+        Delete misleading accounts anytime — no queue wait. Live Talk also auto-removes guideline
+        violators; repeated reports can remove the account automatically.
+      </p>
       <label className="badge-notify-opt admin-badge-notify">
         <input
           type="checkbox"

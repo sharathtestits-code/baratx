@@ -7511,3 +7511,203 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 .plaza-explore-empty .search-empty-lead {
   display: none;
 }
+
+/* ---------- Live Talk (meeting seats under Live) ---------- */
+
+.live-talk {
+  margin: 1rem 0 1.5rem;
+  padding: 1rem 1rem 1.15rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg));
+}
+
+.live-talk-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.live-talk-title {
+  margin: 0;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+
+.live-talk-sub {
+  margin: 0.2rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.live-talk-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.live-talk-ctrl {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 0.65rem;
+  padding: 0.45rem 0.85rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.live-talk-ctrl.is-off {
+  opacity: 0.72;
+}
+
+.live-talk-self-video {
+  display: none;
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 0.55rem;
+  border: 1px solid var(--border);
+  background: #0b1220;
+}
+
+.live-talk-self-video.show {
+  display: block;
+}
+
+.live-talk-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.live-talk-seat {
+  position: relative;
+  text-align: center;
+}
+
+.live-talk-seat.is-pinned .live-talk-seat-btn {
+  outline: 2px solid color-mix(in srgb, var(--accent, #e85d3a) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.live-talk-seat-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.live-talk-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.live-talk-meta {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.live-talk-video-placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #0b1220;
+  color: #e8eef7;
+  font-size: 0.7rem;
+}
+
+.live-talk-menu {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(100% - 0.15rem);
+  min-width: 10rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 18%, transparent);
+}
+
+.live-talk-menu button,
+.live-talk-menu-link {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.45rem;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.live-talk-menu button:hover,
+.live-talk-menu-link:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.live-talk-empty {
+  grid-column: 1 / -1;
+}
+
+.live-talk-chat {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.live-talk-chat-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.live-talk-chat-list {
+  list-style: none;
+  margin: 0 0 0.65rem;
+  padding: 0;
+  max-height: 10rem;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.live-talk-chat-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.live-talk-chat-form input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+}

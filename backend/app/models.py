@@ -399,6 +399,68 @@ class SpaceStance(Base):
     user = relationship("User", foreign_keys=[user_id])
 
 
+class LiveTalkParticipant(Base):
+    """Someone on the Live Talk seat (audio room under a Space). Soft cap ~15."""
+
+    __tablename__ = "live_talk_participants"
+    __table_args__ = (UniqueConstraint("space_id", "user_id", name="uq_live_talk_seat"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    muted = Column(Boolean, default=True, nullable=False)
+    video_enabled = Column(Boolean, default=False, nullable=False)
+    joined_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    left_at = Column(DateTime, nullable=True)
+    removed_at = Column(DateTime, nullable=True)
+    removed_reason = Column(String, default="", nullable=False)
+
+    space = relationship("Space", foreign_keys=[space_id])
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class LiveTalkPin(Base):
+    """Per-viewer pin of a talk participant (self or others) — only for that viewer."""
+
+    __tablename__ = "live_talk_pins"
+    __table_args__ = (
+        UniqueConstraint("space_id", "viewer_id", "pinned_user_id", name="uq_live_talk_pin"),
+    )
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    viewer_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    pinned_user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class LiveTalkMessage(Base):
+    """In-call chat visible only to people currently (or recently) on the Talk."""
+
+    __tablename__ = "live_talk_messages"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    sender_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    sender = relationship("User", foreign_keys=[sender_id])
+
+
+class ModerationStrike(Base):
+    """Auto-moderation strikes — stack toward account removal."""
+
+    __tablename__ = "moderation_strikes"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, default="report", index=True)
+    detail = Column(String, default="", nullable=False)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+
 class Topic(Base):
     """Subtopic under an arena (e.g. IPL under Sports)."""
 
