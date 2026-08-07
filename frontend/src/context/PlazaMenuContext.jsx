@@ -1,16 +1,30 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "bx_plaza_menu_open";
+const STORAGE_KEY = "bx_plaza_menu_open_v2";
 const PlazaMenuContext = createContext(null);
 
+function desktopMenuPreferred() {
+  try {
+    return window.matchMedia("(min-width: 900px)").matches;
+  } catch {
+    return true;
+  }
+}
+
+function readStoredOpen() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "1") return true;
+    if (stored === "0") return false;
+  } catch {
+    // ignore
+  }
+  // First visit: show the Change Arena rail on desktop (matches mockup).
+  return desktopMenuPreferred();
+}
+
 export function PlazaMenuProvider({ children }) {
-  const [open, setOpen] = useState(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [open, setOpen] = useState(readStoredOpen);
 
   useEffect(() => {
     try {

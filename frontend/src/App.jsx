@@ -29,8 +29,6 @@ import Spaces from "./pages/Spaces";
 import SpaceRoom from "./pages/SpaceRoom";
 import OnboardingTopics from "./pages/OnboardingTopics";
 import Rewards from "./pages/Rewards";
-import Sidebar from "./components/Sidebar";
-import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
 import PlazaTopBar from "./components/PlazaTopBar";
 import PlazaSideMenu from "./components/PlazaSideMenu";
@@ -40,15 +38,6 @@ import ThemeOnboarding from "./components/ThemeOnboarding";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
-
-/** Routes that use the plaza shell (not the X-style 3-column chrome). */
-function usePlazaMode(pathname) {
-  if (pathname === "/feed" || pathname.startsWith("/feed/")) return true;
-  if (pathname === "/spaces" || pathname.startsWith("/spaces/")) return true;
-  if (pathname.startsWith("/u/")) return true;
-  if (pathname === "/arenas" || pathname.startsWith("/arenas/")) return true;
-  return false;
-}
 
 function AuthChrome({ children }) {
   return (
@@ -80,46 +69,21 @@ function AdminChrome({ children }) {
   );
 }
 
-function AppShell() {
-  const location = useLocation();
-  const plaza = usePlazaMode(location.pathname);
-
-  if (!plaza) {
-    return (
-      <div className="app-shell">
-        <Sidebar />
-        <main className="app-main">
-          <EmailVerifyBanner />
-          <ThemeOnboarding />
-          <AppRoutes />
-        </main>
-        <RightRail />
-        <ComposeFab />
-        <BottomNav />
-      </div>
-    );
-  }
-
-  return (
-    <PlazaMenuProvider>
-      <PlazaShell />
-    </PlazaMenuProvider>
-  );
-}
-
 function PlazaShell() {
   const { open } = usePlazaMenu();
   return (
     <div className={`app-shell app-shell-plaza${open ? " is-menu-open" : ""}`}>
-      <PlazaTopBar />
       <PlazaSideMenu />
-      <main className="app-main app-main-plaza">
-        <EmailVerifyBanner />
-        <ThemeOnboarding />
-        <AppRoutes />
-      </main>
-      <ComposeFab />
-      <BottomNav />
+      <div className="plaza-shell-body">
+        <PlazaTopBar />
+        <main className="app-main app-main-plaza">
+          <EmailVerifyBanner />
+          <ThemeOnboarding />
+          <AppRoutes />
+        </main>
+        <ComposeFab />
+        <BottomNav />
+      </div>
     </div>
   );
 }
@@ -246,5 +210,9 @@ export default function App() {
     );
   }
 
-  return <AppShell />;
+  return (
+    <PlazaMenuProvider>
+      <PlazaShell />
+    </PlazaMenuProvider>
+  );
 }
