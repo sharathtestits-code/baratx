@@ -6588,6 +6588,7 @@ a.reply-username.name-badge-gold,
   display: flex;
   flex-direction: row;
   align-items: stretch;
+  justify-content: flex-start;
   max-width: none;
   width: 100%;
   min-height: 100vh;
