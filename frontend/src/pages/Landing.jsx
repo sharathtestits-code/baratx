@@ -6,19 +6,14 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 
 /**
  * Public GTM entry — same split brand shell as Login (plain dark + orange BX).
+ * 18+ checkbox lives on Signup only (not every visit / login).
  */
 export default function Landing() {
   const navigate = useNavigate();
   const [emailOrUser, setEmailOrUser] = useState("");
-  const [confirmAge18, setConfirmAge18] = useState(false);
-  const [ageError, setAgeError] = useState("");
 
   function handleNext(e) {
     e.preventDefault();
-    if (!confirmAge18) {
-      setAgeError("You must be 18 or older to join BaratX. Confirm your age to continue.");
-      return;
-    }
     const q = emailOrUser.trim();
     if (!q) {
       navigate("/signup?method=email");
@@ -36,14 +31,6 @@ export default function Landing() {
     if (!q) return "/login";
     if (q.includes("@")) return `/login?email=${encodeURIComponent(q)}`;
     return `/login?username=${encodeURIComponent(q)}`;
-  }
-
-  function goPhoneSignup() {
-    if (!confirmAge18) {
-      setAgeError("You must be 18 or older to join BaratX. Confirm your age to continue.");
-      return;
-    }
-    navigate("/signup?method=phone");
   }
 
   return (
@@ -68,26 +55,11 @@ export default function Landing() {
           <p className="bx-login-sub">Short posts. Real replies. Start with Google.</p>
 
           <div className="x-auth-stack">
-            <label className="age-gate">
-              <input
-                type="checkbox"
-                checked={confirmAge18}
-                onChange={(e) => {
-                  setConfirmAge18(e.target.checked);
-                  if (e.target.checked) setAgeError("");
-                }}
-              />
-              <span>
-                I confirm I am <strong>18 or older</strong>. BaratX is for adults only.
-              </span>
-            </label>
-
-            <GoogleSignInButton
-              label="Continue with Google"
-              confirmAge18={confirmAge18}
-              requireAgeConfirm
-              onError={setAgeError}
-            />
+            {/*
+              Returning Google users sign in freely. New Google accounts send
+              confirm_age_18 so the API can enforce 18+ without a login checkbox.
+            */}
+            <GoogleSignInButton label="Continue with Google" confirmAge18 />
 
             <div className="x-auth-or bx-login-or" role="separator">
               <span>or continue with email</span>
@@ -112,7 +84,7 @@ export default function Landing() {
                   />
                 </span>
               </label>
-              <button type="submit" className="bx-login-submit" disabled={!confirmAge18}>
+              <button type="submit" className="bx-login-submit">
                 Continue with email
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
                   <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
@@ -123,17 +95,14 @@ export default function Landing() {
             <button
               type="button"
               className="x-btn x-btn-phone bx-landing-phone"
-              onClick={goPhoneSignup}
-              disabled={!confirmAge18}
+              onClick={() => navigate("/signup?method=phone")}
             >
               <IconPhone className="x-btn-icon" />
               Continue with phone
             </button>
 
-            {ageError && <p className="error">{ageError}</p>}
-
             <p className="x-legal bx-login-legal">
-              By signing up, you confirm you are 18+ and agree to the{" "}
+              New accounts must be 18+. By signing up you agree to the{" "}
               <Link to="/terms">Terms of Service</Link> and{" "}
               <Link to="/privacy">Privacy Policy</Link>.
             </p>
@@ -148,7 +117,7 @@ export default function Landing() {
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
             <path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z" />
           </svg>
-          HTTPS · Passwords hashed · We don&apos;t sell your data · 18+
+          HTTPS · Passwords hashed · We don&apos;t sell your data
         </p>
       </main>
     </div>

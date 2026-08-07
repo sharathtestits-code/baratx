@@ -1,30 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
-/** Option B: menu starts collapsed; hamburger opens Change Arena drawer. */
-const STORAGE_KEY = "bx_plaza_menu_open_v3";
 const PlazaMenuContext = createContext(null);
 
-function readStoredOpen() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "1") return true;
-    if (stored === "0") return false;
-  } catch {
-    // ignore
-  }
-  return false;
-}
-
+/**
+ * Option B: menu starts closed. Hamburger opens Change Arena drawer.
+ * Open state is not persisted — avoids stuck / half-open localStorage bugs.
+ */
 export function PlazaMenuProvider({ children }) {
-  const [open, setOpen] = useState(readStoredOpen);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, open ? "1" : "0");
-    } catch {
-      // ignore
-    }
-  }, [open]);
+  const [open, setOpen] = useState(false);
 
   const toggle = useCallback(() => {
     setOpen((v) => !v);
@@ -34,9 +17,13 @@ export function PlazaMenuProvider({ children }) {
     setOpen(false);
   }, []);
 
+  const openMenu = useCallback(() => {
+    setOpen(true);
+  }, []);
+
   const value = useMemo(
-    () => ({ open, setOpen, toggle, close }),
-    [open, toggle, close]
+    () => ({ open, setOpen, toggle, close, openMenu }),
+    [open, toggle, close, openMenu]
   );
 
   return <PlazaMenuContext.Provider value={value}>{children}</PlazaMenuContext.Provider>;
@@ -45,7 +32,13 @@ export function PlazaMenuProvider({ children }) {
 export function usePlazaMenu() {
   const ctx = useContext(PlazaMenuContext);
   if (!ctx) {
-    return { open: false, setOpen: () => {}, toggle: () => {}, close: () => {} };
+    return {
+      open: false,
+      setOpen: () => {},
+      toggle: () => {},
+      close: () => {},
+      openMenu: () => {},
+    };
   }
   return ctx;
 }

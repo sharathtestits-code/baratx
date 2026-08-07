@@ -10,6 +10,7 @@ import FoundingStrip from "../components/FoundingStrip";
 import RaceStrip from "../components/RaceStrip";
 import MentionTextarea from "../components/MentionTextarea";
 import { IconImage, IconClose } from "../components/Icons";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
@@ -279,11 +280,10 @@ export default function Feed() {
 
   return (
     <div className="plaza-page plaza-square">
-      <section className="plaza-hero">
-        <p className="plaza-hero-kicker">India&apos;s public square</p>
-        <h1 className="plaza-hero-title">The Square</h1>
-        <p className="plaza-hero-sub">One question. Your take. Real replies — not a firehose.</p>
-      </section>
+      <PlazaPageHeader
+        title="Square"
+        sub="One question. Your take. Real replies — not a firehose."
+      />
 
       <div className="plaza-stage">
         <TodaysSquare

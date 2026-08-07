@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import { IconSearch } from "../components/Icons";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 import SuggestedFollows from "../components/SuggestedFollows";
 
 const QUICK_SEARCHES = [
@@ -87,11 +88,10 @@ export default function Search() {
 
   return (
     <div className="plaza-page plaza-explore">
-      <section className="plaza-hero plaza-hero-compact">
-        <p className="plaza-hero-kicker">Find the square</p>
-        <h1 className="plaza-hero-title">Explore</h1>
-        <p className="plaza-hero-sub">People, posts, and topics across India.</p>
-      </section>
+      <PlazaPageHeader
+        title="Explore"
+        sub="People, posts, and topics across India."
+      />
 
       <form className="plaza-search-form search-form" onSubmit={handleSubmit} role="search">
         <IconSearch className="search-form-icon" aria-hidden="true" />

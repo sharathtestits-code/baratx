@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 
 export default function Spaces() {
   const { token } = useAuth();
@@ -49,17 +50,21 @@ export default function Spaces() {
 
   return (
     <div className="plaza-page plaza-live">
+      <PlazaPageHeader
+        title="Live"
+        sub="Timed discussion rooms — amphitheatre energy, not another timeline."
+      />
       <section className="live-amphitheatre">
         <div className="live-amphitheatre-glow" aria-hidden="true" />
         <span className="live-pill">On air</span>
         <p className="live-eyebrow">Airwaves</p>
-        <h1 className="live-amphitheatre-title">
+        <h2 className="live-amphitheatre-title">
           {featured ? featured.title : "Start a room India can join"}
-        </h1>
+        </h2>
         <p className="live-amphitheatre-sub">
           {featured
             ? `Hosted by @${featured.host?.username} · ${featured.post_count} takes in the room`
-            : "Timed discussion rooms — amphitheatre energy, not another timeline."}
+            : "Pick a room below or go live with a new conversation."}
         </p>
         <div className="live-stage-wave" aria-hidden="true">
           <span />

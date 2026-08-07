@@ -20,9 +20,14 @@ export default function PlazaTopBar() {
         <button
           type="button"
           className={`plaza-menu-toggle${open ? " is-open" : ""}`}
-          onClick={toggle}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggle();
+          }}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
+          aria-controls="plaza-side-menu"
         >
           <span />
           <span />

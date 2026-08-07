@@ -1,19 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { ARENA_TOPICS } from "../arenas";
 
 /**
- * Change Arena drawer (Option B): closed by default, opens from hamburger.
- * Same chrome on every plaza page (Option C).
+ * Change Arena drawer — portaled to document.body so stacking / overflow
+ * never block open/close on Square, Explore, or other plaza pages.
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
   const location = useLocation();
+  const pathRef = useRef(location.pathname);
+
+  // Close only when the route actually changes (not on first mount).
+  useEffect(() => {
+    if (pathRef.current !== location.pathname) {
+      pathRef.current = location.pathname;
+      close();
+    }
+  }, [location.pathname, close]);
 
   useEffect(() => {
-    close();
-  }, [location.pathname, close]);
+    document.body.classList.toggle("plaza-menu-is-open", open);
+    return () => document.body.classList.remove("plaza-menu-is-open");
+  }, [open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -21,10 +32,17 @@ export default function PlazaSideMenu() {
       if (e.key === "Escape") close();
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
   }, [open, close]);
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <>
       <div
         className={`plaza-menu-backdrop${open ? " is-open" : ""}`}
@@ -32,12 +50,14 @@ export default function PlazaSideMenu() {
         aria-hidden={!open}
       />
       <aside
+        id="plaza-side-menu"
         className={`plaza-side-menu${open ? " is-open" : ""}`}
         aria-hidden={!open}
         aria-label="Change arena"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="plaza-side-head">
-          <button type="button" className="plaza-side-arena-switch" aria-label="Current arena">
+          <div className="plaza-side-arena-switch">
             <span className="plaza-side-arena-name">
               Bharat
               <svg className="plaza-side-chevron" viewBox="0 0 16 16" aria-hidden="true">
@@ -52,7 +72,7 @@ export default function PlazaSideMenu() {
               </svg>
             </span>
             <span className="plaza-side-change">Change Arena</span>
-          </button>
+          </div>
           <button type="button" className="plaza-side-close" onClick={close} aria-label="Close menu">
             ×
           </button>
@@ -93,6 +113,7 @@ export default function PlazaSideMenu() {
           </svg>
         </Link>
       </aside>
-    </>
+    </>,
+    document.body
   );
 }

@@ -47,7 +47,8 @@ export default function GoogleSignInButton({
     try {
       const data = await api.loginGoogle({
         id_token: response.credential,
-        confirm_age_18: ageOk || undefined,
+        // Backend only requires this for brand-new Google accounts.
+        ...(ageOk ? { confirm_age_18: true } : {}),
       });
       login(data.access_token);
       // Returning users go Home. Topic picker is one-time (Arenas for later edits).

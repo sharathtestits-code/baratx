@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { arenasApi, communitiesApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { ARENA_TOPICS, arenaMeta } from "../arenas";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 
 export default function Arenas() {
   const { token } = useAuth();
@@ -62,13 +63,10 @@ export default function Arenas() {
 
   return (
     <div className="feed-wrap surface-page arenas-page plaza-page">
-      <div className="feed-header">
-        <h1>Arenas</h1>
-      </div>
-      <p className="hint surface-lead arenas-lead">
-        Not another firehose. Pick a topic, pick a side — Sports, Politics, Entertainment, News, or
-        Spirituality.
-      </p>
+      <PlazaPageHeader
+        title="Arenas"
+        sub="Pick a topic, pick a side — Sports, Politics, Entertainment, News, or Spirituality."
+      />
 
       {error && <div className="error">{error}</div>}
 
