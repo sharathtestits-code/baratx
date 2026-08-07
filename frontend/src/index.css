@@ -5276,25 +5276,41 @@ a.reply-username.name-badge-gold,
   gap: 0.45rem;
 }
 
-.topic-chip {
+.topic-chip,
+button.topic-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
   border: 1px solid var(--border, #e5e7eb);
   background: var(--surface, #fff);
   color: var(--text);
   border-radius: 999px;
   padding: 0.45rem 0.85rem;
+  font: inherit;
   font-size: 0.88rem;
   font-weight: 600;
+  line-height: 1.2;
   cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  user-select: none;
 }
 
-.topic-chip.selected {
+.topic-chip.selected,
+button.topic-chip.selected {
   border-color: #ff671f;
   background: #fff1e6;
   color: #c2410c;
 }
 
-.arena-topic-grid .topic-chip {
+.arena-topic-grid .topic-chip,
+.arena-topic-grid button.topic-chip {
   cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
   transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
