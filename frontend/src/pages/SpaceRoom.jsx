@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
@@ -18,6 +18,8 @@ export default function SpaceRoom() {
   const [stanceBusy, setStanceBusy] = useState(false);
   const [filter, setFilter] = useState("all"); // all | for | against
   const [error, setError] = useState("");
+  const [stanceHint, setStanceHint] = useState(false);
+  const composeRef = useRef(null);
 
   const isDebate = space?.kind === "debate";
 
@@ -44,14 +46,25 @@ export default function SpaceRoom() {
   }, [token, spaceId]);
 
   async function pickSide(side) {
-    if (!token || stanceBusy) return;
+    if (!token || stanceBusy || !space) return;
+    if (space.status !== "open") {
+      setError("This debate is closed");
+      return;
+    }
     setStanceBusy(true);
     setError("");
+    setStanceHint(false);
+    // Optimistic — unlock typing / Post immediately
+    setSpace((prev) => (prev ? { ...prev, my_side: side } : prev));
     try {
       const updated = await spacesApi.setStance(token, spaceId, side);
       setSpace(updated);
+      requestAnimationFrame(() => {
+        if (typeof composeRef.current?.focus === "function") composeRef.current.focus();
+      });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Could not pick a side");
+      load();
     } finally {
       setStanceBusy(false);
     }
@@ -60,8 +73,13 @@ export default function SpaceRoom() {
   async function submitPost(e) {
     e.preventDefault();
     if (!text.trim()) return;
-    if (isDebate && !space.my_side) {
-      setError("Pick For or Against before posting");
+    if (isDebate && !space?.my_side) {
+      setError("Pick For or Against above, then post");
+      setStanceHint(true);
+      document.getElementById("debate-stance-panel")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
       return;
     }
     setPosting(true);
@@ -93,7 +111,7 @@ export default function SpaceRoom() {
 
   if (loading) {
     return (
-      <div className="feed-wrap">
+      <div className="feed-wrap plaza-page">
         <p className="hint">Loading…</p>
       </div>
     );
@@ -101,7 +119,7 @@ export default function SpaceRoom() {
 
   if (!space) {
     return (
-      <div className="feed-wrap">
+      <div className="feed-wrap plaza-page">
         <div className="error">{error || "Not found"}</div>
         <Link to={isDebate ? "/arenas" : "/spaces"}>Back</Link>
       </div>
@@ -158,13 +176,17 @@ export default function SpaceRoom() {
       {error && <div className="error">{error}</div>}
 
       {isDebate && (
-        <div className="debate-stance-panel">
+        <div
+          id="debate-stance-panel"
+          className={`debate-stance-panel${stanceHint && !space.my_side ? " needs-side" : ""}`}
+        >
           <p className="debate-stance-lead">Pick a side to join the fight</p>
           <div className="debate-stance-row">
             <button
               type="button"
               className={`debate-side-btn for${space.my_side === "for" ? " active" : ""}`}
               disabled={!open || stanceBusy}
+              aria-pressed={space.my_side === "for"}
               onClick={() => pickSide("for")}
             >
               <span className="debate-side-label">{space.side_for_label}</span>
@@ -174,16 +196,20 @@ export default function SpaceRoom() {
               type="button"
               className={`debate-side-btn against${space.my_side === "against" ? " active" : ""}`}
               disabled={!open || stanceBusy}
+              aria-pressed={space.my_side === "against"}
               onClick={() => pickSide("against")}
             >
               <span className="debate-side-label">{space.side_against_label}</span>
               <span className="debate-side-count">{space.against_count}</span>
             </button>
           </div>
-          {space.my_side && (
-            <p className="hint">
-              You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong>
+          {space.my_side ? (
+            <p className="hint ok-hint">
+              You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong> —
+              type your argument below.
             </p>
+          ) : (
+            <p className="hint">Tap For or Against, then type your take.</p>
           )}
           <div className="feed-tabs debate-filter-tabs">
             <button
@@ -217,27 +243,34 @@ export default function SpaceRoom() {
             <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={40} />
             <div className="compose-body">
               <MentionTextarea
+                ref={composeRef}
                 value={text}
-                onChange={setText}
+                onChange={(next) => {
+                  setText(next);
+                  if (isDebate && !space.my_side && next.trim()) setStanceHint(true);
+                }}
                 placeholder={
                   isDebate
                     ? space.my_side
                       ? `Argue for ${
                           space.my_side === "for" ? space.side_for_label : space.side_against_label
                         }… type @ to tag`
-                      : "Pick a side above, then post"
+                      : "Type your take — pick For or Against above to post"
                     : "Say something in this Space — type @ to tag"
                 }
                 maxLength={280}
                 rows={3}
-                disabled={isDebate && !space.my_side}
               />
               <button
                 type="submit"
                 className="post-btn"
                 disabled={posting || !text.trim() || (isDebate && !space.my_side)}
               >
-                {posting ? "Posting…" : "Post"}
+                {posting
+                  ? "Posting…"
+                  : isDebate && !space.my_side
+                    ? "Pick a side to post"
+                    : "Post"}
               </button>
             </div>
           </div>
