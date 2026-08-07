@@ -515,6 +515,26 @@ button {
   height: 2.1rem;
 }
 
+.sidebar-logo-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.sidebar-logo-full .logo-mark {
+  width: 2.1rem;
+  height: 2.1rem;
+}
+
+.sidebar-logo-full .logo-wordmark {
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.sidebar-logo-full .logo-wordmark-x {
+  color: var(--brand);
+}
+
 .sidebar-logo-wordmark {
   font-size: 1.2rem;
 }
@@ -5738,9 +5758,21 @@ a.reply-username.name-badge-gold,
   background: #0d0d12;
   color: #ffffff;
   color-scheme: dark;
+  /* Isolate from saved light themes (saffron/ink) so controls stay dark */
+  --bg: #0d0d12;
+  --surface: rgba(26, 26, 36, 0.9);
+  --surface-solid: #1a1a24;
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.22);
   --text: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.72);
+  --text-tertiary: rgba(255, 255, 255, 0.48);
   --brand: #ff9933;
+  --brand-hover: #ffb366;
+  --brand-tint: rgba(255, 153, 51, 0.14);
+  --btn-contrast-bg: #ffffff;
+  --btn-contrast-text: #0d0d12;
+  --hover-overlay: rgba(255, 255, 255, 0.06);
 }
 
 .bx-login-brand {
@@ -5888,6 +5920,18 @@ a.reply-username.name-badge-gold,
 
 .bx-login-methods {
   margin-bottom: 1rem;
+  background: rgba(13, 13, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bx-login-methods button {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.bx-login-methods button.active {
+  background: rgba(255, 153, 51, 0.2);
+  color: #ffffff;
+  box-shadow: none;
 }
 
 .bx-login-form {
@@ -5976,7 +6020,7 @@ a.reply-username.name-badge-gold,
   border: none;
   border-radius: 0.85rem;
   background: #ff9933;
-  color: #0d0d12;
+  color: #0d0d12 !important;
   font-weight: 800;
   font-size: 1rem;
   cursor: pointer;

@@ -181,3 +181,20 @@ export function IconArena({ className = "" }) {
     </svg>
   );
 }
+
+export function IconLive({ className = "" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`icon ${className}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 12h2l2-5 3 10 2-6 2 3h5" />
+      <circle cx="19" cy="7" r="2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
