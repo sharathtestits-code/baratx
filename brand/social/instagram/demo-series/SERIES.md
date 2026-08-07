@@ -12,7 +12,7 @@ Music is attached **in the IG app** (trending India audio matched to the topic).
 
 | Day | Reel | Covers | Music vibe | End card |
 |-----|------|--------|------------|----------|
-| **1** | Features on BaratX · **Part 1 — Square** | Compose, AI Assist starter, Post, Like, Reply, Repost, Save | **Rotate** trending India audio (desi pulse / hot-take — not Faah-only) | Wait for Part 2 — Arenas |
+| **1** | Features on BaratX · **Part 1 — Square** | **Screen recording** of compose, AI Assist, like/reply/repost/save, arenas menu | Soft bed in file; attach **trending India audio** in IG (rotate — not Faah-only) | Wait for Part 2 — Arenas |
 | **2** | **Part 2 — Arenas & debates** | Arenas, topics, Join, For/Against, Leave, Live | Debate / siren energy | Wait for Part 3 — Profile |
 | **3** | **Part 3 — You** | Profile, Edit, photo, cover, Follow/Message | Softer / identity | Wait for Part 4 — Look |
 | **4** | **Part 4 — Look & explore** | Appearance themes, Explore, Search | Chill / aesthetic | Wait for Part 5 — Live |
