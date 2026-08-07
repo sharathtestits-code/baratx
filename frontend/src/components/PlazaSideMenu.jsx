@@ -1,20 +1,33 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../api";
+import { useAuth } from "../context/AuthContext";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { ARENA_TOPICS } from "../arenas";
+import ThemePicker from "./ThemePicker";
+import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
 
 /**
- * Change Arena drawer — Bharat header is a real dropdown that expands arenas.
+ * Change Arena drawer — arenas first, then appearance themes.
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
+  const { token, user, updateUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
   const listId = useId();
+  const themeId = useId();
   const [pickerOpen, setPickerOpen] = useState(true);
+  const [theme, setTheme] = useState(() => user?.theme || getStoredTheme());
+  const [themeSaving, setThemeSaving] = useState(false);
+  const [themeMsg, setThemeMsg] = useState("");
   const switchRef = useRef(null);
+
+  useEffect(() => {
+    if (user?.theme) setTheme(user.theme);
+  }, [user?.theme]);
 
   // Close drawer only when the route actually changes (not on first mount).
   useEffect(() => {
@@ -26,7 +39,10 @@ export default function PlazaSideMenu() {
 
   // Reset picker open whenever the drawer opens.
   useEffect(() => {
-    if (open) setPickerOpen(true);
+    if (open) {
+      setPickerOpen(true);
+      setThemeMsg("");
+    }
   }, [open]);
 
   useEffect(() => {
@@ -66,6 +82,32 @@ export default function PlazaSideMenu() {
     navigate("/arenas");
   }
 
+  function goSettings() {
+    close();
+    navigate("/settings");
+  }
+
+  async function saveTheme(nextId) {
+    setTheme(nextId);
+    applyTheme(nextId);
+    markThemeChosen();
+    setThemeMsg("");
+    if (!token) {
+      setThemeMsg("Theme saved on this device.");
+      return;
+    }
+    setThemeSaving(true);
+    try {
+      const updated = await api.updateMe(token, { theme: nextId });
+      updateUser(updated);
+      setThemeMsg("Appearance saved.");
+    } catch {
+      setThemeMsg("Saved on this device.");
+    } finally {
+      setThemeSaving(false);
+    }
+  }
+
   if (typeof document === "undefined") return null;
 
   const activeKey = location.pathname.startsWith("/arenas/")
@@ -83,7 +125,7 @@ export default function PlazaSideMenu() {
         id="plaza-side-menu"
         className={`plaza-side-menu${open ? " is-open" : ""}`}
         aria-hidden={!open}
-        aria-label="Change arena"
+        aria-label="Menu"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="plaza-side-head">
@@ -149,10 +191,40 @@ export default function PlazaSideMenu() {
           <p className="plaza-side-picker-hint">Tap Change Arena to pick Sports, Politics, and more.</p>
         )}
 
+        <section className="plaza-side-theme" aria-labelledby={themeId}>
+          <div className="plaza-side-theme-head">
+            <h2 id={themeId}>Appearance</h2>
+            <p>Pick your look — Midnight, Saffron, Monsoon, or Ink.</p>
+          </div>
+          <ThemePicker value={theme} onChange={saveTheme} compact />
+          {(themeSaving || themeMsg) && (
+            <p className="plaza-side-theme-status" role="status">
+              {themeSaving ? "Saving…" : themeMsg}
+            </p>
+          )}
+        </section>
+
         <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
           <span className="plaza-side-manage-copy">
             <strong>My Arenas</strong>
             <em>Manage your favourite arenas</em>
+          </span>
+          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M6 4l4 4-4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button type="button" className="plaza-side-manage plaza-side-settings" onClick={goSettings}>
+          <span className="plaza-side-manage-copy">
+            <strong>Settings</strong>
+            <em>Privacy, mutes, and more</em>
           </span>
           <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
             <path

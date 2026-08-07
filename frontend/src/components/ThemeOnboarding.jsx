@@ -56,7 +56,7 @@ export default function ThemeOnboarding() {
       >
         <h2 id="theme-onboard-title">Choose your look</h2>
         <p className="hint">
-          BaratX defaults to Tri-Color Midnight (dark). Pick another look anytime in Settings → Appearance.
+          BaratX defaults to Tri-Color Midnight (dark). Change anytime from the menu → Appearance.
         </p>
         <ThemePicker
           value={theme}

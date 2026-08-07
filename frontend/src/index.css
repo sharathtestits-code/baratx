@@ -7334,6 +7334,60 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   color: var(--text);
 }
 
+.plaza-side-theme {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.15rem 0 0.25rem;
+  padding: 0.75rem 0.65rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 45%, var(--surface));
+}
+
+.plaza-side-theme-head h2 {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.plaza-side-theme-head p {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--text-tertiary);
+}
+
+.plaza-side-theme .theme-picker,
+.plaza-side-theme .theme-picker-compact {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+}
+
+.plaza-side-theme .theme-card {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.7rem;
+  gap: 0.55rem;
+}
+
+.plaza-side-theme .theme-card-text strong {
+  font-size: 0.88rem;
+}
+
+.plaza-side-theme-status {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.plaza-side-settings {
+  margin-top: 0.45rem;
+}
+
 .plaza-side-manage {
   margin-top: auto;
   display: flex;
