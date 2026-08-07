@@ -31,7 +31,7 @@ export const THEMES = [
 ];
 
 export const THEME_IDS = THEMES.map((t) => t.id);
-/** Default: Tri-Color Midnight (dark). Users can change in the hamburger menu → Appearance. */
+/** Default: Tri-Color Midnight (dark). Users can change in Settings → Appearance. */
 export const DEFAULT_THEME = "midnight";
 
 export function isValidTheme(id) {
