@@ -437,6 +437,30 @@ export default function Admin() {
           </button>
           <button
             type="button"
+            className="admin-btn"
+            onClick={async () => {
+              setBusy(true);
+              setError("");
+              setMsg("");
+              try {
+                const res = await adminApi.instagramCarousel(secret, "evening");
+                setMsg(
+                  `Instagram carousel posted` +
+                    (res.media_id ? ` · media ${res.media_id}` : "") +
+                    ` (@getbaratx)`
+                );
+              } catch (err) {
+                setError(err.message || "Instagram publish failed");
+              } finally {
+                setBusy(false);
+              }
+            }}
+            disabled={busy}
+          >
+            Post IG carousel now
+          </button>
+          <button
+            type="button"
             className="admin-btn admin-btn-ghost"
             onClick={() => load(secret)}
             disabled={busy}

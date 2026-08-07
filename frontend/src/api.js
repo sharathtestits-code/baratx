@@ -487,6 +487,11 @@ export const adminApi = {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
     }),
+  instagramCarousel: (adminSecret, pack = "evening") =>
+    request(`/admin/instagram-carousel?pack=${encodeURIComponent(pack)}`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
   deleteUser: (adminSecret, userId) =>
     request(`/admin/users/${encodeURIComponent(userId)}`, {
       method: "DELETE",

@@ -2355,6 +2355,19 @@ def admin_daily_digest(
     )
 
 
+@app.post("/admin/instagram-carousel")
+def admin_instagram_carousel(
+    pack: str = "evening",
+    _: bool = Depends(require_admin),
+):
+    """Publish BaratX app carousel to @getbaratx (Instagram Graph API)."""
+    from app import instagram_publish
+
+    if pack not in ("morning", "evening"):
+        pack = "evening"
+    return instagram_publish.publish_carousel(pack=pack)
+
+
 @app.get("/rewards/founding", response_model=schemas.FoundingStatusOut)
 def founding_status(
     db: Session = Depends(get_db),
@@ -2604,3 +2617,13 @@ except Exception:  # noqa: BLE001
     import logging
 
     logging.getLogger("baratx").exception("Daily digest scheduler failed to start")
+
+# Instagram @getbaratx carousels at IST peak times (needs INSTAGRAM_* env).
+try:
+    from app import instagram_publish
+
+    instagram_publish.start_instagram_scheduler()
+except Exception:  # noqa: BLE001
+    import logging
+
+    logging.getLogger("baratx").exception("Instagram scheduler failed to start")
