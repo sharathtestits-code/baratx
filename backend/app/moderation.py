@@ -234,7 +234,7 @@ def apply_report_auto_mod(
             "Report submitted. They were removed from Live Talk. "
             "Repeated guideline breaches remove the account automatically."
         )
-    return "Report submitted. Thanks for helping keep BaratX safe."
+    return "Report submitted. Thanks for helping keep BarathX safe."
 
 
 def purge_user(db: Session, user: models.User) -> None:

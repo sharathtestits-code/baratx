@@ -8,7 +8,7 @@ import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboar
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
- * Google sign-in that keeps the BaratX button look, but uses GIS renderButton
+ * Google sign-in that keeps the BarathX button look, but uses GIS renderButton
  * (popup account chooser next to the control) — not One Tap in the top-right.
  *
  * In Capacitor native shells, GIS popup/WebView OAuth is unreliable until
@@ -37,7 +37,7 @@ export default function GoogleSignInButton({
     if (!response?.credential) return;
     const { confirmAge18: ageOk, requireAgeConfirm: needAge } = ageRef.current;
     if (needAge && !ageOk) {
-      const msg = "You must be 18 or older to join BaratX. Confirm your age to continue.";
+      const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
       setError(msg);
       onError?.(msg);
       return;
@@ -157,7 +157,7 @@ export default function GoogleSignInButton({
           className="x-btn x-btn-google"
           onClick={() => {
             const msg =
-              "In the BaratX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
+              "In the BarathX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
             setError(msg);
             onError?.(msg);
           }}

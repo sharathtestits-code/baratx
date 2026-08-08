@@ -8,11 +8,11 @@ export default function Guidelines() {
     <div className="page page-auth">
       <article className="legal-doc guidelines-doc">
         <p className="hint">
-          <Link to="/">← BaratX</Link>
+          <Link to="/">← BarathX</Link>
         </p>
         <h1>Community guidelines</h1>
         <p className="legal-lead">
-          BaratX is India&apos;s public square for short posts and live debate. Argue hard. Don&apos;t
+          BarathX is India&apos;s public square for short posts and live debate. Argue hard. Don&apos;t
           abuse people.
         </p>
 
@@ -39,10 +39,10 @@ export default function Guidelines() {
         <h2>Badges</h2>
         <ul>
           <li>
-            <strong>Blue official</strong> — BaratX staff / platform accounts.
+            <strong>Blue official</strong> — BarathX staff / platform accounts.
           </li>
           <li>
-            <strong>Gold BaratX</strong> — BaratX brand voices (seeded topic accounts), not personal
+            <strong>Gold BarathX</strong> — BarathX brand voices (seeded topic accounts), not personal
             verification.
           </li>
         </ul>

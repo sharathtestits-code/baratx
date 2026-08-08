@@ -214,7 +214,7 @@ def register_extra_routes(app, *, get_current_user, get_current_user_optional, s
             )
         )
         db.flush()
-        msg = "Report submitted. Thanks for helping keep BaratX safe."
+        msg = "Report submitted. Thanks for helping keep BarathX safe."
         if target_user_id:
             from app import moderation as mod
 

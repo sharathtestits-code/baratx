@@ -11,8 +11,8 @@ export default function Landing() {
   return (
     <div className="bx-home">
       <header className="bx-home-nav">
-        <Link to="/" className="bx-home-nav-brand" aria-label="BaratX home">
-          <Logo variant="full" title="BaratX" />
+        <Link to="/" className="bx-home-nav-brand" aria-label="BarathX home">
+          <Logo variant="full" title="BarathX" />
         </Link>
         <div className="bx-home-nav-actions">
           <Link to="/login" className="bx-home-nav-signin">
@@ -31,7 +31,7 @@ export default function Landing() {
           <div className="bx-home-hero-brand">
             <LogoMark className="bx-home-hero-mark" title="" />
             <h1 id="bx-home-brand" className="bx-home-hero-name">
-              BaratX
+              BarathX
             </h1>
           </div>
           <p className="bx-home-hero-tag">India&apos;s public square</p>
@@ -63,10 +63,10 @@ export default function Landing() {
       </section>
 
       <section className="bx-home-section" aria-labelledby="bx-home-why">
-        <p className="bx-home-kicker">Why BaratX</p>
+        <p className="bx-home-kicker">Why BarathX</p>
         <h2 id="bx-home-why">Not another feed to scroll</h2>
         <p className="bx-home-copy">
-          Most social apps bury your take in an algorithm. BaratX starts from one shared question and
+          Most social apps bury your take in an algorithm. BarathX starts from one shared question and
           a live room where you pick Agree or Disagree and argue it — audio, video, or just your
           words — with people who showed up for the same debate.
         </p>
@@ -152,7 +152,7 @@ export default function Landing() {
           <div>
             <dt>How is this different from X?</dt>
             <dd>
-              X is built for scrolling followers. BaratX starts with one shared question and live
+              X is built for scrolling followers. BarathX starts with one shared question and live
               rooms where you pick a side and argue in real time.
             </dd>
           </div>
@@ -192,7 +192,7 @@ export default function Landing() {
       <section className="bx-home-closing" aria-labelledby="bx-home-close">
         <LogoMark className="bx-home-closing-mark" title="" />
         <h2 id="bx-home-close">Post your take. Someone will talk back.</h2>
-        <p className="bx-home-copy">BaratX — India&apos;s public square. Built by Indians. For India.</p>
+        <p className="bx-home-copy">BarathX — India&apos;s public square. Built by Indians. For India.</p>
         <div className="bx-home-hero-ctas">
           <Link to="/signup" className="btn btn-primary bx-home-cta-primary">
             Answer today&apos;s question
@@ -215,7 +215,7 @@ export default function Landing() {
       </section>
 
       <footer className="bx-home-foot">
-        <span>© {new Date().getFullYear()} BaratX</span>
+        <span>© {new Date().getFullYear()} BarathX</span>
         <span className="bx-home-foot-links">
           <Link to="/guidelines">Guidelines</Link>
           <Link to="/terms">Terms</Link>

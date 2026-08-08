@@ -1,4 +1,4 @@
-"""BaratX rewards — Founding 100 + biweekly Square Race.
+"""BarathX rewards — Founding 100 + biweekly Square Race.
 
 Evaluation (no AI judge, no self-rating alone):
 1. Floor — real action: civic problem post (≥50 chars, flagged) OR open any arena debate.

@@ -1,4 +1,4 @@
-# BaratX AI Assist — what it is now vs what we can give
+# BarathX AI Assist — what it is now vs what we can give
 
 ## What it does **today**
 `AI Assist` on Square compose is **not** connected to any model (no OpenAI / Gemini / Claude).
@@ -13,9 +13,9 @@ Current behavior (`Feed.jsx`):
 | Mode | Source | Good for |
 |------|--------|----------|
 | **A. Prompt starters** (now) | Hardcoded / curated India hooks | Instant, free, no privacy risk |
-| **B. BaratX context** | User’s arenas/topics + open debates + their last posts | “Continue this debate”, side-aware drafts |
+| **B. BarathX context** | User’s arenas/topics + open debates + their last posts | “Continue this debate”, side-aware drafts |
 | **C. Credible news** | Same RSS allowlist as daily digest | Civic / News takes grounded in real headlines |
-| **D. Full LLM** | OpenAI / Gemini / Claude with BaratX system prompt | Rewrite, shorten, argue For/Against, translate EN↔HI |
+| **D. Full LLM** | OpenAI / Gemini / Claude with BarathX system prompt | Rewrite, shorten, argue For/Against, translate EN↔HI |
 
 Recommended product path: **A → B → C**, then optional **D** behind a toggle (“AI rewrite”).
 

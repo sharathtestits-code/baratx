@@ -1,14 +1,14 @@
 import { useId } from "react";
 
 /**
- * BaratX logo system:
+ * BarathX logo system:
  * - mark: BX circle (favicon / compact nav)
- * - wordmark: BaratX with custom X
+ * - wordmark: BarathX with custom X
  * - full: mark + wordmark
  *
  * Brand color only (saffron/warm ink) — no saffron–white–green flag ring.
  */
-export function LogoMark({ className = "", title = "BaratX" }) {
+export function LogoMark({ className = "", title = "BarathX" }) {
   const uid = useId().replace(/:/g, "");
   const ringId = `bxRing-${uid}`;
 
@@ -49,10 +49,10 @@ export function LogoMark({ className = "", title = "BaratX" }) {
   );
 }
 
-export function LogoWordmark({ className = "", title = "BaratX" }) {
+export function LogoWordmark({ className = "", title = "BarathX" }) {
   return (
     <span className={`logo-wordmark ${className}`} aria-label={title || undefined} aria-hidden={title ? undefined : true}>
-      <span className="logo-wordmark-barat">Barat</span>
+      <span className="logo-wordmark-barat">Barath</span>
       <span className="logo-wordmark-x" aria-hidden="true">
         X
       </span>
@@ -65,7 +65,7 @@ export default function Logo({
   className = "",
   markClassName = "",
   wordmarkClassName = "",
-  title = "BaratX",
+  title = "BarathX",
 }) {
   if (variant === "mark") {
     return <LogoMark className={`${className} ${markClassName}`.trim()} title={title} />;

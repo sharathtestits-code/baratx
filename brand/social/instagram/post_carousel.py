@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Post BaratX carousel to Instagram via Meta Graph API.
+"""Post BarathX carousel to Instagram via Meta Graph API.
 
 Requires env (or ~/.config/baratx/instagram.env):
   INSTAGRAM_ACCESS_TOKEN

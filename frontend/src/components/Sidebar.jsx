@@ -71,8 +71,8 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
-        <Link to="/feed" className="sidebar-brand" aria-label="BaratX Home">
-          <Logo variant="full" className="sidebar-logo-full" title="BaratX" />
+        <Link to="/feed" className="sidebar-brand" aria-label="BarathX Home">
+          <Logo variant="full" className="sidebar-logo-full" title="BarathX" />
         </Link>
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLink to="/feed" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>

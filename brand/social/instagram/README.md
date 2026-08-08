@@ -1,4 +1,4 @@
-# BaratX Instagram — 2–3×/day carousel
+# BarathX Instagram — 2–3×/day carousel
 
 ## Live
 - Account: **[@getbaratx](https://www.instagram.com/getbaratx/)**

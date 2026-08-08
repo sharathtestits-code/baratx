@@ -47,7 +47,7 @@ SLOT_MARKERS = {
     "midday": "#BXMidday",
     "evening": "#BXEvening",
 }
-POST_MARKER = "#BaratXDaily"
+POST_MARKER = "#BarathXDaily"
 
 # Per peak slot: one dense arena first (Startups-weighted) — avoid six thin empty rooms.
 ARENAS_PER_SLOT = 1
@@ -324,7 +324,7 @@ def render_brand_card(*, headline: str, arena: str, source: str = "") -> bytes:
     except OSError:
         font_brand = font_arena = font_body = font_foot = ImageFont.load_default()
 
-    draw.text((48, 42), "BaratX", fill=BRAND_WHITE, font=font_brand)
+    draw.text((48, 42), "BarathX", fill=BRAND_WHITE, font=font_brand)
     label = (arena or "news").upper()
     if source:
         label = f"{label} · {source[:28].upper()}"
@@ -388,8 +388,8 @@ def compose_sharath_reply_to_admin() -> str:
 
 def compose_admin_reply_to_sharath() -> str:
     return (
-        "Fair. BaratX stays on the record: headline + publisher only, then your take. "
-        "Reply with receipts. #BaratXDaily"
+        "Fair. BarathX stays on the record: headline + publisher only, then your take. "
+        "Reply with receipts. #BarathXDaily"
     )
 
 
