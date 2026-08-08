@@ -40,16 +40,16 @@ import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
 
-function AuthChrome({ children }) {
+function AuthChrome({ children, legal = false }) {
   return (
     <div className="page page-auth">
       <header className="topbar topbar-minimal">
-        <Link to="/" className="brand" aria-label="BarathX Home">
+        <Link to="/" className="brand" aria-label="BaratX Home">
           <Logo variant="full" className="topbar-logo" />
         </Link>
       </header>
-      {/* Legal pages need top-aligned main; short auth forms still center via CSS. */}
-      <main className="page-auth-main">{children}</main>
+      {/* Legal docs use an explicit layout class — never rely on :has() alone. */}
+      <main className={`page-auth-main${legal ? " page-auth-main--legal" : ""}`}>{children}</main>
     </div>
   );
 }
@@ -157,21 +157,21 @@ export default function App() {
   }
   if (location.pathname === "/privacy") {
     return (
-      <AuthChrome>
+      <AuthChrome legal>
         <Privacy />
       </AuthChrome>
     );
   }
   if (location.pathname === "/terms") {
     return (
-      <AuthChrome>
+      <AuthChrome legal>
         <Terms />
       </AuthChrome>
     );
   }
   if (location.pathname === "/guidelines") {
     return (
-      <AuthChrome>
+      <AuthChrome legal>
         <Guidelines />
       </AuthChrome>
     );
@@ -201,7 +201,7 @@ export default function App() {
         <Route
           path="/privacy"
           element={
-            <AuthChrome>
+            <AuthChrome legal>
               <Privacy />
             </AuthChrome>
           }
@@ -209,7 +209,7 @@ export default function App() {
         <Route
           path="/terms"
           element={
-            <AuthChrome>
+            <AuthChrome legal>
               <Terms />
             </AuthChrome>
           }
@@ -217,7 +217,7 @@ export default function App() {
         <Route
           path="/guidelines"
           element={
-            <AuthChrome>
+            <AuthChrome legal>
               <Guidelines />
             </AuthChrome>
           }

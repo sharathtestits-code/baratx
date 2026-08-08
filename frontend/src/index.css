@@ -4161,6 +4161,12 @@ a.post-time:hover {
 
 .page-auth .topbar-minimal {
   border-bottom-color: var(--border);
+  flex-shrink: 0;
+}
+
+.page-auth {
+  background: var(--bg);
+  color: var(--text);
 }
 
 .page-auth-main {
@@ -4172,19 +4178,27 @@ a.post-time:hover {
   min-height: 0;
 }
 
+/* Explicit legal layout — do not depend on :has() (older WebViews / flex clip). */
+.page-auth-main--legal,
 .page-auth-main:has(.legal-page),
 .page-auth-main:has(.legal-doc),
 .page-auth-main:has(.guidelines-doc) {
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   padding-top: 1.25rem;
   padding-bottom: 2.5rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 640px) {
   .page-auth-main {
     padding: 0.75rem 0.75rem 2rem;
+  }
+
+  .page-auth-main--legal {
+    padding-top: 1rem;
+    padding-bottom: 3rem;
   }
 }
 
@@ -5840,14 +5854,17 @@ button.topic-chip.selected {
   color: var(--text);
   text-align: left;
   box-sizing: border-box;
+  /* Survive theme/flex quirks — never paint as an empty white sheet */
+  min-height: 50vh;
+  background: transparent;
 }
 
 .page-auth .legal-page,
 .page-auth .guidelines-doc,
 .page-auth .legal-doc {
-  /* Readable regardless of short-form auth centering / theme quirks */
   max-width: 40rem;
   width: 100%;
+  flex: 0 0 auto;
 }
 
 .legal-page h1 {
@@ -8292,12 +8309,16 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 .bx-home {
   --bx-home-display: "Syne", system-ui, sans-serif;
   --bx-home-body: "DM Sans", system-ui, sans-serif;
-  --bx-home-nav-h: 4.25rem;
+  --bx-home-nav-h: 4.5rem;
   min-height: 100dvh;
   background: #0d0d12;
   color: #f4f4f5;
   font-family: var(--bx-home-body);
-  scroll-padding-top: calc(var(--bx-home-nav-h) + 0.75rem);
+}
+
+/* Scroll container is usually the document — pad so sticky nav doesn't cover headings. */
+html:has(.bx-home) {
+  scroll-padding-top: calc(var(--bx-home-nav-h, 4.5rem) + 1rem);
 }
 
 .bx-home-nav {
@@ -8307,11 +8328,18 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 0.85rem clamp(1rem, 4vw, 2.5rem);
-  background: rgba(13, 13, 18, 0.82);
+  padding-left: max(0.85rem, env(safe-area-inset-left, 0px));
+  padding-right: max(0.85rem, env(safe-area-inset-right, 0px));
+  background: rgba(13, 13, 18, 0.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  /* Never let Join free escape the viewport */
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .bx-home-nav-brand {
@@ -8319,16 +8347,21 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   color: inherit;
   display: inline-flex;
   align-items: center;
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
 }
 
 .bx-home-nav-brand .logo-full {
   gap: 0.55rem;
   font-size: 1.35rem;
+  min-width: 0;
 }
 
 .bx-home-nav-brand .logo-mark {
   width: 2rem;
   height: 2rem;
+  flex-shrink: 0;
 }
 
 .bx-home-nav-brand .logo-wordmark {
@@ -8337,6 +8370,10 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   letter-spacing: -0.04em;
   /* Landing nav is always dark — don't inherit theme --text (invisible on light themes). */
   color: #ffffff;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bx-home-nav-brand .logo-wordmark-barat {
@@ -8350,7 +8387,9 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 .bx-home-nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  flex-shrink: 0;
 }
 
 .bx-home-nav-signin {
@@ -8359,6 +8398,7 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   font-size: 0.92rem;
   text-decoration: none;
   padding: 0.45rem 0.7rem;
+  white-space: nowrap;
 }
 
 .bx-home-nav-signin:hover {
@@ -8369,6 +8409,8 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   text-decoration: none;
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .bx-home-hero {
@@ -8505,7 +8547,7 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   max-width: 42rem;
   margin: 0 auto;
   text-align: center;
-  scroll-margin-top: calc(var(--bx-home-nav-h) + 0.85rem);
+  scroll-margin-top: calc(var(--bx-home-nav-h) + 1.25rem);
 }
 
 .bx-home-section h2,
@@ -8515,8 +8557,10 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   font-size: clamp(1.85rem, 5vw, 2.6rem);
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.1;
-  scroll-margin-top: calc(var(--bx-home-nav-h) + 0.85rem);
+  line-height: 1.15;
+  scroll-margin-top: calc(var(--bx-home-nav-h) + 1.25rem);
+  /* Keep sticky nav from covering the first line while scrolling */
+  padding-top: 0.15rem;
 }
 
 .bx-home-section-alt {
@@ -8810,40 +8854,45 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 }
 
 @media (max-width: 560px) {
+  .bx-home {
+    --bx-home-nav-h: 3.75rem;
+  }
+
   .bx-home-nav {
-    padding: 0.7rem 0.75rem;
-    gap: 0.45rem;
+    padding: 0.65rem 0.7rem;
+    gap: 0.4rem;
   }
 
   .bx-home-nav-brand {
     min-width: 0;
     flex: 1 1 auto;
+    max-width: calc(100% - 9.5rem); /* reserve room for Sign in + Join free */
   }
 
   .bx-home-nav-brand .logo-full {
-    font-size: 1.1rem;
-    gap: 0.4rem;
+    font-size: 1.05rem;
+    gap: 0.35rem;
   }
 
   .bx-home-nav-brand .logo-mark {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1.65rem;
+    height: 1.65rem;
     flex-shrink: 0;
   }
 
   .bx-home-nav-actions {
-    gap: 0.3rem;
-    flex-shrink: 0;
+    gap: 0.25rem;
+    flex: 0 0 auto;
   }
 
   .bx-home-nav-signin {
-    padding: 0.4rem 0.45rem;
-    font-size: 0.82rem;
+    padding: 0.38rem 0.4rem;
+    font-size: 0.8rem;
   }
 
   .bx-home-nav-join {
-    padding: 0.42rem 0.7rem;
-    font-size: 0.8rem;
+    padding: 0.4rem 0.65rem;
+    font-size: 0.78rem;
     white-space: nowrap;
   }
 
@@ -8858,14 +8907,30 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   }
 
   .bx-home-section {
-    padding-top: clamp(4rem, 12vh, 5.5rem);
+    padding-top: clamp(4.25rem, 12vh, 5.75rem);
+    scroll-margin-top: calc(var(--bx-home-nav-h) + 1.5rem);
+  }
+
+  .bx-home-section h2,
+  .bx-home-closing h2 {
+    scroll-margin-top: calc(var(--bx-home-nav-h) + 1.5rem);
+    font-size: clamp(1.55rem, 7vw, 2rem);
   }
 }
 
-@media (max-width: 380px) {
-  /* Keep Join free fully tappable — drop Sign in label spacing first */
+@media (max-width: 400px) {
+  /* Prefer a fully tappable Join free over Sign in chrome */
+  .bx-home-nav-brand {
+    max-width: calc(100% - 7.25rem);
+  }
+
   .bx-home-nav-signin {
-    padding-inline: 0.3rem;
+    display: none;
+  }
+
+  .bx-home-nav-join {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
   }
 
   .bx-home-nav-brand .logo-wordmark {
