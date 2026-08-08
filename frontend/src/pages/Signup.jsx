@@ -86,7 +86,7 @@ export default function Signup() {
       login(res.access_token);
       await joinArenaFromParams(res.access_token);
       sessionStorage.setItem("bx_welcome", "1");
-      navigate("/onboarding/topics");
+      navigate("/feed?welcome=1");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -141,7 +141,7 @@ export default function Signup() {
       login(access_token);
       await joinArenaFromParams(access_token);
       sessionStorage.setItem("bx_welcome", "1");
-      navigate("/onboarding/topics");
+      navigate("/feed?welcome=1");
     } catch (err) {
       setError(err.message);
     } finally {
