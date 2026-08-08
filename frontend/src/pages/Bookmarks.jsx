@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
+import EmptyState from "../components/EmptyState";
 
 export default function Bookmarks() {
   const { token } = useAuth();
@@ -38,10 +39,14 @@ export default function Bookmarks() {
       ) : error ? (
         <div className="error">{error}</div>
       ) : posts.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No bookmarks yet</p>
-          <p className="hint">Save posts with the bookmark icon to find them here.</p>
-        </div>
+        <EmptyState
+          title="No bookmarks yet"
+          hint="Save posts with the bookmark icon to find them here."
+          primaryTo="/feed"
+          primaryLabel="Back to Square"
+          secondaryTo="/search"
+          secondaryLabel="Explore"
+        />
       ) : (
         <div className="post-list">
           {posts.map((post) => (

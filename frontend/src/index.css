@@ -1874,7 +1874,7 @@ a.post-username:hover {
 /* ---------- Empty / loading states ---------- */
 
 .empty-state {
-  padding: 3rem 1.5rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
 }
 
@@ -1882,6 +1882,38 @@ a.post-username:hover {
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 0.35rem;
+}
+
+.empty-state-hint {
+  margin: 0 auto 1rem;
+  max-width: 28ch;
+}
+
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.empty-state-cta {
+  text-decoration: none;
+  min-width: 9.5rem;
+}
+
+.bottom-nav-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-top: 0.1rem;
+  line-height: 1;
+}
+
+.bottom-nav-link {
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .skeleton-list {
@@ -7881,4 +7913,52 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   0% { transform: translate(-50%, 0) scale(0.7); opacity: 0; }
   15% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); }
   100% { transform: translate(-50%, -140px) scale(1); opacity: 0; }
+}
+
+
+.live-amphitheatre.is-empty-hero .live-amphitheatre-title {
+  max-width: 18ch;
+}
+
+.live-suggested-pill {
+  appearance: none;
+  display: inline-flex;
+  margin: 0.65rem 0 0.35rem;
+  border: 1px solid rgba(255, 153, 51, 0.55);
+  background: rgba(255, 153, 51, 0.12);
+  color: #ffb366;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+}
+
+.live-empty-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.65rem 1.25rem 1rem;
+}
+
+.live-empty-chip {
+  appearance: none;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.live-empty-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
 }

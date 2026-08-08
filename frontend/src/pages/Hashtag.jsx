@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
+import EmptyState from "../components/EmptyState";
 
 export default function Hashtag() {
   const { tag } = useParams();
@@ -46,9 +47,14 @@ export default function Hashtag() {
       ) : error ? (
         <div className="error">{error}</div>
       ) : posts.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No posts with #{tag}</p>
-        </div>
+        <EmptyState
+          title={`No posts with #${tag}`}
+          hint="Be the first to post this tag on the Square."
+          primaryTo={`/feed?welcome=1`}
+          primaryLabel={`Post with #${tag}`}
+          secondaryTo="/search"
+          secondaryLabel="Explore"
+        />
       ) : (
         <div className="post-list">
           {posts.map((post) => (

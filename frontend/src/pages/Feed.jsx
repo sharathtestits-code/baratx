@@ -11,6 +11,7 @@ import RaceStrip from "../components/RaceStrip";
 import MentionTextarea from "../components/MentionTextarea";
 import { IconImage, IconClose } from "../components/Icons";
 import PlazaPageHeader from "../components/PlazaPageHeader";
+import EmptyState from "../components/EmptyState";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
@@ -485,16 +486,26 @@ export default function Feed() {
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="empty-state">
-            <p className="empty-state-title">
-              {tab === "following" ? "Nothing here yet" : "No takes yet"}
-            </p>
-            <p className="hint">
-              {tab === "following"
+          <EmptyState
+            title={tab === "following" ? "Nothing here yet" : "No takes yet"}
+            hint={
+              tab === "following"
                 ? "Follow people in Explore, then come back."
-                : "Be the first voice in the square."}
-            </p>
-          </div>
+                : "Be the first voice in the square."
+            }
+            primaryTo={tab === "following" ? "/search" : undefined}
+            primaryLabel={tab === "following" ? "Explore people" : "Drop a take"}
+            onPrimary={
+              tab === "following"
+                ? undefined
+                : () => {
+                    composeRef.current?.focus?.();
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+            }
+            secondaryTo="/spaces"
+            secondaryLabel="Start a debate"
+          />
         ) : (
           <>
             <div className="post-list plaza-take-list">

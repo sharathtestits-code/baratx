@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { messagesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import EmptyState from "../components/EmptyState";
 
 export default function Messages() {
   const { token } = useAuth();
@@ -52,10 +53,14 @@ export default function Messages() {
           </div>
         </div>
       ) : items.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No conversations yet</p>
-          <p className="hint">Open a profile and tap Message to start a DM.</p>
-        </div>
+        <EmptyState
+          title="No conversations yet"
+          hint="Find someone in Explore and tap Message on their profile."
+          primaryTo="/search"
+          primaryLabel="Find people"
+          secondaryTo="/feed"
+          secondaryLabel="Back to Square"
+        />
       ) : (
         <div className="people-list">
           {items.map((c) => (

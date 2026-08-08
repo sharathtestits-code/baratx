@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { notificationsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import EmptyState from "../components/EmptyState";
 
 function formatWhen(iso) {
   try {
@@ -106,10 +107,14 @@ export default function Notifications() {
           </div>
         </div>
       ) : items.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No notifications yet</p>
-          <p className="hint">When people follow, like, reply, repost, or tag you, it shows up here.</p>
-        </div>
+        <EmptyState
+          title="No notifications yet"
+          hint="When people follow, like, reply, or tag you, it shows up here."
+          primaryTo="/feed"
+          primaryLabel="Drop a take"
+          secondaryTo="/search"
+          secondaryLabel="Follow people"
+        />
       ) : (
         <div className="notif-list">
           {items.map((n) => (

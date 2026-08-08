@@ -7,6 +7,7 @@ import Avatar from "../components/Avatar";
 import { IconSearch } from "../components/Icons";
 import PlazaPageHeader from "../components/PlazaPageHeader";
 import SuggestedFollows from "../components/SuggestedFollows";
+import EmptyState from "../components/EmptyState";
 
 const QUICK_SEARCHES = [
   { label: "BaratX", query: "BaratX" },
@@ -140,53 +141,69 @@ export default function Search() {
         <p className="hint search-status">Searching…</p>
       ) : (
         <>
-          {results.users.length > 0 && (
-            <>
-              <h3 className="section-title">People</h3>
-              <div className="user-results">
-                {results.users.map((u) => {
-                  const isFollowing = !!(followingMap[u.username] ?? u.is_following);
-                  const isMe = u.username === user?.username;
-                  return (
-                    <div key={u.id} className="user-result user-result-row">
-                      <Link to={`/u/${u.username}`} className="user-result-main">
-                        <Avatar name={u.display_name} username={u.username} url={u.avatar_url} size={44} />
-                        <div>
-                          <div className="user-result-name">{u.display_name}</div>
-                          <div className="user-result-username">@{u.username}</div>
-                          {u.bio && <div className="user-result-bio">{u.bio}</div>}
-                        </div>
-                      </Link>
-                      {token && !isMe && (
-                        <button
-                          type="button"
-                          className={`follow-btn suggested-follow-btn${isFollowing ? " following" : ""}`}
-                          disabled={followBusy === u.username}
-                          onClick={() => toggleFollowUser(u)}
-                        >
-                          {followBusy === u.username ? "…" : isFollowing ? "Following" : "Follow"}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-
-          <h3 className="section-title">Posts</h3>
-          {results.posts.length === 0 ? (
-            <p className="hint search-status">No posts found.</p>
+          {results.users.length === 0 && results.posts.length === 0 ? (
+            <EmptyState
+              title={`No results for “${q}”`}
+              hint="Try another name, @username, or topic."
+              primaryTo="/arenas"
+              primaryLabel="Browse Arenas"
+              secondaryTo="/feed"
+              secondaryLabel="Back to Square"
+            />
           ) : (
-            <div className="post-list">
-              {results.posts.map((post) => (
-                <PostCard key={post.id} post={post} onDeleted={handleDeleted} />
-              ))}
-            </div>
-          )}
+            <>
+              {results.users.length > 0 && (
+                <>
+                  <h3 className="section-title">People</h3>
+                  <div className="user-results">
+                    {results.users.map((u) => {
+                      const isFollowing = !!(followingMap[u.username] ?? u.is_following);
+                      const isMe = u.username === user?.username;
+                      return (
+                        <div key={u.id} className="user-result user-result-row">
+                          <Link to={`/u/${u.username}`} className="user-result-main">
+                            <Avatar name={u.display_name} username={u.username} url={u.avatar_url} size={44} />
+                            <div>
+                              <div className="user-result-name">{u.display_name}</div>
+                              <div className="user-result-username">@{u.username}</div>
+                              {u.bio && <div className="user-result-bio">{u.bio}</div>}
+                            </div>
+                          </Link>
+                          {token && !isMe && (
+                            <button
+                              type="button"
+                              className={`follow-btn suggested-follow-btn${isFollowing ? " following" : ""}`}
+                              disabled={followBusy === u.username}
+                              onClick={() => toggleFollowUser(u)}
+                            >
+                              {followBusy === u.username ? "…" : isFollowing ? "Following" : "Follow"}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
 
-          {results.users.length === 0 && results.posts.length === 0 && (
-            <p className="hint search-status">No results for “{q}”.</p>
+              <h3 className="section-title">Posts</h3>
+              {results.posts.length === 0 ? (
+                <EmptyState
+                  title="No posts found"
+                  hint={`Nothing matched “${q}” in posts yet.`}
+                  primaryTo="/feed"
+                  primaryLabel="Post this on Square"
+                  secondaryTo="/arenas"
+                  secondaryLabel="Browse Arenas"
+                />
+              ) : (
+                <div className="post-list">
+                  {results.posts.map((post) => (
+                    <PostCard key={post.id} post={post} onDeleted={handleDeleted} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </>
       )}

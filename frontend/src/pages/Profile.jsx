@@ -7,6 +7,7 @@ import Avatar from "../components/Avatar";
 import { badgeOf, badgeNameClass, canManageBadges } from "../components/OfficialBadge";
 import EditProfileModal from "../components/EditProfileModal";
 import { IconCamera } from "../components/Icons";
+import EmptyState from "../components/EmptyState";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 
 const PAGE_SIZE = 20;
@@ -548,18 +549,20 @@ export default function Profile() {
               : posts;
         if (visible.length === 0) {
           return (
-            <div className="empty-state">
-              <p className="empty-state-title">
-                {profileTab === "media"
+            <EmptyState
+              title={
+                profileTab === "media"
                   ? "No media yet"
                   : profileTab === "echoes"
                     ? "No echoes yet"
-                    : "No posts yet"}
-              </p>
-              <p className="hint">
-                {isMe ? "Share your first post from The Square." : "Nothing here yet."}
-              </p>
-            </div>
+                    : "No posts yet"
+              }
+              hint={isMe ? "Share your first take on the Square." : "Nothing here yet."}
+              primaryTo={isMe ? "/feed" : "/search"}
+              primaryLabel={isMe ? "Post on Square" : "Explore people"}
+              secondaryTo={isMe ? "/spaces" : undefined}
+              secondaryLabel={isMe ? "Start a debate" : undefined}
+            />
           );
         }
         return (

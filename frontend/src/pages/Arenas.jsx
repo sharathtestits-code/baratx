@@ -4,6 +4,7 @@ import { arenasApi, communitiesApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { ARENA_TOPICS, arenaMeta } from "../arenas";
 import PlazaPageHeader from "../components/PlazaPageHeader";
+import EmptyState from "../components/EmptyState";
 
 export default function Arenas() {
   const { token } = useAuth();
@@ -107,10 +108,14 @@ export default function Arenas() {
 
           <h2 className="section-title">Live debates</h2>
           {debates.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-state-title">No live debates yet</p>
-              <p className="hint">Open an arena and start the first fight.</p>
-            </div>
+            <EmptyState
+              title="No live debates yet"
+              hint="Open an arena and start the first fight."
+              primaryTo="/spaces"
+              primaryLabel="Start a debate"
+              secondaryTo="/feed"
+              secondaryLabel="Browse Square"
+            />
           ) : (
             <ul className="debate-list">
               {debates.map((d) => {

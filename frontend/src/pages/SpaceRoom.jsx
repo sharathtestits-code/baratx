@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import MentionTextarea from "../components/MentionTextarea";
 import LiveTalkPanel from "../components/LiveTalkPanel";
+import EmptyState from "../components/EmptyState";
 
 export default function SpaceRoom() {
   const { spaceId } = useParams();
@@ -336,10 +337,14 @@ export default function SpaceRoom() {
       )}
 
       {visiblePosts.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No posts yet</p>
-          <p className="hint">{isDebate ? "Pick a side and make the first argument." : "Start the conversation."}</p>
-        </div>
+        <EmptyState
+          title="No posts yet"
+          hint={isDebate ? "Pick a side and make the first argument." : "Start the conversation."}
+          onPrimary={() => composeRef.current?.focus?.()}
+          primaryLabel={isDebate ? "Post your argument" : "Post a take"}
+          secondaryTo="/arenas"
+          secondaryLabel="Browse Arenas"
+        />
       ) : (
         <div className="post-list">
           {visiblePosts.map((post) => (
