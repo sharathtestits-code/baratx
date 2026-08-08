@@ -1,18 +1,18 @@
-# BharatX — today's grunge carousel (X)
+# BaratX — today's grunge carousel (X)
 
-Same assets as Instagram. Brand spelling in copy: **BharatX** (URL stays barathx.com).
+Same assets as Instagram. Brand spelling: **BaratX** · URL: barathx.com
 
 ### Tweet
 
 ```
 Everyone's got a take. Few will post it.
 
-BharatX — India's public square is live:
+BaratX — India's public square is live:
 → barathx.com
 
 Comment BX for an invite.
 
-#BharatX #BX
+#BaratX #BX
 ```
 
 ### Alt tweet (shorter)
@@ -20,6 +20,6 @@ Comment BX for an invite.
 ```
 GET IN. IT'S FREE.
 
-BharatX → barathx.com
+BaratX → barathx.com
 Comment BX for an invite.
 ```

@@ -2,7 +2,7 @@
 """Publish today's grunge carousel to Instagram at the next IST peak slot.
 
 Peak slots (IST): 09:00, 13:30, 20:00.
-Uses brand spelling BharatX in caption; URL remains barathx.com.
+Caption uses BaratX; URL remains barathx.com.
 """
 
 from __future__ import annotations
@@ -36,12 +36,12 @@ SLIDES = [
 ]
 CAPTION = """Everyone's got a take. Few will post it.
 
-BharatX is India's public square — short posts, real conversation.
+BaratX is India's public square — short posts, real conversation.
 Join free at barathx.com
 
 Or comment BX for an invite.
 
-#BharatX #BX #India #PublicSquare #SpeakYourTake"""
+#BaratX #BX #India #PublicSquare #SpeakYourTake"""
 
 
 def _env(name: str) -> str:
@@ -142,7 +142,7 @@ def publish() -> dict:
         "media_id": published.get("id"),
         "creation_id": creation_id,
         "when_ist": datetime.now(IST).isoformat(),
-        "caption_brand": "BharatX",
+        "caption_brand": "BaratX",
     }
 
 
