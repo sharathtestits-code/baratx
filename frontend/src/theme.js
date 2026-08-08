@@ -1,4 +1,4 @@
-/** BharatX appearance themes — applied via data-theme on <html>. */
+/** BaratX appearance themes — applied via data-theme on <html>. */
 
 export const THEME_STORAGE_KEY = "bx_theme";
 export const THEME_CHOSEN_KEY = "bx_theme_chosen";
@@ -7,7 +7,7 @@ export const THEMES = [
   {
     id: "saffron",
     name: "Saffron",
-    blurb: "Warm India-first look — the BharatX default.",
+    blurb: "Warm India-first look — the BaratX default.",
     swatch: ["#faf8f5", "#ff671f", "#0f1419"],
   },
   {

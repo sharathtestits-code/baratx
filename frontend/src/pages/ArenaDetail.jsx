@@ -180,7 +180,7 @@ export default function ArenaDetail() {
         </h2>
         {arenaKey === "startups" && (
           <p className="hint surface-lead">
-            BharatX’s YC-style square: pitch a startup idea or thesis. India picks{" "}
+            BaratX’s YC-style square: pitch a startup idea or thesis. India picks{" "}
             <strong>Fund it</strong> or <strong>Pass</strong> — then argue why.
           </p>
         )}

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">BharatX</string>
-    <string name="title_activity_main">BharatX</string>
+    <string name="app_name">BaratX</string>
+    <string name="title_activity_main">BaratX</string>
     <string name="package_name">com.baratx.app</string>
     <string name="custom_url_scheme">com.baratx.app</string>
 </resources>

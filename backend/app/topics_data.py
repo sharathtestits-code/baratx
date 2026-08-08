@@ -1,4 +1,4 @@
-"""BharatX topic taxonomy — 30 India-trending subtopics per arena (Path C).
+"""BaratX topic taxonomy — 30 India-trending subtopics per arena (Path C).
 
 Each topic has an RSS query for Google News (IN). Used to seed debate prompts.
 """

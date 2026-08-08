@@ -5,14 +5,14 @@ send. Prefer Resend; keep Gmail SMTP as backup/debug:
 
   1) Resend (primary):
      RESEND_API_KEY=re_...
-     EMAIL_FROM=BharatX <hello@barathx.com>   # domain must be verified in Resend
+     EMAIL_FROM=BaratX <hello@barathx.com>   # domain must be verified in Resend
 
   2) Gmail SMTP (backup / debug — App Password):
      SMTP_HOST=smtp.gmail.com
      SMTP_PORT=587
      SMTP_USER=you@gmail.com
      SMTP_PASSWORD=app-password
-     EMAIL_FROM=BharatX <hello@barathx.com>
+     EMAIL_FROM=BaratX <hello@barathx.com>
 
 When RESEND_API_KEY is set it wins over SMTP. When neither is configured,
 verification links are logged (and returned as dev_verify_url in development).
@@ -39,7 +39,7 @@ if ENVIRONMENT == "production" and (
     "localhost" in FRONTEND_URL or "127.0.0.1" in FRONTEND_URL or not FRONTEND_URL
 ):
     FRONTEND_URL = "https://barathx.com"
-EMAIL_FROM = os.environ.get("EMAIL_FROM", "BharatX <hello@barathx.com>")
+EMAIL_FROM = os.environ.get("EMAIL_FROM", "BaratX <hello@barathx.com>")
 
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
@@ -94,7 +94,7 @@ def _send_resend(to_email: str, subject: str, text_body: str, html_body: str) ->
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "User-Agent": "BharatX/1.0 (+https://barathx.com)",
+            "User-Agent": "BaratX/1.0 (+https://barathx.com)",
         },
         method="POST",
     )
@@ -126,20 +126,20 @@ def send_email(to_email: str, subject: str, text_body: str, html_body: str) -> b
 
 def send_verification_email(to_email: str, display_name: str, token: str) -> tuple[bool, str]:
     verify_url = build_verify_url(token)
-    subject = "Confirm your BharatX account"
+    subject = "Confirm your BaratX account"
     text_body = (
         f"Hi {display_name},\n\n"
-        f"Welcome to BharatX. Confirm your email by opening this link:\n\n"
+        f"Welcome to BaratX. Confirm your email by opening this link:\n\n"
         f"{verify_url}\n\n"
         f"This link expires in 24 hours. If you did not sign up, ignore this email.\n\n"
-        f"— BharatX\n"
+        f"— BaratX\n"
     )
     html_body = f"""\
 <!DOCTYPE html>
 <html>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
   <p>Hi {display_name},</p>
-  <p>Welcome to <strong>BharatX</strong>. Confirm your email to activate your account.</p>
+  <p>Welcome to <strong>BaratX</strong>. Confirm your email to activate your account.</p>
   <p style="margin: 28px 0;">
     <a href="{verify_url}"
        style="background:#FF671F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;">
@@ -150,7 +150,7 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
     <a href="{verify_url}" style="color:#000080;">{verify_url}</a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">This link expires in 24 hours.</p>
-  <p>— BharatX</p>
+  <p>— BaratX</p>
 </body>
 </html>
 """
@@ -160,20 +160,20 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
 
 def send_password_reset_email(to_email: str, display_name: str, token: str) -> tuple[bool, str]:
     reset_url = build_reset_url(token)
-    subject = "Reset your BharatX password"
+    subject = "Reset your BaratX password"
     text_body = (
         f"Hi {display_name},\n\n"
-        f"We received a request to reset your BharatX password. Open this link:\n\n"
+        f"We received a request to reset your BaratX password. Open this link:\n\n"
         f"{reset_url}\n\n"
         f"This link expires in 1 hour. If you did not request a reset, ignore this email.\n\n"
-        f"— BharatX\n"
+        f"— BaratX\n"
     )
     html_body = f"""\
 <!DOCTYPE html>
 <html>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
   <p>Hi {display_name},</p>
-  <p>We received a request to reset your <strong>BharatX</strong> password.</p>
+  <p>We received a request to reset your <strong>BaratX</strong> password.</p>
   <p style="margin: 28px 0;">
     <a href="{reset_url}"
        style="background:#FF671F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;">
@@ -184,7 +184,7 @@ def send_password_reset_email(to_email: str, display_name: str, token: str) -> t
     <a href="{reset_url}" style="color:#000080;">{reset_url}</a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">This link expires in 1 hour.</p>
-  <p>— BharatX</p>
+  <p>— BaratX</p>
 </body>
 </html>
 """
@@ -214,17 +214,17 @@ def send_activity_email(
     if not to_email:
         return False
     action = _KIND_COPY.get(kind, "interacted with you")
-    subject = f"{actor_name} {action} on BharatX"
+    subject = f"{actor_name} {action} on BaratX"
     cta = f"{FRONTEND_URL}/notifications"
     if kind == "message":
         cta = f"{FRONTEND_URL}/messages/{actor_username}"
     preview_line = f'\n"{preview[:140]}"\n' if preview else "\n"
     text_body = (
         f"Hi {recipient_name},\n\n"
-        f"@{actor_username} {action} on BharatX."
+        f"@{actor_username} {action} on BaratX."
         f"{preview_line}\n"
-        f"Open BharatX: {cta}\n\n"
-        f"— BharatX\n"
+        f"Open BaratX: {cta}\n\n"
+        f"— BaratX\n"
     )
     preview_html = (
         f'<p style="color:#536471;border-left:3px solid #efe8e0;padding-left:12px;">{preview[:140]}</p>'
@@ -236,16 +236,16 @@ def send_activity_email(
 <html>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
   <p>Hi {recipient_name},</p>
-  <p><strong>@{actor_username}</strong> {action} on <strong>BharatX</strong>.</p>
+  <p><strong>@{actor_username}</strong> {action} on <strong>BaratX</strong>.</p>
   {preview_html}
   <p style="margin: 28px 0;">
     <a href="{cta}"
        style="background:#FF671F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;">
-      Open BharatX
+      Open BaratX
     </a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">You’re getting this because someone interacted with your account.</p>
-  <p>— BharatX</p>
+  <p>— BaratX</p>
 </body>
 </html>
 """

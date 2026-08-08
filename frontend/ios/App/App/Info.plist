@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>BharatX</string>
+	<string>BaratX</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -25,9 +25,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>BharatX needs camera access so you can take a profile or post photo.</string>
+	<string>BaratX needs camera access so you can take a profile or post photo.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>BharatX needs photo library access so you can attach images to posts.</string>
+	<string>BaratX needs photo library access so you can attach images to posts.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

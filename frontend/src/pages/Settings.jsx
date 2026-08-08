@@ -98,7 +98,7 @@ export default function Settings() {
 
       <section className="settings-section">
         <h2>Appearance</h2>
-        <p className="hint">Choose how BharatX looks for you. Changes apply instantly.</p>
+        <p className="hint">Choose how BaratX looks for you. Changes apply instantly.</p>
         <ThemePicker value={theme} onChange={saveTheme} compact />
         {themeSaving && <p className="hint">Saving…</p>}
       </section>
@@ -106,7 +106,7 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Language</h2>
         <p className="hint">
-          BharatX is English-first for now. Hindi and Telugu UI will arrive in a later update.
+          BaratX is English-first for now. Hindi and Telugu UI will arrive in a later update.
         </p>
       </section>
 

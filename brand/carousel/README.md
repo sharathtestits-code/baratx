@@ -1,4 +1,4 @@
-# BharatX Instagram carousel (real app screens)
+# BaratX Instagram carousel (real app screens)
 
 Replaces the fake AI “in-app” slide (garbled “Kollrata” / “fioillato” text) with **actual screenshots** from https://barathx.com.
 
@@ -9,7 +9,7 @@ Replaces the fake AI “in-app” slide (garbled “Kollrata” / “fioillato�
 | 01 | Every social app you use… |
 | 02 | …was built for someone else. |
 | 03 | Someone else’s culture / language / rules |
-| 04 | India’s own public square + BharatX mark |
+| 04 | India’s own public square + BaratX mark |
 | 05 | **Real** landing / signup screen |
 | 06 | **Real** mobile feed in a phone frame (this replaces the broken mock) |
 | 07 | **Real** post detail + replies |

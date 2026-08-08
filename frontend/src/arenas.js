@@ -1,4 +1,4 @@
-/** BharatX Arenas — public squares with For/Against (or Fund it/Pass) debates */
+/** BaratX Arenas — public squares with For/Against (or Fund it/Pass) debates */
 
 export const ARENA_TOPICS = [
   {

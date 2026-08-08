@@ -390,7 +390,7 @@ export default function Feed() {
       <div className="suggested-follows-mobile">
         <SuggestedFollows
           title="Who to follow"
-          note="Start with official BharatX accounts — then Explore for more."
+          note="Start with official BaratX accounts — then Explore for more."
           dismissible
         />
       </div>
@@ -433,7 +433,7 @@ export default function Feed() {
           </p>
           <p className="hint">
             {tab === "following"
-              ? "Tap Follow official BharatX above, or find people in Explore."
+              ? "Tap Follow official BaratX above, or find people in Explore."
               : "Be the first to say something."}
           </p>
         </div>

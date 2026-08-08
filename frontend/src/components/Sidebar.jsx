@@ -71,7 +71,7 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
-        <Link to="/feed" className="sidebar-brand sidebar-brand-mark" aria-label="BharatX Home">
+        <Link to="/feed" className="sidebar-brand sidebar-brand-mark" aria-label="BaratX Home">
           <Logo variant="mark" className="sidebar-logo-mark" />
         </Link>
         <nav className="sidebar-nav" aria-label="Primary">

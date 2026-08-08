@@ -1,9 +1,9 @@
-# BharatX
+# BaratX
 
 India-first public square (English now; more languages later). Backend is
 FastAPI + SQLite (local), frontend is React (Vite).
 
-**Brand:** BharatX · **Domain:** barathx.com (kept as purchased)
+**Brand:** BaratX · **Domain:** barathx.com (kept as purchased)
 
 **Canonical local path:** `~/Projects/barathx` (do not run from Google Drive).
 

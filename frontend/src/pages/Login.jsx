@@ -79,7 +79,7 @@ export default function Login() {
 
   return (
     <div className="auth-card auth-card-x">
-      <h1>Sign in to BharatX</h1>
+      <h1>Sign in to BaratX</h1>
 
       {!otpSent && (
         <>

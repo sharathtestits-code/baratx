@@ -40,8 +40,8 @@ export default function Landing() {
     <div className="x-landing">
       <div className="x-landing-auth">
         <div className="x-landing-auth-inner">
-          <LogoMark className="x-landing-mark-sm" title="BharatX" />
-          <p className="x-landing-brand-line">BharatX</p>
+          <LogoMark className="x-landing-mark-sm" title="BaratX" />
+          <p className="x-landing-brand-line">BaratX</p>
           <h1 className="x-landing-headline">Pick a fight. Not a feed.</h1>
           <p className="x-landing-support">
             India&apos;s public square — short posts, real conversation. Join and start talking.
@@ -99,7 +99,7 @@ export default function Landing() {
         <div className="x-landing-brand-glow" />
         <LogoMark className="x-landing-mark-xl" title="" />
         <div className="x-landing-word">
-          Bharat<span className="x-landing-word-x">X</span>
+          Barat<span className="x-landing-word-x">X</span>
         </div>
         <p className="x-landing-brand-tag">barathx.com</p>
       </div>

@@ -8,7 +8,7 @@ import { IconSearch } from "../components/Icons";
 import SuggestedFollows from "../components/SuggestedFollows";
 
 const QUICK_SEARCHES = [
-  { label: "BharatX", query: "BharatX" },
+  { label: "BaratX", query: "BaratX" },
   { label: "Startup India", query: "StartupIndia" },
   { label: "IPL", query: "IPL" },
   { label: "Monsoon", query: "Monsoon" },
@@ -98,7 +98,7 @@ export default function Search() {
             placeholder="Search people, posts, topics…"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            aria-label="Search BharatX"
+            aria-label="Search BaratX"
             enterKeyHint="search"
             autoComplete="off"
           />

@@ -1,4 +1,4 @@
-# BharatX — Domain & hosting setup (Step 3)
+# BaratX — Domain & hosting setup (Step 3)
 
 English-only public path. Do these in order. You must complete payments/signups in the browser — this file is the checklist.
 
@@ -29,7 +29,7 @@ Cloudflare Routing cannot *send*. Prefer **Resend** from `hello@barathx.com` (ve
 
 ```
 FRONTEND_URL=https://barathx.com
-EMAIL_FROM=BharatX <hello@barathx.com>
+EMAIL_FROM=BaratX <hello@barathx.com>
 RESEND_API_KEY=re_xxx
 # Optional backup/debug (ignored when RESEND_API_KEY is set):
 # SMTP_HOST=smtp.gmail.com
@@ -50,12 +50,12 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
    - Optional: `ADMIN_SECRET` for the registrations page at https://barathx.com/admin
 2. MSG91 later for SMS OTP
 
-### See who registered / post & comment as BharatX
+### See who registered / post & comment as BaratX
 
 1. Set `ADMIN_SECRET` on the Railway API service (long random string).
 2. Redeploy the API if needed.
 3. Open https://barathx.com/admin and enter that secret.
-4. You’ll see total users, last 24h / 7d counts, a newest-first list, **Post as BharatX**, and **Comment on new users** (reply to recent posts from new joiners).
+4. You’ll see total users, last 24h / 7d counts, a newest-first list, **Post as BaratX**, and **Comment on new users** (reply to recent posts from new joiners).
 
 ### Log in as official @baratx (optional)
 
