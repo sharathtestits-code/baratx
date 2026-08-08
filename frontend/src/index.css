@@ -966,9 +966,11 @@ button {
 .bottom-nav-link {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 0;
+  gap: 0.12rem;
+  padding: 0.4rem 0;
   color: var(--text-secondary);
   text-decoration: none;
 }
@@ -980,6 +982,14 @@ button {
 .bottom-nav-icon {
   width: 1.5em;
   height: 1.5em;
+}
+
+.bottom-nav-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 @media (min-width: 900px) {
@@ -1884,6 +1894,24 @@ a.post-username:hover {
   margin: 0 0 0.35rem;
 }
 
+.empty-state-hint {
+  margin: 0 auto 1rem;
+  max-width: 28ch;
+}
+
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.empty-state-cta {
+  text-decoration: none;
+  min-width: 9.5rem;
+}
+
 .skeleton-list {
   display: flex;
   flex-direction: column;
@@ -2783,6 +2811,245 @@ a.profile-edit-btn:hover {
     padding: 0.52rem 0.9rem !important;
     font-size: 0.84rem !important;
   }
+}
+
+/* ---------- First session (collapsed onboarding) ---------- */
+
+.first-session {
+  margin: 0 0 1rem;
+  padding: 1.1rem 1.15rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.first-session-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.first-session-logo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.first-session-head h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.first-session-step {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.first-session-block {
+  margin-bottom: 0.95rem;
+}
+
+.first-session-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.first-session-arenas,
+.first-session-cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.first-session-arena,
+.first-session-city,
+.first-session-prompt {
+  appearance: none;
+  border: 1px solid var(--border-strong);
+  background: var(--hover-overlay);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.42rem 0.75rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.first-session-arena.is-selected,
+.first-session-city.is-selected {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  color: var(--brand-hover);
+}
+
+.first-session-take {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  padding: 0.75rem 0.85rem;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  resize: vertical;
+  min-height: 6rem;
+}
+
+.first-session-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.first-session-prompt {
+  border-radius: 12px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.first-session-count {
+  margin: 0.35rem 0 0;
+  text-align: right;
+}
+
+.first-session-cta {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.first-session-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+}
+
+.first-session-settings,
+.first-session-skip {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.first-session-skip:hover,
+.first-session-settings:hover {
+  color: var(--text);
+}
+
+.compose-tile-starters.is-open,
+.compose-tile-starters:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
+}
+
+.compose-starters-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.45rem 0 0.55rem;
+  padding: 0.55rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--hover-overlay);
+}
+
+.compose-starter-chip {
+  appearance: none;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.compose-starter-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
+}
+
+.live-amphitheatre.is-empty-hero .live-amphitheatre-title {
+  max-width: 18ch;
+}
+
+.live-suggested-pill {
+  appearance: none;
+  display: inline-flex;
+  margin: 0.65rem 0 0.35rem;
+  border: 1px solid rgba(255, 153, 51, 0.55);
+  background: rgba(255, 153, 51, 0.12);
+  color: #ffb366;
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+}
+
+.live-empty-suggest {
+  padding: 0.35rem 0 1rem;
+}
+
+.live-empty-suggest-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.live-empty-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.live-empty-chip {
+  appearance: none;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.live-empty-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
 }
 
 /* ---------- Welcome / first-post push ---------- */
@@ -7502,6 +7769,96 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 
 .plaza-hero-title {
   color: var(--text);
+}
+
+/* ---------- Square home (logged-in) ---------- */
+
+.square-home-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+  padding-top: 0.35rem;
+}
+
+.square-home-kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brand);
+}
+
+.square-home-title {
+  margin: 0.15rem 0 0;
+  font-size: clamp(1.65rem, 5vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.square-home-sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.founding-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-shrink: 0;
+  max-width: 12.5rem;
+  margin-top: 0.35rem;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--hover-overlay);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.founding-chip:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
+}
+
+.founding-chip-star {
+  color: var(--brand);
+  font-size: 0.78rem;
+}
+
+.founding-chip-sep {
+  color: var(--text-tertiary);
+}
+
+.founding-chip-done {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--border));
+}
+
+.plaza-onair-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.12em;
+  margin-right: 0.2rem;
+  color: var(--brand);
+}
+
+.plaza-square-first {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.plaza-square-first .first-session {
+  margin-top: 0.35rem;
 }
 
 .plaza-search-form {
