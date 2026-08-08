@@ -1,11 +1,13 @@
 # BaratX logo — pehchaan street energy (v1)
 
-Reference: pehchaan / “Money follows, my brother” promo sticker style.
+Tagline under BaratX: **India's public square**
 
 | File | Use |
 |------|-----|
-| `baratx-logo-mark-pehchaan.png` | BX circle mark (nav, favicon source) |
-| `baratx-logo-wordmark-pehchaan.png` | Full mark + BaratX wordmark |
-| `baratx-logo-appicon-pehchaan.png` | App icon (rounded square) |
+| `baratx-logo-mark-pehchaan.png` | BX circle mark |
+| `baratx-logo-wordmark-pehchaan.png` | Mark + BaratX (no tagline) |
+| `baratx-logo-lockup-tagline.png` | Horizontal lockup + tagline |
+| `baratx-logo-stack-tagline.png` | Vertical stack + tagline |
+| `baratx-logo-appicon-pehchaan.png` | App icon |
 
-Awaiting approval before swapping `frontend` Logo SVG / PWA icons.
+Awaiting approval before wiring into app.
