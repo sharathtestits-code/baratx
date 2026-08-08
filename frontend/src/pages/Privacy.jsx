@@ -6,7 +6,7 @@ export default function Privacy() {
       <h1>Privacy Policy</h1>
       <p className="legal-updated">Last updated: August 6, 2026</p>
       <p>
-        BaratX (BX) is India’s text-first public square at <strong>barathx.com</strong>. This page
+        BarathX (BX) is India’s text-first public square at <strong>barathx.com</strong>. This page
         explains what we collect and how we use it — in plain language.
       </p>
 
@@ -20,7 +20,7 @@ export default function Privacy() {
       <h2>How we use it</h2>
       <ul>
         <li>To create and secure your account</li>
-        <li>To show your posts and replies to other BaratX users</li>
+        <li>To show your posts and replies to other BarathX users</li>
         <li>To send verification or important account messages</li>
         <li>To keep the product working and safe (spam/abuse prevention)</li>
       </ul>
@@ -52,7 +52,7 @@ export default function Privacy() {
       </p>
 
       <p className="legal-back">
-        <Link to="/">← Back to BaratX</Link>
+        <Link to="/">← Back to BarathX</Link>
       </p>
     </div>
   );

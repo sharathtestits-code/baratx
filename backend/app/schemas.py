@@ -45,7 +45,7 @@ class EmailSignupRequest(BaseModel):
     @classmethod
     def must_confirm_age(cls, v):
         if not v:
-            raise ValueError("You must be 18 or older to join BaratX")
+            raise ValueError("You must be 18 or older to join BarathX")
         return True
 
 
@@ -91,7 +91,7 @@ class PhoneSignupVerify(BaseModel):
     @classmethod
     def must_confirm_age(cls, v):
         if not v:
-            raise ValueError("You must be 18 or older to join BaratX")
+            raise ValueError("You must be 18 or older to join BarathX")
         return True
 
     @model_validator(mode="after")
@@ -141,7 +141,7 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
-    # Required only when Google creates a new BaratX account (18+ gate).
+    # Required only when Google creates a new BarathX account (18+ gate).
     confirm_age_18: Optional[bool] = None
 
 

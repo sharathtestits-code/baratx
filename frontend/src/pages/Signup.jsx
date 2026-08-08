@@ -75,7 +75,7 @@ export default function Signup() {
 
   function requireAge() {
     if (!confirmAge18) {
-      setError("You must be 18 or older to join BaratX. Confirm your age to continue.");
+      setError("You must be 18 or older to join BarathX. Confirm your age to continue.");
       return false;
     }
     return true;
@@ -188,7 +188,7 @@ export default function Signup() {
         }}
       />
       <span>
-        I confirm I am <strong>18 or older</strong>. BaratX is for adults only.
+        I confirm I am <strong>18 or older</strong>. BarathX is for adults only.
       </span>
     </label>
   );

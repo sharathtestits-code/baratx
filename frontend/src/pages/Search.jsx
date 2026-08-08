@@ -9,7 +9,7 @@ import PlazaPageHeader from "../components/PlazaPageHeader";
 import SuggestedFollows from "../components/SuggestedFollows";
 
 const QUICK_SEARCHES = [
-  { label: "BaratX", query: "BaratX" },
+  { label: "BarathX", query: "BarathX" },
   { label: "Startup India", query: "StartupIndia" },
   { label: "IPL", query: "IPL" },
   { label: "Monsoon", query: "Monsoon" },
@@ -101,7 +101,7 @@ export default function Search() {
           placeholder="Search people, posts, topics…"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          aria-label="Search BaratX"
+          aria-label="Search BarathX"
           enterKeyHint="search"
           autoComplete="off"
         />

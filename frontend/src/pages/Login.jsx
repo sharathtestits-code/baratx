@@ -83,7 +83,7 @@ export default function Login() {
     <div className="bx-login-page">
       <aside className="bx-login-brand" aria-hidden="false">
         <div className="bx-login-brand-inner">
-          <Logo variant="full" className="bx-login-brand-logo" title="BaratX" />
+          <Logo variant="full" className="bx-login-brand-logo" title="BarathX" />
           <p className="bx-login-tagline">India&apos;s public square</p>
         </div>
         <div className="bx-login-brand-dots" aria-hidden="true" />
@@ -98,7 +98,7 @@ export default function Login() {
           </div>
 
           <h1 className="bx-login-title">Welcome back</h1>
-          <p className="bx-login-sub">Log in to join BaratX</p>
+          <p className="bx-login-sub">Log in to join BarathX</p>
 
           {!otpSent && (
             <div className="method-toggle bx-login-methods">
@@ -192,7 +192,7 @@ export default function Login() {
                 <Link to="/forgot-password">Forgot password?</Link>
               </p>
               <button type="submit" className="bx-login-submit" disabled={busy}>
-                {busy ? "Logging in…" : "Enter BaratX"}
+                {busy ? "Logging in…" : "Enter BarathX"}
                 {!busy && (
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
                     <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
@@ -237,7 +237,7 @@ export default function Login() {
                 </span>
               </label>
               <button type="submit" className="bx-login-submit" disabled={busy}>
-                {busy ? "Verifying…" : "Verify & enter BaratX"}
+                {busy ? "Verifying…" : "Verify & enter BarathX"}
               </button>
               <button type="button" className="auth-back-btn" onClick={goBackFromOtp} disabled={busy}>
                 ← Change phone number
@@ -255,7 +255,7 @@ export default function Login() {
           )}
 
           <p className="bx-login-switch">
-            New to BaratX? <Link to="/signup">Sign up</Link>
+            New to BarathX? <Link to="/signup">Sign up</Link>
           </p>
         </div>
 
@@ -263,7 +263,7 @@ export default function Login() {
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
             <path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z" />
           </svg>
-          Secured &amp; trusted · BaratX Square UI
+          Secured &amp; trusted · BarathX Square UI
         </p>
       </main>
     </div>

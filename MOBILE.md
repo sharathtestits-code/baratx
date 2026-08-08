@@ -1,10 +1,10 @@
-# BaratX mobile apps (Capacitor)
+# BarathX mobile apps (Capacitor)
 
-BaratX Android + iOS ship as **Capacitor** shells around the existing Vite React app.
+BarathX Android + iOS ship as **Capacitor** shells around the existing Vite React app.
 
 | Item | Value |
 |------|--------|
-| App name | BaratX |
+| App name | BarathX |
 | Bundle / application id | `com.baratx.app` |
 | Web assets | `frontend/dist` (synced into native projects) |
 | Production API | `https://baratx-production.up.railway.app` |

@@ -11,9 +11,9 @@ from urllib.request import Request, urlopen
 
 logger = logging.getLogger("baratx.rss")
 
-USER_AGENT = "BaratXBot/1.0 (+https://barathx.com)"
+USER_AGENT = "BarathXBot/1.0 (+https://barathx.com)"
 
-# Publishers we trust for BaratX daily glimpses (matched against Google News " - Source").
+# Publishers we trust for BarathX daily glimpses (matched against Google News " - Source").
 CREDIBLE_SOURCES = (
     "the hindu",
     "indian express",

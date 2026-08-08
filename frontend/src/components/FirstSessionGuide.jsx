@@ -19,7 +19,7 @@ const CITIES = ["Hyderabad", "Bangalore", "Delhi", "Mumbai", "Chennai", "Pune"];
 const PROMPTS = [
   "What's one thing India gets wrong in public debate?",
   "Drop your hottest take on startups in India.",
-  "Who should every BaratX user follow in your city?",
+  "Who should every BarathX user follow in your city?",
   "What should this public square never become?",
 ];
 

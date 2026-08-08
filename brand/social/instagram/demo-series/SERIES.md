@@ -1,4 +1,4 @@
-# BaratX Instagram — Demo Reel Series (curiosity loop)
+# BarathX Instagram — Demo Reel Series (curiosity loop)
 
 **Account:** [@getbaratx](https://www.instagram.com/getbaratx/)  
 **Rule:** **1 elaborated demo Reel per day** (not a rushed “everything” dump).  
@@ -12,7 +12,7 @@ Music is attached **in the IG app** (trending India audio matched to the topic).
 
 | Day | Reel | Covers | Music vibe | End card |
 |-----|------|--------|------------|----------|
-| **1** | Features on BaratX · **Part 1 — Square** | **Screen recording** of compose, AI Assist, like/reply/repost/save, arenas menu | Soft bed in file; attach **trending India audio** in IG (rotate — not Faah-only) | Wait for Part 2 — Arenas |
+| **1** | Features on BarathX · **Part 1 — Square** | **Screen recording** of compose, AI Assist, like/reply/repost/save, arenas menu | Soft bed in file; attach **trending India audio** in IG (rotate — not Faah-only) | Wait for Part 2 — Arenas |
 | **2** | **Part 2 — Arenas & debates** | Arenas, topics, Join, For/Against, Leave, Live | Debate / siren energy | Wait for Part 3 — Profile |
 | **3** | **Part 3 — You** | Profile, Edit, photo, cover, Follow/Message | Softer / identity | Wait for Part 4 — Look |
 | **4** | **Part 4 — Look & explore** | Appearance themes, Explore, Search | Chill / aesthetic | Wait for Part 5 — Live |
@@ -33,13 +33,13 @@ Then **repeat / remix** based on insights (below).
 4. Caption template:
 
 ```
-Features on BaratX · Part {N}
+Features on BarathX · Part {N}
 {one-line hook}
 
 Save this. Part {N+1} drops tomorrow.
 → barathx.com
 
-#BaratX #IndiaApp #BuildInPublic …
+#BarathX #IndiaApp #BuildInPublic …
 ```
 
 5. Post **once** (evening IST peak ~20:00 preferred for Reels). Carousel schedule can still run separately if desired — don’t spam 3 demo Reels/day.

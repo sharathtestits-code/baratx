@@ -3,7 +3,7 @@
 const QUESTIONS = [
   "What’s one unpopular opinion you have about work culture in India?",
   "Which Indian city is most underrated — and why?",
-  "What should BaratX never become?",
+  "What should BarathX never become?",
   "Remote work made Indian careers better or worse?",
   "What’s one civic problem your city still pretends isn’t real?",
   "Drop your hottest take on cricket without starting a war.",
@@ -13,9 +13,9 @@ const QUESTIONS = [
   "If you could fix one thing about online discourse in India, what is it?",
   "College prepared you for work — true or false? Defend it.",
   "What’s a small India habit that should be a national flex?",
-  "Who should every BaratX user from your city follow?",
+  "Who should every BarathX user from your city follow?",
   "What’s overrated in Indian tech Twitter / LinkedIn?",
-  "One sentence: why did you join BaratX today?",
+  "One sentence: why did you join BarathX today?",
 ];
 
 export function todaysSquareQuestion(date = new Date()) {

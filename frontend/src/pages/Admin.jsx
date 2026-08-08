@@ -5,15 +5,15 @@ import { adminApi } from "../api";
 const SECRET_KEY = "baratx_admin_secret";
 
 const OFFICIAL_OPTIONS = [
-  { value: "baratx", label: "@baratx — BaratX (blue)" },
+  { value: "baratx", label: "@baratx — BarathX (blue)" },
   { value: "sharath", label: "@sharath — Sharath (blue)" },
   { value: "bharatvoices", label: "@bharatvoices — Bharat Voices (gold)" },
   { value: "indiatech", label: "@indiatech — India Tech Daily (gold)" },
 ];
 
 const WELCOME_PROMPTS = [
-  "Welcome to BaratX — glad you’re here. What’s your city?",
-  "Nice first post. What made you join BaratX today?",
+  "Welcome to BarathX — glad you’re here. What’s your city?",
+  "Nice first post. What made you join BarathX today?",
   "Welcome! Reply with one India take you wish more people heard.",
 ];
 
@@ -376,7 +376,7 @@ export default function Admin() {
       <header className="admin-header">
         <div>
           <h1>Registrations</h1>
-          <p className="admin-lead">Live BaratX signup overview</p>
+          <p className="admin-lead">Live BarathX signup overview</p>
         </div>
         <div className="admin-actions">
           <button
@@ -654,7 +654,7 @@ export default function Admin() {
       )}
 
       <section className="admin-compose" aria-labelledby="admin-compose-title">
-        <h2 id="admin-compose-title">Post as BaratX</h2>
+        <h2 id="admin-compose-title">Post as BarathX</h2>
         <p className="admin-lead">Publish from an official account without logging into the app.</p>
         <form className="admin-compose-form" onSubmit={handleAdminPost}>
           <div className="admin-field-block">

@@ -108,7 +108,7 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Language</h2>
         <p className="hint">
-          BaratX is English-first for now. Hindi and Telugu UI will arrive in a later update.
+          BarathX is English-first for now. Hindi and Telugu UI will arrive in a later update.
         </p>
       </section>
 
@@ -176,11 +176,11 @@ export default function Settings() {
         <h2>Badges</h2>
         <ul className="settings-badge-legend">
           <li>
-            <strong className="badge-name badge-blue">Blue official</strong> — BaratX staff / platform
+            <strong className="badge-name badge-blue">Blue official</strong> — BarathX staff / platform
             accounts.
           </li>
           <li>
-            <strong className="badge-name badge-gold">Gold BaratX</strong> — BaratX brand voices (topic
+            <strong className="badge-name badge-gold">Gold BarathX</strong> — BarathX brand voices (topic
             accounts), not personal verification.
           </li>
         </ul>

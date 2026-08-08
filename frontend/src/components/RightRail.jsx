@@ -4,7 +4,7 @@ import { IconSearch } from "./Icons";
 import SuggestedFollows from "./SuggestedFollows";
 
 const TRENDING_ORBITS = [
-  { label: "BaratX", query: "BaratX", meta: "On BaratX", members: "Official", energy: 92 },
+  { label: "BarathX", query: "BarathX", meta: "On BarathX", members: "Official", energy: 92 },
   { label: "#StartupIndia", query: "StartupIndia", meta: "Builders", members: "Orbit", energy: 78 },
   { label: "#IPL", query: "IPL", meta: "Sports", members: "Hot", energy: 88 },
   { label: "Monsoon", query: "Monsoon", meta: "Local drops", members: "India today", energy: 64 },
@@ -29,10 +29,10 @@ export default function RightRail() {
           <IconSearch className="rail-search-icon" aria-hidden="true" />
           <input
             type="search"
-            placeholder="Search BaratX"
+            placeholder="Search BarathX"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search BaratX"
+            aria-label="Search BarathX"
             enterKeyHint="search"
             autoComplete="off"
           />
@@ -50,8 +50,8 @@ export default function RightRail() {
 
         <div className="rail-card rail-card-suggested">
           <SuggestedFollows
-            title="Official BaratX"
-            note="Seed accounts run by BaratX — not organic third parties."
+            title="Official BarathX"
+            note="Seed accounts run by BarathX — not organic third parties."
           />
         </div>
 

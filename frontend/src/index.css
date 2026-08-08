@@ -591,6 +591,18 @@ button {
   justify-content: flex-start;
 }
 
+/* Long legal docs must not be vertically centered — that clips the top under the
+   viewport and reads as a blank white/empty page on mobile. */
+.page main:has(.legal-page),
+.page main:has(.legal-doc),
+.page main:has(.guidelines-doc) {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1.25rem;
+  padding-bottom: 2.5rem;
+  overflow-y: auto;
+}
+
 /* ---------- Logged-in app shell ---------- */
 
 .app-shell {
@@ -4151,6 +4163,31 @@ a.post-time:hover {
   border-bottom-color: var(--border);
 }
 
+.page-auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  min-height: 0;
+}
+
+.page-auth-main:has(.legal-page),
+.page-auth-main:has(.legal-doc),
+.page-auth-main:has(.guidelines-doc) {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 1.25rem;
+  padding-bottom: 2.5rem;
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .page-auth-main {
+    padding: 0.75rem 0.75rem 2rem;
+  }
+}
+
 .sidebar-brand-mark {
   padding: 0.55rem;
 }
@@ -5801,6 +5838,16 @@ button.topic-chip.selected {
   margin: 0 auto;
   padding: 0.5rem 0.25rem 2rem;
   color: var(--text);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.page-auth .legal-page,
+.page-auth .guidelines-doc,
+.page-auth .legal-doc {
+  /* Readable regardless of short-form auth centering / theme quirks */
+  max-width: 40rem;
+  width: 100%;
 }
 
 .legal-page h1 {
@@ -8245,10 +8292,12 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 .bx-home {
   --bx-home-display: "Syne", system-ui, sans-serif;
   --bx-home-body: "DM Sans", system-ui, sans-serif;
+  --bx-home-nav-h: 4.25rem;
   min-height: 100dvh;
   background: #0d0d12;
   color: #f4f4f5;
   font-family: var(--bx-home-body);
+  scroll-padding-top: calc(var(--bx-home-nav-h) + 0.75rem);
 }
 
 .bx-home-nav {
@@ -8456,6 +8505,18 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   max-width: 42rem;
   margin: 0 auto;
   text-align: center;
+  scroll-margin-top: calc(var(--bx-home-nav-h) + 0.85rem);
+}
+
+.bx-home-section h2,
+.bx-home-closing h2 {
+  margin: 0;
+  font-family: var(--bx-home-display);
+  font-size: clamp(1.85rem, 5vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  scroll-margin-top: calc(var(--bx-home-nav-h) + 0.85rem);
 }
 
 .bx-home-section-alt {
@@ -8481,16 +8542,6 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #ff9933;
-}
-
-.bx-home-section h2,
-.bx-home-closing h2 {
-  margin: 0;
-  font-family: var(--bx-home-display);
-  font-size: clamp(1.85rem, 5vw, 2.6rem);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
 }
 
 .bx-home-copy {
@@ -8759,8 +8810,41 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 }
 
 @media (max-width: 560px) {
+  .bx-home-nav {
+    padding: 0.7rem 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .bx-home-nav-brand {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .bx-home-nav-brand .logo-full {
+    font-size: 1.1rem;
+    gap: 0.4rem;
+  }
+
+  .bx-home-nav-brand .logo-mark {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+  }
+
+  .bx-home-nav-actions {
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  .bx-home-nav-signin {
+    padding: 0.4rem 0.45rem;
+    font-size: 0.82rem;
+  }
+
   .bx-home-nav-join {
-    padding: 0.45rem 0.75rem;
+    padding: 0.42rem 0.7rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   .bx-home-hero-ctas {
@@ -8771,5 +8855,20 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   .bx-home-cta-primary,
   .bx-home-cta-secondary {
     width: 100%;
+  }
+
+  .bx-home-section {
+    padding-top: clamp(4rem, 12vh, 5.5rem);
+  }
+}
+
+@media (max-width: 380px) {
+  /* Keep Join free fully tappable — drop Sign in label spacing first */
+  .bx-home-nav-signin {
+    padding-inline: 0.3rem;
+  }
+
+  .bx-home-nav-brand .logo-wordmark {
+    font-size: 0.95rem;
   }
 }

@@ -3,7 +3,7 @@
 ## New-user auto-replies (first Home post only)
 Two replies — official engagement, **never counts toward Founding rewards**:
 
-1. **@baratx** — Welcome to BaratX… what’s your city…
+1. **@baratx** — Welcome to BarathX… what’s your city…
 2. **@sharath** — Hey @{user} — Sharath here. Drop one real take…
 
 ## Peak auto-posts (3×/day IST — not all day)
@@ -21,7 +21,7 @@ Per slot (2 arenas, rotated so every floor including **Startups** gets coverage)
 - Google News RSS, **credible publishers only** (PIB / PTI / ANI / Reuters / The Hindu / Indian Express / ET / LiveMint / Inc42 / etc.)
 - Soft-penalize horoscope, listicles, rumours, clickbait
 - **No invented facts** — copy is headline + source + debate CTA only
-- Markers: `#BaratXDaily` + `#BXMorning` / `#BXMidday` / `#BXEvening`
+- Markers: `#BarathXDaily` + `#BXMorning` / `#BXMidday` / `#BXEvening`
 
 ## Rewards exclusion
 Likes/replies from `@baratx`, `@sharath`, other seeded officials, and any `blue` / `is_official` account are **ignored** for Founding payable + race like counts.

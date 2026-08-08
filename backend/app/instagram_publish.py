@@ -1,6 +1,6 @@
 """Instagram carousel publisher + IST peak scheduler for @getbaratx.
 
-Publishes BaratX app carousels via Meta Graph API. Slides are pulled by Meta
+Publishes BarathX app carousels via Meta Graph API. Slides are pulled by Meta
 from public GitHub raw URLs (no image bytes in the API container).
 
 Trending IG music cannot be attached via Graph API for feed carousels.
@@ -40,41 +40,41 @@ CAPTIONS = {
         (
             "India doesn’t need another foreign firehose.\n"
             "It needs a public square.\n\n"
-            "BaratX = short posts, real replies, arenas that matter —\n"
+            "BarathX = short posts, real replies, arenas that matter —\n"
             "Sports · Politics · Entertainment · News · Spirituality.\n\n"
             "Open the app. Drop your city. Argue like you mean it.\n"
             "→ https://barathx.com\n\n"
-            "#BaratX #BaratXApp #IndiaPublicSquare #MakeInIndia #IndianApp "
+            "#BarathX #BarathXApp #IndiaPublicSquare #MakeInIndia #IndianApp "
             "#SocialMediaIndia #Hyderabad #DesiTwitter #CivicIndia #PublicSquare"
         ),
         (
             "Stop scrolling. Start arguing.\n\n"
-            "Inside BaratX:\n"
+            "Inside BarathX:\n"
             "• Home feed that feels Indian\n"
             "• Arenas for real fights\n"
             "• Replies > empty likes\n\n"
             "Built in India. For India.\n"
             "→ https://barathx.com\n\n"
-            "#BaratX #BaratXApp #IndianStartup #TechIndia #SocialApp #Debate "
-            "#BarathX #ProductIndia #JoinBaratX"
+            "#BarathX #BarathXApp #IndianStartup #TechIndia #SocialApp #Debate "
+            "#BarathX #ProductIndia #JoinBarathX"
         ),
     ],
     "evening": [
         (
             "Your city has a take. The feed should hear it.\n\n"
-            "Post one real problem from your street / ward / campus on BaratX.\n"
+            "Post one real problem from your street / ward / campus on BarathX.\n"
             "Founding voices get seen — and rewarded for real civic posts.\n\n"
             "→ https://barathx.com\n\n"
-            "#BaratX #BaratXApp #CivicTech #India2026 #LocalIssues #Hyd "
+            "#BarathX #BarathXApp #CivicTech #India2026 #LocalIssues #Hyd "
             "#Telangana #Democracy #PublicSquare #Founding100"
         ),
         (
             "Every social app you use was built for someone else.\n\n"
             "Culture. Language. Rules. Not ours.\n\n"
-            "BaratX is India’s own public square.\n"
+            "BarathX is India’s own public square.\n"
             "Comment BX if you want the link — or just go: https://barathx.com\n\n"
-            "#BaratX #BaratXApp #IndiaFirst #DesiApp #ViralIndia #InstagramIndia "
-            "#StartupIndia #JoinBaratX #PublicSquare"
+            "#BarathX #BarathXApp #IndiaFirst #DesiApp #ViralIndia #InstagramIndia "
+            "#StartupIndia #JoinBarathX #PublicSquare"
         ),
     ],
 }

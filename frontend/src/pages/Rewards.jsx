@@ -120,7 +120,7 @@ export default function Rewards() {
                 status === "paid"
                   ? "Paid — you’re in."
                   : status === "payable"
-                    ? "You’re on the payable list. BaratX sends ₹150 via UPI."
+                    ? "You’re on the payable list. BarathX sends ₹150 via UPI."
                     : "Admin pays after the rating bar is met."
               }
             />

@@ -7,7 +7,7 @@ import { ARENA_TOPICS } from "../arenas";
 import { IconSearch } from "./Icons";
 
 /**
- * BaratX plaza chrome — top brand + orbit nav + menu toggle.
+ * BarathX plaza chrome — top brand + orbit nav + menu toggle.
  */
 export default function PlazaTopBar() {
   const { user } = useAuth();
@@ -34,8 +34,8 @@ export default function PlazaTopBar() {
           <span />
         </button>
 
-        <Link to="/feed" className="plaza-brand" aria-label="BaratX Square">
-          <Logo variant="full" className="plaza-brand-logo" title="BaratX" />
+        <Link to="/feed" className="plaza-brand" aria-label="BarathX Square">
+          <Logo variant="full" className="plaza-brand-logo" title="BarathX" />
         </Link>
 
         <nav className="plaza-primary" aria-label="Plaza">

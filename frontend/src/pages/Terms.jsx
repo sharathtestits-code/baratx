@@ -6,13 +6,13 @@ export default function Terms() {
       <h1>Terms of Service</h1>
       <p className="legal-updated">Last updated: August 6, 2026</p>
       <p>
-        By using BaratX (BX) at <strong>barathx.com</strong>, you agree to these terms. BaratX is an
+        By using BarathX (BX) at <strong>barathx.com</strong>, you agree to these terms. BarathX is an
         early product — features may change as we improve the square.
       </p>
 
       <h2>The basics</h2>
       <ul>
-        <li>You must be 18 or older to create a BaratX account</li>
+        <li>You must be 18 or older to create a BarathX account</li>
         <li>You’re responsible for what you post</li>
         <li>Don’t impersonate others or spam the square</li>
         <li>Don’t post illegal content, harassment, or doxxing</li>
@@ -20,7 +20,7 @@ export default function Terms() {
 
       <h2>Your content</h2>
       <p>
-        You own what you write. By posting on BaratX, you give us permission to display that content
+        You own what you write. By posting on BarathX, you give us permission to display that content
         on the service so others can read and reply.
       </p>
 
@@ -42,7 +42,7 @@ export default function Terms() {
       </p>
 
       <p className="legal-back">
-        <Link to="/">← Back to BaratX</Link>
+        <Link to="/">← Back to BarathX</Link>
         {" · "}
         <Link to="/privacy">Privacy Policy</Link>
       </p>

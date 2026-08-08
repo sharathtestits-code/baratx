@@ -1,4 +1,4 @@
-/** BaratX appearance themes — applied via data-theme on <html>. */
+/** BarathX appearance themes — applied via data-theme on <html>. */
 
 export const THEME_STORAGE_KEY = "bx_theme";
 export const THEME_CHOSEN_KEY = "bx_theme_chosen";

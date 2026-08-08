@@ -55,7 +55,7 @@ async function request(path, options = {}) {
       throw new Error("Request timed out. Check your connection and try again.");
     }
     if (err instanceof TypeError || /failed to fetch/i.test(err?.message || "")) {
-      throw new Error("Could not reach BaratX. Check your connection and try again.");
+      throw new Error("Could not reach BarathX. Check your connection and try again.");
     }
     throw err;
   } finally {
