@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 
 logger = logging.getLogger("baratx.rss")
 
-USER_AGENT = "BaratXBot/1.0 (+https://barathx.com)"
+USER_AGENT = "BharatXBot/1.0 (+https://barathx.com)"
 
 
 def google_news_rss_url(query: str) -> str:

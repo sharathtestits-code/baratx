@@ -173,7 +173,7 @@ def run_migrations():
 
 run_migrations()
 
-# Cold-start density: official BaratX accounts + starter posts + communities.
+# Cold-start density: official BharatX accounts + starter posts + communities.
 with SessionLocal() as _seed_db:
     try:
         seed.seed_official_accounts(_seed_db)
@@ -215,7 +215,7 @@ with SessionLocal() as _seed_db:
         logging.getLogger("baratx").exception("Prompt refresh on boot failed")
 
 
-app = FastAPI(title="BaratX API", version="0.5.0")
+app = FastAPI(title="BharatX API", version="0.5.0")
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "").strip()
@@ -940,7 +940,7 @@ def admin_create_post(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Post as an official BaratX account using ADMIN_SECRET (no user login)."""
+    """Post as an official BharatX account using ADMIN_SECRET (no user login)."""
     author = _official_author(db, payload.username)
 
     post = models.Post(author_id=author.id, text=payload.text)
@@ -987,7 +987,7 @@ def admin_create_reply(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Reply as an official BaratX account using ADMIN_SECRET (no user login)."""
+    """Reply as an official BharatX account using ADMIN_SECRET (no user login)."""
     author = _official_author(db, payload.username)
     post = db.query(models.Post).filter(models.Post.id == payload.post_id).first()
     if not post:
@@ -1096,7 +1096,7 @@ def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_
     row.consumed = True
     user.is_email_verified = True
     db.commit()
-    return schemas.MessageResponse(message="Email confirmed. Your BaratX account is active.")
+    return schemas.MessageResponse(message="Email confirmed. Your BharatX account is active.")
 
 
 @app.post("/auth/resend-verification", response_model=schemas.MessageResponse)
@@ -1376,12 +1376,12 @@ def bootstrap_follows(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """One-tap follow of official BaratX accounts (idempotent)."""
+    """One-tap follow of official BharatX accounts (idempotent)."""
     added = seed.follow_official_accounts(db, current_user)
     db.commit()
     if added:
-        return schemas.MessageResponse(message=f"Following {added} official BaratX account(s).")
-    return schemas.MessageResponse(message="You’re already following official BaratX accounts.")
+        return schemas.MessageResponse(message=f"Following {added} official BharatX account(s).")
+    return schemas.MessageResponse(message="You’re already following official BharatX accounts.")
 
 
 @app.patch("/users/me", response_model=schemas.UserOut)

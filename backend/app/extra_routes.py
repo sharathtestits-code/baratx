@@ -214,7 +214,7 @@ def register_extra_routes(app, *, get_current_user, get_current_user_optional, s
             )
         )
         db.commit()
-        return schemas.MessageResponse(message="Report submitted. Thanks for helping keep BaratX safe.")
+        return schemas.MessageResponse(message="Report submitted. Thanks for helping keep BharatX safe.")
 
     @router.get("/hashtags/{tag}", response_model=list[schemas.PostOut])
     def hashtag_posts(

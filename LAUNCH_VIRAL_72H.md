@@ -1,9 +1,9 @@
-# BaratX viral soft launch — 72 hours
+# BharatX viral soft launch — 72 hours
 
 **Goal:** density in India (Hyderabad / Bangalore / Delhi NCR), not empty global followers.  
 **Success:** 50–150 signups who **post once**, 20+ replies on X launch thread, IG Story views from real people.
 
-Brand: **BaratX** · URL: **https://barathx.com** · English-first · Never claim Hindi/Telugu yet.
+Brand: **BharatX** · URL: **https://barathx.com** · English-first · Never claim Hindi/Telugu yet.
 
 ---
 
@@ -43,7 +43,7 @@ Brand: **BaratX** · URL: **https://barathx.com** · English-first · Never clai
 Send this DM / WhatsApp to 20–30 people **before** posting public:
 
 ```
-Quick favor — I shipped BaratX (India public square). Live: barathx.com
+Quick favor — I shipped BharatX (India public square). Live: barathx.com
 
 In the next hour I’m posting on X/IG. If you can:
 1) create an account
@@ -66,7 +66,7 @@ India doesn’t need another clone.
 
 It needs a public square.
 
-BaratX is live.
+BharatX is live.
 Short posts. Real conversation. English-first.
 
 → https://barathx.com
@@ -80,7 +80,7 @@ Reply with your city. First 100 get a follow-back.
 ### Post 2 — thread (reply to Post 1), 2 min later
 
 ```
-Why BaratX:
+Why BharatX:
 
 1. India-first product velocity
 2. Honest English-first (more languages later — not fake claims)
@@ -104,7 +104,7 @@ barathx.com
 
 - Reply to **every** city reply within 5–10 min  
 - Quote-tweet interesting replies: “Hyderabad in 🔥 — who else?”  
-- Like + follow early posters on BaratX itself  
+- Like + follow early posters on BharatX itself  
 
 ---
 
@@ -112,12 +112,12 @@ barathx.com
 
 ### Feed post
 
-Visual: cover/logo + text **BaratX** / **barathx.com**
+Visual: cover/logo + text **BharatX** / **barathx.com**
 
 ```
 India’s public square is open.
 
-BaratX — short posts, real conversation.
+BharatX — short posts, real conversation.
 English-first. Built for India.
 
 Link in bio → barathx.com
@@ -125,7 +125,7 @@ Link in bio → barathx.com
 Drop your city below.
 Hyderabad / Bangalore / Delhi NCR first — density over vanity.
 
-#BaratX #India #BuildInPublic
+#BharatX #India #BuildInPublic
 ```
 
 ### Stories (post 4–5 in a row)
@@ -149,7 +149,7 @@ Audio: trending India English audio or clean VO.
 
 | Move | How |
 |------|-----|
-| Reply-guy strategy | Reply usefully on 10 India founder/tech posts: “Shipped BaratX for this — barathx.com — feedback welcome” (not copy-paste) |
+| Reply-guy strategy | Reply usefully on 10 India founder/tech posts: “Shipped BharatX for this — barathx.com — feedback welcome” (not copy-paste) |
 | Communities | 1 honest post in a WhatsApp/Discord you’re *already in* — no cold spam |
 | Tag sparingly | Only people who agreed to amplify |
 | Cross-post | Screenshot of X thread → IG Story “conversation happening on X” |
@@ -161,7 +161,7 @@ Audio: trending India English audio or clean VO.
 **X morning (IST)**
 
 ```
-Day 2 of BaratX.
+Day 2 of BharatX.
 
 What I want from early users:
 • one honest take
@@ -176,7 +176,7 @@ What’s the #1 feature you’d ship next?
 **X evening** — quote a real user post (with permission) or your own feed screenshot.
 
 **IG** — Story poll results + “50 of you joined — keep posting.”  
-Carousel optional: Problem → BaratX → real app screens → How to join.
+Carousel optional: Problem → BharatX → real app screens → How to join.
 Ready-to-post 1080×1080 pack: `brand/carousel/export/slide-01.png` … `slide-10.png`
 (built from live barathx.com screenshots — see `brand/carousel/README.md`).
 
@@ -192,7 +192,7 @@ Soft launch metric that matters:
 Not followers.
 People who posted.
 
-If you joined BaratX and haven’t posted yet —
+If you joined BharatX and haven’t posted yet —
 make your first post today. Empty squares die.
 
 barathx.com
@@ -222,7 +222,7 @@ Pillars: 40% India discourse · 25% product truth · 20% founder POV · 15% comm
 1. “India doesn’t need another clone. It needs a public square.”  
 2. “Empty follower graphs don’t build culture. Density does.”  
 3. “English-first is honesty. Fake language claims are marketing.”  
-4. “If 100 people post this week, BaratX becomes real.”  
+4. “If 100 people post this week, BharatX becomes real.”  
 5. “Public conversation ≠ Recycled Reels.”  
 
 ---

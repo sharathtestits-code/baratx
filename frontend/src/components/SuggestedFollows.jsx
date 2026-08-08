@@ -7,7 +7,7 @@ import { badgeNameClass } from "./OfficialBadge";
 
 export const SUGGESTED_PEOPLE = [
   {
-    display_name: "BaratX",
+    display_name: "BharatX",
     username: "baratx",
     blurb: "Official blue — product updates & India conversation prompts",
     badge: "blue",
@@ -21,13 +21,13 @@ export const SUGGESTED_PEOPLE = [
   {
     display_name: "Bharat Voices",
     username: "bharatvoices",
-    blurb: "Gold BaratX — culture, ideas, everyday India",
+    blurb: "Gold BharatX — culture, ideas, everyday India",
     badge: "gold",
   },
   {
     display_name: "India Tech Daily",
     username: "indiatech",
-    blurb: "Gold BaratX — startups, policy & builders",
+    blurb: "Gold BharatX — startups, policy & builders",
     badge: "gold",
   },
 ];

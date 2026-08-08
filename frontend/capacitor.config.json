@@ -1,6 +1,6 @@
 {
   "appId": "com.baratx.app",
-  "appName": "BaratX",
+  "appName": "BharatX",
   "webDir": "dist",
   "server": {
     "androidScheme": "https",

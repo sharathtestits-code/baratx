@@ -1,4 +1,4 @@
-"""Idempotent official BaratX accounts + starter posts for cold-start density."""
+"""Idempotent official BharatX accounts + starter posts for cold-start density."""
 
 from __future__ import annotations
 
@@ -16,27 +16,27 @@ logger = logging.getLogger("baratx.seed")
 OFFICIAL_ACCOUNTS = [
     {
         "username": "baratx",
-        "display_name": "BaratX",
-        "bio": "Official BaratX — product updates and India conversation prompts.",
+        "display_name": "BharatX",
+        "bio": "Official BharatX — product updates and India conversation prompts.",
         "badge": "blue",
         "posts": [
-            "BaratX is live. India’s public square — short posts, real conversation. Drop your city below.",
+            "BharatX is live. India’s public square — short posts, real conversation. Drop your city below.",
             "Rule for this square: reply > like. Say something someone can answer.",
         ],
     },
     {
         "username": "sharath",
         "display_name": "Sharath",
-        "bio": "Founder of BaratX. Building India’s public square.",
+        "bio": "Founder of BharatX. Building India’s public square.",
         "badge": "blue",
         "posts": [
-            "I’m Sharath — building BaratX so India gets a real public square, not another firehose. Tell me what you want here.",
+            "I’m Sharath — building BharatX so India gets a real public square, not another firehose. Tell me what you want here.",
         ],
     },
     {
         "username": "bharatvoices",
         "display_name": "Bharat Voices",
-        "bio": "Official BaratX — culture, ideas, everyday India.",
+        "bio": "Official BharatX — culture, ideas, everyday India.",
         "badge": "gold",
         "posts": [
             "What’s one India story the feeds keep getting wrong? Reply with your take.",
@@ -45,7 +45,7 @@ OFFICIAL_ACCOUNTS = [
     {
         "username": "indiatech",
         "display_name": "India Tech Daily",
-        "bio": "Official BaratX — startups, policy, and builders across India.",
+        "bio": "Official BharatX — startups, policy, and builders across India.",
         "badge": "gold",
         "posts": [
             "Builders in Hyderabad / Bangalore / Delhi — what are you shipping this week?",
@@ -90,8 +90,14 @@ def seed_official_accounts(db: Session) -> None:
             created_any = True
             logger.info("Seeded official account @%s (%s)", acct["username"], want_badge)
         else:
-            if not (user.bio or "").strip():
-                user.bio = acct["bio"]
+            # Keep official brand naming in sync (e.g. BaratX → BharatX).
+            if (user.display_name or "").strip() != acct["display_name"]:
+                user.display_name = acct["display_name"]
+                created_any = True
+            want_bio = (acct.get("bio") or "").strip()
+            if want_bio and (user.bio or "").strip() != want_bio:
+                user.bio = want_bio
+                created_any = True
             current = (getattr(user, "badge", None) or "none").strip().lower()
             # Promote seeded brand accounts up to their intended badge; never demote a live blue.
             if want_badge == "blue" and current != "blue":
@@ -341,7 +347,7 @@ def seed_arenas(db: Session) -> None:
 
 
 def follow_official_accounts(db: Session, user: models.User) -> int:
-    """Auto-follow official BaratX accounts. Returns number of new follows."""
+    """Auto-follow official BharatX accounts. Returns number of new follows."""
     added = 0
     for username in OFFICIAL_USERNAMES:
         target = db.query(models.User).filter(models.User.username == username).first()

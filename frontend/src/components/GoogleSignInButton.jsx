@@ -7,7 +7,7 @@ import { isNativeApp } from "../native";
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
- * Google sign-in that keeps the BaratX button look, but uses GIS renderButton
+ * Google sign-in that keeps the BharatX button look, but uses GIS renderButton
  * (popup account chooser next to the control) — not One Tap in the top-right.
  *
  * In Capacitor native shells, GIS popup/WebView OAuth is unreliable until
@@ -117,7 +117,7 @@ export default function GoogleSignInButton({ label = "Continue with Google", onE
           className="x-btn x-btn-google"
           onClick={() => {
             const msg =
-              "In the BaratX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
+              "In the BharatX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
             setError(msg);
             onError?.(msg);
           }}

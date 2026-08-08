@@ -1,4 +1,4 @@
-# BaratX Instagram — 55-day calendar
+# BharatX Instagram — 55-day calendar
 
 Start date: **2026-08-08** (Day 1 = tomorrow). Today’s batch already posted.
 
@@ -24,14 +24,14 @@ A cloud agent session cannot stay alive 55 days. Use this calendar + re-trigger 
 ```
 Replies that stay sharp.
 
-BaratX caps replies at 220 characters.
+BharatX caps replies at 220 characters.
 No walls of text. Just takes.
 
 Fight clean. Stay punchy.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Fund it / Pass
@@ -40,11 +40,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Not X. Not Reddit.
@@ -53,17 +53,17 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -73,12 +73,12 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -86,7 +86,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 2 — 2026-08-09
@@ -102,7 +102,7 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 30 topics
@@ -114,7 +114,7 @@ Pick a side. Commit to a take.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -130,7 +130,7 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 3 — 2026-08-10
@@ -145,7 +145,7 @@ Not one generic feed. Pick your battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: First 50
@@ -161,7 +161,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Startups Arena
@@ -173,7 +173,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -189,7 +189,7 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 4 — 2026-08-11
@@ -200,11 +200,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Pitch Night
@@ -213,17 +213,17 @@ Friday Pitch Night.
 
 One night. Real pitches. Real Fund it / Pass votes.
 
-India’s public YC energy — on BaratX.
+India’s public YC energy — on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -233,12 +233,12 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -246,7 +246,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 5 — 2026-08-12
@@ -260,7 +260,7 @@ Pick a side. Commit to a take.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Not X. Not Reddit.
@@ -269,11 +269,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Sports takes
@@ -284,7 +284,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -301,7 +301,7 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 6 — 2026-08-13
@@ -319,7 +319,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Short posts
@@ -328,11 +328,11 @@ Say it in one breath.
 
 Short posts. Sharp sides. Real conflict.
 
-If it needs a thread of 40, it’s not BaratX.
+If it needs a thread of 40, it’s not BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -348,7 +348,7 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 7 — 2026-08-14
@@ -359,11 +359,11 @@ Friday Pitch Night.
 
 One night. Real pitches. Real Fund it / Pass votes.
 
-India’s public YC energy — on BaratX.
+India’s public YC energy — on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Startups Arena
@@ -375,7 +375,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Entertainment
@@ -386,15 +386,15 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -402,12 +402,12 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -415,7 +415,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 8 — 2026-08-15
@@ -426,11 +426,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Spirituality Arena
@@ -443,13 +443,13 @@ Spirituality Arena is live.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -459,7 +459,7 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 9 — 2026-08-16
@@ -470,11 +470,11 @@ Say it in one breath.
 
 Short posts. Sharp sides. Real conflict.
 
-If it needs a thread of 40, it’s not BaratX.
+If it needs a thread of 40, it’s not BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Sports takes
@@ -485,7 +485,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Reply notifications
@@ -493,13 +493,13 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -515,7 +515,7 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 10 — 2026-08-17
@@ -529,7 +529,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Politics without mud
@@ -540,7 +540,7 @@ Politics Arena — sides, not chaos feeds.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -556,12 +556,12 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -569,7 +569,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 11 — 2026-08-18
@@ -584,7 +584,7 @@ Spirituality Arena is live.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Entertainment
@@ -595,25 +595,25 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Public square
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -623,7 +623,7 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 12 — 2026-08-19
@@ -636,7 +636,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Tech India
@@ -647,7 +647,7 @@ Tech Arena: ships, fails, debates — out loud.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -664,7 +664,7 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 13 — 2026-08-20
@@ -677,7 +677,7 @@ Politics Arena — sides, not chaos feeds.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Reply notifications
@@ -685,13 +685,13 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Invite loop
@@ -703,7 +703,7 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -719,12 +719,12 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -732,7 +732,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 14 — 2026-08-21
@@ -745,7 +745,7 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Onboarding topics
@@ -756,15 +756,15 @@ Don’t overwhelm. Pick at least one topic you care about — then enter the squ
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -772,7 +772,7 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 15 — 2026-08-22
@@ -785,19 +785,19 @@ Tech Arena: ships, fails, debates — out loud.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Public square
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: @Mentions
@@ -811,13 +811,13 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -827,7 +827,7 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 16 — 2026-08-23
@@ -837,13 +837,13 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Scout energy
@@ -854,7 +854,7 @@ The First 50 won’t be filled by silent accounts.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -870,12 +870,12 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -883,7 +883,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 17 — 2026-08-24
@@ -896,7 +896,7 @@ Don’t overwhelm. Pick at least one topic you care about — then enter the squ
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Invite loop
@@ -908,7 +908,7 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Fund it / Pass
@@ -917,11 +917,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -937,7 +937,7 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 18 — 2026-08-25
@@ -946,32 +946,32 @@ barathx.com
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 220-char replies
 ```
 Replies that stay sharp.
 
-BaratX caps replies at 220 characters.
+BharatX caps replies at 220 characters.
 No walls of text. Just takes.
 
 Fight clean. Stay punchy.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -981,7 +981,7 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 19 — 2026-08-26
@@ -994,7 +994,7 @@ The First 50 won’t be filled by silent accounts.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: @Mentions
@@ -1008,7 +1008,7 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: First 50
@@ -1024,7 +1024,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -1041,12 +1041,12 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -1054,7 +1054,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 20 — 2026-08-27
@@ -1068,7 +1068,7 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 6 Arenas
@@ -1081,7 +1081,7 @@ Not one generic feed. Pick your battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -1097,7 +1097,7 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 21 — 2026-08-28
@@ -1106,14 +1106,14 @@ barathx.com
 ```
 Replies that stay sharp.
 
-BaratX caps replies at 220 characters.
+BharatX caps replies at 220 characters.
 No walls of text. Just takes.
 
 Fight clean. Stay punchy.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Fund it / Pass
@@ -1122,11 +1122,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Not X. Not Reddit.
@@ -1135,19 +1135,19 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -1155,7 +1155,7 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 22 — 2026-08-29
@@ -1171,7 +1171,7 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 30 topics
@@ -1183,13 +1183,13 @@ Pick a side. Commit to a take.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -1199,12 +1199,12 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -1212,7 +1212,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 23 — 2026-08-30
@@ -1227,7 +1227,7 @@ Not one generic feed. Pick your battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: First 50
@@ -1243,7 +1243,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Startups Arena
@@ -1255,7 +1255,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -1271,7 +1271,7 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 24 — 2026-08-31
@@ -1282,11 +1282,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Pitch Night
@@ -1295,11 +1295,11 @@ Friday Pitch Night.
 
 One night. Real pitches. Real Fund it / Pass votes.
 
-India’s public YC energy — on BaratX.
+India’s public YC energy — on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -1315,7 +1315,7 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 25 — 2026-09-01
@@ -1329,7 +1329,7 @@ Pick a side. Commit to a take.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Not X. Not Reddit.
@@ -1338,11 +1338,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Sports takes
@@ -1353,13 +1353,13 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -1369,12 +1369,12 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -1382,7 +1382,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 26 — 2026-09-02
@@ -1400,7 +1400,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Short posts
@@ -1409,11 +1409,11 @@ Say it in one breath.
 
 Short posts. Sharp sides. Real conflict.
 
-If it needs a thread of 40, it’s not BaratX.
+If it needs a thread of 40, it’s not BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -1430,7 +1430,7 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 27 — 2026-09-03
@@ -1441,11 +1441,11 @@ Friday Pitch Night.
 
 One night. Real pitches. Real Fund it / Pass votes.
 
-India’s public YC energy — on BaratX.
+India’s public YC energy — on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Startups Arena
@@ -1457,7 +1457,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Entertainment
@@ -1468,7 +1468,7 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -1484,7 +1484,7 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 28 — 2026-09-04
@@ -1495,11 +1495,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Spirituality Arena
@@ -1512,15 +1512,15 @@ Spirituality Arena is live.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -1528,12 +1528,12 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -1541,7 +1541,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 29 — 2026-09-05
@@ -1552,11 +1552,11 @@ Say it in one breath.
 
 Short posts. Sharp sides. Real conflict.
 
-If it needs a thread of 40, it’s not BaratX.
+If it needs a thread of 40, it’s not BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Sports takes
@@ -1567,7 +1567,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Reply notifications
@@ -1575,19 +1575,19 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -1597,7 +1597,7 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 30 — 2026-09-06
@@ -1611,7 +1611,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Politics without mud
@@ -1622,7 +1622,7 @@ Politics Arena — sides, not chaos feeds.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -1638,7 +1638,7 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 31 — 2026-09-07
@@ -1653,7 +1653,7 @@ Spirituality Arena is live.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Entertainment
@@ -1664,19 +1664,19 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Public square
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -1692,12 +1692,12 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -1705,7 +1705,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 32 — 2026-09-08
@@ -1718,7 +1718,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Tech India
@@ -1729,13 +1729,13 @@ Tech Arena: ships, fails, debates — out loud.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -1745,7 +1745,7 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 33 — 2026-09-09
@@ -1758,7 +1758,7 @@ Politics Arena — sides, not chaos feeds.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Reply notifications
@@ -1766,13 +1766,13 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Invite loop
@@ -1784,7 +1784,7 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -1801,7 +1801,7 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 34 — 2026-09-10
@@ -1814,7 +1814,7 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Onboarding topics
@@ -1825,7 +1825,7 @@ Don’t overwhelm. Pick at least one topic you care about — then enter the squ
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -1841,12 +1841,12 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -1854,7 +1854,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 35 — 2026-09-11
@@ -1867,19 +1867,19 @@ Tech Arena: ships, fails, debates — out loud.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Public square
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: @Mentions
@@ -1893,15 +1893,15 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -1909,7 +1909,7 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 36 — 2026-09-12
@@ -1919,13 +1919,13 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Scout energy
@@ -1936,13 +1936,13 @@ The First 50 won’t be filled by silent accounts.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -1952,7 +1952,7 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 37 — 2026-09-13
@@ -1965,7 +1965,7 @@ Don’t overwhelm. Pick at least one topic you care about — then enter the squ
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Invite loop
@@ -1977,7 +1977,7 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Fund it / Pass
@@ -1986,11 +1986,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -2006,12 +2006,12 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2019,7 +2019,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 38 — 2026-09-14
@@ -2028,26 +2028,26 @@ barathx.com
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 220-char replies
 ```
 Replies that stay sharp.
 
-BaratX caps replies at 220 characters.
+BharatX caps replies at 220 characters.
 No walls of text. Just takes.
 
 Fight clean. Stay punchy.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -2063,7 +2063,7 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 39 — 2026-09-15
@@ -2076,7 +2076,7 @@ The First 50 won’t be filled by silent accounts.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: @Mentions
@@ -2090,7 +2090,7 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: First 50
@@ -2106,13 +2106,13 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -2122,7 +2122,7 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 40 — 2026-09-16
@@ -2136,7 +2136,7 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 6 Arenas
@@ -2149,7 +2149,7 @@ Not one generic feed. Pick your battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -2166,12 +2166,12 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2179,7 +2179,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 41 — 2026-09-17
@@ -2188,14 +2188,14 @@ barathx.com
 ```
 Replies that stay sharp.
 
-BaratX caps replies at 220 characters.
+BharatX caps replies at 220 characters.
 No walls of text. Just takes.
 
 Fight clean. Stay punchy.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Fund it / Pass
@@ -2204,11 +2204,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Not X. Not Reddit.
@@ -2217,11 +2217,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -2237,7 +2237,7 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 42 — 2026-09-18
@@ -2253,7 +2253,7 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: 30 topics
@@ -2265,15 +2265,15 @@ Pick a side. Commit to a take.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -2281,7 +2281,7 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 43 — 2026-09-19
@@ -2296,7 +2296,7 @@ Not one generic feed. Pick your battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: First 50
@@ -2312,7 +2312,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Startups Arena
@@ -2324,13 +2324,13 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -2340,12 +2340,12 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2353,7 +2353,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 44 — 2026-09-20
@@ -2364,11 +2364,11 @@ Shark Tank energy. India votes.
 
 60s pitch. India chooses: Fund it or Pass.
 
-Startups Arena is live on BaratX.
+Startups Arena is live on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Pitch Night
@@ -2377,11 +2377,11 @@ Friday Pitch Night.
 
 One night. Real pitches. Real Fund it / Pass votes.
 
-India’s public YC energy — on BaratX.
+India’s public YC energy — on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -2397,7 +2397,7 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 45 — 2026-09-21
@@ -2411,7 +2411,7 @@ Pick a side. Commit to a take.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Not X. Not Reddit.
@@ -2420,11 +2420,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Sports takes
@@ -2435,7 +2435,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -2451,7 +2451,7 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 46 — 2026-09-22
@@ -2469,7 +2469,7 @@ barathx.com
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Short posts
@@ -2478,17 +2478,17 @@ Say it in one breath.
 
 Short posts. Sharp sides. Real conflict.
 
-If it needs a thread of 40, it’s not BaratX.
+If it needs a thread of 40, it’s not BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -2498,12 +2498,12 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2511,7 +2511,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 47 — 2026-09-23
@@ -2522,11 +2522,11 @@ Friday Pitch Night.
 
 One night. Real pitches. Real Fund it / Pass votes.
 
-India’s public YC energy — on BaratX.
+India’s public YC energy — on BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Startups Arena
@@ -2538,7 +2538,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Entertainment
@@ -2549,7 +2549,7 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -2566,7 +2566,7 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 48 — 2026-09-24
@@ -2577,11 +2577,11 @@ Built for India first.
 
 Culture, cricket, startups, spirituality — in one square.
 
-BaratX isn’t a clone. It’s a battlefield.
+BharatX isn’t a clone. It’s a battlefield.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Spirituality Arena
@@ -2594,7 +2594,7 @@ Spirituality Arena is live.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -2610,7 +2610,7 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 49 — 2026-09-25
@@ -2621,11 +2621,11 @@ Say it in one breath.
 
 Short posts. Sharp sides. Real conflict.
 
-If it needs a thread of 40, it’s not BaratX.
+If it needs a thread of 40, it’s not BharatX.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Sports takes
@@ -2636,7 +2636,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Reply notifications
@@ -2644,21 +2644,21 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: How to post
-Slides: Open BaratX · Choose Arena · Pick topic · Pick side · Drop your take
+Slides: Open BharatX · Choose Arena · Pick topic · Pick side · Drop your take
 ```
 How to post (swipe)
 
-1) Open BaratX
+1) Open BharatX
 2) Choose Arena
 3) Pick topic
 4) Pick side
@@ -2666,12 +2666,12 @@ How to post (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2679,7 +2679,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 50 — 2026-09-26
@@ -2693,7 +2693,7 @@ No closed rooms. No silent feedback.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Politics without mud
@@ -2704,13 +2704,13 @@ Politics Arena — sides, not chaos feeds.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: How BaratX works
+### Carousel: How BharatX works
 Slides: India’s public square · Pick an Arena · Pick a topic + side · Post sharp (220 chars) · Join the First 50
 ```
-How BaratX works (swipe)
+How BharatX works (swipe)
 
 1) India’s public square
 2) Pick an Arena
@@ -2720,7 +2720,7 @@ How BaratX works (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 51 — 2026-09-27
@@ -2735,7 +2735,7 @@ Spirituality Arena is live.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Entertainment
@@ -2746,19 +2746,19 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Public square
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Features you get
@@ -2774,7 +2774,7 @@ Features you get (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 52 — 2026-09-28
@@ -2787,7 +2787,7 @@ Sports Arena: pick a topic, pick a side, fight it out.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Tech India
@@ -2798,7 +2798,7 @@ Tech Arena: ships, fails, debates — out loud.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Startups Arena
@@ -2814,12 +2814,12 @@ Startups Arena (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2827,7 +2827,7 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 53 — 2026-09-29
@@ -2840,7 +2840,7 @@ Politics Arena — sides, not chaos feeds.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Reply notifications
@@ -2848,13 +2848,13 @@ barathx.com
 Owners get pinged.
 
 Someone replied to your post?
-BaratX notifies the post owner.
+BharatX notifies the post owner.
 
 The fight stays alive.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Invite loop
@@ -2866,13 +2866,13 @@ Then bring one friend who actually argues.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-### Carousel: Why BaratX
+### Carousel: Why BharatX
 Slides: India-first · Not a clone feed · Conflict with structure · Short > endless · Join early
 ```
-Why BaratX (swipe)
+Why BharatX (swipe)
 
 1) India-first
 2) Not a clone feed
@@ -2882,7 +2882,7 @@ Why BaratX (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 54 — 2026-09-30
@@ -2895,7 +2895,7 @@ Entertainment Arena is where opinions don’t hide.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Onboarding topics
@@ -2906,7 +2906,7 @@ Don’t overwhelm. Pick at least one topic you care about — then enter the squ
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: Arenas map
@@ -2923,7 +2923,7 @@ Arenas map (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ## Day 55 — 2026-10-01
@@ -2936,19 +2936,19 @@ Tech Arena: ships, fails, debates — out loud.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: Public square
 ```
 Every social app you use was built for someone else.
 
-BaratX is India’s public square.
+BharatX is India’s public square.
 Short posts. Real conflict. Real sides.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Feature: @Mentions
@@ -2962,7 +2962,7 @@ Public square energy — not silent DMs.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Carousel: First 50 offer
@@ -2978,12 +2978,12 @@ First 50 offer (swipe)
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
 ### Reel (with baked audio)
 ```
-BaratX in under 20s.
+BharatX in under 20s.
 
 Pick a side. Fight clean. Join early.
 
@@ -2991,5 +2991,5 @@ Comment BX for an invite.
 
 barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BharatX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```

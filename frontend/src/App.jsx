@@ -38,7 +38,7 @@ function AuthChrome({ children }) {
   return (
     <div className="page page-auth">
       <header className="topbar topbar-minimal">
-        <Link to="/" className="brand" aria-label="BaratX Home">
+        <Link to="/" className="brand" aria-label="BharatX Home">
           <Logo variant="full" className="topbar-logo" />
         </Link>
       </header>
@@ -51,12 +51,12 @@ function AdminChrome({ children }) {
   return (
     <div className="page page-admin">
       <header className="admin-topbar">
-        <Link to="/" className="admin-brand" aria-label="BaratX Home">
+        <Link to="/" className="admin-brand" aria-label="BharatX Home">
           <Logo variant="full" className="admin-topbar-logo" />
           <span className="admin-topbar-badge">Admin</span>
         </Link>
         <Link to="/" className="admin-topbar-back">
-          Back to BaratX
+          Back to BharatX
         </Link>
       </header>
       <main className="admin-main">{children}</main>
@@ -109,7 +109,7 @@ export default function App() {
   const location = useLocation();
 
   if (loading) {
-    return <div className="page-loading">Starting BaratX…</div>;
+    return <div className="page-loading">Starting BharatX…</div>;
   }
 
   // Admin + email confirm / password reset stay outside the app shell.
