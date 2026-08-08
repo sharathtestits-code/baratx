@@ -1,11 +1,13 @@
-Twitter / X pack — Square intro (no video)
+Twitter / X pack — REAL app screens (not plain text cards)
 
-1) CAROUSEL (attach images in order)
-   carousel-01.png … carousel-04.png
-   Copy: CAROUSEL_TWEET.txt
+CAROUSEL (attach in order):
+  carousel-01.png  Real landing / signup
+  carousel-02.png  Real mobile feed
+  carousel-03.png  Post detail + replies
+  carousel-04.png  Explore (desktop + mobile)
 
-2) REGULAR POST (single image)
-   regular-post.png  (1200×675)
-   Copy: REGULAR_TWEET.txt
+REGULAR:
+  regular-post.png  Landscape with live feed screenshot
 
-Do not auto-post — review first.
+Copy: CAROUSEL_TWEET.txt / REGULAR_TWEET.txt
+DO NOT post until approved.
