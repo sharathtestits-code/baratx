@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import MentionTextarea from "../components/MentionTextarea";
+import EmptyState from "../components/EmptyState";
 
 export default function CommunityDetail() {
   const { slug } = useParams();
@@ -142,10 +143,17 @@ export default function CommunityDetail() {
       )}
 
       {posts.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No posts yet</p>
-          <p className="hint">Be the first to start the conversation.</p>
-        </div>
+        <EmptyState
+          title="No posts yet"
+          hint="Be the first to start the conversation."
+          onPrimary={() => {
+            const el = document.querySelector(".community-compose textarea, .compose-body textarea");
+            el?.focus?.();
+          }}
+          primaryLabel="Write the first post"
+          secondaryTo="/feed"
+          secondaryLabel="Back to Square"
+        />
       ) : (
         <div className="post-list">
           {posts.map((post) => (

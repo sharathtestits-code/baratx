@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import EmptyState from "../components/EmptyState";
 
 export default function FollowList() {
   const { username, kind } = useParams();
@@ -86,11 +87,16 @@ export default function FollowList() {
       ) : error ? (
         <div className="error">{error}</div>
       ) : people.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">
-            {kind === "following" ? "Not following anyone yet" : "No followers yet"}
-          </p>
-        </div>
+        <EmptyState
+          title={kind === "following" ? "Not following anyone yet" : "No followers yet"}
+          hint={
+            kind === "following"
+              ? "Find people worth arguing with in Explore."
+              : "Drop takes on the Square — pehchaan follows."
+          }
+          primaryTo={kind === "following" ? "/search" : "/feed"}
+          primaryLabel={kind === "following" ? "Explore people" : "Post on Square"}
+        />
       ) : (
         <div className="people-list">
           {people.map((person) => (

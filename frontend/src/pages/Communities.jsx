@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { communitiesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import EmptyState from "../components/EmptyState";
 
 export default function Communities() {
   const { token } = useAuth();
@@ -83,10 +84,14 @@ export default function Communities() {
       {loading ? (
         <p className="hint">Loading…</p>
       ) : items.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No communities yet</p>
-          <p className="hint">Start one around a city, craft, or interest.</p>
-        </div>
+        <EmptyState
+          title="No communities yet"
+          hint="Start one around a city, craft, or interest — use the form above."
+          primaryTo="/arenas"
+          primaryLabel="Browse Arenas"
+          secondaryTo="/feed"
+          secondaryLabel="Back to Square"
+        />
       ) : (
         <ul className="surface-card-list">
           {items.map((c) => (

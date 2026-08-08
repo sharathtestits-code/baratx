@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { listsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import EmptyState from "../components/EmptyState";
 
 export default function Lists() {
   const { token } = useAuth();
@@ -85,10 +86,14 @@ export default function Lists() {
       {loading ? (
         <p className="hint">Loading…</p>
       ) : lists.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No lists yet</p>
-          <p className="hint">Create a list and add people you want to follow closely.</p>
-        </div>
+        <EmptyState
+          title="No lists yet"
+          hint="Create a list above, then add people from Explore."
+          primaryTo="/search"
+          primaryLabel="Add from Explore"
+          secondaryTo="/feed"
+          secondaryLabel="Back to Square"
+        />
       ) : (
         <ul className="surface-card-list">
           {lists.map((list) => (

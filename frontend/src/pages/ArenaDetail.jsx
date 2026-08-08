@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { arenaMeta } from "../arenas";
 import PostCard from "../components/PostCard";
 import MentionTextarea from "../components/MentionTextarea";
+import EmptyState from "../components/EmptyState";
 
 export default function ArenaDetail() {
   const { arenaKey } = useParams();
@@ -356,7 +357,17 @@ export default function ArenaDetail() {
           </button>
         </form>
         {posts.length === 0 ? (
-          <p className="hint">No posts in this arena yet.</p>
+          <EmptyState
+            title="No posts in this arena yet"
+            hint="Drop the first take for this floor."
+            onPrimary={() => {
+              const el = document.querySelector(".plaza-studio textarea, .compose-body textarea");
+              el?.focus?.();
+            }}
+            primaryLabel="Post a take"
+            secondaryTo="/spaces"
+            secondaryLabel="Start a debate"
+          />
         ) : (
           <div className="post-list">
             {posts.map((post) => (

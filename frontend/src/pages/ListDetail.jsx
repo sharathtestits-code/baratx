@@ -4,6 +4,7 @@ import { listsApi, searchApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
+import EmptyState from "../components/EmptyState";
 
 export default function ListDetail() {
   const { listId } = useParams();
@@ -168,7 +169,12 @@ export default function ListDetail() {
           </ul>
         )}
         {members.length === 0 ? (
-          <p className="hint">No members yet. Add people to build this timeline.</p>
+          <EmptyState
+            title="No members yet"
+            hint="Add people above to build this timeline."
+            primaryTo="/search"
+            primaryLabel="Find people"
+          />
         ) : (
           <ul className="settings-user-list">
             {members.map((u) => (
@@ -197,10 +203,14 @@ export default function ListDetail() {
       <section className="settings-section">
         <h2>Timeline</h2>
         {posts.length === 0 ? (
-          <div className="empty-state">
-            <p className="empty-state-title">No posts yet</p>
-            <p className="hint">When members post, their updates show up here.</p>
-          </div>
+          <EmptyState
+            title="No posts yet"
+            hint="When members post, their updates show up here."
+            primaryTo="/search"
+            primaryLabel="Add people"
+            secondaryTo="/feed"
+            secondaryLabel="Back to Square"
+          />
         ) : (
           <div className="post-list">
             {posts.map((post) => (

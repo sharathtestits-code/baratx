@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import ReplyItem from "../components/ReplyItem";
 import MentionTextarea from "../components/MentionTextarea";
+import EmptyState from "../components/EmptyState";
 
 const MAX_REPLY_LEN = 220;
 
@@ -185,7 +186,17 @@ export default function PostDetail() {
       <div className="post-detail-replies">
         <h2 className="section-title">Replies</h2>
         {replies.length === 0 ? (
-          <p className="hint profile-posts-hint">No replies yet. Be the first.</p>
+          <EmptyState
+            title="No replies yet"
+            hint="Be the first to answer this take."
+            onPrimary={() => {
+              const el = document.querySelector(".detail-reply-form textarea, .compose-body textarea");
+              el?.focus?.();
+            }}
+            primaryLabel="Write a reply"
+            secondaryTo="/arenas"
+            secondaryLabel="Browse Arenas"
+          />
         ) : (
           <div className="detail-reply-list">
             {replies.map((r) => (
