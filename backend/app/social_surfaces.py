@@ -300,9 +300,12 @@ def register_social_surfaces(
         db: Session = Depends(get_db),
         current_user: Optional[models.User] = Depends(get_current_user_optional),
     ):
+        # Arenas are debate floors (is_arena=True) — keep them out of Communities list
+        # so the two surfaces don't look like duplicate topic systems.
         rows = (
             db.query(models.Community)
             .options(joinedload(models.Community.creator))
+            .filter(models.Community.is_arena == False)  # noqa: E712
             .order_by(models.Community.created_at.desc())
             .limit(100)
             .all()

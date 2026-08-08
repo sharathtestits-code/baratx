@@ -71,6 +71,11 @@ export default function PlazaSideMenu() {
     navigate("/settings");
   }
 
+  function goLink(path) {
+    close();
+    navigate(path);
+  }
+
   if (typeof document === "undefined") return null;
 
   const activeKey = location.pathname.startsWith("/arenas/")
@@ -157,7 +162,41 @@ export default function PlazaSideMenu() {
         <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
           <span className="plaza-side-manage-copy">
             <strong>My Arenas</strong>
-            <em>Manage your favourite arenas</em>
+            <em>Official debate floors — pick a side</em>
+          </span>
+          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M6 4l4 4-4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button type="button" className="plaza-side-manage" onClick={() => goLink("/communities")}>
+          <span className="plaza-side-manage-copy">
+            <strong>Communities</strong>
+            <em>Member-run groups — not Arenas</em>
+          </span>
+          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M6 4l4 4-4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button type="button" className="plaza-side-manage" onClick={() => goLink("/rewards")}>
+          <span className="plaza-side-manage-copy">
+            <strong>Founding ₹150</strong>
+            <em>Open a live debate that gets engagement</em>
           </span>
           <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
             <path
@@ -175,6 +214,23 @@ export default function PlazaSideMenu() {
           <span className="plaza-side-manage-copy">
             <strong>Settings</strong>
             <em>Appearance, privacy, mutes</em>
+          </span>
+          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M6 4l4 4-4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <button type="button" className="plaza-side-manage" onClick={() => goLink("/guidelines")}>
+          <span className="plaza-side-manage-copy">
+            <strong>Guidelines</strong>
+            <em>House rules + how badges work</em>
           </span>
           <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
             <path

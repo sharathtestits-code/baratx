@@ -1,13 +1,27 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-/** Mobile floating compose — focuses the home composer (no separate /compose route). */
+/**
+ * Mobile floating compose — hidden on Square (composer already there) and live rooms
+ * so it cannot cover primary CTAs (audit P0 mobile overlap).
+ */
 export default function ComposeFab() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  const hide =
+    pathname === "/feed" ||
+    pathname.startsWith("/spaces/") ||
+    pathname.startsWith("/onboarding") ||
+    pathname === "/rewards" ||
+    pathname === "/settings" ||
+    pathname === "/guidelines";
+
+  if (hide) return null;
 
   function goCompose() {
     navigate("/feed");
     requestAnimationFrame(() => {
-      const el = document.querySelector(".compose textarea");
+      const el = document.querySelector(".compose textarea, .plaza-studio textarea");
       if (el) {
         el.focus();
         window.scrollTo({ top: 0, behavior: "smooth" });

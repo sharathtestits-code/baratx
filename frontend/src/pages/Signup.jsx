@@ -30,11 +30,37 @@ export default function Signup() {
     params.get("arena") ||
     (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_arena") : "") ||
     "";
+  const nextPath = (() => {
+    const raw = (params.get("next") || "").trim();
+    if (raw.startsWith("/") && !raw.startsWith("//")) return raw;
+    return "";
+  })();
 
   useEffect(() => {
     const a = params.get("arena");
     if (a) sessionStorage.setItem("bx_arena", a);
-  }, [params]);
+    if (nextPath) sessionStorage.setItem("bx_next", nextPath);
+  }, [params, nextPath]);
+
+  function afterJoinPath() {
+    const stored =
+      (typeof sessionStorage !== "undefined" && sessionStorage.getItem("bx_next")) || nextPath;
+    if (stored && stored.startsWith("/") && !stored.startsWith("//")) {
+      sessionStorage.removeItem("bx_next");
+      return stored;
+    }
+    return "/feed?welcome=1";
+  }
+
+  function goAfterSignup() {
+    sessionStorage.setItem("bx_welcome", "1");
+    const dest = afterJoinPath();
+    if (dest === "/feed" || dest.startsWith("/feed?")) {
+      navigate(dest.includes("welcome") ? dest : "/feed?welcome=1");
+      return;
+    }
+    navigate(dest);
+  }
 
   async function joinArenaFromParams(accessToken) {
     const key = (preferredArena || "").trim().toLowerCase();
@@ -85,8 +111,7 @@ export default function Signup() {
       }
       login(res.access_token);
       await joinArenaFromParams(res.access_token);
-      sessionStorage.setItem("bx_welcome", "1");
-      navigate("/onboarding/topics");
+      goAfterSignup();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -140,8 +165,7 @@ export default function Signup() {
       });
       login(access_token);
       await joinArenaFromParams(access_token);
-      sessionStorage.setItem("bx_welcome", "1");
-      navigate("/onboarding/topics");
+      goAfterSignup();
     } catch (err) {
       setError(err.message);
     } finally {

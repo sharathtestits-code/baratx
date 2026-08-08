@@ -87,8 +87,12 @@ def is_credible_source(source: str) -> bool:
     return any(s in low for s in CREDIBLE_SOURCES)
 
 
-def headline_to_debate_title(headline: str) -> str:
-    """Turn a news headline into a fight people can join."""
+def headline_to_debate_title(headline: str, *, arena_key: str | None = None) -> str:
+    """Turn a news headline into a fight people can join.
+
+    Avoids the repetitive "Take: … — overblown or fair?" bot pattern.
+    Startups get Fund it / Pass framing.
+    """
     h = _clean_title(headline)
     if not h:
         return "Is this story being spun wrong?"
@@ -96,7 +100,16 @@ def headline_to_debate_title(headline: str) -> str:
         return h
     if len(h) > 90:
         h = h[:87].rsplit(" ", 1)[0] + "…"
-    return f"Take: {h} — overblown or fair?"
+    key = (arena_key or "").lower()
+    if key == "startups":
+        return f"Fund it or Pass: {h}"
+    # Rotate templates by headline length so digests don't all rhyme.
+    n = len(h) % 3
+    if n == 0:
+        return f"{h} — agree or push back?"
+    if n == 1:
+        return f"Is this fair? {h}"
+    return f"Your take: {h}"
 
 
 def fetch_rss_items(

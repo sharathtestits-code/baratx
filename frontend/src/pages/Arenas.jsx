@@ -65,8 +65,25 @@ export default function Arenas() {
     <div className="feed-wrap surface-page arenas-page plaza-page">
       <PlazaPageHeader
         title="Arenas"
-        sub="Pick a topic, pick a side — Sports, Politics, Entertainment, News, Spirituality, or Startups."
+        sub="Official debate floors — pick a side, go live. Not the same as Communities (member-run groups)."
       />
+
+      <div className="arena-featured">
+        <p className="arena-featured-kicker">Dense first</p>
+        <h2>Startups — Fund it or Pass</h2>
+        <p className="hint">
+          Where builders argue the pitch and the raise live. Founding ₹150 for early rooms with real
+          engagement.
+        </p>
+        <div className="arena-featured-actions">
+          <Link to="/arenas/startups" className="btn btn-primary">
+            Enter Startups
+          </Link>
+          <Link to="/rewards" className="btn btn-secondary">
+            Founding ₹150
+          </Link>
+        </div>
+      </div>
 
       {error && <div className="error">{error}</div>}
 
