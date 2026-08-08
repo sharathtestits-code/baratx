@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PlazaPageHeader from "../components/PlazaPageHeader";
+
+const SUGGESTED_DEBATES = [
+  "Should WFH stay the default in India tech?",
+  "Kohli or Rohit — who carries big games?",
+  "One civic problem your city still ignores",
+  "Is hustle culture burning junior talent?",
+];
 
 export default function Spaces() {
   const { token } = useAuth();
@@ -11,6 +18,7 @@ export default function Spaces() {
   const [error, setError] = useState("");
   const [title, setTitle] = useState("");
   const [creating, setCreating] = useState(false);
+  const titleRef = useRef(null);
 
   async function load() {
     setLoading(true);
@@ -46,7 +54,15 @@ export default function Spaces() {
     }
   }
 
+  function startSuggested(topic) {
+    setTitle(topic);
+    const el = document.getElementById("go-live");
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => titleRef.current?.focus?.(), 200);
+  }
+
   const featured = items[0];
+  const empty = !loading && items.length === 0;
 
   return (
     <div className="plaza-page plaza-live">
@@ -54,18 +70,31 @@ export default function Spaces() {
         title="Live"
         sub="Open a room, Join conversation — mute, video, reactions (max 15)."
       />
-      <section className="live-amphitheatre">
+      <section className={`live-amphitheatre${empty ? " is-empty-hero" : ""}`}>
         <div className="live-amphitheatre-glow" aria-hidden="true" />
-        <span className="live-pill">On air</span>
+        <span className="live-pill">{empty ? "Start one" : "On air"}</span>
         <p className="live-eyebrow">Airwaves</p>
         <h2 className="live-amphitheatre-title">
-          {featured ? featured.title : "Start a room India can join"}
+          {featured
+            ? featured.title
+            : empty
+              ? "No rooms on air — start one"
+              : "Start a room India can join"}
         </h2>
         <p className="live-amphitheatre-sub">
           {featured
             ? `Hosted by @${featured.host?.username} · ${featured.post_count} takes in the room`
-            : "Pick a room below or go live — Join conversation for audio & video."}
+            : "Open a 15-person talk. Argue live — mute, video, reactions."}
         </p>
+        {empty && (
+          <button
+            type="button"
+            className="live-suggested-pill"
+            onClick={() => startSuggested(SUGGESTED_DEBATES[0])}
+          >
+            {SUGGESTED_DEBATES[0]}
+          </button>
+        )}
         <div className="live-stage-wave" aria-hidden="true">
           <span />
           <span />
@@ -80,16 +109,31 @@ export default function Spaces() {
             <Link to={`/spaces/${featured.id}`} className="btn btn-primary">
               Join conversation
             </Link>
-          ) : null}
-          <a href="#go-live" className="btn btn-secondary">
-            Go live
-          </a>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => startSuggested(title.trim() || SUGGESTED_DEBATES[0])}
+            >
+              Start debate & join
+            </button>
+          )}
+          {featured ? (
+            <a href="#go-live" className="btn btn-secondary">
+              Go live
+            </a>
+          ) : (
+            <Link to="/arenas" className="btn btn-secondary">
+              Browse arenas
+            </Link>
+          )}
         </div>
       </section>
 
       <form id="go-live" className="plaza-studio live-create" onSubmit={createSpace}>
         <p className="plaza-studio-label">Open a live room</p>
         <input
+          ref={titleRef}
           type="text"
           placeholder="What should India hear right now?"
           value={title}
@@ -111,9 +155,21 @@ export default function Spaces() {
         {loading ? (
           <p className="hint">Loading…</p>
         ) : items.length === 0 ? (
-          <div className="empty-state">
-            <p className="empty-state-title">No rooms on air</p>
-            <p className="hint">Be the first host tonight.</p>
+          <div className="live-empty-suggest">
+            <p className="live-empty-suggest-title">Suggested debates</p>
+            <p className="hint">Tap a topic to prefill — then Go live.</p>
+            <div className="live-empty-chips">
+              {SUGGESTED_DEBATES.map((topic) => (
+                <button
+                  key={topic}
+                  type="button"
+                  className="live-empty-chip"
+                  onClick={() => startSuggested(topic)}
+                >
+                  {topic}
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
           <ul className="plaza-onair-list live-room-grid">
