@@ -4,7 +4,7 @@ import { api, postsApi, spacesApi, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
-import WelcomePanel from "../components/WelcomePanel";
+import FirstSessionGuide from "../components/FirstSessionGuide";
 import TodaysSquare from "../components/TodaysSquare";
 import FoundingStrip from "../components/FoundingStrip";
 import RaceStrip from "../components/RaceStrip";
@@ -16,6 +16,14 @@ import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboar
 
 const MAX_LEN = 500;
 const PAGE_SIZE = 20;
+
+const STARTER_PROMPTS = [
+  "What's one thing India gets wrong in public debate?",
+  "Drop your hottest take on startups in India.",
+  "Who should every BaratX user follow in your city?",
+  "What should this public square never become?",
+  "In my city, the real problem is ",
+];
 
 function feedItemKey(item) {
   const prefix = item.reposted_by ? "repost-" + item.reposted_by.username + "-" : "post-";
@@ -43,7 +51,14 @@ export default function Feed() {
   const [quotePreview, setQuotePreview] = useState(null);
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState("");
-  const [showWelcome, setShowWelcome] = useState(wantWelcome);
+  const [showFirstSession, setShowFirstSession] = useState(() => {
+    try {
+      return localStorage.getItem("bx_first_post_done") !== "1";
+    } catch {
+      return true;
+    }
+  });
+  const [showStarters, setShowStarters] = useState(false);
   const [liveDebates, setLiveDebates] = useState([]);
   const [civicProblem, setCivicProblem] = useState(false);
   const [foundingRefresh, setFoundingRefresh] = useState(0);
@@ -130,28 +145,22 @@ export default function Feed() {
 
   useEffect(() => {
     if (!token || !user) return;
+    // Topics page remains for Arenas personalize; first-run lives on Square.
     if (hasSeenTopicOnboarding()) return;
-    // One-time nudge only — Arenas tab is where people manage topics after this.
     topicsApi
       .mine(token)
       .then((rows) => {
-        if (!rows || rows.length === 0) {
-          // First empty-interests visit only — OnboardingTopics marks seen on mount.
-          navigate("/onboarding/topics");
-        } else {
-          markTopicOnboardingSeen();
-        }
+        if (rows && rows.length > 0) markTopicOnboardingSeen();
       })
       .catch(() => {
-        // Don't trap users in a loop if topics API fails.
         markTopicOnboardingSeen();
       });
-  }, [token, user, navigate]);
+  }, [token, user]);
 
   useEffect(() => {
     if (wantWelcome) {
       sessionStorage.setItem("bx_welcome", "1");
-      setShowWelcome(true);
+      setShowFirstSession(true);
     }
   }, [wantWelcome]);
 
@@ -196,16 +205,20 @@ export default function Feed() {
 
   useEffect(() => {
     if (!user || !token) return;
-    if (localStorage.getItem("bx_first_post_done") === "1") return;
+    if (localStorage.getItem("bx_first_post_done") === "1") {
+      setShowFirstSession(false);
+      return;
+    }
     let cancelled = false;
     api
       .getUserPosts(user.username, token)
       .then((posts) => {
         if (cancelled) return;
         if (!Array.isArray(posts) || posts.length === 0) {
-          setShowWelcome(true);
+          setShowFirstSession(true);
         } else {
           localStorage.setItem("bx_first_post_done", "1");
+          setShowFirstSession(false);
         }
       })
       .catch(() => {});
@@ -213,6 +226,13 @@ export default function Feed() {
       cancelled = true;
     };
   }, [user, token]);
+
+  async function finishFirstSession() {
+    setShowFirstSession(false);
+    markTopicOnboardingSeen();
+    setFoundingRefresh((n) => n + 1);
+    await loadFeed(tab);
+  }
 
   function handleImageChange(e) {
     const file = e.target.files?.[0];
@@ -252,7 +272,7 @@ export default function Feed() {
       }
       localStorage.setItem("bx_first_post_done", "1");
       sessionStorage.removeItem("bx_welcome");
-      setShowWelcome(false);
+      setShowFirstSession(false);
       setFoundingRefresh((n) => n + 1);
       window.dispatchEvent(new CustomEvent("bx:first-post"));
       api.bootstrapFollows(token).catch(() => {});
@@ -285,168 +305,165 @@ export default function Feed() {
         sub="One question. Your take. Real replies — not a firehose."
       />
 
-      <div className="plaza-stage">
-        <TodaysSquare
-          onAnswer={(question) => {
-            setText(`${question}\n\n`);
-            composeRef.current?.focus?.();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        />
-      </div>
-
-      <form className="plaza-studio compose" onSubmit={handlePost}>
-        <div className="plaza-studio-head">
-          <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
-          <div>
-            <p className="plaza-studio-label">Create Studio</p>
-            <p className="hint">Drop a viewpoint for the square</p>
+      {showFirstSession ? (
+        <FirstSessionGuide token={token} onComplete={finishFirstSession} />
+      ) : (
+        <>
+          <div className="plaza-stage">
+            <TodaysSquare
+              onAnswer={(question) => {
+                setText(`${question}\n\n`);
+                composeRef.current?.focus?.();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
           </div>
-        </div>
-        <div className="compose-body">
-          <MentionTextarea
-            ref={composeRef}
-            placeholder={
-              quotePreview
-                ? "Add a comment and tag people with @…"
-                : showWelcome
-                  ? "Say hello with your city…"
-                  : "What should India hear from you?"
-            }
-            value={text}
-            onChange={setText}
-            maxLength={MAX_LEN}
-            rows={3}
-          />
-          {imagePreview && (
-            <div className="image-preview">
-              <img src={imagePreview} alt="attachment preview" />
-              <button type="button" className="remove-image" onClick={clearImage}>
-                <IconClose />
-              </button>
+
+          <form className="plaza-studio compose" onSubmit={handlePost}>
+            <div className="plaza-studio-head">
+              <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
+              <div>
+                <p className="plaza-studio-label">Create Studio</p>
+                <p className="hint">Drop a viewpoint for the square</p>
+              </div>
             </div>
-          )}
-          {quotePreview && (
-            <div className="quoted-post compose-quote">
-              <div className="quoted-head">
-                Quoting @{quotePreview.author.username}
+            <div className="compose-body">
+              <MentionTextarea
+                ref={composeRef}
+                placeholder={
+                  quotePreview
+                    ? "Add a comment and tag people with @…"
+                    : "What should India hear from you?"
+                }
+                value={text}
+                onChange={setText}
+                maxLength={MAX_LEN}
+                rows={3}
+              />
+              {imagePreview && (
+                <div className="image-preview">
+                  <img src={imagePreview} alt="attachment preview" />
+                  <button type="button" className="remove-image" onClick={clearImage}>
+                    <IconClose />
+                  </button>
+                </div>
+              )}
+              {quotePreview && (
+                <div className="quoted-post compose-quote">
+                  <div className="quoted-head">
+                    Quoting @{quotePreview.author.username}
+                    <button
+                      type="button"
+                      className="remove-image"
+                      onClick={() => {
+                        setSearchParams({});
+                        setQuotePreview(null);
+                      }}
+                    >
+                      <IconClose />
+                    </button>
+                  </div>
+                  <p>{quotePreview.text}</p>
+                </div>
+              )}
+              {postError && <div className="error">{postError}</div>}
+              <div className="compose-studio-tiles" aria-label="Create studio">
+                <button type="button" className="compose-tile" onClick={() => fileInputRef.current?.click()}>
+                  Photo
+                </button>
                 <button
                   type="button"
-                  className="remove-image"
-                  onClick={() => {
-                    setSearchParams({});
-                    setQuotePreview(null);
-                  }}
+                  className={`compose-tile compose-tile-starters${showStarters ? " is-open" : ""}`}
+                  aria-expanded={showStarters}
+                  onClick={() => setShowStarters((v) => !v)}
+                  title="Starter prompts — not AI drafts"
                 >
-                  <IconClose />
+                  Starters
+                </button>
+                <Link to="/spaces" className="compose-tile">
+                  Start debate
+                </Link>
+                <Link to="/communities" className="compose-tile">
+                  Community
+                </Link>
+              </div>
+              {showStarters && (
+                <div className="compose-starters-sheet" role="listbox" aria-label="Starter prompts">
+                  {STARTER_PROMPTS.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      className="compose-starter-chip"
+                      onClick={() => {
+                        setText(prompt);
+                        setShowStarters(false);
+                        composeRef.current?.focus?.();
+                      }}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <label className="compose-civic">
+                <input
+                  type="checkbox"
+                  checked={civicProblem}
+                  onChange={(e) => setCivicProblem(e.target.checked)}
+                />
+                <span>This is a real civic / city problem</span>
+              </label>
+              <div className="compose-footer">
+                <label className="attach-btn" title="Add image">
+                  <IconImage />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    onChange={handleImageChange}
+                    hidden
+                  />
+                </label>
+                {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
+                <button type="submit" className="post-btn" disabled={posting || !text.trim()}>
+                  {posting ? "Posting..." : "Post viewpoint"}
                 </button>
               </div>
-              <p>{quotePreview.text}</p>
             </div>
+          </form>
+
+          <FoundingStrip
+            key={foundingRefresh}
+            onPostProblem={() => {
+              setCivicProblem(true);
+              if (!text.trim()) setText("In my city, the real problem is ");
+              composeRef.current?.focus?.();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+
+          <RaceStrip key={`race-${foundingRefresh}`} />
+
+          {liveDebates.length > 0 && (
+            <section className="plaza-onair" aria-label="Live debates">
+              <div className="plaza-onair-head">
+                <h2>On air now</h2>
+                <Link to="/spaces">Enter Live</Link>
+              </div>
+              <ul className="plaza-onair-list">
+                {liveDebates.slice(0, 4).map((d) => (
+                  <li key={d.id}>
+                    <Link to={`/spaces/${d.id}`} className="plaza-onair-card">
+                      <span className="live-pill">Live</span>
+                      <strong>{d.title}</strong>
+                      <span className="hint">{d.topic_name || d.arena_name || "Debate"}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-          {postError && <div className="error">{postError}</div>}
-          <div className="compose-studio-tiles" aria-label="Create studio">
-            <button type="button" className="compose-tile" onClick={() => fileInputRef.current?.click()}>
-              Media
-            </button>
-            <button
-              type="button"
-              className="compose-tile"
-              onClick={() => {
-                if (!text.includes("?")) setText((t) => `${t.trim()}\n\nA) \nB) `.trimStart());
-                composeRef.current?.focus?.();
-              }}
-            >
-              Poll
-            </button>
-            <Link to="/spaces" className="compose-tile">
-              Live Room
-            </Link>
-            <Link to="/communities" className="compose-tile">
-              Community Drop
-            </Link>
-            <button
-              type="button"
-              className="compose-tile compose-tile-ai"
-              onClick={() => {
-                // Local prompt starter only (no model yet) — cycles India-first hooks.
-                const starters = [
-                  "In my city, the real take is ",
-                  "Hot take: India needs to stop pretending ",
-                  "Nobody talks about this enough — ",
-                  "From the street: the problem isn’t X, it’s ",
-                  "Ask BaratX: should we ",
-                ];
-                const pick = starters[Math.floor(Math.random() * starters.length)];
-                setText((prev) => (prev.trim() ? prev : pick));
-                composeRef.current?.focus?.();
-              }}
-              title="Drops a starter line — full AI drafts can plug in later"
-            >
-              AI Assist
-            </button>
-          </div>
-          <label className="compose-civic">
-            <input
-              type="checkbox"
-              checked={civicProblem}
-              onChange={(e) => setCivicProblem(e.target.checked)}
-            />
-            <span>This is a real civic / city problem</span>
-          </label>
-          <div className="compose-footer">
-            <label className="attach-btn" title="Add image">
-              <IconImage />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/gif,image/webp"
-                onChange={handleImageChange}
-                hidden
-              />
-            </label>
-            {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
-            <button type="submit" className="post-btn" disabled={posting || !text.trim()}>
-              {posting ? "Posting..." : "Post viewpoint"}
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <FoundingStrip
-        key={foundingRefresh}
-        onPostProblem={() => {
-          setCivicProblem(true);
-          if (!text.trim()) setText("In my city, the real problem is ");
-          composeRef.current?.focus?.();
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      />
-
-      <RaceStrip key={`race-${foundingRefresh}`} />
-
-      {liveDebates.length > 0 && (
-        <section className="plaza-onair" aria-label="Live debates">
-          <div className="plaza-onair-head">
-            <h2>On air now</h2>
-            <Link to="/spaces">Enter Live</Link>
-          </div>
-          <ul className="plaza-onair-list">
-            {liveDebates.slice(0, 4).map((d) => (
-              <li key={d.id}>
-                <Link to={`/spaces/${d.id}`} className="plaza-onair-card">
-                  <span className="live-pill">Live</span>
-                  <strong>{d.title}</strong>
-                  <span className="hint">{d.topic_name || d.arena_name || "Debate"}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {showWelcome && (
-        <WelcomePanel token={token} text={text} setText={setText} onPostedFlag composeRef={composeRef} />
+        </>
       )}
 
       <section className="plaza-takes">
