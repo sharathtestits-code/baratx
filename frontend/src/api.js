@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const DEFAULT_TIMEOUT_MS = 15000;
 
 /** Resolve post/avatar/cover media paths (relative, absolute, or data URLs). */

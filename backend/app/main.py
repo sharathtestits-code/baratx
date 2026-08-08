@@ -2,11 +2,12 @@ import os
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Optional
 
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
@@ -2593,3 +2594,26 @@ except Exception:  # noqa: BLE001
     import logging
 
     logging.getLogger("baratx").exception("Instagram scheduler failed to start")
+
+
+# Optional SPA (built into Docker as /app/frontend_dist) — same-origin Square UI on Railway.
+_FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend_dist"
+if _FRONTEND_DIST.is_dir():
+    _assets = _FRONTEND_DIST / "assets"
+    if _assets.is_dir():
+        app.mount("/assets", StaticFiles(directory=str(_assets)), name="frontend_assets")
+
+    @app.get("/")
+    def spa_index():
+        return FileResponse(_FRONTEND_DIST / "index.html")
+
+    @app.get("/{full_path:path}")
+    def spa_fallback(full_path: str):
+        # Let unmatched non-API paths fall through to the React router.
+        candidate = _FRONTEND_DIST / full_path
+        if candidate.is_file():
+            return FileResponse(candidate)
+        index = _FRONTEND_DIST / "index.html"
+        if index.is_file():
+            return FileResponse(index)
+        raise HTTPException(status_code=404, detail="Not found")
