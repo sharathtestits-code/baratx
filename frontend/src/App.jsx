@@ -48,7 +48,8 @@ function AuthChrome({ children }) {
           <Logo variant="full" className="topbar-logo" />
         </Link>
       </header>
-      <main>{children}</main>
+      {/* Legal pages need top-aligned main; short auth forms still center via CSS. */}
+      <main className="page-auth-main">{children}</main>
     </div>
   );
 }
