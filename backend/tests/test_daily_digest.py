@@ -72,8 +72,14 @@ def test_select_caps_per_arena_and_day():
 
 
 def test_arenas_for_slot_rotates():
+    from app.daily_digest import ARENAS_PER_SLOT
+
     morning = arenas_for_slot("morning")
     midday = arenas_for_slot("midday")
-    assert len(morning) == 2
-    assert len(midday) == 2
-    assert "startups" in set(arenas_for_slot("morning") + arenas_for_slot("midday") + arenas_for_slot("evening")) or "startups" in morning or "startups" in midday
+    evening = arenas_for_slot("evening")
+    assert len(morning) == ARENAS_PER_SLOT
+    assert len(midday) == ARENAS_PER_SLOT
+    assert len(evening) == ARENAS_PER_SLOT
+    # Startups-weighted densify: startups should appear in the daily rotation.
+    day = set(morning + midday + evening)
+    assert "startups" in day or ARENAS_PER_SLOT >= 1

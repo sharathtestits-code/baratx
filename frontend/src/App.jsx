@@ -7,6 +7,7 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import Guidelines from "./pages/Guidelines";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
@@ -115,6 +116,7 @@ function AppRoutes() {
       <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
       <Route path="/onboarding/topics" element={<OnboardingTopics />} />
       <Route path="/rewards" element={<Rewards />} />
+      <Route path="/guidelines" element={<Guidelines />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="*" element={<Navigate to="/feed" replace />} />
@@ -166,6 +168,13 @@ export default function App() {
       </AuthChrome>
     );
   }
+  if (location.pathname === "/guidelines") {
+    return (
+      <AuthChrome>
+        <Guidelines />
+      </AuthChrome>
+    );
+  }
 
   if (!token) {
     return (
@@ -201,6 +210,14 @@ export default function App() {
           element={
             <AuthChrome>
               <Terms />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/guidelines"
+          element={
+            <AuthChrome>
+              <Guidelines />
             </AuthChrome>
           }
         />

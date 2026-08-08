@@ -51,6 +51,13 @@ export default function GoogleSignInButton({
         ...(ageOk ? { confirm_age_18: true } : {}),
       });
       login(data.access_token);
+      const next =
+        typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_next") : "";
+      if (next && next.startsWith("/") && !next.startsWith("//")) {
+        sessionStorage.removeItem("bx_next");
+        navigate(next);
+        return;
+      }
       // Returning users and first-timers go Square — first-session guide lives there.
       if (hasSeenTopicOnboarding()) {
         navigate("/feed");

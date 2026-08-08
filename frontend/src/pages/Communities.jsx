@@ -55,7 +55,10 @@ export default function Communities() {
       <div className="feed-header">
         <h1>Communities</h1>
       </div>
-      <p className="hint surface-lead">Topic spaces you can join and post into.</p>
+      <p className="hint surface-lead">
+        Member-run groups — city, craft, or interest. For national sided debate use{" "}
+        <Link to="/arenas">Arenas</Link> instead (Sports, Politics, Startups…).
+      </p>
 
       <form className="surface-create" onSubmit={createCommunity}>
         <input

@@ -2,6 +2,16 @@
 
 export const ARENA_TOPICS = [
   {
+    key: "startups",
+    name: "Startups",
+    blurb: "Funding, founders, and the India builder economy — Fund it or Pass.",
+    accent: "#059669",
+    debateFor: "Fund it",
+    debateAgainst: "Pass",
+    composeHint: "Fund it or Pass — make your case…",
+    openDebateLabel: "Open Fund it vs Pass",
+  },
+  {
     key: "sports",
     name: "Sports",
     blurb: "Cricket, football, and every match India argues about.",
@@ -34,16 +44,6 @@ export const ARENA_TOPICS = [
     debateAgainst: "Skeptical",
     composeHint: "Start a spirituality debate…",
     openDebateLabel: "Open Resonates vs Skeptical",
-  },
-  {
-    key: "startups",
-    name: "Startups",
-    blurb: "Funding, founders, and the India builder economy.",
-    accent: "#059669",
-    debateFor: "Fund it",
-    debateAgainst: "Pass",
-    composeHint: "Fund it or Pass — make your case…",
-    openDebateLabel: "Open Fund it vs Pass",
   },
 ];
 

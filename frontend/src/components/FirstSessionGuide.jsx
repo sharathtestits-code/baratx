@@ -150,6 +150,10 @@ export default function FirstSessionGuide({ token, onComplete }) {
         <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>
           {busy ? "Entering…" : "Post & enter Square"}
         </button>
+        <p className="first-session-founding">
+          Founding ₹150 — open a live debate that gets real engagement. Details in Rewards after you
+          enter.
+        </p>
         <p className="first-session-foot">
           <Link to="/settings" className="first-session-settings">
             Appearance later in Settings

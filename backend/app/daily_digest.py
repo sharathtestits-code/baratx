@@ -49,22 +49,22 @@ SLOT_MARKERS = {
 }
 POST_MARKER = "#BaratXDaily"
 
-# Per peak slot: cover this many arenas (rotated so every arena gets airtime).
-ARENAS_PER_SLOT = 2
+# Per peak slot: one dense arena first (Startups-weighted) — avoid six thin empty rooms.
+ARENAS_PER_SLOT = 1
 # Soft floors for headline selection (tests + collector).
-MIN_POSTS_IF_QUALITY = 3
-MAX_POSTS_PER_DAY = 12  # 3 slots × 2 arenas × 2 voices
+MIN_POSTS_IF_QUALITY = 2
+MAX_POSTS_PER_DAY = 6  # 3 slots × 1 arena × 2 voices
 MAX_POSTS_PER_ARENA = 2
 MAX_POSTS_PER_AUTHOR = 6
 MIN_SCORE_TO_POST = 12.0
 
 ARENA_WEIGHT = {
-    "politics": 2.5,
-    "news": 1.5,
-    "startups": 2.0,
-    "sports": 1.0,
-    "entertainment": 0.5,
-    "spirituality": 1.0,
+    "startups": 3.5,  # densify builders first (audit niche decision)
+    "politics": 1.5,
+    "news": 1.2,
+    "sports": 0.8,
+    "entertainment": 0.4,
+    "spirituality": 0.6,
 }
 
 # Prefer press / wire / named desk queries — then filter by credible publisher.
@@ -342,20 +342,22 @@ def render_brand_card(*, headline: str, arena: str, source: str = "") -> bytes:
 
 def compose_admin_glimpse(*, title: str, arena: str, source: str, slot: str) -> str:
     """Admin morning/peak glimpse — stick to the headline + named source only."""
-    slot_marker = SLOT_MARKERS.get(slot, "#BXMorning")
-    tag = f"#{arena.capitalize()}" if arena else "#India"
-    source_line = f"Source: {source}" if source else "Source: wire / national desk"
-    parts = [
-        f"Daily glimpse · {(arena or 'news').title()}",
-        "",
-        title.strip(),
-        "",
-        source_line,
-        "",
-        "India — what should the square debate here?",
-        f"{tag} {POST_MARKER} {slot_marker}",
+    tag = f"#{(arena or 'news').replace(' ', '')}"
+    slot_marker = SLOT_MARKERS.get(slot, "")
+    clean = (title or "").strip()
+    src = (source or "").strip()
+    lines = [
+        f"Worth arguing · {(arena or 'news').title()}",
+        clean,
     ]
-    return "\n".join(parts).strip()[:500]
+    if src:
+        lines.append(f"via {src}")
+    if (arena or "").lower() == "startups":
+        lines.append("Fund it or Pass?")
+    else:
+        lines.append("Agree or push back?")
+    lines.append(f"{tag} {POST_MARKER} {slot_marker}".strip())
+    return "\n".join(lines)[:500]
 
 
 def compose_sharath_take(*, title: str, arena: str, source: str, slot: str) -> str:

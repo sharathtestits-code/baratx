@@ -7,6 +7,7 @@ import Avatar from "../components/Avatar";
 import FirstSessionGuide from "../components/FirstSessionGuide";
 import FoundingChip from "../components/FoundingChip";
 import EmptyState from "../components/EmptyState";
+import TodaysSquare from "../components/TodaysSquare";
 import MentionTextarea from "../components/MentionTextarea";
 import { IconImage, IconClose, IconLive } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
@@ -313,6 +314,14 @@ export default function Feed() {
         </div>
         <FoundingChip refreshKey={foundingRefresh} />
       </header>
+
+      <TodaysSquare
+        onAnswer={(question) => {
+          setText(`${question}\n\n`);
+          composeRef.current?.focus?.();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
 
       <form className="plaza-studio compose" onSubmit={handlePost}>
         <div className="plaza-studio-head">

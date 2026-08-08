@@ -173,6 +173,33 @@ export default function Settings() {
       </section>
 
       <section className="settings-section">
+        <h2>Badges</h2>
+        <ul className="settings-badge-legend">
+          <li>
+            <strong className="badge-name badge-blue">Blue official</strong> — BaratX staff / platform
+            accounts.
+          </li>
+          <li>
+            <strong className="badge-name badge-gold">Gold BaratX</strong> — BaratX brand voices (topic
+            accounts), not personal verification.
+          </li>
+        </ul>
+        <Link className="btn btn-secondary" to="/guidelines">
+          Community guidelines
+        </Link>
+      </section>
+
+      <section className="settings-section">
+        <h2>Founding ₹150</h2>
+        <p className="hint">
+          First 100 creators who open a live debate with real engagement earn Founding status and ₹150.
+        </p>
+        <Link className="btn btn-secondary" to="/rewards">
+          View rewards
+        </Link>
+      </section>
+
+      <section className="settings-section">
         <h2>Account</h2>
         <button type="button" className="btn btn-secondary" onClick={handleLogout}>
           Log out
