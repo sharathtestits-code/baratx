@@ -8286,6 +8286,16 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   font-family: var(--bx-home-display);
   font-weight: 800;
   letter-spacing: -0.04em;
+  /* Landing nav is always dark — don't inherit theme --text (invisible on light themes). */
+  color: #ffffff;
+}
+
+.bx-home-nav-brand .logo-wordmark-barat {
+  color: #ffffff;
+}
+
+.bx-home-nav-brand .logo-wordmark-x {
+  color: #ff9933;
 }
 
 .bx-home-nav-actions {
