@@ -1,125 +1,125 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
-import { IconPhone } from "../components/Icons";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 /**
- * Public GTM entry — same split brand shell as Login (plain dark + orange BX).
- * 18+ checkbox lives on Signup only (not every visit / login).
+ * Brand landing — explains BaratX before auth.
+ * Hero: brand + tagline + one line + CTAs. Sections: Square · Arenas · Live · join.
  */
 export default function Landing() {
-  const navigate = useNavigate();
-  const [emailOrUser, setEmailOrUser] = useState("");
-
-  function handleNext(e) {
-    e.preventDefault();
-    const q = emailOrUser.trim();
-    if (!q) {
-      navigate("/signup?method=email");
-      return;
-    }
-    if (q.includes("@")) {
-      navigate(`/signup?method=email&email=${encodeURIComponent(q)}`);
-    } else {
-      navigate(`/signup?method=email&username=${encodeURIComponent(q)}`);
-    }
-  }
-
-  function signInPath() {
-    const q = emailOrUser.trim();
-    if (!q) return "/login";
-    if (q.includes("@")) return `/login?email=${encodeURIComponent(q)}`;
-    return `/login?username=${encodeURIComponent(q)}`;
-  }
-
   return (
-    <div className="bx-login-page">
-      <aside className="bx-login-brand">
-        <div className="bx-login-brand-inner">
-          <Logo variant="full" className="bx-login-brand-logo" title="BaratX" />
-          <p className="bx-login-tagline">India&apos;s public square</p>
+    <div className="bx-home">
+      <header className="bx-home-nav">
+        <Link to="/" className="bx-home-nav-brand" aria-label="BaratX home">
+          <Logo variant="full" title="BaratX" />
+        </Link>
+        <div className="bx-home-nav-actions">
+          <Link to="/login" className="bx-home-nav-signin">
+            Sign in
+          </Link>
+          <Link to="/signup" className="btn btn-primary bx-home-nav-join">
+            Join free
+          </Link>
         </div>
-        <div className="bx-login-brand-dots" aria-hidden="true" />
-      </aside>
+      </header>
 
-      <main className="bx-login-main">
-        <div className="bx-login-card">
-          <div className="bx-login-card-head">
-            <span className="bx-login-accent-line brand" aria-hidden="true" />
-            <LogoMark className="bx-login-card-mark" title="" />
-            <span className="bx-login-accent-line green" aria-hidden="true" />
+      <section className="bx-home-hero" aria-labelledby="bx-home-brand">
+        <div className="bx-home-hero-glow" aria-hidden="true" />
+        <div className="bx-home-hero-grain" aria-hidden="true" />
+        <div className="bx-home-hero-inner">
+          <div className="bx-home-hero-brand">
+            <LogoMark className="bx-home-hero-mark" title="" />
+            <h1 id="bx-home-brand" className="bx-home-hero-name">
+              BaratX
+            </h1>
           </div>
-
-          <h1 className="bx-login-title">Join BaratX</h1>
-          <p className="bx-login-sub">Short posts. Real replies. Start with Google.</p>
-
-          <div className="x-auth-stack">
-            {/*
-              Returning Google users sign in freely. New Google accounts send
-              confirm_age_18 so the API can enforce 18+ without a login checkbox.
-            */}
+          <p className="bx-home-hero-tag">India&apos;s public square</p>
+          <p className="bx-home-hero-line">Everyone&apos;s got a take. Few will post it.</p>
+          <p className="bx-home-hero-sub">
+            Short posts. Real conversation. Arenas for the fights that matter.
+          </p>
+          <div className="bx-home-hero-ctas">
+            <Link to="/signup" className="btn btn-primary bx-home-cta-primary">
+              Join free
+            </Link>
+            <Link to="/login" className="btn btn-secondary bx-home-cta-secondary">
+              Sign in
+            </Link>
+          </div>
+          <div className="bx-home-hero-google">
             <GoogleSignInButton label="Continue with Google" confirmAge18 />
-
-            <div className="x-auth-or bx-login-or" role="separator">
-              <span>or continue with email</span>
-            </div>
-
-            <form className="bx-login-form" onSubmit={handleNext}>
-              <label className="bx-field">
-                Email or username
-                <span className="bx-field-control">
-                  <span className="bx-field-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <rect x="3" y="5" width="18" height="14" rx="2" />
-                      <path d="M3 7l9 7 9-7" />
-                    </svg>
-                  </span>
-                  <input
-                    type="text"
-                    value={emailOrUser}
-                    onChange={(e) => setEmailOrUser(e.target.value)}
-                    autoComplete="username"
-                    placeholder="name@email.com"
-                  />
-                </span>
-              </label>
-              <button type="submit" className="bx-login-submit">
-                Continue with email
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
-                  <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </form>
-
-            <button
-              type="button"
-              className="x-btn x-btn-phone bx-landing-phone"
-              onClick={() => navigate("/signup?method=phone")}
-            >
-              <IconPhone className="x-btn-icon" />
-              Continue with phone
-            </button>
-
-            <p className="x-legal bx-login-legal">
-              New accounts must be 18+. By signing up you agree to the{" "}
-              <Link to="/terms">Terms of Service</Link> and{" "}
-              <Link to="/privacy">Privacy Policy</Link>.
-            </p>
-
-            <p className="bx-login-switch">
-              Already have an account? <Link to={signInPath()}>Sign in</Link>
-            </p>
           </div>
+          <p className="bx-home-hero-legal">
+            18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
+            <Link to="/privacy">Privacy</Link>.
+          </p>
         </div>
+      </section>
 
-        <p className="bx-login-trust">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-            <path d="M12 3l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-3z" />
-          </svg>
-          HTTPS · Passwords hashed · We don&apos;t sell your data
+      <section className="bx-home-section" aria-labelledby="bx-home-square">
+        <p className="bx-home-kicker">Square</p>
+        <h2 id="bx-home-square">One feed. Your city. Your take.</h2>
+        <p className="bx-home-copy">
+          Drop short posts, reply hard, and follow voices from Hyderabad to Delhi — not a foreign
+          firehose.
         </p>
-      </main>
+      </section>
+
+      <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-arenas">
+        <p className="bx-home-kicker">Arenas</p>
+        <h2 id="bx-home-arenas">Pick your fight.</h2>
+        <p className="bx-home-copy">
+          Sports · Politics · Entertainment · News · Spirituality · Startups — join an arena and argue
+          like you mean it.
+        </p>
+        <ul className="bx-home-arena-row" aria-label="Arenas">
+          {["Sports", "Politics", "Entertainment", "News", "Spirituality", "Startups"].map((name) => (
+            <li key={name}>{name}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="bx-home-section" aria-labelledby="bx-home-live">
+        <p className="bx-home-kicker">Live</p>
+        <h2 id="bx-home-live">When text isn&apos;t enough — talk.</h2>
+        <p className="bx-home-copy">
+          Open a room, join conversation, mute, video, reactions — up to 15 voices in the amphitheatre.
+        </p>
+      </section>
+
+      <section className="bx-home-closing" aria-labelledby="bx-home-close">
+        <LogoMark className="bx-home-closing-mark" title="" />
+        <h2 id="bx-home-close">Get in. It&apos;s free.</h2>
+        <p className="bx-home-copy">BaratX — India&apos;s public square. Built by Indians. For India.</p>
+        <div className="bx-home-hero-ctas">
+          <Link to="/signup" className="btn btn-primary bx-home-cta-primary">
+            Join free
+          </Link>
+          <a
+            className="btn btn-secondary bx-home-cta-secondary"
+            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp community
+          </a>
+        </div>
+        <p className="bx-home-closing-follow">
+          Follow on X →{" "}
+          <a href="https://x.com/getbaratx" target="_blank" rel="noreferrer">
+            @getbaratx
+          </a>
+        </p>
+      </section>
+
+      <footer className="bx-home-foot">
+        <span>© {new Date().getFullYear()} BaratX</span>
+        <span className="bx-home-foot-links">
+          <Link to="/terms">Terms</Link>
+          <Link to="/privacy">Privacy</Link>
+          <a href="https://barathx.com">barathx.com</a>
+        </span>
+      </footer>
     </div>
   );
 }
