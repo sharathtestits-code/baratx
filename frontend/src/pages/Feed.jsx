@@ -497,7 +497,7 @@ export default function Feed() {
             hint={
               tab === "following"
                 ? "Follow people in Explore, then come back."
-                : "Be the first voice in the square."
+                : "Drop the first take in the square."
             }
             primaryLabel={tab === "following" ? "Explore people" : "Write a take"}
             primaryTo={tab === "following" ? "/search" : undefined}
