@@ -20,14 +20,16 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 if [[ -z "${RAILWAY_API_TOKEN:-}" && -n "${RAILWAY_TOKEN:-}" ]]; then
+  # Account/workspace tokens must use RAILWAY_API_TOKEN. Project tokens use RAILWAY_TOKEN.
+  # Prefer promoting a lone RAILWAY_TOKEN into API token for provision (needs create rights).
   export RAILWAY_API_TOKEN="$RAILWAY_TOKEN"
 fi
 if [[ -z "${RAILWAY_API_TOKEN:-}" ]]; then
   echo "Missing RAILWAY_API_TOKEN. Create one at https://railway.com/account/tokens" >&2
   exit 1
 fi
-# CLI accepts either; prefer account token via RAILWAY_API_TOKEN
-export RAILWAY_TOKEN="${RAILWAY_TOKEN:-$RAILWAY_API_TOKEN}"
+# Do NOT set RAILWAY_TOKEN to the account token — CLI treats RAILWAY_TOKEN as a project token.
+unset RAILWAY_TOKEN
 
 if ! command -v railway >/dev/null 2>&1; then
   curl -fsSL https://railway.com/install.sh | sh
@@ -175,13 +177,18 @@ RAIL_DOMAIN="$(echo "$DOMAINS" | jq -r '
   if type=="array" then
     (map(select(.domain != null)) | .[0].domain // .[0].serviceDomains[0].domain // empty)
   elif type=="object" then
-    (.serviceDomains[0].domain // .domains[0].domain // empty)
+    (.domains[]? | select(.type=="service") | .domain) // (.serviceDomains[0].domain // .domains[0].domain // empty)
   else empty end
-')"
+' | head -n1)"
+# Strip accidental scheme from CLI JSON
+RAIL_DOMAIN="${RAIL_DOMAIN#https://}"
+RAIL_DOMAIN="${RAIL_DOMAIN#http://}"
 if [[ -z "$RAIL_DOMAIN" || "$RAIL_DOMAIN" == "null" ]]; then
   DOM_OUT="$(railway domain --service "$SERVICE_NAME" --json 2>/dev/null || railway domain --service "$SERVICE_NAME")"
   echo "$DOM_OUT"
   RAIL_DOMAIN="$(echo "$DOM_OUT" | jq -r '.domain // .serviceDomain.domain // empty' 2>/dev/null || true)"
+  RAIL_DOMAIN="${RAIL_DOMAIN#https://}"
+  RAIL_DOMAIN="${RAIL_DOMAIN#http://}"
 fi
 # Fallback guess used in docs
 if [[ -z "$RAIL_DOMAIN" || "$RAIL_DOMAIN" == "null" ]]; then
