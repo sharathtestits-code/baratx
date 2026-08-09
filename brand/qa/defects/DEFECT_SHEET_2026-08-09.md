@@ -36,6 +36,38 @@
 
 ---
 
+## Retest — 2026-08-09 (live QA)
+
+**Verdict: NOT CLEAR — fixes not on live QA yet.**
+
+| Gate | Status |
+|------|--------|
+| PR #21 merged to `main` | **No** (`670cff5` not ancestor of `origin/main`) |
+| Railway `baratx-qa` redeploy with fix | **No** (API still mails `baratx-production-f8ce.up.railway.app`) |
+| Cloudflare `qa.barathx.com` rebuild with fix + `VITE_PUBLIC_URL` | **No** (live bundle still `useState(Uu[0])`; OG still `barathx.com`) |
+
+| ID | Live QA (`qa.barathx.com` / `baratx-qa`) | Evidence |
+|----|------------------------------------------|----------|
+| **DEF-001** | **FAIL** | Signup/`forgot-password` `dev_*_url` → `https://baratx-production-f8ce.up.railway.app/...` |
+| **DEF-002** | **FAIL** | Resend verify same bad host |
+| **DEF-003** | **FAIL** | `og:url` / `og:image` still `https://barathx.com/...` |
+| **DEF-004** | **FAIL** | Live JS still `useState(Uu[0])` (prompt prefilled) |
+| **DEF-005** | **FAIL** *(code not live)* | Live JS lacks `(unverified)` admin label |
+| **DEF-006** | **FAIL** | Delete-all → new post still got **4** official replies (2 welcome) for `@qaretest1786308208` |
+| **DEF-007** | **FAIL** | Live JS still contains “Badge grant/demote is only available…” |
+
+**Branch preview static check** (`https://c824aa30.baratx.pages.dev`, commit `670cff5`): DEF-004 empty `useState("")` + `placeholder:Uu[0]` **present**; DEF-007 ops hint **removed**; DEF-005 `(unverified)` **present**. Preview still points API at **production** (`baratx-production.up.railway.app`) and OG still prod (no `VITE_PUBLIC_URL` on that Pages build) — interactive preview signup **CORS-blocked**.
+
+### Unblock checklist (then re-run this section)
+
+1. Merge PR #21 → `main` (or deploy this branch to Railway QA).  
+2. Railway QA vars: `FRONTEND_URL=https://qa.barathx.com`, prefer `ENVIRONMENT=qa`. Redeploy API.  
+3. Cloudflare Pages QA: set `VITE_PUBLIC_URL=https://qa.barathx.com`, rebuild `qa.barathx.com`.  
+4. Re-hit: forgot-password host, OG source, first-take `0/500`, admin email row, delete-all welcome, `/u/baratx` as member.
+
+---
+
+
 ## Failed scenarios
 
 | Case ID | Scenario | Result | Linked defect |
