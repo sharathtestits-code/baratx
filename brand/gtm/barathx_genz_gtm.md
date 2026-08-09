@@ -16,7 +16,7 @@ This is the actionable pack. Read in this order:
 
 1. **No live-audio claims** — Spaces are live **text** rooms.  
 2. **No ₹150 Founding promise** until you can pay + track payouts. Use First 50 + shoutout + WhatsApp.  
-3. **WhatsApp / Telegram are not “already live”** until *you* create them today.  
+3. **WhatsApp Channel is LIVE:** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o — Telegram still optional.  
 4. **Topics = 30 × 6 Arenas** (not “48 tags”). Startups has denser taxonomy.  
 5. **Seed Entertainment first** (live open debates). Sports/Startups topics currently show ~0 open debates — open rooms there *before* pushing those Arenas in Reels.  
 6. **Activation = first post with a side** (not signup alone).  

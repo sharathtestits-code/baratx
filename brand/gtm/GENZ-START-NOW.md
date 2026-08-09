@@ -13,20 +13,28 @@ Do these **in order**. Do not skip Gate #1. Do not run paid ads this week.
 | IG `@getbaratx` | Account live; **Graph API token currently blocked** — post manually or refresh token |
 | Entertainment Arena | Has open debates — **seed here first** |
 | Sports / Startups topics | ~0 open debates — **you must open debates before pushing** |
-| WhatsApp Community | Create today (not assumed live) |
-| Telegram | Create today |
+| WhatsApp Channel | **LIVE** → https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o |
+| Telegram | Create today if missing |
 | X | Paste tweets manually (no API yet) |
 
 ---
 
 ## A. Next 2–3 hours (today)
 
-### 1) Create retention channels (20–30 min)
-- [ ] WhatsApp → New community → name **`BaratX Scouts`**
-- [ ] Invite 10–20 friends who will actually post (not lurk)
-- [ ] Telegram → New channel → **`BaratX Daily`**
-- [ ] Bio: `Today’s question. Pick a side. → https://barathx.com`
-- [ ] Pin in both: `https://barathx.com` + “First action = leave one take”
+### 1) Retention channels (10 min)
+- [x] **WhatsApp Channel LIVE:** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o  
+  - Share this link everywhere (IG bio, Campus Voice onboarding, friend DMs)  
+  - Post today’s question + Arena link in the channel now  
+- [ ] Telegram → New channel → **`BaratX Daily`** (if you still want a second distribution surface)  
+- [ ] Bio/description on WhatsApp: `Today’s question. Pick a side. → https://barathx.com`  
+- [ ] First channel post template:
+```
+Today’s fight is live.
+Pick a side → https://barathx.com/arenas/entertainment
+
+Rule: reply > like.
+First action after signup = leave one take.
+```
 
 ### 2) Open 3 Sports debates (10 min) — so Sports isn’t empty
 On https://barathx.com/arenas/sports open debates like:
@@ -107,7 +115,8 @@ Looking for 1 Founding Campus Voice at [COLLEGE].
 • 1 campus debate/week (Entertainment or Sports)
 • Share to your Story
 
-You get: Founding Campus Voice shoutout + First 50 list + scout WhatsApp.
+You get: Founding Campus Voice shoutout + First 50 list + WhatsApp channel
+https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 
 Interested? I’ll send the 3-line brief.
 ```
@@ -117,7 +126,7 @@ Interested? I’ll send the 3-line brief.
 BaratX Campus Voice — week 1
 1. Sign up: https://barathx.com
 2. Follow @getbaratx
-3. Join WhatsApp: [YOUR COMMUNITY LINK]
+3. Join WhatsApp: https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 4. Today: reply here → https://barathx.com/arenas/entertainment
 5. This week: open 1 campus topic in Entertainment or Sports
 
@@ -193,8 +202,8 @@ Search: `Campus Ambassador` + college name → message students who already run 
 
 ## F. Day 7 success checklist
 
-- [ ] WhatsApp Community ≥15 people  
-- [ ] Telegram channel live  
+- [ ] WhatsApp Channel shared + ≥15 follows/joins  
+- [ ] Telegram channel live (optional if WhatsApp is primary)  
 - [ ] ≥3 debates with ≥5 real replies each (Entertainment)  
 - [ ] ≥3 Sports debates opened + some replies  
 - [ ] ≥3 Reels from real product moments  

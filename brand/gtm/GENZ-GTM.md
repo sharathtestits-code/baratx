@@ -12,7 +12,7 @@ Source plan reviewed and corrected against the live product.
 | “Live-audio debate rooms” | **Spaces = live text rooms**, not audio | Market “live text fights / sided debates,” never claim Clubhouse audio |
 | “Founding ₹150 creator incentive” | **Not in product.** Current offer = First 50 (public list + IG shoutout + WhatsApp group) | Keep non-cash First 50 for now; add campus stipend only if you can actually pay |
 | “No Reels required” as product stance | Landing is “Pick a fight. Not a feed.” — no Reels *inside* BaratX | Keep product text-first; use Reels/Shorts **only for acquisition** (already our IG approach) |
-| “WhatsApp community already live” | Offered in GTM copy; may not be set up as a real community | Create WhatsApp Community **today** before promising it |
+| “WhatsApp community already live” | **Channel is LIVE** | Use https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o everywhere |
 | “48 trending tags” | **30 topics × 6 Arenas** | Use “30 topics per Arena” |
 | Primary wedge Startups-first | Fine for builders; Gen Z reach needs Entertainment/Sports first | **70% Campus & Culture / 30% Hustle** for 60 days |
 
@@ -68,7 +68,7 @@ If gate #1 fails → seed with 10–15 friends first. Do not push Reels into emp
 | Instagram Reels `@getbaratx` | Primary acquisition | Already posting — keep signup-first + debate clips |
 | YouTube Shorts | Same clips, longer shelf | Create channel this week if missing |
 | Telegram | Daily question → deep link to Arena | Create channel Day 1 |
-| WhatsApp Community | Retention nudge | Create Day 1; invite First 50 / friends |
+| WhatsApp Channel | Retention nudge | **LIVE** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o — post daily question + Arena link |
 | X | Wedge B (builders) | Paste daily tweets (API later) |
 | Campus ambassadors | Seeding | Start outreach Day 1 (Section 8) |
 | Micro meme pages (5k–50k) | Amplify later | Days 46+ only |
