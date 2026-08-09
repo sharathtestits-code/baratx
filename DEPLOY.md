@@ -53,7 +53,7 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
 ### See who registered / post & comment as BarathX
 
 **Production:** https://barathx.com/admin  
-**QA:** https://qa.barathx.com/admin (separate Railway QA service + secrets)
+**QA:** https://qa.barathx.com/admin (separate Railway QA service + secrets — provision via `brand/qa/PROVISION.md`)
 
 1. Set `ADMIN_SECRET` on the Railway API service (long random string).
 2. Redeploy the API if needed.

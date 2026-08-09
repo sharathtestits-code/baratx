@@ -2,10 +2,12 @@
 
 Keep these separate. Automation agents and Playwright must use **QA**, never Production, unless ops explicitly request a prod smoke.
 
+**Status (2026-08-09):** Production is live. QA hosts are **not provisioned yet** (`baratx-qa` Railway → Application not found; `qa.barathx.com` currently redirects to a link page). Bring QA up with **`brand/qa/PROVISION.md`** or `./scripts/provision-qa.sh`.
+
 | | **QA (staging)** | **Production (prod)** |
 |---|---|---|
 | **Web app** | `https://qa.barathx.com` | `https://barathx.com` |
-| **API** | `https://baratx-qa.up.railway.app` | `https://baratx-production.up.railway.app` |
+| **API** | `https://baratx-qa.up.railway.app` (same-origin SPA+API once live) | `https://baratx-production.up.railway.app` |
 | **API docs** | `https://baratx-qa.up.railway.app/docs` | `https://baratx-production.up.railway.app/docs` |
 | **Admin** | `https://qa.barathx.com/admin` | `https://barathx.com/admin` |
 | **DB** | Separate Railway Postgres (QA) | Production Postgres |
@@ -44,5 +46,5 @@ QA_ADMIN_SECRET=
 
 1. Feature matrix + Playwright default to **QA_*** URLs.  
 2. Never run destructive admin actions (delete user, force IG) on **prod**.  
-3. When QA service is not provisioned yet, create Railway service `baratx-qa` + Pages `baratx-qa` + DNS `qa.barathx.com` CNAME before enabling CI.  
+3. When QA service is not provisioned yet, follow `brand/qa/PROVISION.md` (script `scripts/provision-qa.sh` or Railway dashboard + Cloudflare DNS) before enabling CI.  
 4. Prod remains the live user-facing stack in `DEPLOY.md`.
