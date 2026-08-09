@@ -6,4 +6,4 @@ DEF-004,P2,Onboarding UX,First-take prompt is real text,CLOSED
 DEF-005,P2,Admin Users,Email shows as em-dash,CLOSED
 DEF-006,P2,Engagement,Delete-all re-triggers welcome,CLOSED
 DEF-007,P3,Profile / Ops leakage,Blue-only ops copy on profiles,CLOSED
-DEF-008,P0,Routing / same-origin,Hard nav refresh hits API not SPA,Fixed pending deploy
+DEF-008,P0,Routing / same-origin,Hard nav refresh hits API not SPA,CLOSED

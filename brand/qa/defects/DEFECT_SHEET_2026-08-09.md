@@ -20,7 +20,7 @@ SKIP = Google/Phone OTP, image upload, coach marks, Live Talk deep, IG/ops, Capa
 
 | Severity | Open |
 |----------|-----:|
-| P0 | 1 (DEF-008) |
+| P0 | 0 |
 | P1–P3 | 0 new |
 
 ---
@@ -30,7 +30,7 @@ SKIP = Google/Phone OTP, image upload, coach marks, Live Talk deep, IG/ops, Capa
 | ID | Sev | Status | Notes |
 |----|-----|--------|-------|
 | **DEF-001…007** | — | **CLOSED** | Live QA retest clear after merge/deploy |
-| **DEF-008** | **P0** | **Fixed (pending deploy)** | Same-origin SPA: browser document navigations get `index.html`; `fetch` keeps API JSON. Helpers in `app/spa_serve.py`. |
+| **DEF-008** | **P0** | **CLOSED** | Live QA: document nav → HTML; `fetch` → JSON. Verified 2026-08-09 after PR #49. |
 
 ---
 
