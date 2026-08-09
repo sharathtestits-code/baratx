@@ -265,11 +265,8 @@ def _official_pair(db: Session) -> tuple[Optional[models.User], Optional[models.
 
 
 def _author_is_official(user: Optional[models.User]) -> bool:
+    """Seeded platform accounts only — blue/gold members still get engagement."""
     if not user:
-        return True
-    if getattr(user, "is_official", False):
-        return True
-    if (user.badge or "") == "blue":
         return True
     return (user.username or "").lower() in {
         ADMIN_USERNAME,
@@ -427,7 +424,6 @@ def backfill_missing_replies(db: Session, *, create_notification, limit: int = B
                 (ADMIN_USERNAME, SHARATH_USERNAME, "bharatvoices", "indiatech")
             )
         )
-        .filter(models.User.is_official.is_(False))
         .order_by(models.Post.created_at.desc())
         .limit(limit * 3)
         .all()

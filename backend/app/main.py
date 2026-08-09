@@ -1006,7 +1006,6 @@ def admin_backfill_post_notifications(
         .filter(models.Post.created_at >= since)
         .filter(models.Post.community_id.is_(None), models.Post.space_id.is_(None))
         .filter(~models.User.username.in_(official_names))
-        .filter(models.User.is_official.is_(False))
         .order_by(models.Post.created_at.desc())
         .limit(200)
         .all()
@@ -1797,9 +1796,8 @@ async def create_post(
         logging.getLogger("baratx").exception("Official engage on create_post failed")
 
     # Alert @baratx + @sharath when a community member posts (so Alerts isn't empty for ops).
-    if not getattr(current_user, "is_official", False) and current_user.username not in set(
-        seed.OFFICIAL_USERNAMES
-    ):
+    # Only skip seeded platform accounts — blue/gold badge members still notify.
+    if current_user.username not in set(seed.OFFICIAL_USERNAMES):
         officials = (
             db.query(models.User)
             .filter(models.User.username.in_(("baratx", "sharath")))
@@ -1889,16 +1887,14 @@ def list_posts(
         )
 
     if feed == "global":
-        # Square "For you": community takes first (even if you’re not following them),
-        # then official digest — so real posts aren’t missing under peak RSS.
+        # Square "For you": real member takes first (including blue/gold badges),
+        # then seeded official digest accounts — follow not required.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
-            is_off = False
-            if author is not None:
-                uname = (getattr(author, "username", None) or "").lower()
-                is_off = bool(getattr(author, "is_official", False)) or uname in official_names
+            uname = (getattr(author, "username", None) or "").lower() if author else ""
+            is_seed_official = uname in official_names
             ts = i.item_time.timestamp() if i.item_time else 0.0
-            return (1 if is_off else 0, -ts)
+            return (1 if is_seed_official else 0, -ts)
 
         items.sort(key=_sort_key)
     else:
