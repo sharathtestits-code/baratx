@@ -3,12 +3,21 @@
 India-first public square (English now; more languages later). Backend is
 FastAPI + SQLite (local), frontend is React (Vite).
 
-**Brand:** BarathX · **Domain:** https://barathx.com
+**Brand:** BarathX · **Domain:** https://barathx.com  
+**License:** [MIT](./LICENSE) — this repository is **open source** on GitHub.
 
 **Canonical local path:** `~/Projects/barathx` (do not run from Google Drive).
 
-Public hosting checklist: see [DEPLOY.md](./DEPLOY.md).
-Android / App Store (Capacitor): see [MOBILE.md](./MOBILE.md).
+Public hosting checklist: see [DEPLOY.md](./DEPLOY.md).  
+Android / App Store (Capacitor): see [MOBILE.md](./MOBILE.md).  
+Security reports: see [SECURITY.md](./SECURITY.md).
+
+### Open source
+
+- Source of truth: https://github.com/sharathtestits-code/baratx  
+- You may use, modify, and redistribute under the MIT License.  
+- Production credentials stay in Railway / Cloudflare / local `.env` — not in git.  
+- Clone, follow **Run it** below, copy `backend/.env.example` → `backend/.env`.
 
 ## Structure
 
