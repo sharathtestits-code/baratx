@@ -13,10 +13,20 @@ Keep these separate. Automation agents and Playwright must use **QA**, never Pro
 
 ### Cloudflare Pages (frontend)
 
-| Env | Project / branch | `VITE_API_BASE` |
-|-----|------------------|-----------------|
-| QA | Pages project `baratx-qa` · branch `main` or `qa` | `https://baratx-qa.up.railway.app` |
-| Prod | Pages project `baratx` · production | `https://baratx-production.up.railway.app` |
+| Env | Project / branch | `VITE_API_BASE` | `VITE_PUBLIC_URL` (OG tags) |
+|-----|------------------|-----------------|------------------------------|
+| QA | Pages project `baratx-qa` · branch `main` or `qa` | `https://baratx-qa.up.railway.app` (or empty if same-origin proxy) | `https://qa.barathx.com` |
+| Prod | Pages project `baratx` · production | `https://baratx-production.up.railway.app` | `https://barathx.com` |
+
+### Railway API env (critical for email links)
+
+| Var | QA | Production |
+|-----|----|------------|
+| `ENVIRONMENT` | `qa` | `production` |
+| `FRONTEND_URL` | `https://qa.barathx.com` | `https://barathx.com` |
+| `CORS_ORIGINS` | include `https://qa.barathx.com` | include `https://barathx.com` |
+
+Never set `FRONTEND_URL` to a `*.up.railway.app` host — verify/reset emails must use the public web domain. The API hardens common misconfigs, but ops should still set the vars correctly.
 
 Optional interim QA frontend if DNS not ready: `https://baratx-qa.pages.dev`.
 

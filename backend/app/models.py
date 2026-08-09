@@ -48,6 +48,8 @@ class User(Base):
     # none | gold | blue — blue = official verified; gold can be promoted to blue by blue accounts
     badge = Column(String, default="none", nullable=False, index=True)
     is_official = Column(Boolean, default=False, nullable=False, index=True)
+    # Lifetime flag: official first-post welcome fires once even if all posts are deleted.
+    has_posted_once = Column(Boolean, default=False, nullable=False)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 

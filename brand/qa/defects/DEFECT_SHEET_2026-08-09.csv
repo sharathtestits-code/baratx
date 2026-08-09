@@ -1,0 +1,8 @@
+ID,Severity,Area,Title,Status
+DEF-001,P0,Config / Auth email,QA FRONTEND_URL points at production Railway app,Code harden + ops (set FRONTEND_URL=https://qa.barathx.com)
+DEF-002,P1,Auth / First-time UX,New members stuck unverified; verify banner always on,Follows DEF-001 after QA redeploy
+DEF-003,P2,SEO / QA branding,QA HTML OG tags advertise production,Fixed (VITE_PUBLIC_URL in Vite build)
+DEF-004,P2,Onboarding UX,First-take prompt is real text not placeholder,Fixed
+DEF-005,P2,Admin Users,Email shows as em-dash for members who have emails,Fixed
+DEF-006,P2,Engagement,Deleting all posts re-triggers first-post welcome,Fixed (has_posted_once)
+DEF-007,P3,Profile / Ops leakage,Blue-only ops copy visible to normal members,Fixed

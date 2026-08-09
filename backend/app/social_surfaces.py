@@ -433,6 +433,8 @@ def register_social_surfaces(
             text=payload.text,
             community_id=c.id,
         )
+        if not bool(getattr(current_user, "has_posted_once", False)):
+            current_user.has_posted_once = True
         db.add(post)
         db.flush()
         attach_hashtags(db, post, payload.text)
@@ -931,6 +933,8 @@ def register_social_surfaces(
             space_id=s.id,
             debate_side=debate_side,
         )
+        if not bool(getattr(current_user, "has_posted_once", False)):
+            current_user.has_posted_once = True
         db.add(post)
         db.flush()
         attach_hashtags(db, post, payload.text)

@@ -32,13 +32,72 @@ from typing import Optional
 
 logger = logging.getLogger("baratx.email")
 
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173").rstrip("/")
-# Never email localhost verify links from production (common misconfig).
-if ENVIRONMENT == "production" and (
-    "localhost" in FRONTEND_URL or "127.0.0.1" in FRONTEND_URL or not FRONTEND_URL
-):
-    FRONTEND_URL = "https://barathx.com"
+ENVIRONMENT = (os.environ.get("ENVIRONMENT", "development") or "development").strip().lower()
+_RAW_FRONTEND_URL = (os.environ.get("FRONTEND_URL") or "").strip().rstrip("/")
+FRONTEND_URL = _RAW_FRONTEND_URL or "http://localhost:5173"
+
+_PROD_WEB = "https://barathx.com"
+_QA_WEB = "https://qa.barathx.com"
+
+
+def _is_localhost(url: str) -> bool:
+    u = (url or "").lower()
+    return (not u) or ("localhost" in u) or ("127.0.0.1" in u)
+
+
+def _is_railway_host(url: str) -> bool:
+    return ".up.railway.app" in (url or "").lower()
+
+
+def _is_prod_web(url: str) -> bool:
+    u = (url or "").lower().rstrip("/")
+    return u in ("https://barathx.com", "http://barathx.com") or "baratx-production" in u
+
+
+def _looks_like_qa_runtime() -> bool:
+    """QA Railway services are often cloned from prod with ENVIRONMENT=production."""
+    if ENVIRONMENT in ("qa", "staging", "stage"):
+        return True
+    for key in (
+        "RAILWAY_ENVIRONMENT",
+        "RAILWAY_SERVICE_NAME",
+        "RAILWAY_PROJECT_NAME",
+        "RAILWAY_ENVIRONMENT_NAME",
+    ):
+        val = (os.environ.get(key) or "").strip().lower()
+        if "qa" in val or "staging" in val or "stage" in val:
+            return True
+    cors = (os.environ.get("CORS_ORIGINS") or "").lower()
+    if "qa.barathx.com" in cors:
+        return True
+    raw = (_RAW_FRONTEND_URL or "").lower()
+    if "qa.barathx.com" in raw or "baratx-qa" in raw:
+        return True
+    return False
+
+
+def _resolve_frontend_url(env: str, url: str) -> str:
+    """Canonical public web host for email links.
+
+    Ops should set FRONTEND_URL correctly. Harden common misconfigs:
+    - never mail localhost from deployed envs
+    - never mail Railway *.up.railway.app app hosts (use public web)
+    - QA must not mail production barathx.com / production Railway hosts
+    """
+    qa = _looks_like_qa_runtime()
+    if qa:
+        if _is_localhost(url) or _is_prod_web(url) or _is_railway_host(url):
+            return _QA_WEB
+        return url
+    if env in ("production", "prod"):
+        if _is_localhost(url) or _is_railway_host(url):
+            return _PROD_WEB
+        return url
+    # development / other: keep as-is (incl. localhost)
+    return url or "http://localhost:5173"
+
+
+FRONTEND_URL = _resolve_frontend_url(ENVIRONMENT, FRONTEND_URL)
 EMAIL_FROM = os.environ.get("EMAIL_FROM", "BarathX <hello@barathx.com>")
 
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
