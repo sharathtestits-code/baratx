@@ -5,7 +5,7 @@
 | **QA app + API** | https://qa.barathx.com |
 | Health | https://qa.barathx.com/health → `{"status":"ok"}` |
 | Admin | https://qa.barathx.com/admin |
-| Railway fallback | https://baratx-production-f8ce.up.railway.app |
+| Railway fallback | https://baratx-qa.up.railway.app |
 | Railway project | `baratx-qa` |
 
 `ADMIN_SECRET` / official password: Railway → project **baratx-qa** → service **baratx** → **Variables**.
