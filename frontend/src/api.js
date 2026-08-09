@@ -490,6 +490,16 @@ export const searchApi = {
     request(`/search?q=${encodeURIComponent(q)}`, { headers: authHeaders(token) }),
 };
 
+export const suggestionsApi = {
+  list: (token, { surface = "square", arena, limit = 20 } = {}) => {
+    const params = new URLSearchParams({ surface, limit: String(limit) });
+    if (arena) params.set("arena", arena);
+    return request(`/suggestions?${params}`, {
+      headers: token ? authHeaders(token) : {},
+    });
+  },
+};
+
 export const notificationsApi = {
   list: (token) => request("/notifications", { headers: authHeaders(token) }),
   unreadCount: (token) =>

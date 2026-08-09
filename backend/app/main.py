@@ -742,6 +742,22 @@ def admin_stats(_: bool = Depends(require_admin), db: Session = Depends(get_db))
     )
 
 
+@app.get("/suggestions")
+def get_suggestions(
+    surface: str = "square",
+    arena: Optional[str] = None,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """Top 15–20 debate questions/problems for Square or an Arena tab."""
+    from app import suggestions as suggestions_mod
+
+    return suggestions_mod.list_suggestions(
+        db, surface=surface, arena_key=arena, limit=limit
+    )
+
+
 @app.get("/admin/users", response_model=schemas.AdminUsersOut)
 def admin_users(
     limit: int = 50,

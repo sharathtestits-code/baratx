@@ -5,8 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import FirstSessionGuide from "../components/FirstSessionGuide";
-import NavTour, { shouldShowNavTour } from "../components/NavTour";
+import CoachMarks, { shouldShowNavTour } from "../components/CoachMarks";
 import FoundingChip from "../components/FoundingChip";
+import SuggestionsStrip from "../components/SuggestionsStrip";
 import EmptyState from "../components/EmptyState";
 import TodaysSquare from "../components/TodaysSquare";
 import MentionTextarea from "../components/MentionTextarea";
@@ -181,8 +182,8 @@ export default function Feed() {
   }, [loading, token, user, navigate]);
 
   useEffect(() => {
-    if (user && !showFirstSession && !showNavTour) loadFeed(tab);
-  }, [user, tab, loadFeed, showFirstSession, showNavTour]);
+    if (user && !showFirstSession) loadFeed(tab);
+  }, [user, tab, loadFeed, showFirstSession]);
 
   useEffect(() => {
     let cancelled = false;
@@ -319,16 +320,9 @@ export default function Feed() {
     );
   }
 
-  if (showNavTour) {
-    return (
-      <div className="plaza-page plaza-square plaza-square-first">
-        <NavTour onDone={() => setShowNavTour(false)} />
-      </div>
-    );
-  }
-
   return (
     <div className="plaza-page plaza-square">
+      {showNavTour ? <CoachMarks onDone={() => setShowNavTour(false)} /> : null}
       <header className="square-home-head">
         <div className="square-home-head-main">
           <p className="square-home-kicker">India&apos;s public square</p>
@@ -346,7 +340,19 @@ export default function Feed() {
         }}
       />
 
-      <form className="plaza-studio compose" onSubmit={handlePost}>
+      <SuggestionsStrip
+        token={token}
+        surface="square"
+        title="Top questions in the Square"
+        onPick={(prompt) => {
+          setText(prompt.slice(0, MAX_LEN));
+          setShowStarters(false);
+          composeRef.current?.focus?.();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
+      <form className="plaza-studio compose" onSubmit={handlePost} data-coach="compose">
         <div className="plaza-studio-head">
           <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
           <div>

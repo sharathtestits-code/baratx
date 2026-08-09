@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { arenaMeta } from "../arenas";
 import PostCard from "../components/PostCard";
 import MentionTextarea from "../components/MentionTextarea";
+import SuggestionsStrip from "../components/SuggestionsStrip";
 
 export default function ArenaDetail() {
   const { arenaKey } = useParams();
@@ -220,6 +221,17 @@ export default function ArenaDetail() {
 
       {error && <div className="error">{error}</div>}
       {msg && <p className="hint ok-hint">{msg}</p>}
+
+      <SuggestionsStrip
+        token={token}
+        surface="arena"
+        arenaKey={arenaKey}
+        title={`Top problems · ${arena.name}`}
+        onPick={(prompt) => {
+          setText(prompt.slice(0, 500));
+          setDebateTitle(prompt.slice(0, 120));
+        }}
+      />
 
       <section className="arena-section" id="arena-trending-topics">
         <h2 className="section-title">Trending topics</h2>

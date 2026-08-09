@@ -9405,3 +9405,203 @@ html:has(.bx-home) {
   color: var(--text, #0f1419);
   text-decoration: underline;
 }
+
+/* ---- Coach marks (X/FB-style spotlight tips) ---- */
+.coach-root {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+
+.coach-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 20, 25, 0.55);
+  pointer-events: auto;
+}
+
+.coach-hole {
+  position: absolute;
+  border-radius: 14px;
+  box-shadow: 0 0 0 9999px rgba(15, 20, 25, 0.55);
+  background: transparent;
+  outline: 2px solid #ff671f;
+  outline-offset: 2px;
+  pointer-events: none;
+}
+
+.coach-dim:has(.coach-hole) {
+  background: transparent;
+}
+
+.coach-tip {
+  position: fixed;
+  z-index: 81;
+  pointer-events: auto;
+  padding: 0.95rem 1rem 1.05rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #e4d9ce;
+  box-shadow: 0 12px 40px rgba(15, 20, 25, 0.22);
+  color: #0f1419;
+}
+
+.coach-tip-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.coach-tip-progress {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8b98a5;
+}
+
+.coach-tip-close {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #8b98a5;
+  padding: 0.15rem 0.35rem;
+}
+
+.coach-tip-close:hover {
+  color: #0f1419;
+}
+
+.coach-tip-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.coach-tip-body {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #536471;
+}
+
+.coach-tip-dots {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.coach-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #d9cfc4;
+}
+
+.coach-dot.is-on {
+  background: #ff671f;
+  width: 1rem;
+}
+
+.coach-tip-next {
+  width: 100%;
+}
+
+.coach-target-live {
+  position: relative;
+  z-index: 82;
+}
+
+/* ---- Suggestions strip ---- */
+.suggestions-strip {
+  margin: 0 0 1rem;
+  padding: 0.95rem 1rem 1.05rem;
+  border: 1px solid var(--border, #e4d9ce);
+  border-radius: 16px;
+  background: var(--surface, #fff);
+}
+
+.suggestions-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.suggestions-title {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.suggestions-sub {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted, #536471);
+}
+
+.suggestions-hide,
+.suggestions-reopen {
+  border: none;
+  background: transparent;
+  color: var(--muted, #536471);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  white-space: nowrap;
+}
+
+.suggestions-hide:hover,
+.suggestions-reopen:hover {
+  color: var(--brand, #ff671f);
+  text-decoration: underline;
+}
+
+.suggestions-reopen {
+  display: block;
+  margin: 0 0 0.85rem;
+}
+
+.suggestions-status {
+  margin: 0 0 0.85rem;
+}
+
+.suggestions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.suggestions-chip {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #e4d9ce;
+  background: #faf7f3;
+  color: #0f1419;
+  border-radius: 12px;
+  padding: 0.65rem 0.8rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.suggestions-chip:hover {
+  border-color: #ff671f;
+  background: #fff1e6;
+}

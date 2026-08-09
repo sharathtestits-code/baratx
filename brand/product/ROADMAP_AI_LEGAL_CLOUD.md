@@ -95,12 +95,13 @@ Not legal advice — checklist for counsel / CA / company secretary in India.
 
 ---
 
-## 5. What we’re implementing in this pass (non-AI)
+## 5. What shipped
 
 1. Menu **Alerts** with unread badge  
 2. Clearer **activity emails** (reply + posted) with login/post CTA  
 3. **Follower** Alerts when someone you follow posts  
 4. **QA org** docs for an automation agent  
-5. **Nav tour** with skip  
+5. **X/FB-style coach marks** (spotlight on real UI — Next/Got it, no Skip tour)  
+6. **Top 15–20 suggestions** on Square + each Arena (`GET /suggestions`; optional LLM rank via `AI_ASSIST_*`)
 
-**Not in this pass:** LLM wiring for 15–20 tab suggestions — approve this roadmap first.
+**Optional next:** set `AI_ASSIST_PROVIDER=openai` + API key on Railway to rank/rewrite suggestion lists.

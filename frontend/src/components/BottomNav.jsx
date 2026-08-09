@@ -36,7 +36,13 @@ export default function BottomNav() {
 
   return (
     <nav className="bottom-nav" aria-label="Main">
-      <NavLink to="/feed" className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`} end aria-label="Square">
+      <NavLink
+        to="/feed"
+        className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}
+        end
+        aria-label="Square"
+        data-coach="nav-square"
+      >
         <IconHome className="bottom-nav-icon" />
         <span className="bottom-nav-label">Square</span>
       </NavLink>
@@ -44,6 +50,7 @@ export default function BottomNav() {
         to="/spaces"
         className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}
         aria-label="Live"
+        data-coach="nav-live"
       >
         <IconLive className="bottom-nav-icon" />
         <span className="bottom-nav-label">Live</span>
@@ -52,6 +59,7 @@ export default function BottomNav() {
         to="/arenas"
         className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}
         aria-label="Arenas"
+        data-coach="nav-arenas"
       >
         <IconArena className="bottom-nav-icon" />
         <span className="bottom-nav-label">Arenas</span>
@@ -60,6 +68,7 @@ export default function BottomNav() {
         to="/notifications"
         className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}
         aria-label="Alerts"
+        data-coach="nav-alerts"
       >
         <span className="bottom-nav-icon-wrap">
           <IconBell className="bottom-nav-icon" />
@@ -71,6 +80,7 @@ export default function BottomNav() {
         to={`/u/${user.username}`}
         className={({ isActive }) => `bottom-nav-link ${isActive ? "active" : ""}`}
         aria-label="Profile"
+        data-coach="nav-you"
       >
         <IconUser className="bottom-nav-icon" />
         <span className="bottom-nav-label">You</span>

@@ -43,8 +43,9 @@ QA_ADMIN_SECRET=
 | S3 | Compose take | Write + Post | Post appears; Alerts for followers + @baratx/@sharath |
 | S4 | Hot take starters | Open starters → pick | Fills compose (not LLM) |
 | S5 | First session | New user | Arena + take + city; **Skip for now** works |
-| S6 | Nav tour | After first session | 3 steps Square / Alerts / Arenas; **Skip tour** works |
-| S7 | Like / reply / repost | On a post | Counts update; author gets Alert + email if configured |
+| S6 | Coach marks | After first session | Spotlight tips on compose → Square → Alerts → Arenas; **Next/Got it** (no Skip tour); × closes tips |
+| S7 | Suggestions | Square + each Arena | 15–20 suggested questions; tap fills compose; Hide works |
+| S8 | Like / reply / repost | On a post | Counts update; author gets Alert + email if configured |
 
 ## Alerts & email
 
@@ -113,4 +114,8 @@ QA_ADMIN_SECRET=
 - Real UPI payouts  
 - Instagram publish  
 - Phone OTP (MSG91) unless staging numbers exist  
-- LLM features (not shipped yet — see `brand/product/ROADMAP_AI_LEGAL_CLOUD.md`)
+- Full LLM rewrite unless `AI_ASSIST_PROVIDER=openai` is set in staging  
+
+## Playwright scaffold (next agent)
+
+Create `e2e/` with auth + square + alerts + coach + suggestions specs using env from `AUTOMATION_AGENT.md`. Coach targets: `[data-coach='compose']`, `[data-coach='nav-alerts']`, etc.
