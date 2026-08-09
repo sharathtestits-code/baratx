@@ -1004,7 +1004,7 @@ def admin_backfill_post_notifications(
         db.query(models.Post)
         .join(models.User, models.User.id == models.Post.author_id)
         .filter(models.Post.created_at >= since)
-        .filter(models.Post.community_id.is_(None), models.Post.space_id.is_(None))
+        .filter(models.Post.community_id.is_(None))
         .filter(~models.User.username.in_(official_names))
         .order_by(models.Post.created_at.desc())
         .limit(200)
