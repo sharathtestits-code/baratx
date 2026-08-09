@@ -1,89 +1,110 @@
 # BaratX Gen Z GTM — START NOW (Days 1–7)
-Date: 2026-08-09
+Updated: **2026-08-09** · Master index: [barathx_genz_gtm.md](./barathx_genz_gtm.md)
 
-Do these in order. Do not skip Gate #1.
+Do these **in order**. Do not skip Gate #1. Do not run paid ads this week.
 
 ---
 
-## A. Today (next 2–3 hours)
+## Status check (live)
 
-### 1) Create the retention channels (30 min)
-- [ ] **WhatsApp Community:** name `BaratX Scouts` → invite your 10–20 closest friends who will actually post  
-- [ ] **Telegram channel:** `BaratX Daily` — bio: “Today’s question. Pick a side. → barathx.com”  
-- [ ] Pin in both: link `https://barathx.com` + “First action = leave one take”
+| Item | Status |
+|---|---|
+| Website | Live → https://barathx.com |
+| IG `@getbaratx` | Account live; **Graph API token currently blocked** — post manually or refresh token |
+| Entertainment Arena | Has open debates — **seed here first** |
+| Sports / Startups topics | ~0 open debates — **you must open debates before pushing** |
+| WhatsApp Community | Create today (not assumed live) |
+| Telegram | Create today |
+| X | Paste tweets manually (no API yet) |
 
-### 2) Seed density yourself (60–90 min) — Gate #1
-On **https://barathx.com**, open **Arenas → Entertainment** and **Sports**.
+---
 
-For each of **3 debates**:
-1. Post a sharp take (as you / friends)  
+## A. Next 2–3 hours (today)
+
+### 1) Create retention channels (20–30 min)
+- [ ] WhatsApp → New community → name **`BaratX Scouts`**
+- [ ] Invite 10–20 friends who will actually post (not lurk)
+- [ ] Telegram → New channel → **`BaratX Daily`**
+- [ ] Bio: `Today’s question. Pick a side. → https://barathx.com`
+- [ ] Pin in both: `https://barathx.com` + “First action = leave one take”
+
+### 2) Open 3 Sports debates (10 min) — so Sports isn’t empty
+On https://barathx.com/arenas/sports open debates like:
+1. Kohli vs Rohit — who’s the bigger match-winner right now?  
+2. IPL auctions: overpay or smart buy?  
+3. India football vs cricket funding — fair?
+
+### 3) Seed Gate #1 in Entertainment (60–90 min)
+Open: **https://barathx.com/arenas/entertainment**
+
+Pick **3 live topics** (Bollywood / Pan-India / Box Office / OTT). For each:
+1. You post a sharp take (pick a side)  
 2. Get **≥5 real replies** from different people (not only @baratx)  
-3. Screenshot the thread (for clips)
+3. Screenshot the thread (for Reels clips)
 
-**DM friends this (copy/paste):**
+**Friend DM (copy/paste):**
 ```
 Quick favor — BaratX is live: https://barathx.com
 
-I need 5 real replies on this debate (not likes):
-[PASTE ARENA LINK]
+Need 5 real replies on this (not likes):
+https://barathx.com/arenas/entertainment
 
 1) Sign up with phone
-2) Pick a side
+2) Pick a side on 1 debate
 3) Reply in <220 chars
 
 Takes 2 mins. Means a lot.
 ```
 
-**Target before tomorrow:** 3 debates × 5 replies = 15 real replies.
+**Target before sleep:** 3 debates × 5 replies = **15 real replies**.
 
-### 3) Film 3 clips (30 min)
-Screen-record vertical (phone):
-1. Scroll of a spicy reply thread  
-2. Someone picking Fund it / Pass (Startups) OR Agree/Disagree  
-3. You asking today’s question on camera (15s) then cut to the Arena  
+### 4) Film 3 clips (30 min)
+Phone vertical screen-record:
+1. Spicy reply thread scroll  
+2. Someone picking a side (Agree/Disagree or Fund it/Pass)  
+3. You on camera: today’s question (15s) → cut to Arena  
 
-Caption formula (mandatory):
+**Caption formula:**
 ```
-[PAIN]
-[HOW BARATX FIXES IT]
+[PAIN they feel]
+[How BaratX fixes it]
 Sign up → barathx.com
 ```
 
-### 4) Post today (IG already has token)
-Post 1 Reels clip + 1 carousel question + paste 1 X tweet from `brand/x/`.
+### 5) Post today
+- **IG:** if API still blocked → post manually from `brand/ig/posted/2026-08-09/` + captions in `brand/ig/CAPTIONS-2026-08-09.md`  
+- **X:** paste from `brand/x/TWEETS-2026-08-09.md`  
+- **Telegram + WhatsApp:** drop today’s question + Entertainment link  
+
+**Refresh IG token (so I can auto-post again):**
+1. Meta Developer → your app → Graph API Explorer  
+2. Permissions: `instagram_basic`, `instagram_content_publish`, `instagram_manage_comments`, `pages_show_list`, `pages_read_engagement`, `business_management`  
+3. Long-lived User token → Page token for BarathX  
+4. Paste Page token here  
 
 ---
 
-## B. Campus Voices — recruit this week (Days 1–7)
+## B. Campus Voices — this week (Days 1–7)
 
-### Who to recruit (roles, not celebrities)
-Per college, aim for **2–4 people**:
+### Who (2–4 per college)
 1. Fest / cultural club organizer  
-2. Campus meme page admin (IG)  
-3. Placement-cell / entrepreneurship cell active member  
-4. Sports committee / cricket WhatsApp admin  
+2. Campus meme page admin  
+3. E-Cell / placement-active student  
+4. Sports committee / cricket group admin  
 
-### First colleges (suggested mix)
-**Tier-1 start**
-- Delhi: DU colleges (SRCC / Hindu / Miranda — pick where you have 1 warm intro)  
-- Bangalore: Christ / RVCE / PES  
-- Hyderabad: University of Hyderabad / CBIT / IIIT-H student clubs (warm intros only)  
-- Mumbai: St. Xavier’s / NMIMS undergrad clubs  
+### Colleges (warm intros only)
+**Tier-1:** DU (SRCC/Hindu/Miranda if you know someone) · Christ / RVCE / PES (BLR) · UoH / CBIT (HYD) · St. Xavier’s / NMIMS (BOM)  
+**Tier-2 by Day 7:** city where you already have 1 friend (Jaipur / Indore / Coimbatore / Chandigarh / Vizag…)
 
-**Tier-2 add by Day 7**
-- Jaipur / Indore / Coimbatore / Chandigarh / Vizag — whichever city you already know people
-
-> You don’t need cold HR emails. Warm WhatsApp intros beat LinkedIn spam 10×.
-
-### Outreach message (WhatsApp / IG DM)
+### Outreach DM
 ```
-Hey — I’m building BaratX (barathx.com): sided debates for India, not another Reels feed.
+Hey — building BaratX (barathx.com): sided debates for India, not another Reels feed.
 
 Looking for 1 Founding Campus Voice at [COLLEGE].
 
-Job (1–2 hrs/week):
-• 1 take/day on the Square question
-• 1 campus debate room/week
+1–2 hrs/week:
+• 1 take/day on today’s question
+• 1 campus debate/week (Entertainment or Sports)
 • Share to your Story
 
 You get: Founding Campus Voice shoutout + First 50 list + scout WhatsApp.
@@ -91,73 +112,94 @@ You get: Founding Campus Voice shoutout + First 50 list + scout WhatsApp.
 Interested? I’ll send the 3-line brief.
 ```
 
-### After they say yes — onboarding brief
+### After yes
 ```
 BaratX Campus Voice — week 1
 1. Sign up: https://barathx.com
-2. Follow @getbaratx on IG
-3. Join WhatsApp: [LINK]
-4. Today: reply to this debate → [LINK]
-5. This week: open/ co-host 1 campus topic in Entertainment or Sports
+2. Follow @getbaratx
+3. Join WhatsApp: [YOUR COMMUNITY LINK]
+4. Today: reply here → https://barathx.com/arenas/entertainment
+5. This week: open 1 campus topic in Entertainment or Sports
 
-Rules: real replies only. No fake accounts. No bots.
+Rules: real replies only. No fake accounts.
 ```
 
-### Tracker (make a Google Sheet today)
-Columns: Name | College | City | Phone | IG handle | Status (asked/joined/posted) | Last post URL | Notes
+### Tracker
+Fill **[CONTACTS.csv](./CONTACTS.csv)** (or import to Google Sheet).  
+Columns already include public IG pages to DM + empty rows for your friends.
 
 ---
 
-## C. Contacts — how to get them *today*
+## C. Contacts you can reach *today*
 
-I can’t pull private phone books. Use these **reachable paths**:
+I can’t access your phone book. Use this mix:
 
-| Source | How | What to ask |
-|---|---|---|
-| Your own WhatsApp | Forward scout DM to 20 friends | “Reply on this debate link” |
-| College group chats you’re already in | Soft ask, not spam | 1 Campus Voice volunteer |
-| IG: search `[college] memes`, `[college] confessions` | DM admin | Barter shoutout later; first ask for 1 debate reply |
-| LinkedIn: “Campus Ambassador” + college name | Message students who already do brand ambassador gigs | Campus Voice role |
-| Entrepreneurship cells / E-Cell Instagram | DM “collaborations” | Fund it/Pass night on campus |
-| Friends in other cities | Ask for **1 intro each** | Warm handoff > cold list |
+### 1) Your network (highest conversion)
+| Action | Target |
+|---|---|
+| Forward seed DM | 20 WhatsApp friends |
+| Ask each friend | “Intro me to 1 person at your college” |
+| College groups you’re already in | Soft ask for 1 Campus Voice |
 
-**Minimum viable contact list by Sunday night:** 20 seed posters + 8 Campus Voice asks (even if only 3 say yes).
+### 2) Public IG pages (DM for collab / 1 reply — not paid yet)
+| Handle | Why |
+|---|---|
+| [@du__india](https://instagram.com/du__india) | Large DU student reach; collab DMs open |
+| [@du__club](https://instagram.com/du__club) | DU updates / student audience |
+| [@campuschroniclesdu](https://instagram.com/campuschroniclesdu) | Fest/culture tone |
+| Search: `christ university memes`, `rvce memes`, `cbit memes`, `xaviers mumbai memes` | Student-run pages (better than official uni accounts) |
+| Search: `[college] ecell` | Later: Fund it/Pass campus night |
+
+**Collab DM (pages):**
+```
+Hey — BaratX (barathx.com) is a sided-debate app for India (text fights, not Reels).
+
+Not asking for a paid shoutout yet.
+Can you (or 1 admin) leave one real take on this live debate?
+https://barathx.com/arenas/entertainment
+
+If it feels native, we can do a Story collab next week.
+```
+
+### 3) LinkedIn (secondary)
+Search: `Campus Ambassador` + college name → message students who already run brand ambassador gigs.
+
+### Minimum by Sunday night
+- [ ] 20 seed posters messaged  
+- [ ] 8 Campus Voice asks sent  
+- [ ] ≥3 yes (even if they post later)  
+- [ ] CONTACTS.csv has real names filled  
 
 ---
 
-## D. Daily operating rhythm (Week 1)
+## D. Daily rhythm (Week 1)
 
 | Time (IST) | Action |
 |---|---|
-| 9–10am | Post today’s question (IG + Telegram + WhatsApp) |
+| 9–10am | Today’s question → IG + Telegram + WhatsApp + link to Arena |
 | Afternoon | Nudge 3 people to reply on the live debate |
-| 7–9pm | Post 1 Reels clip of a real exchange; reply to every IG comment |
-| Night | Log Sheet: new signups, replies, Campus Voice status |
+| 7–9pm | 1 Reels clip of a **real** exchange; reply to every IG comment |
+| Night | Update CONTACTS.csv + count: signups / replies / Voices |
 
 ---
 
-## E. Do / Don’t this week
+## E. Do / Don’t
 
-**Do**
-- Seed Entertainment/Sports first  
-- Promise First 50 / shoutout / WhatsApp (things you can deliver)  
-- Use signup-first captions  
+**Do:** Entertainment first · First 50 / shoutout / WhatsApp only · signup-first captions · warm intros  
 
-**Don’t**
-- Claim live audio  
-- Promise ₹150 unless you’ve set aside cash and a payout process  
-- Run paid ads into empty rooms  
-- Lead Gen Z ads with “public square” NGO tone  
+**Don’t:** claim live audio · promise ₹150 without cash process · paid ads into empty rooms · lead Gen Z with NGO “public square” tone · push Sports/Startups Reels until debates exist there  
 
 ---
 
-## F. Success by Day 7
+## F. Day 7 success checklist
 
-- [ ] WhatsApp Community live with ≥15 people  
+- [ ] WhatsApp Community ≥15 people  
 - [ ] Telegram channel live  
-- [ ] ≥3 debates with ≥5 real replies each  
-- [ ] ≥3 Reels posted from real product moments  
-- [ ] ≥5 Campus Voices agreed (even if not all posted yet)  
+- [ ] ≥3 debates with ≥5 real replies each (Entertainment)  
+- [ ] ≥3 Sports debates opened + some replies  
+- [ ] ≥3 Reels from real product moments  
+- [ ] ≥5 Campus Voices agreed  
 - [ ] ≥20 people who posted at least once on BaratX  
+- [ ] IG token refreshed (optional but unlocks auto-post)  
 
-When Day 7 hits these, start Days 16–45 organic cadence from `GENZ-GTM.md`.
+When this hits → continue Days 16–45 from [GENZ-GTM.md](./GENZ-GTM.md).

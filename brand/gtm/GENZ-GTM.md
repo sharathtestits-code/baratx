@@ -40,11 +40,14 @@ Source plan reviewed and corrected against the live product.
 
 ## 3. Product gates (before any paid spend)
 
-1. **Entertainment or Sports:** top 3–5 debates each have **≥5 non-official real replies**
+1. **Entertainment first (live density):** top 3–5 debates each have **≥5 non-official real replies**  
+   - Live check 2026-08-09: Entertainment/News/Politics have open debates; **Sports & Startups topics ≈ 0 open debates** — open rooms there before featuring them in Reels.
 2. **≥5 user-written daily questions/week** (not only RSS/headline reformats)
 3. **3–5 vertical clips ready** from real activity (screen-record sharp replies / Fund it–Pass)
 
 If gate #1 fails → seed with 10–15 friends first. Do not push Reels into empty rooms.
+
+**Day-1 runbook + contacts:** [GENZ-START-NOW.md](./GENZ-START-NOW.md) · [barathx_genz_gtm.md](./barathx_genz_gtm.md)
 
 ---
 
