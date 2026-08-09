@@ -17,6 +17,7 @@ from app import auth, email as email_service, google_auth, media_store, models, 
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
+from app.spa_serve import spa_shell_allowed, wants_spa_document
 
 Base.metadata.create_all(bind=engine)
 
@@ -2723,7 +2724,7 @@ except Exception:  # noqa: BLE001
 _FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend_dist"
 
 
-def _public_web_origin(request: Optional["Request"] = None) -> str:
+def _public_web_origin(request: Optional[Request] = None) -> str:
     """Canonical public web origin for OG tags (QA vs prod)."""
     try:
         origin = (email_service.FRONTEND_URL or "").rstrip("/")
@@ -2739,7 +2740,7 @@ def _public_web_origin(request: Optional["Request"] = None) -> str:
     return "https://barathx.com"
 
 
-def _spa_index_response(request: Optional["Request"] = None) -> Response:
+def _spa_index_response(request: Optional[Request] = None) -> Response:
     index = _FRONTEND_DIST / "index.html"
     html = index.read_text(encoding="utf-8")
     origin = _public_web_origin(request)
@@ -2754,6 +2755,19 @@ if _FRONTEND_DIST.is_dir():
     _assets = _FRONTEND_DIST / "assets"
     if _assets.is_dir():
         app.mount("/assets", StaticFiles(directory=str(_assets)), name="frontend_assets")
+
+    @app.middleware("http")
+    async def spa_document_navigation(request: Request, call_next):
+        """DEF-008: browser refresh/shared links must get index.html, not API JSON."""
+        path = request.url.path
+        header_map = {k.decode().lower(): v.decode() for k, v in request.scope.get("headers", [])}
+        if wants_spa_document(method=request.method, headers=header_map) and spa_shell_allowed(path):
+            candidate = _FRONTEND_DIST / path.lstrip("/")
+            if path != "/" and candidate.is_file():
+                return FileResponse(candidate)
+            if (_FRONTEND_DIST / "index.html").is_file():
+                return _spa_index_response(request)
+        return await call_next(request)
 
     @app.get("/")
     def spa_index(request: Request):

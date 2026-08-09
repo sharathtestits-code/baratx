@@ -27,6 +27,11 @@ async function request(path, options = {}) {
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   const headers = { ...(extraHeaders || {}) };
+  // Prefer JSON from the same-origin API so document navigations can own HTML
+  // routes like /notifications without colliding with fetch() (DEF-008).
+  if (!headers.Accept && !headers.accept) {
+    headers.Accept = "application/json";
+  }
   // Only set JSON content-type when sending a body — bare DELETE/GET with
   // Content-Type: application/json can confuse some proxies.
   if (rest.body != null && !headers["Content-Type"] && !headers["content-type"]) {
