@@ -310,7 +310,7 @@ export default function Feed() {
         <div className="square-home-head-main">
           <p className="square-home-kicker">India&apos;s public square</p>
           <h1 className="square-home-title">Square</h1>
-          <p className="square-home-sub">One question. Your take.</p>
+          <p className="square-home-sub">One question. Your take. No Reels required.</p>
         </div>
         <FoundingChip refreshKey={foundingRefresh} />
       </header>
@@ -327,15 +327,15 @@ export default function Feed() {
         <div className="plaza-studio-head">
           <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
           <div>
-            <p className="plaza-studio-label">Create Studio</p>
-            <p className="hint">Drop a viewpoint for the square</p>
+            <p className="plaza-studio-label">Drop a take</p>
+            <p className="hint">Short post. Real replies.</p>
           </div>
         </div>
         <div className="compose-body">
           <MentionTextarea
             ref={composeRef}
             placeholder={
-              quotePreview ? "Add a comment and tag people with @…" : "What should India hear from you?"
+              quotePreview ? "Add a comment and tag people with @…" : "What's your take?"
             }
             value={text}
             onChange={setText}
@@ -380,10 +380,10 @@ export default function Feed() {
               onClick={() => setShowStarters((v) => !v)}
               title="Starter prompts — not AI drafts"
             >
-              Starters
+              Hot take starters
             </button>
             <Link to="/spaces" className="compose-tile">
-              Start debate
+              Start a live
             </Link>
             <Link to="/communities" className="compose-tile">
               Community
@@ -435,10 +435,10 @@ export default function Feed() {
       </form>
 
       {liveDebates.length > 0 && (
-        <section className="plaza-onair" aria-label="On air">
+        <section className="plaza-onair" aria-label="Live now">
           <div className="plaza-onair-head">
             <h2>
-              <IconLive className="plaza-onair-icon" aria-hidden="true" /> On air
+              <IconLive className="plaza-onair-icon" aria-hidden="true" /> Live now
             </h2>
             <Link to="/spaces">Enter Live</Link>
           </div>

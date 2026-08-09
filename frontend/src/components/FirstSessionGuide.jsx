@@ -85,7 +85,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
       <div className="first-session-head">
         <Logo variant="mark" className="first-session-logo" />
         <div>
-          <h2 id="first-session-title">Welcome to the Square</h2>
+          <h2 id="first-session-title">You&apos;re in. Drop your first take.</h2>
           <p className="first-session-step">1 of 1 · Get in</p>
         </div>
       </div>
@@ -148,11 +148,11 @@ export default function FirstSessionGuide({ token, onComplete }) {
         {error && <div className="error">{error}</div>}
 
         <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>
-          {busy ? "Entering…" : "Post & enter Square"}
+          {busy ? "Entering…" : "Post & enter"}
         </button>
         <p className="first-session-founding">
-          Founding ₹150 — open a live debate that gets real engagement. Details in Rewards after you
-          enter.
+          First 100 · ₹150 — open a live debate that gets real engagement. Details in Rewards after
+          you enter.
         </p>
         <p className="first-session-foot">
           <Link to="/settings" className="first-session-settings">

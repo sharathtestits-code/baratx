@@ -68,17 +68,17 @@ export default function Spaces() {
     <div className="plaza-page plaza-live">
       <PlazaPageHeader
         title="Live"
-        sub="Open a room, Join conversation — mute, video, reactions (max 15)."
+        sub="Start a live. Jump in. Mute, video, reactions — max 15."
       />
       <section className={`live-amphitheatre${empty ? " is-empty-hero" : ""}`}>
         <div className="live-amphitheatre-glow" aria-hidden="true" />
-        <span className="live-pill">{empty ? "Start one" : "On air"}</span>
-        <p className="live-eyebrow">Airwaves</p>
+        <span className="live-pill">{empty ? "Start one" : "Live now"}</span>
+        <p className="live-eyebrow">Live now</p>
         <h2 className="live-amphitheatre-title">
           {featured
             ? featured.title
             : empty
-              ? "No rooms on air — start one"
+              ? "No rooms live — start one"
               : "Start a room India can join"}
         </h2>
         <p className="live-amphitheatre-sub">
@@ -107,7 +107,7 @@ export default function Spaces() {
         <div className="live-amphitheatre-actions">
           {featured ? (
             <Link to={`/spaces/${featured.id}`} className="btn btn-primary">
-              Join conversation
+              Jump in
             </Link>
           ) : (
             <button
@@ -115,12 +115,12 @@ export default function Spaces() {
               className="btn btn-primary"
               onClick={() => startSuggested(title.trim() || SUGGESTED_DEBATES[0])}
             >
-              Start debate & join
+              Start a live
             </button>
           )}
           {featured ? (
             <a href="#go-live" className="btn btn-secondary">
-              Go live
+              Jump in
             </a>
           ) : (
             <Link to="/arenas" className="btn btn-secondary">
@@ -131,11 +131,11 @@ export default function Spaces() {
       </section>
 
       <form id="go-live" className="plaza-studio live-create" onSubmit={createSpace}>
-        <p className="plaza-studio-label">Open a live room</p>
+        <p className="plaza-studio-label">Start a live</p>
         <input
           ref={titleRef}
           type="text"
-          placeholder="What should India hear right now?"
+          placeholder="What are we arguing?"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={100}
@@ -150,14 +150,14 @@ export default function Spaces() {
 
       <section className="plaza-takes">
         <div className="plaza-takes-head">
-          <h2>Rooms on air</h2>
+          <h2>Rooms live</h2>
         </div>
         {loading ? (
           <p className="hint">Loading…</p>
         ) : items.length === 0 ? (
           <div className="live-empty-suggest">
             <p className="live-empty-suggest-title">Suggested debates</p>
-            <p className="hint">Tap a topic to prefill — then Go live.</p>
+            <p className="hint">Tap a topic to prefill — then go live.</p>
             <div className="live-empty-chips">
               {SUGGESTED_DEBATES.map((topic) => (
                 <button

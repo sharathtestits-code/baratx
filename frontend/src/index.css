@@ -8506,6 +8506,14 @@ html:has(.bx-home) {
   color: rgba(255, 255, 255, 0.62);
 }
 
+.bx-home-hero-anti-ai {
+  margin: 0.55rem 0 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ff9933;
+}
+
 .bx-home-hero-ctas {
   display: flex;
   flex-wrap: wrap;

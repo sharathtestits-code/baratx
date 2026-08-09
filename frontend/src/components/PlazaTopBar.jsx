@@ -82,7 +82,7 @@ export default function PlazaTopBar() {
           </Link>
         ))}
         <Link to="/spaces" className="plaza-orbit plaza-orbit-live">
-          On air
+          Live now
         </Link>
       </nav>
     </header>

@@ -4,7 +4,7 @@ import { rewardsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 /**
- * Compact Founding 100 chip for Square home header — not a stacked strip.
+ * Compact First 100 chip for Square home header — not a stacked strip.
  */
 export default function FoundingChip({ refreshKey = 0 }) {
   const { token } = useAuth();
@@ -28,11 +28,11 @@ export default function FoundingChip({ refreshKey = 0 }) {
 
   if (status.my_status === "paid") {
     return (
-      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding reward paid">
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="First 100 reward paid">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
-        <span>Founding {status.cap}</span>
+        <span>First {status.cap}</span>
         <span className="founding-chip-sep" aria-hidden="true">
           ·
         </span>
@@ -43,11 +43,11 @@ export default function FoundingChip({ refreshKey = 0 }) {
 
   if (status.my_status === "payable") {
     return (
-      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding payout">
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="First 100 payout">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
-        <span>Founding {status.cap}</span>
+        <span>First {status.cap}</span>
         <span className="founding-chip-sep" aria-hidden="true">
           ·
         </span>
@@ -63,11 +63,11 @@ export default function FoundingChip({ refreshKey = 0 }) {
         ? `${q.stance_count || 0}/${q.need_stances || 2} stances`
         : `${q.like_count || 0}/${q.need_likes || 25} likes`;
     return (
-      <Link to="/rewards" className="founding-chip" aria-label="Founding progress">
+      <Link to="/rewards" className="founding-chip" aria-label="First 100 progress">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
-        <span>Founding {status.cap}</span>
+        <span>First {status.cap}</span>
         <span className="founding-chip-sep" aria-hidden="true">
           ·
         </span>
@@ -79,15 +79,15 @@ export default function FoundingChip({ refreshKey = 0 }) {
   if (!status.open || status.slots_remaining <= 0) return null;
 
   return (
-    <Link to="/rewards" className="founding-chip" aria-label="Founding 100">
+    <Link to="/rewards" className="founding-chip" aria-label="First 100">
       <span className="founding-chip-star" aria-hidden="true">
         ★
       </span>
-      <span>Founding {status.cap}</span>
+      <span>First {status.cap}</span>
       <span className="founding-chip-sep" aria-hidden="true">
         ·
       </span>
-      <span>{status.slots_remaining} left</span>
+      <span>₹{status.amount_inr} · {status.slots_remaining} left</span>
     </Link>
   );
 }

@@ -37,9 +37,9 @@ export default function Landing() {
           <p className="bx-home-hero-tag">India&apos;s public square</p>
           <p className="bx-home-hero-line">Pick a side. Argue it live.</p>
           <p className="bx-home-hero-sub">
-            Short posts, live debate rooms, and real replies — not an algorithm burying you in a
-            firehose.
+            Drop a take. Pick a side. Real replies — not a performance.
           </p>
+          <p className="bx-home-hero-anti-ai">Human takes only. No AI slop.</p>
           <div className="bx-home-hero-ctas">
             <Link to="/signup" className="btn btn-primary bx-home-cta-primary">
               Answer today&apos;s question
@@ -52,8 +52,8 @@ export default function Landing() {
             <GoogleSignInButton label="Continue with Google" confirmAge18 />
           </div>
           <p className="bx-home-founding-chip">
-            <Link to="/signup?next=/rewards">Founding ₹150</Link> — first 100 who open a live debate
-            that gets real engagement.
+            <Link to="/signup?next=/rewards">First 100 · ₹150</Link> — open a live debate that gets
+            real engagement.
           </p>
           <p className="bx-home-hero-legal">
             18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
@@ -109,15 +109,15 @@ export default function Landing() {
           <div>
             <h3>Arenas</h3>
             <p>
-              Official topic floors for sided debate — Sports, Politics, Entertainment, News,
-              Spirituality, Startups. Pick Agree/Disagree (or Fund it/Pass) and go live.
+              Pick a side and jump in — Sports, Politics, Entertainment, News, Spirituality,
+              Startups. Agree/Disagree (or Fund it/Pass) live.
             </p>
           </div>
           <div>
             <h3>Communities</h3>
             <p>
-              Member-run groups (city, craft, interest) you create or join. Not the same six Arenas —
-              use them when you want a smaller circle, not a national floor.
+              Smaller groups (city, craft, interest). Not the same six Arenas — use them when you
+              want a circle, not a national floor.
             </p>
           </div>
         </div>
@@ -169,11 +169,14 @@ export default function Landing() {
             </dd>
           </div>
           <div>
-            <dt>What&apos;s Founding ₹150?</dt>
+            <dt>What&apos;s First 100 · ₹150?</dt>
             <dd>
-              First 100 people who open a live debate that gets real engagement earn Founding status
-              and ₹150.
+              First 100 people who open a live that gets real engagement earn status and ₹150.
             </dd>
+          </div>
+          <div>
+            <dt>Is this full of AI posts?</dt>
+            <dd>No. Human takes only. No AI slop in the square.</dd>
           </div>
           <div>
             <dt>Hindi or Telugu?</dt>
