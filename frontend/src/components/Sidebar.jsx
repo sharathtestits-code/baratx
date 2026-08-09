@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
-import { IconArena, IconBell, IconBookmark, IconHome, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
+import { IconArena, IconBell, IconBookmark, IconHome, IconLive, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
 const MORE_LINKS = [
+  { to: "/rewards", label: "Rewards progress" },
   { to: "/lists", label: "Lists" },
   { to: "/communities", label: "Communities" },
-  { to: "/spaces", label: "Spaces" },
   { to: "/settings", label: "Settings and privacy" },
 ];
 
@@ -71,13 +71,17 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
-        <Link to="/feed" className="sidebar-brand sidebar-brand-mark" aria-label="BaratX Home">
-          <Logo variant="mark" className="sidebar-logo-mark" />
+        <Link to="/feed" className="sidebar-brand" aria-label="BarathX Home">
+          <Logo variant="full" className="sidebar-logo-full" title="BarathX" />
         </Link>
         <nav className="sidebar-nav" aria-label="Primary">
           <NavLink to="/feed" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconHome className="sidebar-icon" />
-            <span>Home</span>
+            <span>Square</span>
+          </NavLink>
+          <NavLink to="/spaces" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
+            <IconLive className="sidebar-icon" />
+            <span>Live</span>
           </NavLink>
           <NavLink to="/arenas" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconArena className="sidebar-icon" />
@@ -95,7 +99,7 @@ export default function Sidebar() {
               <IconBell className="sidebar-icon" />
               {unread > 0 && <span className="nav-badge">{unread > 9 ? "9+" : unread}</span>}
             </span>
-            <span>Notifications</span>
+            <span>Alerts</span>
           </NavLink>
           <NavLink to="/messages" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconMessage className="sidebar-icon" />

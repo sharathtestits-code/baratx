@@ -88,7 +88,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="feed-wrap surface-page">
+    <div className="feed-wrap surface-page plaza-page">
       <div className="feed-header">
         <h1>Settings and privacy</h1>
       </div>
@@ -98,7 +98,9 @@ export default function Settings() {
 
       <section className="settings-section">
         <h2>Appearance</h2>
-        <p className="hint">Choose how BaratX looks for you. Changes apply instantly.</p>
+        <p className="hint">
+          Default is Tri-Color Midnight (dark). Switch to Saffron, Monsoon, or Ink anytime.
+        </p>
         <ThemePicker value={theme} onChange={saveTheme} compact />
         {themeSaving && <p className="hint">Saving…</p>}
       </section>
@@ -106,7 +108,7 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Language</h2>
         <p className="hint">
-          BaratX is English-first for now. Hindi and Telugu UI will arrive in a later update.
+          BarathX is English-first for now. Hindi and Telugu UI will arrive in a later update.
         </p>
       </section>
 
@@ -168,6 +170,33 @@ export default function Settings() {
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="settings-section">
+        <h2>Badges</h2>
+        <ul className="settings-badge-legend">
+          <li>
+            <strong className="badge-name badge-blue">Blue official</strong> — BarathX staff / platform
+            accounts.
+          </li>
+          <li>
+            <strong className="badge-name badge-gold">Gold BarathX</strong> — BarathX brand voices (topic
+            accounts), not personal verification.
+          </li>
+        </ul>
+        <Link className="btn btn-secondary" to="/guidelines">
+          Community guidelines
+        </Link>
+      </section>
+
+      <section className="settings-section">
+        <h2>First 100 · ₹150</h2>
+        <p className="hint">
+          First 100 creators who open a live that gets real engagement earn status and ₹150.
+        </p>
+        <Link className="btn btn-secondary" to="/rewards">
+          View rewards
+        </Link>
       </section>
 
       <section className="settings-section">

@@ -1,6 +1,16 @@
-/** BaratX Arenas — public squares with For/Against (or Fund it/Pass) debates */
+/** BarathX Arenas — public squares with For/Against (or Fund it/Pass) debates */
 
 export const ARENA_TOPICS = [
+  {
+    key: "startups",
+    name: "Startups",
+    blurb: "Funding, founders, and the India builder economy — Fund it or Pass.",
+    accent: "#059669",
+    debateFor: "Fund it",
+    debateAgainst: "Pass",
+    composeHint: "Fund it or Pass — make your case…",
+    openDebateLabel: "Open Fund it vs Pass",
+  },
   {
     key: "sports",
     name: "Sports",
@@ -24,16 +34,6 @@ export const ARENA_TOPICS = [
     name: "News",
     blurb: "Breaking stories and the takes India can’t ignore.",
     accent: "#0369a1",
-  },
-  {
-    key: "startups",
-    name: "Startups",
-    blurb: "India’s idea square — pitch like YC, crowd votes Fund it or Pass.",
-    accent: "#b45309",
-    debateFor: "Fund it",
-    debateAgainst: "Pass",
-    composeHint: "Pitch your startup idea for India to Fund it or Pass…",
-    openDebateLabel: "Open Fund it vs Pass",
   },
   {
     key: "spirituality",

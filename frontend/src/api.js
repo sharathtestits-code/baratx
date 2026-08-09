@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const DEFAULT_TIMEOUT_MS = 15000;
 
 /** Resolve post/avatar/cover media paths (relative, absolute, or data URLs). */
@@ -55,7 +55,7 @@ async function request(path, options = {}) {
       throw new Error("Request timed out. Check your connection and try again.");
     }
     if (err instanceof TypeError || /failed to fetch/i.test(err?.message || "")) {
-      throw new Error("Could not reach BaratX. Check your connection and try again.");
+      throw new Error("Could not reach BarathX. Check your connection and try again.");
     }
     throw err;
   } finally {
@@ -198,11 +198,12 @@ export const postsApi = {
 
   get: (id, token) => request(`/posts/${id}`, { headers: authHeaders(token) }),
 
-  create: async (token, { text, image, quotePostId }) => {
+  create: async (token, { text, image, quotePostId, civicProblem }) => {
     const form = new FormData();
     form.append("text", text);
     if (image) form.append("image", image);
     if (quotePostId) form.append("quote_post_id", quotePostId);
+    if (civicProblem) form.append("civic_problem", "true");
 
     const res = await fetch(`${API_BASE}/posts`, {
       method: "POST",
@@ -386,6 +387,11 @@ export const spacesApi = {
       headers: authHeaders(token),
       body: JSON.stringify({ side }),
     }),
+  clearStance: (token, id) =>
+    request(`/spaces/${id}/stance`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
   listDebates: (token, arenaKey) =>
     request(
       `/spaces?status=open&kind=debate${arenaKey ? `&arena_key=${encodeURIComponent(arenaKey)}` : ""}`,
@@ -393,6 +399,46 @@ export const spacesApi = {
     ),
   listForYou: (token) =>
     request(`/spaces?status=open&kind=debate&for_you=true`, { headers: authHeaders(token) }),
+  talkGet: (token, id) => request(`/spaces/${id}/talk`, { headers: authHeaders(token) }),
+  talkJoin: (token, id) =>
+    request(`/spaces/${id}/talk/join`, { method: "POST", headers: authHeaders(token) }),
+  talkLeave: (token, id) =>
+    request(`/spaces/${id}/talk/leave`, { method: "POST", headers: authHeaders(token) }),
+  talkUpdateMe: (token, id, body) =>
+    request(`/spaces/${id}/talk/me`, {
+      method: "PATCH",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  talkPin: (token, id, username) =>
+    request(`/spaces/${id}/talk/pin`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ username }),
+    }),
+  talkUnpin: (token, id, username) =>
+    request(`/spaces/${id}/talk/pin/${encodeURIComponent(username)}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
+  talkMessage: (token, id, text) =>
+    request(`/spaces/${id}/talk/messages`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ text }),
+    }),
+  talkRemove: (token, id, username, reason) =>
+    request(`/spaces/${id}/talk/participants/${encodeURIComponent(username)}/remove`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ reason }),
+    }),
+  talkReact: (token, id, emoji) =>
+    request(`/spaces/${id}/talk/reactions`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ emoji }),
+    }),
 };
 
 export const topicsApi = {
@@ -444,6 +490,16 @@ export const searchApi = {
     request(`/search?q=${encodeURIComponent(q)}`, { headers: authHeaders(token) }),
 };
 
+export const suggestionsApi = {
+  list: (token, { surface = "square", arena, limit = 20 } = {}) => {
+    const params = new URLSearchParams({ surface, limit: String(limit) });
+    if (arena) params.set("arena", arena);
+    return request(`/suggestions?${params}`, {
+      headers: token ? authHeaders(token) : {},
+    });
+  },
+};
+
 export const notificationsApi = {
   list: (token) => request("/notifications", { headers: authHeaders(token) }),
   unreadCount: (token) =>
@@ -481,6 +537,21 @@ export const adminApi = {
       method: "POST",
       headers: { "X-Admin-Secret": adminSecret },
     }),
+  dailyDigest: (adminSecret, force = false, slot = "") =>
+    request(
+      `/admin/daily-digest?force=${force ? "true" : "false"}${
+        slot ? `&slot=${encodeURIComponent(slot)}` : ""
+      }`,
+      {
+        method: "POST",
+        headers: { "X-Admin-Secret": adminSecret },
+      }
+    ),
+  instagramCarousel: (adminSecret, pack = "evening") =>
+    request(`/admin/instagram-carousel?pack=${encodeURIComponent(pack)}`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
   deleteUser: (adminSecret, userId) =>
     request(`/admin/users/${encodeURIComponent(userId)}`, {
       method: "DELETE",
@@ -497,4 +568,39 @@ export const adminApi = {
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify({ badge, notify: !!notify }),
     }),
+  foundingRewards: (adminSecret, { status } = {}) => {
+    const q = status ? `?status=${encodeURIComponent(status)}` : "";
+    return request(`/admin/founding-rewards${q}`, {
+      headers: { "X-Admin-Secret": adminSecret },
+    });
+  },
+  markFoundingPaid: (adminSecret, rewardId, note = "") =>
+    request(`/admin/founding-rewards/${encodeURIComponent(rewardId)}/paid`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify({ note }),
+    }),
+  raceRewards: (adminSecret) =>
+    request("/admin/race-rewards", {
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
+  closeRace: (adminSecret, body = {}) =>
+    request("/admin/race-rewards/close", {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify(body),
+    }),
+  markRacePaid: (adminSecret, rewardId, note = "") =>
+    request(`/admin/race-rewards/${encodeURIComponent(rewardId)}/paid`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+      body: JSON.stringify({ note }),
+    }),
+};
+
+export const rewardsApi = {
+  founding: (token) =>
+    request("/rewards/founding", { headers: authHeaders(token) }),
+  race: (token) => request("/rewards/race", { headers: authHeaders(token) }),
+  ops: (token) => request("/rewards/ops", { headers: authHeaders(token) }),
 };

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { arenasApi, communitiesApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { ARENA_TOPICS, arenaMeta } from "../arenas";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 
 export default function Arenas() {
   const { token } = useAuth();
@@ -61,14 +62,27 @@ export default function Arenas() {
   const byKey = Object.fromEntries(arenas.map((a) => [a.key, a]));
 
   return (
-    <div className="feed-wrap surface-page arenas-page">
-      <div className="feed-header">
-        <h1>Arenas</h1>
+    <div className="feed-wrap surface-page arenas-page plaza-page">
+      <PlazaPageHeader
+        title="Arenas"
+        sub="Pick a side. Jump in. Not a group chat."
+      />
+
+      <div className="arena-featured">
+        <p className="arena-featured-kicker">Builders only</p>
+        <h2>Startups — Fund it or Pass</h2>
+        <p className="hint">
+          Argue the pitch and the raise live. First 100 · ₹150 for early rooms with real engagement.
+        </p>
+        <div className="arena-featured-actions">
+          <Link to="/arenas/startups" className="btn btn-primary">
+            Enter Startups
+          </Link>
+          <Link to="/rewards" className="btn btn-secondary">
+            First 100 · ₹150
+          </Link>
+        </div>
       </div>
-      <p className="hint surface-lead arenas-lead">
-        Not another firehose. Pick a topic, pick a side — Sports, Politics, Entertainment, News,
-        Startups (Fund it / Pass), or Spirituality.
-      </p>
 
       {error && <div className="error">{error}</div>}
 

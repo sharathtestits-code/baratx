@@ -1,20 +1,20 @@
-/** BaratX appearance themes — applied via data-theme on <html>. */
+/** BarathX appearance themes — applied via data-theme on <html>. */
 
 export const THEME_STORAGE_KEY = "bx_theme";
 export const THEME_CHOSEN_KEY = "bx_theme_chosen";
 
 export const THEMES = [
   {
-    id: "saffron",
-    name: "Saffron",
-    blurb: "Warm India-first look — the BaratX default.",
-    swatch: ["#faf8f5", "#ff671f", "#0f1419"],
+    id: "midnight",
+    name: "Tri-Color Midnight",
+    blurb: "Dark premium look — saffron, green & navy accents. Default.",
+    swatch: ["#0D0D12", "#FF9933", "#138808", "#FFFFFF"],
   },
   {
-    id: "midnight",
-    name: "Midnight",
-    blurb: "Dark charcoal with saffron highlights.",
-    swatch: ["#121216", "#ff7a3d", "#f4f4f5"],
+    id: "saffron",
+    name: "Saffron",
+    blurb: "Warm light India-first look.",
+    swatch: ["#faf8f5", "#ff671f", "#0f1419"],
   },
   {
     id: "monsoon",
@@ -31,7 +31,8 @@ export const THEMES = [
 ];
 
 export const THEME_IDS = THEMES.map((t) => t.id);
-export const DEFAULT_THEME = "saffron";
+/** Default: Tri-Color Midnight (dark). Users can change in Settings → Appearance. */
+export const DEFAULT_THEME = "midnight";
 
 export function isValidTheme(id) {
   return THEME_IDS.includes(id);
@@ -54,9 +55,18 @@ export function hasChosenTheme() {
   }
 }
 
+const THEME_COLORS = {
+  midnight: "#0D0D12",
+  saffron: "#FF671F",
+  monsoon: "#0d9488",
+  ink: "#000080",
+};
+
 export function applyTheme(themeId) {
   const id = isValidTheme(themeId) ? themeId : DEFAULT_THEME;
   document.documentElement.setAttribute("data-theme", id);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", THEME_COLORS[id] || THEME_COLORS.midnight);
   try {
     localStorage.setItem(THEME_STORAGE_KEY, id);
   } catch {

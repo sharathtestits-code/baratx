@@ -27,6 +27,7 @@ class EmailSignupRequest(BaseModel):
     password: str
     username: str
     display_name: str
+    confirm_age_18: bool = False
 
     @field_validator("username")
     @classmethod
@@ -39,6 +40,13 @@ class EmailSignupRequest(BaseModel):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
         return v
+
+    @field_validator("confirm_age_18")
+    @classmethod
+    def must_confirm_age(cls, v):
+        if not v:
+            raise ValueError("You must be 18 or older to join BarathX")
+        return True
 
 
 class EmailLoginRequest(BaseModel):
@@ -72,11 +80,19 @@ class PhoneSignupVerify(BaseModel):
     username: str
     display_name: str
     region: Optional[str] = None
+    confirm_age_18: bool = False
 
     @field_validator("username")
     @classmethod
     def valid_username(cls, v):
         return normalize_username(v)
+
+    @field_validator("confirm_age_18")
+    @classmethod
+    def must_confirm_age(cls, v):
+        if not v:
+            raise ValueError("You must be 18 or older to join BarathX")
+        return True
 
     @model_validator(mode="after")
     def normalize(self):
@@ -125,6 +141,8 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
+    # Required only when Google creates a new BarathX account (18+ gate).
+    confirm_age_18: Optional[bool] = None
 
 
 class MessageResponse(BaseModel):
@@ -194,7 +212,7 @@ class UserOut(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     language: str
-    theme: str = "saffron"
+    theme: str = "midnight"
     bio: str
     avatar_url: Optional[str] = None
     cover_url: Optional[str] = None
@@ -308,7 +326,7 @@ class SearchResults(BaseModel):
 
 class NotificationOut(BaseModel):
     id: str
-    type: str  # follow | like | reply | repost | mention | message | badge
+    type: str  # follow | like | reply | repost | mention | message | badge | post
     created_at: datetime
     is_read: bool
     actor: AuthorOut
@@ -596,6 +614,7 @@ class SpaceCreate(BaseModel):
     kind: Optional[str] = "room"  # room | debate
     arena_key: Optional[str] = None
     community_id: Optional[str] = None
+    topic_id: Optional[str] = None
     side_for_label: Optional[str] = "For"
     side_against_label: Optional[str] = "Against"
 
@@ -652,6 +671,97 @@ class StanceCreate(BaseModel):
         return v
 
 
+class LiveTalkStateUpdate(BaseModel):
+    muted: Optional[bool] = None
+    video_enabled: Optional[bool] = None
+
+
+class LiveTalkPinBody(BaseModel):
+    username: str
+
+    @field_validator("username")
+    @classmethod
+    def valid_username(cls, v):
+        v = (v or "").strip().lstrip("@").lower()
+        if len(v) < 2:
+            raise ValueError("username required")
+        return v
+
+
+class LiveTalkMessageCreate(BaseModel):
+    text: str
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = (v or "").strip()
+        if len(v) < 1 or len(v) > 500:
+            raise ValueError("Message must be 1–500 characters")
+        return v
+
+
+class LiveTalkRemoveBody(BaseModel):
+    reason: str = "community guidelines"
+
+    @field_validator("reason")
+    @classmethod
+    def valid_reason(cls, v):
+        v = (v or "community guidelines").strip()
+        if len(v) < 3 or len(v) > 120:
+            raise ValueError("Reason must be 3–120 characters")
+        return v
+
+
+class LiveTalkParticipantOut(BaseModel):
+    user: AuthorOut
+    muted: bool = True
+    video_enabled: bool = False
+    joined_at: datetime
+    is_self: bool = False
+    is_pinned: bool = False
+    is_host: bool = False
+
+
+class LiveTalkMessageOut(BaseModel):
+    id: str
+    text: str
+    created_at: datetime
+    sender: AuthorOut
+
+
+class LiveTalkReactionCreate(BaseModel):
+    emoji: str
+
+    @field_validator("emoji")
+    @classmethod
+    def valid_emoji(cls, v):
+        v = (v or "").strip()
+        allowed = {"👍", "👎", "❤️", "😂", "👏", "🔥", "😮", "🎉"}
+        if v not in allowed:
+            raise ValueError("Pick a supported reaction")
+        return v
+
+
+class LiveTalkReactionOut(BaseModel):
+    id: str
+    emoji: str
+    created_at: datetime
+    user: AuthorOut
+
+
+class LiveTalkStateOut(BaseModel):
+    space_id: str
+    max_participants: int = 15
+    participant_count: int = 0
+    in_talk: bool = False
+    my_muted: bool = True
+    my_video: bool = False
+    participants: list[LiveTalkParticipantOut] = []
+    messages: list[LiveTalkMessageOut] = []
+    reactions: list[LiveTalkReactionOut] = []
+    pinned_usernames: list[str] = []
+
+
 class TopicOut(BaseModel):
     id: str
     arena_key: str
@@ -705,3 +815,114 @@ class SurfacePostCreate(BaseModel):
         if v not in ("for", "against"):
             raise ValueError("debate_side must be for or against")
         return v
+
+
+class FoundingStatusOut(BaseModel):
+    cap: int
+    amount_inr: int
+    min_problem_chars: int
+    slots_remaining: int
+    open: bool
+    my_status: Optional[str] = None  # eligible | payable | paid | None
+    my_kind: Optional[str] = None  # problem | debate
+    my_quality: Optional[dict] = None
+    qualify_arenas: list[str] = []
+    civic_arenas: list[str] = []
+    eval: Optional[dict] = None
+
+
+class FoundingRewardRow(BaseModel):
+    id: str
+    user_id: str
+    username: str
+    display_name: str
+    kind: str
+    amount_inr: int
+    status: str
+    qualifying_post_id: Optional[str] = None
+    qualifying_space_id: Optional[str] = None
+    note: str = ""
+    created_at: datetime
+    paid_at: Optional[datetime] = None
+    quality: Optional[dict] = None
+
+
+class FoundingRewardsOut(BaseModel):
+    cap: int
+    amount_inr: int
+    slots_remaining: int
+    eligible_count: int
+    payable_count: int = 0
+    paid_count: int
+    rewards: list[FoundingRewardRow]
+    eval: Optional[dict] = None
+
+
+class FoundingMarkPaid(BaseModel):
+    note: Optional[str] = ""
+
+
+class RaceLeaderRow(BaseModel):
+    post_id: str
+    text: str
+    like_count: int
+    prize_inr: int
+    author_id: str
+    username: str
+    display_name: str
+    created_at: datetime
+
+
+class RaceStatusOut(BaseModel):
+    period_key: str
+    starts_at: datetime
+    ends_at: datetime
+    cadence_days: int
+    prize_min: int
+    prize_max: int
+    min_likes_to_win: int
+    eval: str
+    leader: Optional[RaceLeaderRow] = None
+    leaderboard: list[RaceLeaderRow] = []
+    my_best: Optional[RaceLeaderRow] = None
+    my_rank: Optional[int] = None
+    period_paid: bool = False
+    period_winner_username: Optional[str] = None
+
+
+class RewardsOpsOut(BaseModel):
+    """Read-only queue for blue accounts (payout actions stay on /admin)."""
+    founding: FoundingRewardsOut
+    race: RaceStatusOut
+    note: str = "Blue can review progress. Mark paid / lock winner stays on /admin with ADMIN_SECRET."
+
+
+class RaceRewardRow(BaseModel):
+    id: str
+    period_key: str
+    user_id: str
+    username: str
+    post_id: str
+    like_count: int
+    amount_inr: int
+    status: str
+    note: str = ""
+    created_at: datetime
+    paid_at: Optional[datetime] = None
+    period_starts_at: datetime
+    period_ends_at: datetime
+
+
+class RaceRewardsOut(BaseModel):
+    current: RaceStatusOut
+    rewards: list[RaceRewardRow]
+
+
+class RaceCloseRequest(BaseModel):
+    period_key: Optional[str] = None
+    post_id: Optional[str] = None
+    note: Optional[str] = ""
+
+
+class RaceMarkPaid(BaseModel):
+    note: Optional[str] = ""

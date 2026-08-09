@@ -5,6 +5,9 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import Guidelines from "./pages/Guidelines";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
@@ -26,17 +29,18 @@ import ArenaDetail from "./pages/ArenaDetail";
 import Spaces from "./pages/Spaces";
 import SpaceRoom from "./pages/SpaceRoom";
 import OnboardingTopics from "./pages/OnboardingTopics";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
-import Sidebar from "./components/Sidebar";
-import RightRail from "./components/RightRail";
+import Rewards from "./pages/Rewards";
 import BottomNav from "./components/BottomNav";
+import PlazaTopBar from "./components/PlazaTopBar";
+import PlazaSideMenu from "./components/PlazaSideMenu";
 import EmailVerifyBanner from "./components/EmailVerifyBanner";
 import Logo from "./components/Logo";
 import ThemeOnboarding from "./components/ThemeOnboarding";
+import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
+import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
 
-function AuthChrome({ children }) {
+function AuthChrome({ children, legal = false }) {
   return (
     <div className="page page-auth">
       <header className="topbar topbar-minimal">
@@ -44,7 +48,8 @@ function AuthChrome({ children }) {
           <Logo variant="full" className="topbar-logo" />
         </Link>
       </header>
-      <main>{children}</main>
+      {/* Legal docs use an explicit layout class — never rely on :has() alone. */}
+      <main className={`page-auth-main${legal ? " page-auth-main--legal" : ""}`}>{children}</main>
     </div>
   );
 }
@@ -53,12 +58,12 @@ function AdminChrome({ children }) {
   return (
     <div className="page page-admin">
       <header className="admin-topbar">
-        <Link to="/" className="admin-brand" aria-label="BaratX Home">
+        <Link to="/" className="admin-brand" aria-label="BarathX Home">
           <Logo variant="full" className="admin-topbar-logo" />
           <span className="admin-topbar-badge">Admin</span>
         </Link>
         <Link to="/" className="admin-topbar-back">
-          Back to BaratX
+          Back to BarathX
         </Link>
       </header>
       <main className="admin-main">{children}</main>
@@ -66,45 +71,57 @@ function AdminChrome({ children }) {
   );
 }
 
-function AppShell() {
+function PlazaShell() {
+  const { open } = usePlazaMenu();
   return (
-    <div className="app-shell">
-      <Sidebar />
-      <main className="app-main">
-        <EmailVerifyBanner />
-        <ThemeOnboarding />
-        <Routes>
-          <Route path="/" element={<Navigate to="/feed" replace />} />
-          <Route path="/signup" element={<Navigate to="/feed" replace />} />
-          <Route path="/login" element={<Navigate to="/feed" replace />} />
-          <Route path="/feed" element={<Feed />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/notifications" element={<Notifications />} />
-          <Route path="/bookmarks" element={<Bookmarks />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/messages/:username" element={<MessageThread />} />
-          <Route path="/hashtag/:tag" element={<Hashtag />} />
-          <Route path="/posts/:postId" element={<PostDetail />} />
-          <Route path="/u/:username" element={<Profile />} />
-          <Route path="/u/:username/:kind" element={<FollowList />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/lists" element={<Lists />} />
-          <Route path="/lists/:listId" element={<ListDetail />} />
-          <Route path="/communities" element={<Communities />} />
-          <Route path="/communities/:slug" element={<CommunityDetail />} />
-          <Route path="/arenas" element={<Arenas />} />
-          <Route path="/arenas/:arenaKey" element={<ArenaDetail />} />
-          <Route path="/spaces" element={<Spaces />} />
-          <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
-          <Route path="/onboarding/topics" element={<OnboardingTopics />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="*" element={<Navigate to="/feed" replace />} />
-        </Routes>
-      </main>
-      <RightRail />
-      <BottomNav />
+    <div className={`app-shell app-shell-plaza${open ? " is-menu-open" : ""}`}>
+      <div className="plaza-shell-body">
+        <PlazaTopBar />
+        <main className="app-main app-main-plaza">
+          <EmailVerifyBanner />
+          <ThemeOnboarding />
+          <AppRoutes />
+        </main>
+        <ComposeFab />
+        <BottomNav />
+      </div>
+      <PlazaSideMenu />
     </div>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/feed" replace />} />
+      <Route path="/signup" element={<Navigate to="/feed" replace />} />
+      <Route path="/login" element={<Navigate to="/feed" replace />} />
+      <Route path="/feed" element={<Feed />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/notifications" element={<Notifications />} />
+      <Route path="/bookmarks" element={<Bookmarks />} />
+      <Route path="/messages" element={<Messages />} />
+      <Route path="/messages/:username" element={<MessageThread />} />
+      <Route path="/hashtag/:tag" element={<Hashtag />} />
+      <Route path="/posts/:postId" element={<PostDetail />} />
+      <Route path="/u/:username" element={<Profile />} />
+      <Route path="/u/:username/:kind" element={<FollowList />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/lists" element={<Lists />} />
+      <Route path="/lists/:listId" element={<ListDetail />} />
+      <Route path="/communities" element={<Communities />} />
+      <Route path="/communities/:slug" element={<CommunityDetail />} />
+      <Route path="/arenas" element={<Arenas />} />
+      <Route path="/arenas/:arenaKey" element={<ArenaDetail />} />
+      <Route path="/spaces" element={<Spaces />} />
+      <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
+      <Route path="/onboarding/topics" element={<OnboardingTopics />} />
+      <Route path="/rewards" element={<Rewards />} />
+      <Route path="/guidelines" element={<Guidelines />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="*" element={<Navigate to="/feed" replace />} />
+    </Routes>
   );
 }
 
@@ -113,7 +130,7 @@ export default function App() {
   const location = useLocation();
 
   if (loading) {
-    return <div className="page-loading">Starting BaratX…</div>;
+    return <div className="page-loading">Starting BarathX…</div>;
   }
 
   // Admin + email confirm / password reset stay outside the app shell.
@@ -138,6 +155,27 @@ export default function App() {
       </AuthChrome>
     );
   }
+  if (location.pathname === "/privacy") {
+    return (
+      <AuthChrome legal>
+        <Privacy />
+      </AuthChrome>
+    );
+  }
+  if (location.pathname === "/terms") {
+    return (
+      <AuthChrome legal>
+        <Terms />
+      </AuthChrome>
+    );
+  }
+  if (location.pathname === "/guidelines") {
+    return (
+      <AuthChrome legal>
+        <Guidelines />
+      </AuthChrome>
+    );
+  }
 
   if (!token) {
     return (
@@ -151,14 +189,7 @@ export default function App() {
             </AuthChrome>
           }
         />
-        <Route
-          path="/login"
-          element={
-            <AuthChrome>
-              <Login />
-            </AuthChrome>
-          }
-        />
+        <Route path="/login" element={<Login />} />
         <Route
           path="/forgot-password"
           element={
@@ -170,7 +201,7 @@ export default function App() {
         <Route
           path="/privacy"
           element={
-            <AuthChrome>
+            <AuthChrome legal>
               <Privacy />
             </AuthChrome>
           }
@@ -178,8 +209,16 @@ export default function App() {
         <Route
           path="/terms"
           element={
-            <AuthChrome>
+            <AuthChrome legal>
               <Terms />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/guidelines"
+          element={
+            <AuthChrome legal>
+              <Guidelines />
             </AuthChrome>
           }
         />
@@ -189,5 +228,9 @@ export default function App() {
     );
   }
 
-  return <AppShell />;
+  return (
+    <PlazaMenuProvider>
+      <PlazaShell />
+    </PlazaMenuProvider>
+  );
 }

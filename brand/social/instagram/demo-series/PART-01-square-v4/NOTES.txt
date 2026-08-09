@@ -1,0 +1,13 @@
+# Part 1 Square — v4 (screen recording)
+
+## Why v4
+v3 used tiny static screenshots on black + harsh synthetic audio.
+v4 is a **real mobile screen recording** of barathx.com, cropped to the phone UI and scaled to fill 1080×1920 (no black letterbox screenshots).
+
+## Audio
+Soft bed from demo mix (not Faah-only, not the harsh pulse). In IG, still attach a **trending India audio**.
+
+## Files
+- Latest: `/opt/cursor/artifacts/downloads/baratx-demo-PART1-LATEST.mp4`
+- Repo: `baratx-demo-PART1-v4.mp4`
+- Raw mobile capture: `raw-mobile-demo.mp4`

@@ -1,0 +1,93 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { rewardsApi } from "../api";
+import { useAuth } from "../context/AuthContext";
+
+/**
+ * Compact First 100 chip for Square home header — not a stacked strip.
+ */
+export default function FoundingChip({ refreshKey = 0 }) {
+  const { token } = useAuth();
+  const [status, setStatus] = useState(null);
+
+  useEffect(() => {
+    if (!token) return undefined;
+    let cancelled = false;
+    rewardsApi
+      .founding(token)
+      .then((data) => {
+        if (!cancelled) setStatus(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [token, refreshKey]);
+
+  if (!status) return null;
+
+  if (status.my_status === "paid") {
+    return (
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="First 100 reward paid">
+        <span className="founding-chip-star" aria-hidden="true">
+          ★
+        </span>
+        <span>First {status.cap}</span>
+        <span className="founding-chip-sep" aria-hidden="true">
+          ·
+        </span>
+        <span>Paid</span>
+      </Link>
+    );
+  }
+
+  if (status.my_status === "payable") {
+    return (
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="First 100 payout">
+        <span className="founding-chip-star" aria-hidden="true">
+          ★
+        </span>
+        <span>First {status.cap}</span>
+        <span className="founding-chip-sep" aria-hidden="true">
+          ·
+        </span>
+        <span>Payable</span>
+      </Link>
+    );
+  }
+
+  if (status.my_status === "eligible") {
+    const q = status.my_quality || {};
+    const progress =
+      status.my_kind === "debate"
+        ? `${q.stance_count || 0}/${q.need_stances || 2} stances`
+        : `${q.like_count || 0}/${q.need_likes || 25} likes`;
+    return (
+      <Link to="/rewards" className="founding-chip" aria-label="First 100 progress">
+        <span className="founding-chip-star" aria-hidden="true">
+          ★
+        </span>
+        <span>First {status.cap}</span>
+        <span className="founding-chip-sep" aria-hidden="true">
+          ·
+        </span>
+        <span>{progress}</span>
+      </Link>
+    );
+  }
+
+  if (!status.open || status.slots_remaining <= 0) return null;
+
+  return (
+    <Link to="/rewards" className="founding-chip" aria-label="First 100">
+      <span className="founding-chip-star" aria-hidden="true">
+        ★
+      </span>
+      <span>First {status.cap}</span>
+      <span className="founding-chip-sep" aria-hidden="true">
+        ·
+      </span>
+      <span>₹{status.amount_inr} · {status.slots_remaining} left</span>
+    </Link>
+  );
+}

@@ -16,6 +16,7 @@ export default function Signup() {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmAge18, setConfirmAge18] = useState(false);
 
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
@@ -25,12 +26,41 @@ export default function Signup() {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [devOtp, setDevOtp] = useState("");
-  const preferredArena = params.get("arena") || (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_arena") : "") || "";
+  const preferredArena =
+    params.get("arena") ||
+    (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_arena") : "") ||
+    "";
+  const nextPath = (() => {
+    const raw = (params.get("next") || "").trim();
+    if (raw.startsWith("/") && !raw.startsWith("//")) return raw;
+    return "";
+  })();
 
   useEffect(() => {
     const a = params.get("arena");
     if (a) sessionStorage.setItem("bx_arena", a);
-  }, [params]);
+    if (nextPath) sessionStorage.setItem("bx_next", nextPath);
+  }, [params, nextPath]);
+
+  function afterJoinPath() {
+    const stored =
+      (typeof sessionStorage !== "undefined" && sessionStorage.getItem("bx_next")) || nextPath;
+    if (stored && stored.startsWith("/") && !stored.startsWith("//")) {
+      sessionStorage.removeItem("bx_next");
+      return stored;
+    }
+    return "/feed?welcome=1";
+  }
+
+  function goAfterSignup() {
+    sessionStorage.setItem("bx_welcome", "1");
+    const dest = afterJoinPath();
+    if (dest === "/feed" || dest.startsWith("/feed?")) {
+      navigate(dest.includes("welcome") ? dest : "/feed?welcome=1");
+      return;
+    }
+    navigate(dest);
+  }
 
   async function joinArenaFromParams(accessToken) {
     const key = (preferredArena || "").trim().toLowerCase();
@@ -43,6 +73,13 @@ export default function Signup() {
     }
   }
 
+  function requireAge() {
+    if (!confirmAge18) {
+      setError("You must be 18 or older to join BarathX. Confirm your age to continue.");
+      return false;
+    }
+    return true;
+  }
 
   function goBackFromOtp() {
     setOtpSent(false);
@@ -53,6 +90,7 @@ export default function Signup() {
 
   async function handleEmailSignup(e) {
     e.preventDefault();
+    if (!requireAge()) return;
     const userErr = validateUsername(username);
     if (userErr) {
       setError(userErr);
@@ -66,14 +104,14 @@ export default function Signup() {
         password,
         username,
         display_name: displayName,
+        confirm_age_18: true,
       });
       if (res.dev_verify_url) {
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
       }
       login(res.access_token);
       await joinArenaFromParams(res.access_token);
-      sessionStorage.setItem("bx_welcome", "1");
-      navigate("/onboarding/topics");
+      goAfterSignup();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -83,6 +121,7 @@ export default function Signup() {
 
   async function handleRequestOtp(e) {
     e.preventDefault();
+    if (!requireAge()) return;
     if (!displayName.trim()) {
       setError("Enter your display name");
       return;
@@ -107,6 +146,7 @@ export default function Signup() {
 
   async function handleVerifyOtp(e) {
     e.preventDefault();
+    if (!requireAge()) return;
     const userErr = validateUsername(username);
     if (userErr) {
       setError(userErr);
@@ -121,11 +161,11 @@ export default function Signup() {
         username,
         display_name: displayName,
         region,
+        confirm_age_18: true,
       });
       login(access_token);
       await joinArenaFromParams(access_token);
-      sessionStorage.setItem("bx_welcome", "1");
-      navigate("/onboarding/topics");
+      goAfterSignup();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -137,13 +177,35 @@ export default function Signup() {
     <span className="hint">3–20 chars. Letters, numbers, _ . - (e.g. rahul_99 or john.doe)</span>
   );
 
+  const ageGate = (
+    <label className="age-gate">
+      <input
+        type="checkbox"
+        checked={confirmAge18}
+        onChange={(e) => {
+          setConfirmAge18(e.target.checked);
+          if (e.target.checked) setError("");
+        }}
+      />
+      <span>
+        I confirm I am <strong>18 or older</strong>. BarathX is for adults only.
+      </span>
+    </label>
+  );
+
   return (
     <div className="auth-card auth-card-x">
       <h1>Create your account</h1>
 
       {!otpSent && (
         <>
-          <GoogleSignInButton label="Sign up with Google" onError={setError} />
+          {ageGate}
+          <GoogleSignInButton
+            label="Sign up with Google"
+            onError={setError}
+            confirmAge18={confirmAge18}
+            requireAgeConfirm
+          />
 
           <div className="x-auth-or" role="separator">
             <span>or</span>
@@ -220,7 +282,7 @@ export default function Signup() {
               required
             />
           </label>
-          <button type="submit" disabled={busy}>
+          <button type="submit" disabled={busy || !confirmAge18}>
             {busy ? "Creating account..." : "Sign up"}
           </button>
         </form>
@@ -253,7 +315,7 @@ export default function Signup() {
             onRegionChange={setRegion}
             onPhoneChange={setPhone}
           />
-          <button type="submit" disabled={busy}>
+          <button type="submit" disabled={busy || !confirmAge18}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>
         </form>
@@ -267,6 +329,7 @@ export default function Signup() {
               </>
             )}
           </p>
+          {ageGate}
           <label>
             Username
             <input
@@ -290,7 +353,7 @@ export default function Signup() {
               required
             />
           </label>
-          <button type="submit" disabled={busy}>
+          <button type="submit" disabled={busy || !confirmAge18}>
             {busy ? "Verifying..." : "Verify & create account"}
           </button>
           <button type="button" className="auth-back-btn" onClick={goBackFromOtp} disabled={busy}>

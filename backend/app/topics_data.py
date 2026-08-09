@@ -1,19 +1,25 @@
-"""BaratX topic taxonomy — 30 India-trending subtopics per arena (Path C).
+"""BarathX topic taxonomy — 30 India-trending subtopics per arena (Path C).
 
 Each topic has an RSS query for Google News (IN). Used to seed debate prompts.
 """
 
 from __future__ import annotations
 
-# Default For/Against labels per arena (Startups = YC-style idea validation).
+# Default For/Against labels per arena.
 ARENA_DEBATE_SIDES: dict[str, tuple[str, str]] = {
     "sports": ("Agree", "Disagree"),
     "politics": ("Agree", "Disagree"),
     "entertainment": ("Agree", "Disagree"),
     "news": ("Agree", "Disagree"),
-    "startups": ("Fund it", "Pass"),
     "spirituality": ("Resonates", "Skeptical"),
+    "startups": ("Fund it", "Pass"),
 }
+
+# Public arenas shown in product.
+ACTIVE_ARENA_KEYS = frozenset(ARENA_DEBATE_SIDES.keys())
+
+# Civic pulse path — real problems / debates that count toward founding rewards.
+CIVIC_ARENA_KEYS = frozenset({"politics", "news"})
 
 
 def debate_sides_for(arena_key: str | None) -> tuple[str, str]:
@@ -150,39 +156,6 @@ TOPICS_BY_ARENA: dict[str, list[dict]] = {
         {"key": "viral", "name": "Viral India", "blurb": "Stories everyone shared.", "rss_query": "India viral news"},
         {"key": "investigations", "name": "Investigations", "blurb": "Longform and probes.", "rss_query": "India investigation news"},
     ],
-    # YC-style public square: pitch ideas, India votes Fund it / Pass.
-    "startups": [
-        {"key": "pitch-validation", "name": "Pitch Validation", "blurb": "Drop an idea. Get Fund it / Pass.", "rss_query": "India startup idea pitch"},
-        {"key": "yc-accelerators", "name": "YC & Accelerators", "blurb": "YC, Sequoia Arc, Surge, and more.", "rss_query": "Y Combinator India accelerator"},
-        {"key": "fundraising", "name": "Fundraising", "blurb": "Seed to Series rounds.", "rss_query": "India startup funding round"},
-        {"key": "ai-startups", "name": "AI Startups", "blurb": "Indic models, agents, infra.", "rss_query": "India AI startup funding Sarvam"},
-        {"key": "deeptech", "name": "Deep Tech", "blurb": "Chips, robotics, hard science.", "rss_query": "India deeptech startup"},
-        {"key": "fintech", "name": "Fintech", "blurb": "Payments, lending, UPI rails.", "rss_query": "India fintech startup"},
-        {"key": "saas", "name": "SaaS / B2B", "blurb": "Global SaaS from India.", "rss_query": "India SaaS startup"},
-        {"key": "d2c", "name": "D2C Brands", "blurb": "Beauty, health, unit economics.", "rss_query": "India D2C brand startup"},
-        {"key": "quick-commerce", "name": "Quick Commerce", "blurb": "10-minute delivery wars.", "rss_query": "India quick commerce"},
-        {"key": "healthtech", "name": "Healthtech", "blurb": "Care, diagnostics, medtech.", "rss_query": "India healthtech startup"},
-        {"key": "edtech", "name": "Edtech", "blurb": "Learning after the boom.", "rss_query": "India edtech startup"},
-        {"key": "climate-tech", "name": "Climate Tech", "blurb": "Clean energy and carbon.", "rss_query": "India climate tech startup"},
-        {"key": "space-tech", "name": "Space Tech", "blurb": "Private space and satellites.", "rss_query": "India space tech startup"},
-        {"key": "defence-tech", "name": "Defence Tech", "blurb": "Dual-use and defence startups.", "rss_query": "India defence startup"},
-        {"key": "semicon", "name": "Semiconductors", "blurb": "Design, packaging, fab dreams.", "rss_query": "India semiconductor startup"},
-        {"key": "agritech", "name": "Agritech", "blurb": "Farms, supply chains, tech.", "rss_query": "India agritech startup"},
-        {"key": "logistics", "name": "Logistics", "blurb": "Supply chain and mobility.", "rss_query": "India logistics startup"},
-        {"key": "wealthtech", "name": "Wealthtech", "blurb": "Investing for mass affluent India.", "rss_query": "India wealthtech startup"},
-        {"key": "insurtech", "name": "Insurtech", "blurb": "Insurance distribution tech.", "rss_query": "India insurtech startup"},
-        {"key": "unit-economics", "name": "Unit Economics", "blurb": "Burn, CAC, LTV fights.", "rss_query": "India startup unit economics"},
-        {"key": "product-market-fit", "name": "Product-Market Fit", "blurb": "Do users actually want it?", "rss_query": "startup product market fit"},
-        {"key": "founder-stories", "name": "Founder Stories", "blurb": "Builds, pivots, exits.", "rss_query": "India startup founder"},
-        {"key": "layoffs-hiring", "name": "Hiring & Layoffs", "blurb": "Talent market reality.", "rss_query": "India startup layoffs hiring"},
-        {"key": "ipo-exits", "name": "IPO & Exits", "blurb": "Listings and M&A.", "rss_query": "India startup IPO OYO Zepto"},
-        {"key": "tier2-startups", "name": "Tier-2 / Bharat", "blurb": "Building beyond metros.", "rss_query": "India Tier 2 startup Bharat"},
-        {"key": "women-founders", "name": "Women Founders", "blurb": "Capital and representation.", "rss_query": "India women founders startups"},
-        {"key": "regtech", "name": "Policy & Regtech", "blurb": "DPI, compliance, regulation.", "rss_query": "India startup regulation DPI"},
-        {"key": "investor-takes", "name": "Investor Takes", "blurb": "What VCs are funding now.", "rss_query": "India venture capital 2026"},
-        {"key": "ev-mobility", "name": "EV & Mobility", "blurb": "EVs, charging, mobility.", "rss_query": "India EV startup mobility"},
-        {"key": "global-from-india", "name": "Global from Day One", "blurb": "India-built, world-sold.", "rss_query": "India global SaaS startup"},
-    ],
     "spirituality": [
         {"key": "bhajan-clubbing", "name": "Bhajan Clubbing", "blurb": "Gen Z devotion meets nightlife.", "rss_query": "bhajan clubbing India"},
         {"key": "yoga", "name": "Yoga", "blurb": "Practice, teachers, International Day.", "rss_query": "yoga India"},
@@ -214,6 +187,38 @@ TOPICS_BY_ARENA: dict[str, list[dict]] = {
         {"key": "wellness-retreats", "name": "Wellness Retreats", "blurb": "Retreats that mix spa + spirit.", "rss_query": "India wellness spiritual retreat"},
         {"key": "seva", "name": "Seva & Charity", "blurb": "Service as spiritual practice.", "rss_query": "seva charity India"},
         {"key": "digital-faith", "name": "Digital Faith", "blurb": "Online satsang and apps.", "rss_query": "spirituality app India online"},
+    ],
+    "startups": [
+        {"key": "funding", "name": "Funding", "blurb": "Rounds, valuations, dry powder.", "rss_query": "India startup funding round"},
+        {"key": "unicorns", "name": "Unicorns", "blurb": "Unicorns and soonicorns.", "rss_query": "India unicorn startup"},
+        {"key": "layoffs", "name": "Layoffs", "blurb": "Hiring freezes and cuts.", "rss_query": "India startup layoffs"},
+        {"key": "fintech", "name": "Fintech", "blurb": "Payments, lending, UPI plays.", "rss_query": "India fintech startup"},
+        {"key": "saas", "name": "SaaS", "blurb": "B2B software builders.", "rss_query": "India SaaS startup"},
+        {"key": "consumer", "name": "Consumer Apps", "blurb": "D2C and consumer internet.", "rss_query": "India consumer startup D2C"},
+        {"key": "edtech", "name": "Edtech", "blurb": "Learning startups.", "rss_query": "India edtech startup"},
+        {"key": "healthtech", "name": "Healthtech", "blurb": "Health and wellness startups.", "rss_query": "India healthtech startup"},
+        {"key": "climate-tech", "name": "Climate Tech", "blurb": "Green and energy startups.", "rss_query": "India climate tech startup"},
+        {"key": "deeptech", "name": "Deep Tech", "blurb": "Hardware, AI, space tech.", "rss_query": "India deep tech AI startup"},
+        {"key": "policy-startup", "name": "Startup Policy", "blurb": "DPIIT, tax, compliance.", "rss_query": "Startup India DPIIT policy"},
+        {"key": "ipo", "name": "IPO Pipeline", "blurb": "Listings and public markets.", "rss_query": "India startup IPO"},
+        {"key": "vcs", "name": "VCs & Angels", "blurb": "Investors and theses.", "rss_query": "India venture capital startup"},
+        {"key": "exits", "name": "Exits & M&A", "blurb": "Acquisitions and exits.", "rss_query": "India startup acquisition"},
+        {"key": "tier2", "name": "Tier-2 Builders", "blurb": "Startups beyond metros.", "rss_query": "India tier 2 startup"},
+        {"key": "women-founders", "name": "Women Founders", "blurb": "Women-led startups.", "rss_query": "India women founders startup"},
+        {"key": "quick-commerce", "name": "Quick Commerce", "blurb": "10-minute delivery wars.", "rss_query": "India quick commerce startup"},
+        {"key": "mobility", "name": "Mobility", "blurb": "EV and ride startups.", "rss_query": "India EV startup mobility"},
+        {"key": "agritech", "name": "Agritech", "blurb": "Farm and food startups.", "rss_query": "India agritech startup"},
+        {"key": "gaming-startups", "name": "Gaming Startups", "blurb": "Studios and platforms.", "rss_query": "India gaming startup"},
+        {"key": "cyber-startups", "name": "Cybersecurity", "blurb": "Security builders.", "rss_query": "India cybersecurity startup"},
+        {"key": "press-startup", "name": "Press & Briefings", "blurb": "PIB / founder press notes.", "rss_query": "India startup press conference PIB"},
+        {"key": "profitability", "name": "Path to Profit", "blurb": "Unit economics fights.", "rss_query": "India startup profitability"},
+        {"key": "regtech", "name": "Regtech", "blurb": "Compliance startups.", "rss_query": "India regtech startup"},
+        {"key": "marketplace", "name": "Marketplaces", "blurb": "Platform businesses.", "rss_query": "India marketplace startup"},
+        {"key": "hardware", "name": "Hardware", "blurb": "Make-in-India hardware.", "rss_query": "India hardware startup manufacturing"},
+        {"key": "ai-startups", "name": "AI Startups", "blurb": "Applied AI in India.", "rss_query": "India AI startup"},
+        {"key": "space-startups", "name": "Space Startups", "blurb": "Private space race.", "rss_query": "India space startup"},
+        {"key": "banking-startups", "name": "Neo Banks", "blurb": "Digital banking plays.", "rss_query": "India neobank startup"},
+        {"key": "founder-stories", "name": "Founder Stories", "blurb": "Builds, pivots, lessons.", "rss_query": "India startup founder interview"},
     ],
 }
 

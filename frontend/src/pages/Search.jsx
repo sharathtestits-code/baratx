@@ -5,10 +5,11 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import { IconSearch } from "../components/Icons";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 import SuggestedFollows from "../components/SuggestedFollows";
 
 const QUICK_SEARCHES = [
-  { label: "BaratX", query: "BaratX" },
+  { label: "BarathX", query: "BarathX" },
   { label: "Startup India", query: "StartupIndia" },
   { label: "IPL", query: "IPL" },
   { label: "Monsoon", query: "Monsoon" },
@@ -65,7 +66,6 @@ export default function Search() {
     inputRef.current?.focus();
   }
 
-
   async function toggleFollowUser(u) {
     if (!token || followBusy || u.username === user?.username) return;
     setFollowBusy(u.username);
@@ -87,38 +87,38 @@ export default function Search() {
   }
 
   return (
-    <div className="feed-wrap">
-      <header className="search-header">
-        <h1 className="search-title">Explore</h1>
-        <form className="search-form" onSubmit={handleSubmit} role="search">
-          <IconSearch className="search-form-icon" aria-hidden="true" />
-          <input
-            ref={inputRef}
-            type="search"
-            placeholder="Search people, posts, topics…"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            aria-label="Search BaratX"
-            enterKeyHint="search"
-            autoComplete="off"
-          />
-          {inputValue ? (
-            <button type="button" className="search-clear" onClick={clearQuery} aria-label="Clear search">
-              ×
-            </button>
-          ) : null}
-          <button type="submit" className="search-submit" disabled={!inputValue.trim()}>
-            Search
+    <div className="plaza-page plaza-explore">
+      <PlazaPageHeader
+        title="Explore"
+        sub="People, posts, and topics across India."
+      />
+
+      <form className="plaza-search-form search-form" onSubmit={handleSubmit} role="search">
+        <IconSearch className="search-form-icon" aria-hidden="true" />
+        <input
+          ref={inputRef}
+          type="search"
+          placeholder="Search people, posts, topics…"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          aria-label="Search BarathX"
+          enterKeyHint="search"
+          autoComplete="off"
+        />
+        {inputValue ? (
+          <button type="button" className="search-clear" onClick={clearQuery} aria-label="Clear search">
+            ×
           </button>
-        </form>
-      </header>
+        ) : null}
+        <button type="submit" className="search-submit" disabled={!inputValue.trim()}>
+          Search
+        </button>
+      </form>
 
       {error && <div className="error">{error}</div>}
 
       {!q.trim() ? (
-        <div className="search-empty">
-          <p className="search-empty-lead">Find people and conversations across India.</p>
-          <p className="hint">Try a name, @username, or a topic.</p>
+        <div className="search-empty plaza-explore-empty">
           <SuggestedFollows
             title="Who to follow"
             note="Tap Follow to start seeing their posts."

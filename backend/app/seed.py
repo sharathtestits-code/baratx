@@ -1,4 +1,4 @@
-"""Idempotent official BaratX accounts + starter posts for cold-start density."""
+"""Idempotent official BarathX accounts + starter posts for cold-start density."""
 
 from __future__ import annotations
 
@@ -16,27 +16,27 @@ logger = logging.getLogger("baratx.seed")
 OFFICIAL_ACCOUNTS = [
     {
         "username": "baratx",
-        "display_name": "BaratX",
-        "bio": "Official BaratX — product updates and India conversation prompts.",
+        "display_name": "BarathX",
+        "bio": "Official BarathX — product updates and India conversation prompts.",
         "badge": "blue",
         "posts": [
-            "BaratX is live. India’s public square — short posts, real conversation. Drop your city below.",
+            "BarathX is live. India’s public square — short posts, real conversation. Drop your city below.",
             "Rule for this square: reply > like. Say something someone can answer.",
         ],
     },
     {
         "username": "sharath",
         "display_name": "Sharath",
-        "bio": "Founder of BaratX. Building India’s public square.",
+        "bio": "Founder of BarathX. Building India’s public square.",
         "badge": "blue",
         "posts": [
-            "I’m Sharath — building BaratX so India gets a real public square, not another firehose. Tell me what you want here.",
+            "I’m Sharath — building BarathX so India gets a real public square, not another firehose. Tell me what you want here.",
         ],
     },
     {
         "username": "bharatvoices",
         "display_name": "Bharat Voices",
-        "bio": "Official BaratX — culture, ideas, everyday India.",
+        "bio": "Official BarathX — culture, ideas, everyday India.",
         "badge": "gold",
         "posts": [
             "What’s one India story the feeds keep getting wrong? Reply with your take.",
@@ -45,7 +45,7 @@ OFFICIAL_ACCOUNTS = [
     {
         "username": "indiatech",
         "display_name": "India Tech Daily",
-        "bio": "Official BaratX — startups, policy, and builders across India.",
+        "bio": "Official BarathX — startups, policy, and builders across India.",
         "badge": "gold",
         "posts": [
             "Builders in Hyderabad / Bangalore / Delhi — what are you shipping this week?",
@@ -90,8 +90,12 @@ def seed_official_accounts(db: Session) -> None:
             created_any = True
             logger.info("Seeded official account @%s (%s)", acct["username"], want_badge)
         else:
-            if not (user.bio or "").strip():
+            if user.display_name != acct["display_name"]:
+                user.display_name = acct["display_name"]
+                created_any = True
+            if not (user.bio or "").strip() or "BaratX" in (user.bio or ""):
                 user.bio = acct["bio"]
+                created_any = True
             current = (getattr(user, "badge", None) or "none").strip().lower()
             # Promote seeded brand accounts up to their intended badge; never demote a live blue.
             if want_badge == "blue" and current != "blue":
@@ -193,16 +197,16 @@ ARENA_TOPICS = [
         "description": "Breaking stories and the takes India can’t ignore.",
     },
     {
-        "key": "startups",
-        "slug": "startups",
-        "name": "Startups",
-        "description": "India’s idea square — pitch like YC, crowd votes Fund it or Pass.",
-    },
-    {
         "key": "spirituality",
         "slug": "spirituality",
         "name": "Spirituality",
         "description": "Faith, yoga, festivals, and the searches shaping modern India.",
+    },
+    {
+        "key": "startups",
+        "slug": "startups",
+        "name": "Startups",
+        "description": "Funding, founders, and the India builder economy — Fund it or Pass.",
     },
 ]
 
@@ -232,18 +236,6 @@ SAMPLE_DEBATES = [
         "side_against": "Still essential",
     },
     {
-        "arena_key": "startups",
-        "title": "Should every Indian founder apply to YC before raising locally?",
-        "side_for": "Fund it",
-        "side_against": "Pass",
-    },
-    {
-        "arena_key": "startups",
-        "title": "Pitch: AI tutor for Bharat vernacular exams — Fund it or Pass?",
-        "side_for": "Fund it",
-        "side_against": "Pass",
-    },
-    {
         "arena_key": "spirituality",
         "title": "Is bhajan clubbing devotion — or just a new nightlife product?",
         "side_for": "Resonates",
@@ -255,11 +247,17 @@ SAMPLE_DEBATES = [
         "side_for": "Resonates",
         "side_against": "Skeptical",
     },
+    {
+        "arena_key": "startups",
+        "title": "Should India prioritize profitability over growth-at-all-costs?",
+        "side_for": "Fund it",
+        "side_against": "Pass",
+    },
 ]
 
 
 def seed_arenas(db: Session) -> None:
-    """Seed all arenas + starter debates (incl. Startups & Spirituality)."""
+    """Seed active arenas + starter debates (including Startups)."""
     host = db.query(models.User).filter(models.User.username == "baratx").first()
     if not host:
         return
@@ -341,7 +339,7 @@ def seed_arenas(db: Session) -> None:
 
 
 def follow_official_accounts(db: Session, user: models.User) -> int:
-    """Auto-follow official BaratX accounts. Returns number of new follows."""
+    """Auto-follow official BarathX accounts. Returns number of new follows."""
     added = 0
     for username in OFFICIAL_USERNAMES:
         target = db.query(models.User).filter(models.User.username == username).first()

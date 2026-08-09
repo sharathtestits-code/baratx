@@ -1,12 +1,12 @@
-# BaratX mobile apps (Capacitor)
+# BarathX mobile apps (Capacitor)
 
-BaratX Android + iOS ship as **Capacitor** shells around the existing Vite React app.
+BarathX Android + iOS ship as **Capacitor** shells around the existing Vite React app.
 
 **Soft launch (Gen Z):** see **[brand/mobile/SOFT-LAUNCH.md](./brand/mobile/SOFT-LAUNCH.md)** — Android Internal testing first, then TestFlight.
 
 | Item | Value |
 |------|--------|
-| App name | BaratX |
+| App name | BarathX |
 | Bundle / application id | `com.baratx.app` |
 | Version | `0.1.0` (Android versionCode 2) |
 | Web assets | `frontend/dist` (synced into native projects) |

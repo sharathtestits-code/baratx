@@ -163,9 +163,38 @@ export function IconQuote({ className = "" }) {
 }
 
 export function IconArena({ className = "" }) {
+  // Amphitheatre / public square — matches Arenas as debate floors.
   return (
-    <svg viewBox="0 0 24 24" className={`icon ${className}`} fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 19h16M6 19V9l6-4 6 4v10M9 19v-5h6v5" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      className={`icon ${className}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 19c2.8-5 5.8-7.5 9-7.5S18.2 14 21 19" />
+      <path d="M6.2 19c1.9-3.2 3.9-4.7 5.8-4.7s3.9 1.5 5.8 4.7" />
+      <path d="M12 4.5v5.5M9.5 7h5" />
+      <path d="M4 19h16" />
+    </svg>
+  );
+}
+
+export function IconLive({ className = "" }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={`icon ${className}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 12h2l2-5 3 10 2-6 2 3h5" />
+      <circle cx="19" cy="7" r="2" fill="currentColor" stroke="none" />
     </svg>
   );
 }

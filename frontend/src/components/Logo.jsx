@@ -1,14 +1,14 @@
 import { useId } from "react";
 
 /**
- * BaratX logo system:
+ * BarathX logo system:
  * - mark: BX circle (favicon / compact nav)
- * - wordmark: BaratX with custom X
+ * - wordmark: BarathX with custom X
  * - full: mark + wordmark
  *
  * Brand color only (saffron/warm ink) — no saffron–white–green flag ring.
  */
-export function LogoMark({ className = "", title = "BaratX" }) {
+export function LogoMark({ className = "", title = "BarathX" }) {
   const uid = useId().replace(/:/g, "");
   const ringId = `bxRing-${uid}`;
 
@@ -27,12 +27,12 @@ export function LogoMark({ className = "", title = "BaratX" }) {
       <defs>
         <linearGradient id={ringId} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#3D2314" />
-          <stop offset="55%" stopColor="#C45A12" />
-          <stop offset="100%" stopColor="#FF671F" />
+          <stop offset="45%" stopColor="#C45A12" />
+          <stop offset="100%" stopColor="#FF9933" />
         </linearGradient>
       </defs>
       <circle cx="16" cy="16" r="15.25" fill={`url(#${ringId})`} />
-      <circle cx="16" cy="16" r="12.1" fill="#FF671F" />
+      <circle cx="16" cy="16" r="12.1" fill="#FF9933" />
       <text
         x="16"
         y="20.6"
@@ -49,10 +49,10 @@ export function LogoMark({ className = "", title = "BaratX" }) {
   );
 }
 
-export function LogoWordmark({ className = "", title = "BaratX" }) {
+export function LogoWordmark({ className = "", title = "BarathX" }) {
   return (
     <span className={`logo-wordmark ${className}`} aria-label={title || undefined} aria-hidden={title ? undefined : true}>
-      <span className="logo-wordmark-barat">Barat</span>
+      <span className="logo-wordmark-barat">Barath</span>
       <span className="logo-wordmark-x" aria-hidden="true">
         X
       </span>
@@ -65,7 +65,7 @@ export default function Logo({
   className = "",
   markClassName = "",
   wordmarkClassName = "",
-  title = "BaratX",
+  title = "BarathX",
 }) {
   if (variant === "mark") {
     return <LogoMark className={`${className} ${markClassName}`.trim()} title={title} />;

@@ -3,11 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { IconSearch } from "./Icons";
 import SuggestedFollows from "./SuggestedFollows";
 
-const TRENDING_TOPICS = [
-  { label: "BaratX", query: "BaratX", meta: "On BaratX" },
-  { label: "#StartupIndia", query: "StartupIndia", meta: "Explore" },
-  { label: "#IPL", query: "IPL", meta: "Sports" },
-  { label: "Monsoon", query: "Monsoon", meta: "India today" },
+const TRENDING_ORBITS = [
+  { label: "BarathX", query: "BarathX", meta: "On BarathX", members: "Official", energy: 92 },
+  { label: "#StartupIndia", query: "StartupIndia", meta: "Builders", members: "Orbit", energy: 78 },
+  { label: "#IPL", query: "IPL", meta: "Sports", members: "Hot", energy: 88 },
+  { label: "Monsoon", query: "Monsoon", meta: "Local drops", members: "India today", energy: 64 },
+  { label: "Politics", query: "Politics", meta: "Arena", members: "Debate", energy: 71 },
 ];
 
 export default function RightRail() {
@@ -22,16 +23,16 @@ export default function RightRail() {
   }
 
   return (
-    <aside className="right-rail" aria-label="Explore">
+    <aside className="right-rail" aria-label="Discover">
       <div className="right-rail-inner">
         <form className="rail-search" onSubmit={handleSearch} role="search">
           <IconSearch className="rail-search-icon" aria-hidden="true" />
           <input
             type="search"
-            placeholder="Search BaratX"
+            placeholder="Search BarathX"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search BaratX"
+            aria-label="Search BarathX"
             enterKeyHint="search"
             autoComplete="off"
           />
@@ -49,25 +50,29 @@ export default function RightRail() {
 
         <div className="rail-card rail-card-suggested">
           <SuggestedFollows
-            title="Official BaratX"
-            note="Seed accounts run by BaratX — not organic third parties."
+            title="Official BarathX"
+            note="Seed accounts run by BarathX — not organic third parties."
           />
         </div>
 
         <section className="rail-card">
-          <h2 className="rail-card-title">Trending topics</h2>
+          <h2 className="rail-card-title">Trending Orbits</h2>
           <ul className="rail-trends">
-            {TRENDING_TOPICS.map((topic) => (
+            {TRENDING_ORBITS.map((topic) => (
               <li key={topic.query}>
                 <Link to={`/search?q=${encodeURIComponent(topic.query)}`} className="rail-trend">
                   <span className="rail-trend-meta">{topic.meta}</span>
                   <span className="rail-trend-label">{topic.label}</span>
+                  <span className="rail-trend-members">{topic.members}</span>
+                  <span className="orbit-energy" aria-hidden="true">
+                    <span style={{ width: `${topic.energy}%` }} />
+                  </span>
                 </Link>
               </li>
             ))}
           </ul>
-          <Link to="/search" className="rail-card-more">
-            Show more
+          <Link to="/arenas" className="rail-card-more">
+            Browse arenas
           </Link>
         </section>
       </div>

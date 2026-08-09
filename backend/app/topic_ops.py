@@ -202,7 +202,10 @@ def refresh_debate_prompts(
             continue
         for item in items:
             link = (item.get("link") or "").strip()
-            title = rss.headline_to_debate_title(item.get("title") or "")
+            title = rss.headline_to_debate_title(
+                item.get("title") or "",
+                arena_key=topic.arena_key,
+            )
             if link:
                 exists = (
                     db.query(models.Space)

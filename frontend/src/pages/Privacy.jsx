@@ -1,60 +1,59 @@
 import { Link } from "react-router-dom";
 
-/** Public Privacy Policy — required for Play Store / App Store soft launch. */
 export default function Privacy() {
   return (
-    <article className="legal-doc">
+    <div className="legal-page">
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: 9 August 2026 · BaratX (barathx.com)</p>
-
+      <p className="legal-updated">Last updated: August 6, 2026</p>
       <p>
-        BaratX (“we”, “us”) is India’s public square for short posts and sided debates.
-        This policy explains what we collect and how we use it when you use barathx.com
-        or the BaratX Android / iOS apps.
+        BarathX (BX) is India’s text-first public square at <strong>barathx.com</strong>. This page
+        explains what we collect and how we use it — in plain language.
       </p>
 
       <h2>What we collect</h2>
       <ul>
-        <li>Account info: phone number and/or email, username, display name, bio, avatar</li>
-        <li>Content you post: posts, replies, votes/sides, messages, community activity</li>
-        <li>Usage data: device type, app/browser, approximate region, crash/diagnostic logs</li>
-        <li>Optional: contacts you choose to follow; topic interests you pick at onboarding</li>
+        <li>Account details you provide: display name, username, email and/or phone</li>
+        <li>Content you post: posts, replies, images you upload</li>
+        <li>Basic technical data needed to run the service (login session, device/browser basics)</li>
       </ul>
 
       <h2>How we use it</h2>
       <ul>
-        <li>To create and secure your account (including OTP / email verification)</li>
-        <li>To show your posts and profile to other users on BaratX</li>
-        <li>To operate feed, Arenas, notifications, and safety tools</li>
-        <li>To improve the product and prevent abuse</li>
+        <li>To create and secure your account</li>
+        <li>To show your posts and replies to other BarathX users</li>
+        <li>To send verification or important account messages</li>
+        <li>To keep the product working and safe (spam/abuse prevention)</li>
       </ul>
 
-      <h2>Sharing</h2>
+      <h2>What we don’t do</h2>
+      <ul>
+        <li>We don’t sell your personal data</li>
+        <li>We don’t run ads based on selling your profile to brokers</li>
+        <li>Passwords are stored hashed — we can’t read your password</li>
+      </ul>
+
+      <h2>Security</h2>
       <p>
-        We do not sell your personal data. We may share data with infrastructure providers
-        (hosting, email/SMS delivery) only to run BaratX, or when required by law.
-        Content you post publicly is visible to other BaratX users.
+        barathx.com is served over HTTPS. Sign-in uses secure session tokens. You can sign in with
+        Google if you prefer not to create a new password.
       </p>
 
-      <h2>Retention & deletion</h2>
-      <p>
-        We keep account and content data while your account is active. Contact us to
-        request account deletion; we will remove or anonymize personal data except where
-        we must retain it for legal or safety reasons.
-      </p>
-
-      <h2>Children</h2>
-      <p>BaratX is not directed at children under 13. Soft-launch testers should be 18+.</p>
+      <h2>Your choices</h2>
+      <ul>
+        <li>Edit your profile anytime</li>
+        <li>Delete posts you create</li>
+        <li>Contact us to request account deletion</li>
+      </ul>
 
       <h2>Contact</h2>
       <p>
-        Questions or deletion requests:{" "}
+        Questions about privacy:{" "}
         <a href="mailto:hello@barathx.com">hello@barathx.com</a>
       </p>
 
       <p className="legal-back">
-        <Link to="/">← Back to BaratX</Link>
+        <Link to="/">← Back to BarathX</Link>
       </p>
-    </article>
+    </div>
   );
 }

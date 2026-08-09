@@ -1,0 +1,41 @@
+import { useState } from "react";
+import { todaysSquareKey, todaysSquareQuestion } from "../square";
+
+/**
+ * Daily mission strip — one shared India question so newcomers have something to join.
+ */
+export default function TodaysSquare({ onAnswer }) {
+  const question = todaysSquareQuestion();
+  const dayKey = todaysSquareKey();
+  const [skipped, setSkipped] = useState(
+    () => typeof localStorage !== "undefined" && localStorage.getItem(`bx_square_skip_${dayKey}`) === "1"
+  );
+
+  if (skipped) return null;
+
+  function skip() {
+    localStorage.setItem(`bx_square_skip_${dayKey}`, "1");
+    setSkipped(true);
+  }
+
+  return (
+    <section className="todays-square" aria-label="Today’s Square">
+      <span className="for-you-chip" aria-hidden="true">
+        For You Now
+      </span>
+      <div className="todays-square-head">
+        <div>
+          <p className="todays-square-label">Today’s Square</p>
+          <h2 className="todays-square-title">{question}</h2>
+          <p className="todays-square-sub">Post your take. Someone will talk back.</p>
+        </div>
+        <button type="button" className="todays-square-skip" onClick={skip}>
+          Later
+        </button>
+      </div>
+      <button type="button" className="todays-square-cta" onClick={() => onAnswer?.(question)}>
+        Answer today’s question
+      </button>
+    </section>
+  );
+}

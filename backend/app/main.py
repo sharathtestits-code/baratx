@@ -2,17 +2,18 @@ import os
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Optional
 
 from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, media_store, models, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, media_store, models, rewards, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -173,7 +174,7 @@ def run_migrations():
 
 run_migrations()
 
-# Cold-start density: official BaratX accounts + starter posts + communities.
+# Cold-start density: official BarathX accounts + starter posts + communities.
 with SessionLocal() as _seed_db:
     try:
         seed.seed_official_accounts(_seed_db)
@@ -215,7 +216,7 @@ with SessionLocal() as _seed_db:
         logging.getLogger("baratx").exception("Prompt refresh on boot failed")
 
 
-app = FastAPI(title="BaratX API", version="0.5.0")
+app = FastAPI(title="BarathX API", version="0.5.0")
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "").strip()
@@ -426,7 +427,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         email=user.email,
         phone=user.phone,
         language=user.language,
-        theme=getattr(user, "theme", None) or "saffron",
+        theme=getattr(user, "theme", None) or "midnight",
         bio=user.bio,
         is_email_verified=user.is_email_verified,
         is_phone_verified=user.is_phone_verified,
@@ -627,6 +628,7 @@ def create_notification(
             actor.username,
             kind,
             preview=preview,
+            post_id=post_id,
         )
     except Exception:  # noqa: BLE001
         pass
@@ -740,6 +742,22 @@ def admin_stats(_: bool = Depends(require_admin), db: Session = Depends(get_db))
     )
 
 
+@app.get("/suggestions")
+def get_suggestions(
+    surface: str = "square",
+    arena: Optional[str] = None,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """Top 15–20 debate questions/problems for Square or an Arena tab."""
+    from app import suggestions as suggestions_mod
+
+    return suggestions_mod.list_suggestions(
+        db, surface=surface, arena_key=arena, limit=limit
+    )
+
+
 @app.get("/admin/users", response_model=schemas.AdminUsersOut)
 def admin_users(
     limit: int = 50,
@@ -780,67 +798,24 @@ def admin_users(
     )
 
 
-def _purge_user(db: Session, user: models.User) -> None:
-    """Remove a user and dependent rows that lack cascade-from-user."""
-    uid = user.id
-    # Follows where this user is the followed account (incoming).
-    db.query(models.Follow).filter(
-        (models.Follow.follower_id == uid) | (models.Follow.followed_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Notification).filter(
-        (models.Notification.recipient_id == uid) | (models.Notification.actor_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Bookmark).filter(models.Bookmark.user_id == uid).delete(synchronize_session=False)
-    db.query(models.Block).filter(
-        (models.Block.blocker_id == uid) | (models.Block.blocked_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Mute).filter(
-        (models.Mute.muter_id == uid) | (models.Mute.muted_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.Report).filter(
-        (models.Report.reporter_id == uid) | (models.Report.target_user_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.DirectMessage).filter(
-        (models.DirectMessage.sender_id == uid) | (models.DirectMessage.recipient_id == uid)
-    ).delete(synchronize_session=False)
-    db.query(models.ListMember).filter(models.ListMember.user_id == uid).delete(synchronize_session=False)
-    db.query(models.UserList).filter(models.UserList.owner_id == uid).delete(synchronize_session=False)
-    db.query(models.CommunityMember).filter(models.CommunityMember.user_id == uid).delete(
-        synchronize_session=False
-    )
-    db.query(models.SpaceStance).filter(models.SpaceStance.user_id == uid).delete(
-        synchronize_session=False
-    )
-    # Spaces hosted by user: close ownership by reassigning to baratx when possible.
-    host = db.query(models.User).filter(models.User.username == "baratx").first()
-    if host and host.id != uid:
-        db.query(models.Space).filter(models.Space.host_id == uid).update(
-            {models.Space.host_id: host.id}, synchronize_session=False
-        )
-    else:
-        db.query(models.Space).filter(models.Space.host_id == uid).delete(synchronize_session=False)
-    # Communities created_by — reassign to baratx
-    if host and host.id != uid:
-        db.query(models.Community).filter(models.Community.created_by == uid).update(
-            {models.Community.created_by: host.id}, synchronize_session=False
-        )
-    db.delete(user)
-
-
 @app.delete("/admin/users/{user_id}", response_model=schemas.MessageResponse)
 def admin_delete_user(
     user_id: str,
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Remove a misleading / abusive account. Protected blue founders cannot be deleted."""
+    """Remove a misleading / abusive account. Protected blue founders cannot be deleted.
+    Admins can act immediately — no queue wait. Auto-mod also deletes after repeated reports.
+    """
+    from app.moderation import purge_user
+
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if user.username in seed.PROTECTED_BLUE_USERNAMES:
         raise HTTPException(status_code=400, detail="Cannot delete protected blue official accounts")
     username = user.username
-    _purge_user(db, user)
+    purge_user(db, user)
     db.commit()
     return schemas.MessageResponse(message=f"Deleted @{username}")
 
@@ -940,7 +915,7 @@ def admin_create_post(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Post as an official BaratX account using ADMIN_SECRET (no user login)."""
+    """Post as an official BarathX account using ADMIN_SECRET (no user login)."""
     author = _official_author(db, payload.username)
 
     post = models.Post(author_id=author.id, text=payload.text)
@@ -987,7 +962,7 @@ def admin_create_reply(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Reply as an official BaratX account using ADMIN_SECRET (no user login)."""
+    """Reply as an official BarathX account using ADMIN_SECRET (no user login)."""
     author = _official_author(db, payload.username)
     post = db.query(models.Post).filter(models.Post.id == payload.post_id).first()
     if not post:
@@ -1021,6 +996,65 @@ def admin_create_reply(
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, author)
+
+
+@app.post("/admin/backfill-post-notifications")
+def admin_backfill_post_notifications(
+    days: int = 14,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Create missing 'post' Alerts for @baratx/@sharath on recent community posts."""
+    days = max(1, min(days, 60))
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    officials = (
+        db.query(models.User)
+        .filter(models.User.username.in_(("baratx", "sharath")))
+        .all()
+    )
+    if not officials:
+        return {"ok": False, "error": "officials_missing", "created": 0}
+
+    official_ids = {u.id for u in officials}
+    official_names = set(seed.OFFICIAL_USERNAMES)
+    posts = (
+        db.query(models.Post)
+        .join(models.User, models.User.id == models.Post.author_id)
+        .filter(models.Post.created_at >= since)
+        .filter(models.Post.community_id.is_(None))
+        .filter(~models.User.username.in_(official_names))
+        .order_by(models.Post.created_at.desc())
+        .limit(200)
+        .all()
+    )
+    created = 0
+    for post in posts:
+        for official in officials:
+            exists = (
+                db.query(models.Notification.id)
+                .filter(
+                    models.Notification.recipient_id == official.id,
+                    models.Notification.actor_id == post.author_id,
+                    models.Notification.kind == "post",
+                    models.Notification.post_id == post.id,
+                )
+                .first()
+            )
+            if exists:
+                continue
+            if post.author_id in official_ids:
+                continue
+            create_notification(
+                db,
+                recipient_id=official.id,
+                actor_id=post.author_id,
+                kind="post",
+                post_id=post.id,
+                message=(post.text or "")[:140] or None,
+            )
+            created += 1
+    db.commit()
+    return {"ok": True, "created": created, "posts_scanned": len(posts)}
 
 
 def _official_author(db: Session, username: str) -> models.User:
@@ -1096,7 +1130,7 @@ def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_
     row.consumed = True
     user.is_email_verified = True
     db.commit()
-    return schemas.MessageResponse(message="Email confirmed. Your BaratX account is active.")
+    return schemas.MessageResponse(message="Email confirmed. Your BarathX account is active.")
 
 
 @app.post("/auth/resend-verification", response_model=schemas.MessageResponse)
@@ -1242,6 +1276,11 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
 
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user:
+        if not payload.confirm_age_18:
+            raise HTTPException(
+                status_code=400,
+                detail="You must be 18 or older to join BarathX. Confirm your age to continue.",
+            )
         base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
         username = base
         n = 0
@@ -1376,12 +1415,12 @@ def bootstrap_follows(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """One-tap follow of official BaratX accounts (idempotent)."""
+    """One-tap follow of official BarathX accounts (idempotent)."""
     added = seed.follow_official_accounts(db, current_user)
     db.commit()
     if added:
-        return schemas.MessageResponse(message=f"Following {added} official BaratX account(s).")
-    return schemas.MessageResponse(message="You’re already following official BaratX accounts.")
+        return schemas.MessageResponse(message=f"Following {added} official BarathX account(s).")
+    return schemas.MessageResponse(message="You’re already following official BarathX accounts.")
 
 
 @app.patch("/users/me", response_model=schemas.UserOut)
@@ -1705,6 +1744,7 @@ async def create_post(
     text: str = Form(...),
     image: Optional[UploadFile] = File(None),
     quote_post_id: Optional[str] = Form(None),
+    civic_problem: Optional[str] = Form(None),
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -1742,10 +1782,79 @@ async def create_post(
         image_url=image_url,
         quoted_post_id=quoted_post_id,
     )
+    # Count before insert flush so we know if this is the user's first post.
+    prior_posts = (
+        db.query(func.count(models.Post.id))
+        .filter(models.Post.author_id == current_user.id)
+        .scalar()
+        or 0
+    )
     db.add(post)
     db.flush()
     attach_hashtags(db, post, text)
     notify_mentions(db, current_user.id, text, post_id=post.id)
+
+    # Traction: @baratx + @sharath reply first.
+    # First post → welcome + content-aware takes; every later post → human takes.
+    # Official replies never count toward Founding / Race rewards.
+    try:
+        from app import engagement_replies
+
+        engagement_replies.engage_on_new_post(
+            db,
+            post=post,
+            author=current_user,
+            is_first_post=(prior_posts == 0),
+            create_notification=create_notification,
+        )
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Official engage on create_post failed")
+
+    # Alert @baratx + @sharath when a community member posts (so Alerts isn't empty for ops).
+    # Only skip seeded platform accounts — blue/gold badge members still notify.
+    if current_user.username not in set(seed.OFFICIAL_USERNAMES):
+        officials = (
+            db.query(models.User)
+            .filter(models.User.username.in_(("baratx", "sharath")))
+            .all()
+        )
+        for official in officials:
+            create_notification(
+                db,
+                recipient_id=official.id,
+                actor_id=current_user.id,
+                kind="post",
+                post_id=post.id,
+                message=(text[:140] if text else None),
+            )
+
+        # Followers: “someone you follow posted” → Alerts + email (login back).
+        follower_rows = (
+            db.query(models.Follow.follower_id)
+            .filter(models.Follow.followed_id == current_user.id)
+            .limit(200)
+            .all()
+        )
+        official_ids = {o.id for o in officials}
+        for (follower_id,) in follower_rows:
+            if follower_id in official_ids or follower_id == current_user.id:
+                continue
+            create_notification(
+                db,
+                recipient_id=follower_id,
+                actor_id=current_user.id,
+                kind="post",
+                post_id=post.id,
+                message=(text[:140] if text else None),
+            )
+
+    # Founding 100: quiet reward for one real civic problem (≥50 chars, flagged).
+    mark_problem = str(civic_problem or "").strip().lower() in ("1", "true", "yes", "on")
+    if mark_problem and rewards.qualifies_as_problem(text):
+        rewards.try_award(db, user=current_user, kind="problem", post_id=post.id)
+
     db.commit()
     db.refresh(post)
     return serialize_post(post, current_user)
@@ -1767,10 +1876,10 @@ def list_posts(
             raise HTTPException(status_code=401, detail="Log in to view your following feed")
         author_filter_ids = [f.followed_id for f in current_user.following] + [current_user.id]
 
-    # Keep community/space posts on their surfaces, not the home feed.
+    # Home Square: include arena debate takes (space posts). Keep Communities off Home.
     post_query = (
         db.query(models.Post)
-        .filter(models.Post.community_id.is_(None), models.Post.space_id.is_(None))
+        .filter(models.Post.community_id.is_(None))
         .order_by(models.Post.created_at.desc())
     )
     repost_query = db.query(models.Repost).order_by(models.Repost.created_at.desc())
@@ -1788,9 +1897,13 @@ def list_posts(
         repost_query = repost_query.filter(models.Repost.created_at < cursor)
 
     # pull a generous window from each side, then merge + trim — good enough at demo scale
-    posts = post_query.limit(limit * 3).all()
+    # For You (global): over-fetch so community takes aren't buried under digest flood.
+    window = limit * (8 if feed == "global" else 3)
+    posts = post_query.limit(window).all()
     reposts = repost_query.limit(limit * 3).all()
     hidden = hidden_author_ids(db, current_user)
+
+    official_names = set(seed.OFFICIAL_USERNAMES)
 
     items = []
     for p in posts:
@@ -1810,7 +1923,19 @@ def list_posts(
             )
         )
 
-    items.sort(key=lambda i: i.item_time, reverse=True)
+    if feed == "global":
+        # Square "For you": real member takes first (including blue/gold badges),
+        # then seeded official digest accounts — follow not required.
+        def _sort_key(i: schemas.FeedItemOut):
+            author = getattr(i.post, "author", None)
+            uname = (getattr(author, "username", None) or "").lower() if author else ""
+            is_seed_official = uname in official_names
+            ts = i.item_time.timestamp() if i.item_time else 0.0
+            return (1 if is_seed_official else 0, -ts)
+
+        items.sort(key=_sort_key)
+    else:
+        items.sort(key=lambda i: i.item_time, reverse=True)
     return items[:limit]
 
 
@@ -1913,6 +2038,7 @@ def like_post(
             kind="like",
             post_id=post.id,
         )
+        rewards.bump_founding_for_post(db, post_id)
         db.commit()
         db.refresh(post)
 
@@ -2061,6 +2187,7 @@ def create_reply(
         reply_id=reply.id,
         exclude_ids=notified,
     )
+    rewards.bump_founding_for_post(db, post_id)
     db.commit()
     db.refresh(reply)
     return serialize_reply(reply, current_user)
@@ -2267,10 +2394,262 @@ def admin_seed_topics(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Force-upsert the full 30×arena topic taxonomy (Startups, Spirituality, etc.)."""
+    """Force-upsert the full 30×arena topic taxonomy (active arenas)."""
     from app import topic_ops
 
     return topic_ops.seed_topics(db)
+
+
+@app.post("/admin/daily-digest")
+def admin_daily_digest(
+    force: bool = False,
+    slot: str | None = None,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Run a peak digest slot (morning/midday/evening): @baratx glimpse + @sharath take,
+    cross-replies, and mutual likes — credible news sources only.
+    """
+    from app import daily_digest
+
+    return daily_digest.run_daily_digest(
+        db,
+        force=force,
+        slot=slot,
+        attach_hashtags=attach_hashtags,
+        notify_mentions=notify_mentions,
+    )
+
+
+@app.post("/admin/instagram-carousel")
+def admin_instagram_carousel(
+    pack: str = "evening",
+    _: bool = Depends(require_admin),
+):
+    """Publish BarathX app carousel to @getbaratx (Instagram Graph API)."""
+    from app import instagram_publish
+
+    if pack not in ("morning", "evening"):
+        pack = "evening"
+    return instagram_publish.publish_carousel(pack=pack)
+
+
+@app.get("/rewards/founding", response_model=schemas.FoundingStatusOut)
+def founding_status(
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """Quiet Founding 100 status — slots left + whether this user already earned."""
+    return rewards.status_payload(db, current_user)
+
+
+@app.get("/rewards/race", response_model=schemas.RaceStatusOut)
+def race_status(
+    db: Session = Depends(get_db),
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """Biweekly Square Race — highest likes win ₹150–₹500."""
+    data = rewards.race_status_for_user(db, current_user)
+    return schemas.RaceStatusOut(**data)
+
+
+def _is_blue(user: models.User) -> bool:
+    badge = (getattr(user, "badge", None) or "none").strip().lower()
+    if badge == "blue" or getattr(user, "is_official", False):
+        return True
+    return (user.username or "").lower() in ("sharath", "baratx")
+
+
+@app.get("/rewards/ops", response_model=schemas.RewardsOpsOut)
+def rewards_ops_for_blue(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Blue accounts: read-only Founding queue + race board. Money actions stay on /admin."""
+    if not _is_blue(current_user):
+        raise HTTPException(status_code=403, detail="Blue accounts only")
+    # Reuse admin serializers without admin secret.
+    founding = admin_founding_rewards(status=None, _=True, db=db)
+    race = schemas.RaceStatusOut(**rewards.race_status_for_user(db, None))
+    return schemas.RewardsOpsOut(founding=founding, race=race)
+
+
+def _founding_row_out(r: models.FoundingReward, u: Optional[models.User], db: Session):
+    if r.status == "eligible":
+        rewards.refresh_founding_payable(db, r)
+    return schemas.FoundingRewardRow(
+        id=r.id,
+        user_id=r.user_id,
+        username=u.username if u else "?",
+        display_name=u.display_name if u else "?",
+        kind=r.kind,
+        amount_inr=r.amount_inr,
+        status=r.status,
+        qualifying_post_id=r.qualifying_post_id,
+        qualifying_space_id=r.qualifying_space_id,
+        note=r.note or "",
+        created_at=r.created_at,
+        paid_at=r.paid_at,
+        quality=rewards.quality_snapshot(db, r),
+    )
+
+
+@app.get("/admin/founding-rewards", response_model=schemas.FoundingRewardsOut)
+def admin_founding_rewards(
+    status: Optional[str] = None,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    q = db.query(models.FoundingReward).order_by(models.FoundingReward.created_at.asc())
+    if status in ("eligible", "payable", "paid"):
+        q = q.filter(models.FoundingReward.status == status)
+    rows = q.all()
+    user_ids = [r.user_id for r in rows]
+    users = {
+        u.id: u
+        for u in db.query(models.User).filter(models.User.id.in_(user_ids)).all()
+    } if user_ids else {}
+    out_rows = []
+    for r in rows:
+        out_rows.append(_founding_row_out(r, users.get(r.user_id), db))
+    db.commit()
+    eligible_count = (
+        db.query(models.FoundingReward).filter(models.FoundingReward.status == "eligible").count()
+    )
+    payable_count = (
+        db.query(models.FoundingReward).filter(models.FoundingReward.status == "payable").count()
+    )
+    paid_count = (
+        db.query(models.FoundingReward).filter(models.FoundingReward.status == "paid").count()
+    )
+    return schemas.FoundingRewardsOut(
+        cap=rewards.FOUNDING_CAP,
+        amount_inr=rewards.FOUNDING_AMOUNT_INR,
+        slots_remaining=rewards.slots_remaining(db),
+        eligible_count=eligible_count,
+        payable_count=payable_count,
+        paid_count=paid_count,
+        rewards=out_rows,
+        eval={
+            "floor": "Problem post (≥50 chars + flag) OR any-arena debate",
+            "rating": f"≥{rewards.FOUNDING_MIN_LIKES} likes OR ≥{rewards.FOUNDING_MIN_REPLIES} reply from others (debates: stances/posts)",
+            "payout": "Pay when status=payable (or after manual review)",
+        },
+    )
+
+
+@app.post("/admin/founding-rewards/{reward_id}/paid", response_model=schemas.FoundingRewardRow)
+def admin_mark_founding_paid(
+    reward_id: str,
+    payload: schemas.FoundingMarkPaid,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        row = rewards.mark_paid(db, reward_id, note=payload.note or "")
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Reward not found")
+    db.commit()
+    db.refresh(row)
+    u = db.query(models.User).filter(models.User.id == row.user_id).first()
+    return _founding_row_out(row, u, db)
+
+
+@app.get("/admin/race-rewards", response_model=schemas.RaceRewardsOut)
+def admin_race_rewards(
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    current = schemas.RaceStatusOut(**rewards.race_status_for_user(db, None))
+    rows = db.query(models.RaceReward).order_by(models.RaceReward.created_at.desc()).limit(40).all()
+    out = [
+        schemas.RaceRewardRow(
+            id=r.id,
+            period_key=r.period_key,
+            user_id=r.user_id,
+            username=r.username_snapshot or "?",
+            post_id=r.post_id,
+            like_count=r.like_count,
+            amount_inr=r.amount_inr,
+            status=r.status,
+            note=r.note or "",
+            created_at=r.created_at,
+            paid_at=r.paid_at,
+            period_starts_at=r.period_starts_at,
+            period_ends_at=r.period_ends_at,
+        )
+        for r in rows
+    ]
+    return schemas.RaceRewardsOut(current=current, rewards=out)
+
+
+@app.post("/admin/race-rewards/close", response_model=schemas.RaceRewardRow)
+def admin_close_race(
+    payload: schemas.RaceCloseRequest,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        row = rewards.close_race_winner(
+            db,
+            period_key=payload.period_key,
+            post_id=payload.post_id,
+            note=payload.note or "",
+        )
+    except LookupError as exc:
+        detail = {
+            "no_qualifying_leader": "No post with enough likes yet",
+            "post_not_in_period": "Post not in this race period",
+            "bad_period": "Invalid period key",
+        }.get(str(exc), "Could not close race")
+        raise HTTPException(status_code=400, detail=detail)
+    db.commit()
+    db.refresh(row)
+    return schemas.RaceRewardRow(
+        id=row.id,
+        period_key=row.period_key,
+        user_id=row.user_id,
+        username=row.username_snapshot or "?",
+        post_id=row.post_id,
+        like_count=row.like_count,
+        amount_inr=row.amount_inr,
+        status=row.status,
+        note=row.note or "",
+        created_at=row.created_at,
+        paid_at=row.paid_at,
+        period_starts_at=row.period_starts_at,
+        period_ends_at=row.period_ends_at,
+    )
+
+
+@app.post("/admin/race-rewards/{reward_id}/paid", response_model=schemas.RaceRewardRow)
+def admin_mark_race_paid(
+    reward_id: str,
+    payload: schemas.RaceMarkPaid,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    try:
+        row = rewards.mark_race_paid(db, reward_id, note=payload.note or "")
+    except LookupError:
+        raise HTTPException(status_code=404, detail="Race reward not found")
+    db.commit()
+    db.refresh(row)
+    return schemas.RaceRewardRow(
+        id=row.id,
+        period_key=row.period_key,
+        user_id=row.user_id,
+        username=row.username_snapshot or "?",
+        post_id=row.post_id,
+        like_count=row.like_count,
+        amount_inr=row.amount_inr,
+        status=row.status,
+        note=row.note or "",
+        created_at=row.created_at,
+        paid_at=row.paid_at,
+        period_starts_at=row.period_starts_at,
+        period_ends_at=row.period_ends_at,
+    )
 
 
 register_extra_routes(
@@ -2291,3 +2670,60 @@ register_social_surfaces(
     attach_hashtags=attach_hashtags,
     notify_mentions=notify_mentions,
 )
+
+# Daily @sharath trending digest (~09:05 IST). Disable with DISABLE_DAILY_DIGEST=1.
+try:
+    from app import daily_digest
+
+    daily_digest.start_daily_digest_scheduler(
+        attach_hashtags=attach_hashtags,
+        notify_mentions=notify_mentions,
+    )
+except Exception:  # noqa: BLE001
+    import logging
+
+    logging.getLogger("baratx").exception("Daily digest scheduler failed to start")
+
+# Instagram @getbaratx carousels at IST peak times (needs INSTAGRAM_* env).
+try:
+    from app import instagram_publish
+
+    instagram_publish.start_instagram_scheduler()
+except Exception:  # noqa: BLE001
+    import logging
+
+    logging.getLogger("baratx").exception("Instagram scheduler failed to start")
+
+# Always-on: @baratx + @sharath first replies on community posts.
+# Disable with DISABLE_OFFICIAL_ENGAGE=1
+try:
+    from app import engagement_replies
+
+    engagement_replies.start_engagement_scheduler(create_notification=create_notification)
+except Exception:  # noqa: BLE001
+    import logging
+
+    logging.getLogger("baratx").exception("Official engage scheduler failed to start")
+
+
+# Optional SPA (built into Docker as /app/frontend_dist) — same-origin Square UI on Railway.
+_FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend_dist"
+if _FRONTEND_DIST.is_dir():
+    _assets = _FRONTEND_DIST / "assets"
+    if _assets.is_dir():
+        app.mount("/assets", StaticFiles(directory=str(_assets)), name="frontend_assets")
+
+    @app.get("/")
+    def spa_index():
+        return FileResponse(_FRONTEND_DIST / "index.html")
+
+    @app.get("/{full_path:path}")
+    def spa_fallback(full_path: str):
+        # Let unmatched non-API paths fall through to the React router.
+        candidate = _FRONTEND_DIST / full_path
+        if candidate.is_file():
+            return FileResponse(candidate)
+        index = _FRONTEND_DIST / "index.html"
+        if index.is_file():
+            return FileResponse(index)
+        raise HTTPException(status_code=404, detail="Not found")

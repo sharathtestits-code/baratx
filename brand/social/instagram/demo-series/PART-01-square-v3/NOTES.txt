@@ -1,0 +1,22 @@
+# Part 1 Square — v3
+
+## Changes vs v2
+- **Bigger UI screenshots**: zoom callouts fill ~70–75% of reel height (was ~30–40%), full width, so compose / AI Assist / actions are easier to read.
+- **Audio**: synthetic Indian pulse bed (`indian_pulse.wav`) — **not Faah-only**. In IG, attach a **different trending India audio**.
+
+## Files
+- Latest cut: `/opt/cursor/artifacts/downloads/baratx-demo-PART1-LATEST.mp4`
+- Repo copy: `baratx-demo-PART1-v3.mp4` (this folder)
+
+## Caption
+
+```
+Features on BarathX · Part 1
+Where you write, AI Assist, like/reply/repost/save, arenas + menu.
+
+Save this. Part 2 drops tomorrow — Arenas & debates.
+→ barathx.com
+```
+
+## Music (IG app)
+Pick **any trending Indian audio** that fits a hot-take / pulse vibe. Do **not** lock to Faah every time.

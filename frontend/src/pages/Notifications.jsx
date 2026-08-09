@@ -34,6 +34,8 @@ function notificationCopy(n) {
       return "sent you a message";
     case "badge":
       return n.message || "updated your account badge";
+    case "post":
+      return "posted in the Square";
     default:
       return "interacted with you";
   }
@@ -89,9 +91,12 @@ export default function Notifications() {
   }
 
   return (
-    <div className="feed-wrap">
+    <div className="feed-wrap plaza-page">
       <div className="feed-header">
-        <h1>Notifications</h1>
+        <h1>Alerts</h1>
+        <p className="hint" style={{ margin: "0.25rem 0 0" }}>
+          Replies, follows, and new Square posts land here.
+        </p>
       </div>
 
       {loading ? (
@@ -107,8 +112,8 @@ export default function Notifications() {
         </div>
       ) : items.length === 0 ? (
         <div className="empty-state">
-          <p className="empty-state-title">No notifications yet</p>
-          <p className="hint">When people follow, like, reply, repost, or tag you, it shows up here.</p>
+          <p className="empty-state-title">No alerts yet</p>
+          <p className="hint">When people post in the Square, reply, follow, like, or tag you, it shows up here.</p>
         </div>
       ) : (
         <div className="notif-list">

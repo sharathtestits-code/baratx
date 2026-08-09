@@ -17,7 +17,17 @@ const MentionTextarea = forwardRef(function MentionTextarea(
   const [activeIndex, setActiveIndex] = useState(0);
   const [busy, setBusy] = useState(false);
 
-  useImperativeHandle(ref, () => localRef.current);
+  useImperativeHandle(ref, () => ({
+    focus: () => localRef.current?.focus(),
+    blur: () => localRef.current?.blur(),
+    get value() {
+      return localRef.current?.value ?? "";
+    },
+    get selectionStart() {
+      return localRef.current?.selectionStart ?? 0;
+    },
+    setSelectionRange: (start, end) => localRef.current?.setSelectionRange(start, end),
+  }));
 
   useEffect(() => {
     if (!mentionQuery || !mentionQuery.query) {

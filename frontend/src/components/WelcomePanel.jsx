@@ -4,9 +4,9 @@ import { api } from "../api";
 const CITIES = ["Hyderabad", "Bangalore", "Delhi", "Mumbai", "Chennai", "Pune"];
 
 const PROMPTS = [
-  "What’s one thing India gets wrong in public debate?",
-  "Drop your hottest take on startups in India.",
-  "Who should every BaratX user follow in your city?",
+  "What’s one civic problem your city still pretends isn’t real?",
+  "Drop your hottest take on public debate in India.",
+  "Who should every BarathX user from your city follow?",
   "What should this public square never become?",
 ];
 
@@ -53,7 +53,7 @@ export default function WelcomePanel({ token, setText, onPostedFlag, composeRef 
     setFollowMsg("");
     try {
       const res = await api.bootstrapFollows(token);
-      setFollowMsg(res.message || "Following official BaratX accounts.");
+      setFollowMsg(res.message || "Following official BarathX accounts.");
       setFollowDone(true);
     } catch (err) {
       setFollowMsg(err.message || "Could not follow yet");
@@ -117,7 +117,7 @@ export default function WelcomePanel({ token, setText, onPostedFlag, composeRef 
           onClick={followOfficial}
           disabled={followBusy || followDone}
         >
-          {followBusy ? "Following…" : followDone ? "Following official accounts" : "Follow official BaratX"}
+          {followBusy ? "Following…" : followDone ? "Following official accounts" : "Follow official BarathX"}
         </button>
         {followMsg && <p className="hint welcome-follow-msg">{followMsg}</p>}
       </div>

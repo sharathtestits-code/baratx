@@ -37,7 +37,7 @@ class User(Base):
     password_hash = Column(String, nullable=False)
 
     language = Column(String, default="en", nullable=False)  # en | hi | te
-    theme = Column(String, default="saffron", nullable=False)  # saffron | midnight | monsoon | ink
+    theme = Column(String, default="midnight", nullable=False)  # midnight | saffron | monsoon | ink
     bio = Column(String, default="", nullable=False)
 
     avatar_url = Column(String, nullable=True)
@@ -333,7 +333,7 @@ class Community(Base):
     slug = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, default="", nullable=False)
-    # Arena topic homes: sports | politics | entertainment | news | startups | spirituality
+    # Arena topic homes: sports | politics | entertainment | news | spirituality
     is_arena = Column(Boolean, default=False, nullable=False, index=True)
     arena_key = Column(String, nullable=True, unique=True, index=True)
     created_by = Column(String, ForeignKey("users.id"), nullable=False, index=True)
@@ -399,6 +399,82 @@ class SpaceStance(Base):
     user = relationship("User", foreign_keys=[user_id])
 
 
+class LiveTalkParticipant(Base):
+    """Someone on the Live Talk seat (audio room under a Space). Soft cap ~15."""
+
+    __tablename__ = "live_talk_participants"
+    __table_args__ = (UniqueConstraint("space_id", "user_id", name="uq_live_talk_seat"),)
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    muted = Column(Boolean, default=True, nullable=False)
+    video_enabled = Column(Boolean, default=False, nullable=False)
+    joined_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    left_at = Column(DateTime, nullable=True)
+    removed_at = Column(DateTime, nullable=True)
+    removed_reason = Column(String, default="", nullable=False)
+
+    space = relationship("Space", foreign_keys=[space_id])
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class LiveTalkPin(Base):
+    """Per-viewer pin of a talk participant (self or others) — only for that viewer."""
+
+    __tablename__ = "live_talk_pins"
+    __table_args__ = (
+        UniqueConstraint("space_id", "viewer_id", "pinned_user_id", name="uq_live_talk_pin"),
+    )
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    viewer_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    pinned_user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+
+class LiveTalkMessage(Base):
+    """In-call chat visible only to people currently (or recently) on the Talk."""
+
+    __tablename__ = "live_talk_messages"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    sender_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    sender = relationship("User", foreign_keys=[sender_id])
+
+
+class LiveTalkReaction(Base):
+    """Ephemeral in-call reactions (👍 ❤️ 😂 …) shown to people on the Talk."""
+
+    __tablename__ = "live_talk_reactions"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    emoji = Column(String, nullable=False, default="👍")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class ModerationStrike(Base):
+    """Auto-moderation strikes — stack toward account removal."""
+
+    __tablename__ = "moderation_strikes"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, default="report", index=True)
+    detail = Column(String, default="", nullable=False)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+
 class Topic(Base):
     """Subtopic under an arena (e.g. IPL under Sports)."""
 
@@ -430,3 +506,46 @@ class UserTopicInterest(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     topic = relationship("Topic", back_populates="interests")
+
+
+class FoundingReward(Base):
+    """First-N incentive: one real problem post or any-arena debate."""
+
+    __tablename__ = "founding_rewards"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), unique=True, nullable=False, index=True)
+    kind = Column(String, nullable=False)  # problem | debate
+    amount_inr = Column(Integer, nullable=False, default=150)
+    # eligible (floor met) → payable (community rating bar) → paid
+    status = Column(String, nullable=False, default="eligible", index=True)
+    qualifying_post_id = Column(String, ForeignKey("posts.id"), nullable=True)
+    qualifying_space_id = Column(String, ForeignKey("spaces.id"), nullable=True)
+    note = Column(String, default="", nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    paid_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class RaceReward(Base):
+    """Biweekly Square Race — highest-liked Home post wins ₹150–₹500."""
+
+    __tablename__ = "race_rewards"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    period_key = Column(String, unique=True, nullable=False, index=True)
+    period_starts_at = Column(DateTime, nullable=False)
+    period_ends_at = Column(DateTime, nullable=False)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    post_id = Column(String, ForeignKey("posts.id"), nullable=False)
+    like_count = Column(Integer, nullable=False, default=0)
+    amount_inr = Column(Integer, nullable=False, default=150)
+    username_snapshot = Column(String, nullable=False, default="")
+    status = Column(String, nullable=False, default="payable", index=True)  # payable | paid
+    note = Column(String, default="", nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    paid_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", foreign_keys=[user_id])
+    post = relationship("Post", foreign_keys=[post_id])
