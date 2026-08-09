@@ -28,7 +28,7 @@
 |----|-----|--------|-------|
 | **DEF-001** | P0 | **Code harden + ops** | `email.py` never mails Railway hosts; QA detected via `ENVIRONMENT=qa` / CORS / Railway service name. **Ops:** set Railway QA `FRONTEND_URL=https://qa.barathx.com` and prefer `ENVIRONMENT=qa`. |
 | **DEF-002** | P1 | **Follows DEF-001** | Same link host fix; re-test Resend / `dev_verify_url` after QA redeploy. |
-| **DEF-003** | P2 | **Follow-up** | Vite `VITE_PUBLIC_URL` + Pages `_middleware.js` host rewrite for QA/prod same build. |
+| **DEF-003** | P2 | **Fixed** | Railway SPA serves host-aware OG; Pages middleware for `*.pages.dev`. |
 | **DEF-004** | P2 | **Fixed** | First-session take starts empty; prompts are chips + placeholder only. |
 | **DEF-005** | P2 | **Fixed** | Admin Users shows email + `(unverified)` / verified status. |
 | **DEF-006** | P2 | **Fixed** | `users.has_posted_once` lifetime flag; welcome no longer re-fires after delete-all. |
@@ -38,23 +38,25 @@
 
 ## Retest — 2026-08-09 (after merge + deploy)
 
-**Verdict: CLEAR for DEF-001/002/004/005/006/007 · DEF-003 still needs host-aware OG (follow-up).**
+**Verdict: CLEAR — all DEF-001–007 pass on live QA.**
 
 | Gate | Status |
 |------|--------|
-| PR #21 merged to `main` | **Yes** — `685139d` @ 2026-08-09T21:00:49Z |
-| Railway `baratx-qa` redeploy | **Yes** — deployment success |
-| Cloudflare Pages rebuild | **Yes** — live QA bundle `index--V64bElO.js` |
+| PR #21 merged to `main` | **Yes** — `685139d` |
+| Railway `baratx-qa` redeploy | **Yes** — success (incl. OG rewrite `d0fadaa`) |
+| Cloudflare Pages rebuild | **Yes** — prod/pages.dev + Railway-served QA HTML |
 
 | ID | Live QA | Evidence |
 |----|---------|----------|
 | **DEF-001** | **PASS** | `dev_verify_url` / `dev_reset_url` → `https://qa.barathx.com/...` |
 | **DEF-002** | **PASS** | Same host as DEF-001 |
-| **DEF-003** | **FAIL** *(ops/build)* | Static OG still `barathx.com` on Railway-served QA HTML; Pages middleware helps `*.pages.dev` only |
+| **DEF-003** | **PASS** | `og:url` / `og:image` → `https://qa.barathx.com/...` (Railway HTML rewrite) |
 | **DEF-004** | **PASS** | Live JS `useState("")` + `placeholder:Uu[0]` |
 | **DEF-005** | **PASS** | Live JS includes `(unverified)` admin label |
 | **DEF-006** | **PASS** | After delete-all, next post → **2** content replies, **0** welcome |
 | **DEF-007** | **PASS** | “Badge grant/demote…” string gone from live bundle |
+
+Follow-ups shipped: PR #46 (Pages middleware), PR #47 (Railway SPA OG rewrite).
 
 ---
 
