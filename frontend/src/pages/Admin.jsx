@@ -796,7 +796,8 @@ export default function Admin() {
               <div>
                 <h2 id="admin-engage-title">Comment on new users</h2>
                 <p className="admin-lead">
-                  Welcome new joiners by replying to their posts — not only broadcasting.
+                  Auto: @baratx + @sharath already welcome first posts and reply on every take.
+                  Use this tab for an extra human comment when you want.
                 </p>
               </div>
               <label className="admin-toggle">

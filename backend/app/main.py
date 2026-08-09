@@ -1718,54 +1718,23 @@ async def create_post(
     attach_hashtags(db, post, text)
     notify_mentions(db, current_user.id, text, post_id=post.id)
 
-    # Traction: first post gets official welcome replies so the square feels alive.
-    # These are from @baratx + @sharath and never count toward Founding rewards.
-    if prior_posts == 0:
-        welcomers = (
-            db.query(models.User)
-            .filter(models.User.username.in_(("baratx", "sharath")))
-            .all()
+    # Traction: @baratx + @sharath reply first.
+    # First post → welcome + content-aware takes; every later post → human takes.
+    # Official replies never count toward Founding / Race rewards.
+    try:
+        from app import engagement_replies
+
+        engagement_replies.engage_on_new_post(
+            db,
+            post=post,
+            author=current_user,
+            is_first_post=(prior_posts == 0),
+            create_notification=create_notification,
         )
-        by_name = {u.username: u for u in welcomers}
-        scripts = [
-            (
-                "baratx",
-                (
-                    f"Welcome to BarathX, @{current_user.username}. "
-                    "Glad you’re here — what’s your city, and what should this square never become?"
-                ),
-            ),
-            (
-                "sharath",
-                (
-                    f"Hey @{current_user.username} — Sharath here. "
-                    "Drop one real take from your city. I’ll read the replies."
-                ),
-            ),
-        ]
-        for username, text in scripts:
-            official = by_name.get(username)
-            if not official or official.id == current_user.id:
-                continue
-            # Ensure blue founders stay flagged official so reward math ignores them.
-            if not getattr(official, "is_official", False):
-                official.is_official = True
-            welcome = models.Reply(
-                post_id=post.id,
-                author_id=official.id,
-                text=text,
-                parent_reply_id=None,
-            )
-            db.add(welcome)
-            db.flush()
-            create_notification(
-                db,
-                recipient_id=current_user.id,
-                actor_id=official.id,
-                kind="reply",
-                post_id=post.id,
-                reply_id=welcome.id,
-            )
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Official engage on create_post failed")
 
     # Founding 100: quiet reward for one real civic problem (≥50 chars, flagged).
     mark_problem = str(civic_problem or "").strip().lower() in ("1", "true", "yes", "on")
@@ -2594,6 +2563,17 @@ except Exception:  # noqa: BLE001
     import logging
 
     logging.getLogger("baratx").exception("Instagram scheduler failed to start")
+
+# Always-on: @baratx + @sharath first replies on community posts.
+# Disable with DISABLE_OFFICIAL_ENGAGE=1
+try:
+    from app import engagement_replies
+
+    engagement_replies.start_engagement_scheduler(create_notification=create_notification)
+except Exception:  # noqa: BLE001
+    import logging
+
+    logging.getLogger("baratx").exception("Official engage scheduler failed to start")
 
 
 # Optional SPA (built into Docker as /app/frontend_dist) — same-origin Square UI on Railway.

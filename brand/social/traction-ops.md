@@ -3,14 +3,16 @@
 BX wins when newcomers get a reply. Ship does the product half; you do the human half.
 
 ## Every day
-1. Open https://barathx.com/admin → comment on new users’ posts as @baratx
+1. Open https://barathx.com/admin → skim Engage for posts that need a *second* human touch
 2. Answer every notification reply within an hour when you can
 3. Post **Today’s Square** question yourself first (set the tone)
-4. Confirm **@sharath / @baratx daily digest** ran (~09:05 IST) — target **3–5** multi-arena posts (max 2/arena), or hit **Run daily digest now** in admin
+4. Confirm **@sharath / @baratx daily digest** ran (~09:05 IST) — or hit **Run peak digest now**
 
 ## Auto (already in code)
-- **New-user first post** → `@baratx` auto-replies a welcome
-- **Daily trending** → `@sharath` auto-posts 1–2 news takes + branded image (see `daily-digest-ops.md`)
+- **New-user first post** → `@baratx` + `@sharath` welcome, then content replies
+- **Every community post** → `@baratx` + `@sharath` human takes (topic-aware; not identical scripts)
+- **Daily peak digest** → multi-arena news posts (see `daily-digest-ops.md`)
+- Kill switch: `DISABLE_OFFICIAL_ENGAGE=1`
 
 ## Seed 20 people (WhatsApp / DM)
 Ask each to:

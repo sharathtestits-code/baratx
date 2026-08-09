@@ -1,10 +1,18 @@
 # Daily peak digest + welcome replies
 
-## New-user auto-replies (first Home post only)
-Two replies — official engagement, **never counts toward Founding rewards**:
+## New-user first post
+1. **@baratx** — Welcome (human, may nod to their take)
+2. **@sharath** — Welcome
+3. **@baratx** + **@sharath** — Content-aware replies on the same post (not generic chips)
 
-1. **@baratx** — Welcome to BarathX… what’s your city…
-2. **@sharath** — Hey @{user} — Sharath here. Drop one real take…
+## Every later community post
+**@baratx** + **@sharath** each leave one human reply that reacts to the post topic
+(reels, city, startups, cricket, etc.). Official digest posts are skipped.
+
+Runs on `POST /posts` and a background poller (~45s) for anything missed.
+Disable: `DISABLE_OFFICIAL_ENGAGE=1`
+
+Official likes/replies **never** count toward Founding / Race.
 
 ## Peak auto-posts (3×/day IST — not all day)
 Slots: **09:00 · 13:30 · 20:00 IST**
@@ -27,6 +35,7 @@ Per slot (2 arenas, rotated so every floor including **Startups** gets coverage)
 Likes/replies from `@baratx`, `@sharath`, other seeded officials, and any `blue` / `is_official` account are **ignored** for Founding payable + race like counts.
 
 ## Manual
+Admin → Engage tab still works for extra human comments.
 Admin → **Run peak digest now** (`POST /admin/daily-digest?force=true&slot=morning|midday|evening`).
 
 ## Infra note
