@@ -52,10 +52,15 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
 
 ### See who registered / post & comment as BarathX
 
+**Production:** https://barathx.com/admin  
+**QA:** https://qa.barathx.com/admin (separate Railway QA service + secrets)
+
 1. Set `ADMIN_SECRET` on the Railway API service (long random string).
 2. Redeploy the API if needed.
-3. Open https://barathx.com/admin and enter that secret.
-4. You’ll see total users, last 24h / 7d counts, a newest-first list, **Post as BarathX**, and **Comment on new users** (reply to recent posts from new joiners).
+3. Open the matching admin URL and enter that secret.
+4. You’ll see total users, last 24h / 7d counts, a newest-first list, **Post as BarathX**, and **Comment on new users**.
+
+QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
 
 ### Log in as official @baratx (optional)
 

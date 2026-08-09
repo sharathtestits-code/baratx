@@ -20,7 +20,7 @@ export default defineConfig({
   testDir: "./e2e/tests",
   timeout: 60_000,
   use: {
-    baseURL: process.env.QA_BASE_URL || "https://barathx.com",
+    baseURL: process.env.QA_BASE_URL || "https://qa.barathx.com",
     trace: "on-first-retry",
   },
 });

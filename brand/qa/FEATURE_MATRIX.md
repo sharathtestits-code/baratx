@@ -1,6 +1,8 @@
 # BarathX QA — Feature matrix (for automation agents)
 
-Use this as the source of truth for login + end-to-end coverage. Base URL: `https://barathx.com` · API: `https://baratx-production.up.railway.app`.
+**Environment:** QA only — see `ENVIRONMENTS.md`.  
+**QA app:** `https://qa.barathx.com` · **QA API:** `https://baratx-qa.up.railway.app`  
+**Production (do not automate against):** `https://barathx.com` · `https://baratx-production.up.railway.app`
 
 ## Test accounts (set locally — never commit passwords)
 
@@ -8,13 +10,13 @@ Use this as the source of truth for login + end-to-end coverage. Base URL: `http
 |------|----------------|-------|
 | Member A | Email/password or Google test user | Primary poster |
 | Member B | Second email account | Follower / replier |
-| Official | `sharath` or `baratx` + `OFFICIAL_ACCOUNT_PASSWORD` | Ops |
-| Admin console | `/admin` + `ADMIN_SECRET` | No user JWT |
+| Official | `sharath` or `baratx` + QA `OFFICIAL_ACCOUNT_PASSWORD` | Ops on QA |
+| Admin console | `https://qa.barathx.com/admin` + QA `ADMIN_SECRET` | No user JWT |
 
-Env for agent (secrets manager / local `.env.qa`, gitignored):
+Env for agent (copy `brand/qa/env.qa.example` → repo-root `.env.qa`, gitignored):
 ```
-QA_BASE_URL=https://barathx.com
-QA_API_BASE=https://baratx-production.up.railway.app
+QA_BASE_URL=https://qa.barathx.com
+QA_API_BASE=https://baratx-qa.up.railway.app
 QA_USER_A_EMAIL=
 QA_USER_A_PASSWORD=
 QA_USER_B_EMAIL=
@@ -22,6 +24,12 @@ QA_USER_B_PASSWORD=
 QA_OFFICIAL_USER=sharath
 QA_OFFICIAL_PASSWORD=
 QA_ADMIN_SECRET=
+```
+
+# Production reference (humans / ops only — not for E2E agents)
+```
+PROD_BASE_URL=https://barathx.com
+PROD_API_BASE=https://baratx-production.up.railway.app
 ```
 
 ## Auth
