@@ -2,14 +2,17 @@
 
 Keep these separate. Automation agents and Playwright must use **QA**, never Production, unless ops explicitly request a prod smoke.
 
+**Status (2026-08-09):** Production and QA are both live. Custom host `https://qa.barathx.com` points at Railway project `baratx-qa` (wildcard `*.barathx.com` → Porkbun overridden by specific `qa` CNAME).
+
 | | **QA (staging)** | **Production (prod)** |
 |---|---|---|
 | **Web app** | `https://qa.barathx.com` | `https://barathx.com` |
-| **API** | `https://baratx-qa.up.railway.app` | `https://baratx-production.up.railway.app` |
-| **API docs** | `https://baratx-qa.up.railway.app/docs` | `https://baratx-production.up.railway.app/docs` |
+| **API** | Same origin (`qa.barathx.com`) | `https://baratx-production.up.railway.app` |
+| **API docs** | `https://qa.barathx.com/docs` | `https://baratx-production.up.railway.app/docs` |
 | **Admin** | `https://qa.barathx.com/admin` | `https://barathx.com/admin` |
-| **DB** | Separate Railway Postgres (QA) | Production Postgres |
-| **Secrets** | `ADMIN_SECRET` / passwords for QA only | Prod secrets — never in QA docs |
+| **Interim Railway URL** | `https://baratx-qa.up.railway.app` | `https://baratx-production.up.railway.app` |
+| **DB** | Separate Railway Postgres (`baratx-qa`) | Production Postgres |
+| **Secrets** | QA-only vars on Railway service `baratx` | Prod secrets — never in QA docs |
 
 ### Cloudflare Pages (frontend)
 
@@ -44,5 +47,5 @@ QA_ADMIN_SECRET=
 
 1. Feature matrix + Playwright default to **QA_*** URLs.  
 2. Never run destructive admin actions (delete user, force IG) on **prod**.  
-3. When QA service is not provisioned yet, create Railway service `baratx-qa` + Pages `baratx-qa` + DNS `qa.barathx.com` CNAME before enabling CI.  
+3. When QA service is not provisioned yet, follow `brand/qa/PROVISION.md` (script `scripts/provision-qa.sh` or Railway dashboard + Cloudflare DNS) before enabling CI.  
 4. Prod remains the live user-facing stack in `DEPLOY.md`.
