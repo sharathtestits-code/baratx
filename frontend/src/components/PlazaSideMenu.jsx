@@ -2,21 +2,24 @@ import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
+import { useAuth } from "../context/AuthContext";
+import { notificationsApi } from "../api";
 import { ARENA_TOPICS } from "../arenas";
 
 /**
- * Change Arena drawer — arenas + Settings (Appearance lives in Settings).
+ * Change Arena drawer — arenas + Alerts + Settings (Appearance lives in Settings).
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
+  const { token } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
   const listId = useId();
   const [pickerOpen, setPickerOpen] = useState(true);
+  const [unread, setUnread] = useState(0);
   const switchRef = useRef(null);
 
-  // Close drawer only when the route actually changes (not on first mount).
   useEffect(() => {
     if (pathRef.current !== location.pathname) {
       pathRef.current = location.pathname;
@@ -24,7 +27,6 @@ export default function PlazaSideMenu() {
     }
   }, [location.pathname, close]);
 
-  // Reset picker open whenever the drawer opens.
   useEffect(() => {
     if (open) setPickerOpen(true);
   }, [open]);
@@ -33,6 +35,31 @@ export default function PlazaSideMenu() {
     document.body.classList.toggle("plaza-menu-is-open", open);
     return () => document.body.classList.remove("plaza-menu-is-open");
   }, [open]);
+
+  useEffect(() => {
+    if (!token) {
+      setUnread(0);
+      return undefined;
+    }
+    let cancelled = false;
+    async function refresh() {
+      try {
+        const data = await notificationsApi.unreadCount(token);
+        if (!cancelled) setUnread(data.unread_count || 0);
+      } catch {
+        /* ignore */
+      }
+    }
+    refresh();
+    const onRead = () => setUnread(0);
+    window.addEventListener("bx:notifications-read", onRead);
+    const id = window.setInterval(refresh, 45000);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("bx:notifications-read", onRead);
+      window.clearInterval(id);
+    };
+  }, [token, open]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -158,6 +185,30 @@ export default function PlazaSideMenu() {
         {!pickerOpen && (
           <p className="plaza-side-picker-hint">Tap Change Arena to pick Sports, Politics, and more.</p>
         )}
+
+        <button type="button" className="plaza-side-manage" onClick={() => goLink("/notifications")}>
+          <span className="plaza-side-manage-copy">
+            <strong>
+              Alerts
+              {unread > 0 ? (
+                <span className="plaza-side-unread" aria-label={`${unread} unread`}>
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              ) : null}
+            </strong>
+            <em>Replies, follows, and new posts</em>
+          </span>
+          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+            <path
+              d="M6 4l4 4-4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
 
         <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
           <span className="plaza-side-manage-copy">

@@ -86,7 +86,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
         <Logo variant="mark" className="first-session-logo" />
         <div>
           <h2 id="first-session-title">You&apos;re in. Drop your first take.</h2>
-          <p className="first-session-step">1 of 1 · Get in</p>
+          <p className="first-session-step">Step 1 of 2 · First take (then a quick tour)</p>
         </div>
       </div>
 

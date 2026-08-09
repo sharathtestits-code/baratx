@@ -99,7 +99,7 @@ export default function Sidebar() {
               <IconBell className="sidebar-icon" />
               {unread > 0 && <span className="nav-badge">{unread > 9 ? "9+" : unread}</span>}
             </span>
-            <span>Notifications</span>
+            <span>Alerts</span>
           </NavLink>
           <NavLink to="/messages" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconMessage className="sidebar-icon" />

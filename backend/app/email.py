@@ -199,6 +199,8 @@ _KIND_COPY = {
     "reply": "replied to your post",
     "mention": "mentioned you",
     "message": "sent you a message",
+    "post": "posted in the Square",
+    "badge": "updated your badge",
 }
 
 
@@ -209,21 +211,37 @@ def send_activity_email(
     actor_username: str,
     kind: str,
     preview: Optional[str] = None,
+    post_id: Optional[str] = None,
 ) -> bool:
     """Best-effort retention email when someone interacts with you."""
     if not to_email:
         return False
     action = _KIND_COPY.get(kind, "interacted with you")
-    subject = f"{actor_name} {action} on BarathX"
-    cta = f"{FRONTEND_URL}/notifications"
+    if kind == "reply":
+        subject = f"{actor_name} replied to your post on BarathX"
+        cta_label = "See the reply"
+    elif kind == "post":
+        subject = f"{actor_name} posted in the Square"
+        cta_label = "Open the Square"
+    else:
+        subject = f"{actor_name} {action} on BarathX"
+        cta_label = "Open Alerts"
+
     if kind == "message":
         cta = f"{FRONTEND_URL}/messages/{actor_username}"
+        cta_label = "Open messages"
+    elif post_id and kind in ("reply", "like", "repost", "mention", "post"):
+        cta = f"{FRONTEND_URL}/posts/{post_id}"
+    else:
+        cta = f"{FRONTEND_URL}/notifications"
+
     preview_line = f'\n"{preview[:140]}"\n' if preview else "\n"
     text_body = (
         f"Hi {recipient_name},\n\n"
         f"@{actor_username} {action} on BarathX."
         f"{preview_line}\n"
-        f"Open BarathX: {cta}\n\n"
+        f"{cta_label}: {cta}\n\n"
+        f"Sign in at {FRONTEND_URL}/login if you need to.\n\n"
         f"— BarathX\n"
     )
     preview_html = (
@@ -241,10 +259,12 @@ def send_activity_email(
   <p style="margin: 28px 0;">
     <a href="{cta}"
        style="background:#FF671F;color:#fff;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:700;">
-      Open BarathX
+      {cta_label}
     </a>
   </p>
-  <p style="color:#8b98a5;font-size:13px;">You’re getting this because someone interacted with your account.</p>
+  <p style="color:#8b98a5;font-size:13px;">
+    Sign in at <a href="{FRONTEND_URL}/login" style="color:#000080;">{FRONTEND_URL}/login</a> to catch up.
+  </p>
   <p>— BarathX</p>
 </body>
 </html>

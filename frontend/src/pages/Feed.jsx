@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import FirstSessionGuide from "../components/FirstSessionGuide";
+import NavTour, { shouldShowNavTour } from "../components/NavTour";
 import FoundingChip from "../components/FoundingChip";
 import EmptyState from "../components/EmptyState";
 import TodaysSquare from "../components/TodaysSquare";
@@ -55,6 +56,16 @@ export default function Feed() {
       return localStorage.getItem("bx_first_post_done") !== "1";
     } catch {
       return true;
+    }
+  });
+  const [showNavTour, setShowNavTour] = useState(() => {
+    try {
+      if (localStorage.getItem("bx_first_post_done") !== "1" && sessionStorage.getItem("bx_welcome") === "1") {
+        return false;
+      }
+      return shouldShowNavTour();
+    } catch {
+      return false;
     }
   });
   const [showStarters, setShowStarters] = useState(false);
@@ -170,8 +181,8 @@ export default function Feed() {
   }, [loading, token, user, navigate]);
 
   useEffect(() => {
-    if (user && !showFirstSession) loadFeed(tab);
-  }, [user, tab, loadFeed, showFirstSession]);
+    if (user && !showFirstSession && !showNavTour) loadFeed(tab);
+  }, [user, tab, loadFeed, showFirstSession, showNavTour]);
 
   useEffect(() => {
     let cancelled = false;
@@ -228,7 +239,11 @@ export default function Feed() {
     setShowFirstSession(false);
     markTopicOnboardingSeen();
     setFoundingRefresh((n) => n + 1);
-    await loadFeed(tab);
+    if (shouldShowNavTour()) {
+      setShowNavTour(true);
+    } else {
+      await loadFeed(tab);
+    }
   }
 
   function handleImageChange(e) {
@@ -300,6 +315,14 @@ export default function Feed() {
     return (
       <div className="plaza-page plaza-square plaza-square-first">
         <FirstSessionGuide token={token} onComplete={finishFirstSession} />
+      </div>
+    );
+  }
+
+  if (showNavTour) {
+    return (
+      <div className="plaza-page plaza-square plaza-square-first">
+        <NavTour onDone={() => setShowNavTour(false)} />
       </div>
     );
   }

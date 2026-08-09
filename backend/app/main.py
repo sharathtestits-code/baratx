@@ -628,6 +628,7 @@ def create_notification(
             actor.username,
             kind,
             preview=preview,
+            post_id=post_id,
         )
     except Exception:  # noqa: BLE001
         pass
@@ -1807,6 +1808,26 @@ async def create_post(
             create_notification(
                 db,
                 recipient_id=official.id,
+                actor_id=current_user.id,
+                kind="post",
+                post_id=post.id,
+                message=(text[:140] if text else None),
+            )
+
+        # Followers: “someone you follow posted” → Alerts + email (login back).
+        follower_rows = (
+            db.query(models.Follow.follower_id)
+            .filter(models.Follow.followed_id == current_user.id)
+            .limit(200)
+            .all()
+        )
+        official_ids = {o.id for o in officials}
+        for (follower_id,) in follower_rows:
+            if follower_id in official_ids or follower_id == current_user.id:
+                continue
+            create_notification(
+                db,
+                recipient_id=follower_id,
                 actor_id=current_user.id,
                 kind="post",
                 post_id=post.id,
