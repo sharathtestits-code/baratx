@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, UploadFile, status
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -2721,22 +2721,50 @@ except Exception:  # noqa: BLE001
 
 # Optional SPA (built into Docker as /app/frontend_dist) — same-origin Square UI on Railway.
 _FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend_dist"
+
+
+def _public_web_origin(request: Optional["Request"] = None) -> str:
+    """Canonical public web origin for OG tags (QA vs prod)."""
+    try:
+        origin = (email_service.FRONTEND_URL or "").rstrip("/")
+    except Exception:
+        origin = (os.environ.get("FRONTEND_URL") or "").rstrip("/")
+    host = ""
+    if request is not None:
+        host = (request.headers.get("host") or "").lower()
+    if host.startswith("qa.") or "qa.barathx.com" in host:
+        return "https://qa.barathx.com"
+    if origin:
+        return origin
+    return "https://barathx.com"
+
+
+def _spa_index_response(request: Optional["Request"] = None) -> Response:
+    index = _FRONTEND_DIST / "index.html"
+    html = index.read_text(encoding="utf-8")
+    origin = _public_web_origin(request)
+    if origin and origin != "https://barathx.com":
+        html = html.replace("https://barathx.com/", f"{origin}/").replace(
+            'content="https://barathx.com"', f'content="{origin}"'
+        )
+    return Response(content=html, media_type="text/html; charset=utf-8")
+
+
 if _FRONTEND_DIST.is_dir():
     _assets = _FRONTEND_DIST / "assets"
     if _assets.is_dir():
         app.mount("/assets", StaticFiles(directory=str(_assets)), name="frontend_assets")
 
     @app.get("/")
-    def spa_index():
-        return FileResponse(_FRONTEND_DIST / "index.html")
+    def spa_index(request: Request):
+        return _spa_index_response(request)
 
     @app.get("/{full_path:path}")
-    def spa_fallback(full_path: str):
+    def spa_fallback(full_path: str, request: Request):
         # Let unmatched non-API paths fall through to the React router.
         candidate = _FRONTEND_DIST / full_path
         if candidate.is_file():
             return FileResponse(candidate)
-        index = _FRONTEND_DIST / "index.html"
-        if index.is_file():
-            return FileResponse(index)
+        if (_FRONTEND_DIST / "index.html").is_file():
+            return _spa_index_response(request)
         raise HTTPException(status_code=404, detail="Not found")
