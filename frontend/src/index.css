@@ -7725,6 +7725,10 @@ button.topic-chip.selected {
   letter-spacing: -0.02em;
 }
 
+.plaza-takes-hint {
+  margin: 0 0 0.85rem;
+}
+
 .plaza-onair-head a {
   color: var(--brand);
   font-weight: 700;
