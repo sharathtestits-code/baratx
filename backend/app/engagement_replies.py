@@ -436,13 +436,19 @@ def backfill_missing_replies(db: Session, *, create_notification, limit: int = B
             continue
         admin_n = _reply_count(db, post.id, admin.id)
         sharath_n = _reply_count(db, post.id, sharath.id)
+        # Prefer lifetime flag; fall back to "no other posts" for legacy rows.
+        has_once = bool(getattr(author, "has_posted_once", False))
         prior = (
             db.query(models.Post.id)
             .filter(models.Post.author_id == author.id, models.Post.id != post.id)
             .limit(1)
             .first()
         )
-        is_first = prior is None
+        if prior is not None and not has_once:
+            author.has_posted_once = True
+            has_once = True
+        # True first post only when the account has never completed a post before.
+        is_first = not has_once
         # First posts need up to 2 each (welcome + engage); others need 1 each.
         need = (is_first and (admin_n < 2 or sharath_n < 2)) or (
             not is_first and (admin_n < 1 or sharath_n < 1)

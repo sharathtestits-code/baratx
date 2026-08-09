@@ -53,9 +53,18 @@ function formatShortWhen(iso) {
 
 function verifiedLabel(u) {
   const parts = [];
-  if (u.is_email_verified) parts.push("email");
-  if (u.is_phone_verified) parts.push("phone");
+  if (u.email) {
+    parts.push(u.is_email_verified ? "email verified" : "email unverified");
+  }
+  if (u.phone) {
+    parts.push(u.is_phone_verified ? "phone verified" : "phone unverified");
+  }
   return parts.length ? parts.join(" · ") : "—";
+}
+
+function emailDisplay(u) {
+  if (!u.email) return "—";
+  return u.is_email_verified ? u.email : `${u.email} (unverified)`;
 }
 
 function OfficialSelect({ id, value, onChange }) {
@@ -698,11 +707,17 @@ export default function Admin() {
                           <dl className="admin-detail-grid">
                             <div>
                               <dt>Email</dt>
-                              <dd>{u.email || "—"}</dd>
+                              <dd>{emailDisplay(u)}</dd>
                             </div>
                             <div>
                               <dt>Phone</dt>
-                              <dd>{u.phone || "—"}</dd>
+                              <dd>
+                                {u.phone
+                                  ? u.is_phone_verified
+                                    ? u.phone
+                                    : `${u.phone} (unverified)`
+                                  : "—"}
+                              </dd>
                             </div>
                             <div>
                               <dt>Joined</dt>

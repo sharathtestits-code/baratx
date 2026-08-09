@@ -30,7 +30,7 @@ const PROMPTS = [
 export default function FirstSessionGuide({ token, onComplete }) {
   const [arena, setArena] = useState("politics");
   const [city, setCity] = useState("Hyderabad");
-  const [text, setText] = useState(PROMPTS[0]);
+  const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -116,7 +116,8 @@ export default function FirstSessionGuide({ token, onComplete }) {
             onChange={(e) => setText(e.target.value.slice(0, 500))}
             rows={4}
             maxLength={500}
-            placeholder="What's your take?"
+            placeholder={PROMPTS[0]}
+            aria-label="Your first take"
           />
           <div className="first-session-prompts">
             {PROMPTS.map((p) => (

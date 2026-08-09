@@ -459,13 +459,6 @@ export default function Profile() {
           </div>
         )}
 
-        {token && user && !canManageBadges(user) && !isMe && (
-          <p className="badge-control-hint muted">
-            Badge grant/demote is only available when logged in as a blue account (@sharath or
-            @baratx).
-          </p>
-        )}
-
         {isMe && canManageBadges(user) && (
           <p className="badge-control-hint">
             You’re logged in as blue. Open another user’s profile to manage their badge.

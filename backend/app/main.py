@@ -40,6 +40,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN badge VARCHAR DEFAULT 'none'"))
             if "is_official" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN is_official BOOLEAN DEFAULT 0"))
+            if "has_posted_once" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN has_posted_once BOOLEAN DEFAULT 0"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -123,6 +125,8 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE users ADD COLUMN badge VARCHAR DEFAULT 'none'"))
                 if "is_official" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN is_official BOOLEAN DEFAULT FALSE"))
+                if "has_posted_once" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN has_posted_once BOOLEAN DEFAULT FALSE"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -168,6 +172,18 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE notifications ADD COLUMN kind VARCHAR"))
             if notif_cols and "message" not in notif_cols:
                 conn.execute(text("ALTER TABLE notifications ADD COLUMN message VARCHAR"))
+
+        # Lifetime first-post flag: backfill anyone who already has posts.
+        try:
+            conn.execute(
+                text(
+                    "UPDATE users SET has_posted_once = TRUE "
+                    "WHERE COALESCE(has_posted_once, FALSE) = FALSE "
+                    "AND id IN (SELECT DISTINCT author_id FROM posts)"
+                )
+            )
+        except Exception:
+            pass
 
         conn.commit()
 
@@ -1782,13 +1798,10 @@ async def create_post(
         image_url=image_url,
         quoted_post_id=quoted_post_id,
     )
-    # Count before insert flush so we know if this is the user's first post.
-    prior_posts = (
-        db.query(func.count(models.Post.id))
-        .filter(models.Post.author_id == current_user.id)
-        .scalar()
-        or 0
-    )
+    # Lifetime welcome: fire once per account even if every post is later deleted.
+    is_first_post = not bool(getattr(current_user, "has_posted_once", False))
+    if is_first_post:
+        current_user.has_posted_once = True
     db.add(post)
     db.flush()
     attach_hashtags(db, post, text)
@@ -1804,7 +1817,7 @@ async def create_post(
             db,
             post=post,
             author=current_user,
-            is_first_post=(prior_posts == 0),
+            is_first_post=is_first_post,
             create_notification=create_notification,
         )
     except Exception:  # noqa: BLE001
