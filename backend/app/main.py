@@ -1839,10 +1839,10 @@ def list_posts(
             raise HTTPException(status_code=401, detail="Log in to view your following feed")
         author_filter_ids = [f.followed_id for f in current_user.following] + [current_user.id]
 
-    # Keep community/space posts on their surfaces, not the home feed.
+    # Home Square: include arena debate takes (space posts). Keep Communities off Home.
     post_query = (
         db.query(models.Post)
-        .filter(models.Post.community_id.is_(None), models.Post.space_id.is_(None))
+        .filter(models.Post.community_id.is_(None))
         .order_by(models.Post.created_at.desc())
     )
     repost_query = db.query(models.Repost).order_by(models.Repost.created_at.desc())
