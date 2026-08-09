@@ -981,6 +981,66 @@ def admin_create_reply(
     return serialize_reply(reply, author)
 
 
+@app.post("/admin/backfill-post-notifications")
+def admin_backfill_post_notifications(
+    days: int = 14,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Create missing 'post' Alerts for @baratx/@sharath on recent community posts."""
+    days = max(1, min(days, 60))
+    since = datetime.now(timezone.utc) - timedelta(days=days)
+    officials = (
+        db.query(models.User)
+        .filter(models.User.username.in_(("baratx", "sharath")))
+        .all()
+    )
+    if not officials:
+        return {"ok": False, "error": "officials_missing", "created": 0}
+
+    official_ids = {u.id for u in officials}
+    official_names = set(seed.OFFICIAL_USERNAMES)
+    posts = (
+        db.query(models.Post)
+        .join(models.User, models.User.id == models.Post.author_id)
+        .filter(models.Post.created_at >= since)
+        .filter(models.Post.community_id.is_(None), models.Post.space_id.is_(None))
+        .filter(~models.User.username.in_(official_names))
+        .filter(models.User.is_official.is_(False))
+        .order_by(models.Post.created_at.desc())
+        .limit(200)
+        .all()
+    )
+    created = 0
+    for post in posts:
+        for official in officials:
+            exists = (
+                db.query(models.Notification.id)
+                .filter(
+                    models.Notification.recipient_id == official.id,
+                    models.Notification.actor_id == post.author_id,
+                    models.Notification.kind == "post",
+                    models.Notification.post_id == post.id,
+                )
+                .first()
+            )
+            if exists:
+                continue
+            if post.author_id in official_ids:
+                continue
+            create_notification(
+                db,
+                recipient_id=official.id,
+                actor_id=post.author_id,
+                kind="post",
+                post_id=post.id,
+                message=(post.text or "")[:140] or None,
+            )
+            created += 1
+    db.commit()
+    return {"ok": True, "created": created, "posts_scanned": len(posts)}
+
+
 def _official_author(db: Session, username: str) -> models.User:
     if username not in set(seed.OFFICIAL_USERNAMES):
         raise HTTPException(
@@ -1736,6 +1796,25 @@ async def create_post(
 
         logging.getLogger("baratx").exception("Official engage on create_post failed")
 
+    # Alert @baratx + @sharath when a community member posts (so Alerts isn't empty for ops).
+    if not getattr(current_user, "is_official", False) and current_user.username not in set(
+        seed.OFFICIAL_USERNAMES
+    ):
+        officials = (
+            db.query(models.User)
+            .filter(models.User.username.in_(("baratx", "sharath")))
+            .all()
+        )
+        for official in officials:
+            create_notification(
+                db,
+                recipient_id=official.id,
+                actor_id=current_user.id,
+                kind="post",
+                post_id=post.id,
+                message=(text[:140] if text else None),
+            )
+
     # Founding 100: quiet reward for one real civic problem (≥50 chars, flagged).
     mark_problem = str(civic_problem or "").strip().lower() in ("1", "true", "yes", "on")
     if mark_problem and rewards.qualifies_as_problem(text):
@@ -1783,9 +1862,13 @@ def list_posts(
         repost_query = repost_query.filter(models.Repost.created_at < cursor)
 
     # pull a generous window from each side, then merge + trim — good enough at demo scale
-    posts = post_query.limit(limit * 3).all()
+    # For You (global): over-fetch so community takes aren't buried under digest flood.
+    window = limit * (8 if feed == "global" else 3)
+    posts = post_query.limit(window).all()
     reposts = repost_query.limit(limit * 3).all()
     hidden = hidden_author_ids(db, current_user)
+
+    official_names = set(seed.OFFICIAL_USERNAMES)
 
     items = []
     for p in posts:
@@ -1805,7 +1888,21 @@ def list_posts(
             )
         )
 
-    items.sort(key=lambda i: i.item_time, reverse=True)
+    if feed == "global":
+        # Square "For you": community takes first (even if you’re not following them),
+        # then official digest — so real posts aren’t missing under peak RSS.
+        def _sort_key(i: schemas.FeedItemOut):
+            author = getattr(i.post, "author", None)
+            is_off = False
+            if author is not None:
+                uname = (getattr(author, "username", None) or "").lower()
+                is_off = bool(getattr(author, "is_official", False)) or uname in official_names
+            ts = i.item_time.timestamp() if i.item_time else 0.0
+            return (1 if is_off else 0, -ts)
+
+        items.sort(key=_sort_key)
+    else:
+        items.sort(key=lambda i: i.item_time, reverse=True)
     return items[:limit]
 
 

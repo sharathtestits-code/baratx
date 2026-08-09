@@ -476,6 +476,11 @@ export default function Feed() {
             </button>
           </div>
         </div>
+        {tab === "global" && (
+          <p className="hint plaza-takes-hint">
+            Everyone’s takes — you don’t need to follow them first.
+          </p>
+        )}
 
         {feedError && <div className="error">{feedError}</div>}
         {feedLoading ? (

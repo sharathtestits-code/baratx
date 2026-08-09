@@ -326,7 +326,7 @@ class SearchResults(BaseModel):
 
 class NotificationOut(BaseModel):
     id: str
-    type: str  # follow | like | reply | repost | mention | message | badge
+    type: str  # follow | like | reply | repost | mention | message | badge | post
     created_at: datetime
     is_read: bool
     actor: AuthorOut
