@@ -694,7 +694,7 @@ export default function Admin() {
                         </div>
                         <div className="admin-user-card-meta">
                           <span>Joined {formatShortWhen(u.created_at)}</span>
-                          <span>{u.signup_method}</span>
+                          <span>{emailDisplay(u)}</span>
                           <span>{verifiedLabel(u)}</span>
                           <span className="admin-user-card-chevron" aria-hidden>
                             {open ? "▴" : "▾"}
