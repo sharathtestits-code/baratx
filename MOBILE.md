@@ -2,12 +2,29 @@
 
 BaratX Android + iOS ship as **Capacitor** shells around the existing Vite React app.
 
+**Soft launch (Gen Z):** see **[brand/mobile/SOFT-LAUNCH.md](./brand/mobile/SOFT-LAUNCH.md)** — Android Internal testing first, then TestFlight.
+
 | Item | Value |
 |------|--------|
 | App name | BaratX |
 | Bundle / application id | `com.baratx.app` |
+| Version | `0.1.0` (Android versionCode 2) |
 | Web assets | `frontend/dist` (synced into native projects) |
 | Production API | `https://baratx-production.up.railway.app` |
+| Privacy | https://barathx.com/privacy |
+| Terms | https://barathx.com/terms |
+
+## Soft launch order (Gen Z India)
+
+1. **Deploy** privacy/terms to production (`/privacy`, `/terms`).
+2. **MSG91** real OTP on Railway (do not soft-launch on demo OTP).
+3. **Android** Play Internal testing + Campus Voices (see `brand/mobile/SOFT-LAUNCH.md`).
+4. **iOS** TestFlight after Android testers are live.
+5. Keep acquisition on IG Reels → deep link to Play/TestFlight, not mobile browser.
+
+Phone OTP is the primary auth for India Gen Z in-app. Google Sign-In is phase 2 (store OAuth clients).
+
+---
 
 ## Prerequisites
 

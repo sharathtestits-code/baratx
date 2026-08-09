@@ -26,6 +26,8 @@ import ArenaDetail from "./pages/ArenaDetail";
 import Spaces from "./pages/Spaces";
 import SpaceRoom from "./pages/SpaceRoom";
 import OnboardingTopics from "./pages/OnboardingTopics";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Sidebar from "./components/Sidebar";
 import RightRail from "./components/RightRail";
 import BottomNav from "./components/BottomNav";
@@ -95,6 +97,8 @@ function AppShell() {
           <Route path="/spaces" element={<Spaces />} />
           <Route path="/spaces/:spaceId" element={<SpaceRoom />} />
           <Route path="/onboarding/topics" element={<OnboardingTopics />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<Navigate to="/feed" replace />} />
         </Routes>
       </main>
@@ -160,6 +164,22 @@ export default function App() {
           element={
             <AuthChrome>
               <ForgotPassword />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/privacy"
+          element={
+            <AuthChrome>
+              <Privacy />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
+            <AuthChrome>
+              <Terms />
             </AuthChrome>
           }
         />

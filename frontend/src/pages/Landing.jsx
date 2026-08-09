@@ -76,7 +76,9 @@ export default function Landing() {
             </form>
 
             <p className="x-legal">
-              By signing up, you agree to the Terms of Service and Privacy Policy.
+              By signing up, you agree to the{" "}
+              <Link to="/terms">Terms of Service</Link> and{" "}
+              <Link to="/privacy">Privacy Policy</Link>.
             </p>
 
             <div className="x-have-account">

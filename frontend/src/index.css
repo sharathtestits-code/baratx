@@ -3517,6 +3517,49 @@ a.post-time:hover {
   text-decoration: underline;
 }
 
+.legal-doc {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 3rem;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.legal-doc h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.65rem;
+  letter-spacing: -0.02em;
+}
+
+.legal-doc h2 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.legal-doc p,
+.legal-doc ul {
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.legal-doc ul {
+  padding-left: 1.2rem;
+}
+
+.legal-doc a {
+  color: var(--link);
+}
+
+.legal-updated {
+  color: var(--text-tertiary) !important;
+  font-size: 0.8rem !important;
+}
+
+.legal-back {
+  margin-top: 2rem !important;
+}
+
 .x-have-account {
   margin-top: 1.5rem;
   display: flex;
