@@ -50,7 +50,7 @@
 |----|---------|----------|
 | **DEF-001** | **PASS** | `dev_verify_url` / `dev_reset_url` → `https://qa.barathx.com/...` |
 | **DEF-002** | **PASS** | Same host as DEF-001 |
-| **DEF-003** | **FAIL** *(ops/build)* | Static OG still `barathx.com` (shared Pages build; needs host rewrite or `VITE_PUBLIC_URL`) |
+| **DEF-003** | **FAIL** *(ops/build)* | Static OG still `barathx.com` on Railway-served QA HTML; Pages middleware helps `*.pages.dev` only |
 | **DEF-004** | **PASS** | Live JS `useState("")` + `placeholder:Uu[0]` |
 | **DEF-005** | **PASS** | Live JS includes `(unverified)` admin label |
 | **DEF-006** | **PASS** | After delete-all, next post → **2** content replies, **0** welcome |
