@@ -2,25 +2,15 @@
 
 | | URL |
 |---|---|
-| **QA app + API (use this)** | https://baratx-production-f8ce.up.railway.app |
-| Health | https://baratx-production-f8ce.up.railway.app/health → `{"status":"ok"}` |
-| Admin | https://baratx-production-f8ce.up.railway.app/admin |
+| **QA app + API** | https://qa.barathx.com |
+| Health | https://qa.barathx.com/health → `{"status":"ok"}` |
+| Admin | https://qa.barathx.com/admin |
+| Railway fallback | https://baratx-production-f8ce.up.railway.app |
 | Railway project | `baratx-qa` |
 
 `ADMIN_SECRET` / official password: Railway → project **baratx-qa** → service **baratx** → **Variables**.
 
-### Finish `qa.barathx.com` (Cloudflare DNS)
-
-Railway expects:
-
-| Type | Name | Value |
-|---|---|---|
-| CNAME | `qa` | `qsj314oe.up.railway.app` |
-| TXT | `_railway-verify.qa` | `railway-verify=6bc01a7c8d4605bbc3c1b58fc3623abcb32704da32ab6399fcf7a732a1e6adbc` |
-
-Also **delete** any Redirect Rule / Bulk Redirect that sends `qa.barathx.com` → `l.ink`.
-
-Until DNS is fixed, use the Railway interim URL above for QA testing.
+DNS note: specific CNAME `qa` → `qsj314oe.up.railway.app` overrides wildcard `*.barathx.com` → Porkbun Easy Links.
 
 ---
 

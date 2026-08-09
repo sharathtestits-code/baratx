@@ -2,14 +2,15 @@
 
 Keep these separate. Automation agents and Playwright must use **QA**, never Production, unless ops explicitly request a prod smoke.
 
-**Status (2026-08-09):** Production is live. **QA API+SPA is live** on Railway interim URL below. Custom host `qa.barathx.com` still needs Cloudflare DNS (currently redirects to a link page).
+**Status (2026-08-09):** Production and QA are both live. Custom host `https://qa.barathx.com` points at Railway project `baratx-qa` (wildcard `*.barathx.com` → Porkbun overridden by specific `qa` CNAME).
 
 | | **QA (staging)** | **Production (prod)** |
 |---|---|---|
-| **Web app** | Interim: `https://baratx-production-f8ce.up.railway.app` · Custom (pending DNS): `https://qa.barathx.com` | `https://barathx.com` |
-| **API** | Same origin as QA web (Railway `baratx-qa` project) | `https://baratx-production.up.railway.app` |
-| **API docs** | `https://baratx-production-f8ce.up.railway.app/docs` | `https://baratx-production.up.railway.app/docs` |
-| **Admin** | Interim `/admin` on the Railway URL · later `https://qa.barathx.com/admin` | `https://barathx.com/admin` |
+| **Web app** | `https://qa.barathx.com` | `https://barathx.com` |
+| **API** | Same origin (`qa.barathx.com`) | `https://baratx-production.up.railway.app` |
+| **API docs** | `https://qa.barathx.com/docs` | `https://baratx-production.up.railway.app/docs` |
+| **Admin** | `https://qa.barathx.com/admin` | `https://barathx.com/admin` |
+| **Interim Railway URL** | `https://baratx-production-f8ce.up.railway.app` | `https://baratx-production.up.railway.app` |
 | **DB** | Separate Railway Postgres (`baratx-qa`) | Production Postgres |
 | **Secrets** | QA-only vars on Railway service `baratx` | Prod secrets — never in QA docs |
 
