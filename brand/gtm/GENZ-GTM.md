@@ -69,9 +69,9 @@ If gate #1 fails → seed with 10–15 friends first. Do not push Reels into emp
 | YouTube Shorts | Same clips, longer shelf | Create channel this week if missing |
 | Telegram | Daily question → deep link to Arena | Create channel Day 1 |
 | WhatsApp Channel | Retention nudge | **LIVE** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o — post daily question + Arena link |
-| X | Wedge B (builders) | Paste daily tweets (API later) |
+| X | Paste daily tweets (API later) |
+| **Android app (soft launch)** | Gen Z install path | Play Internal testing — see `brand/mobile/SOFT-LAUNCH.md` |
 | Campus ambassadors | Seeding | Start outreach Day 1 (Section 8) |
-| Micro meme pages (5k–50k) | Amplify later | Days 46+ only |
 
 ---
 
