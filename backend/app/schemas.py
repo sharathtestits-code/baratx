@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
 
 from app.phoneutil import normalize_phone
+from app.text_parse import sanitize_user_text
 
 # Letters/numbers first; allow . _ - (Instagram/Twitter-style handles)
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]{2,19}$")
@@ -279,7 +280,7 @@ class ReplyCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Reply cannot be empty")
         if len(v) > 220:
@@ -378,7 +379,7 @@ class MessageCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Message cannot be empty")
         if len(v) > 1000:
@@ -460,7 +461,7 @@ class AdminPostCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Post cannot be empty")
         if len(v) > 500:
@@ -483,7 +484,7 @@ class AdminReplyCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Reply cannot be empty")
         if len(v) > 220:
@@ -694,7 +695,7 @@ class LiveTalkMessageCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
         if len(v) < 1 or len(v) > 500:
             raise ValueError("Message must be 1–500 characters")
         return v
@@ -799,11 +800,12 @@ class SurfacePostCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Post cannot be empty")
-        if len(v) > 280:
-            raise ValueError("Post must be 280 characters or fewer")
+        # Same cap as Square — one product limit everywhere members post.
+        if len(v) > 500:
+            raise ValueError("Post must be 500 characters or fewer")
         return v
 
     @field_validator("debate_side")

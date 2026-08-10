@@ -125,12 +125,16 @@ export default function CommunityDetail() {
                 placeholder={`Share with ${community.name}… type @ to tag`}
                 value={text}
                 onChange={setText}
-                maxLength={280}
+                maxLength={500}
                 rows={3}
               />
               <div className="compose-footer">
-                <span className="hint">{text.length}/280</span>
-                <button type="submit" className="btn btn-primary" disabled={posting || !text.trim()}>
+                <span className="hint">{text.length}/500</span>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={posting || !text.trim() || text.trim().length > 500}
+                >
                   {posting ? "Posting…" : "Post"}
                 </button>
               </div>

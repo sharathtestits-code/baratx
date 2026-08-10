@@ -118,6 +118,22 @@ export default function Admin() {
   const [payingId, setPayingId] = useState("");
   const [raceBusy, setRaceBusy] = useState(false);
 
+  useEffect(() => {
+    // Keep this surface out of search indexes; unlock copy must not name hosting/env vars.
+    let robots = document.querySelector('meta[name="robots"]');
+    const prev = robots?.getAttribute("content") || "";
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.setAttribute("name", "robots");
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute("content", "noindex, nofollow");
+    return () => {
+      if (prev) robots.setAttribute("content", prev);
+      else robots.remove();
+    };
+  }, []);
+
   const goTab = useCallback((id) => {
     setTab(id);
     try {
@@ -160,7 +176,13 @@ export default function Admin() {
         setRecentTotal(0);
         setFounding(null);
         setRace(null);
-        setError(err.message || "Could not load admin data");
+        const msg = err.message || "Could not load admin data";
+        setError(msg);
+        // Wrong / revoked secret — drop session so unlock screen returns.
+        if (/admin secret|unauthorized|401/i.test(msg)) {
+          sessionStorage.removeItem(SECRET_KEY);
+          setSecret("");
+        }
       } finally {
         setBusy(false);
       }
@@ -195,15 +217,26 @@ export default function Admin() {
   const needsAttention =
     (founding?.payable_count || payableFounding.length || 0) + payableRace.length;
 
-  function handleUnlock(e) {
+  async function handleUnlock(e) {
     e.preventDefault();
     const next = draft.trim();
     if (!next) {
       setError("Enter the admin secret");
       return;
     }
-    sessionStorage.setItem(SECRET_KEY, next);
-    setSecret(next);
+    setBusy(true);
+    setError("");
+    try {
+      // Validate before persisting — wrong secrets never stick in sessionStorage.
+      await adminApi.stats(next);
+      sessionStorage.setItem(SECRET_KEY, next);
+      setSecret(next);
+    } catch (err) {
+      sessionStorage.removeItem(SECRET_KEY);
+      setError(err.message || "Could not unlock admin");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function handleLock() {
@@ -415,11 +448,11 @@ export default function Admin() {
     return (
       <div className="admin-unlock">
         <h1>Admin</h1>
-        <p className="admin-lead">Enter the ADMIN_SECRET from Railway to open the console.</p>
+        <p className="admin-lead">Enter the ops secret to open the console.</p>
         {error && <div className="admin-error">{error}</div>}
         <form className="admin-unlock-form" onSubmit={handleUnlock}>
           <label className="admin-field" htmlFor="admin-secret">
-            Admin secret
+            Ops secret
           </label>
           <input
             id="admin-secret"

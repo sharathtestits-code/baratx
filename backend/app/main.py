@@ -694,7 +694,7 @@ def require_admin(x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Se
     if not ADMIN_SECRET:
         raise HTTPException(
             status_code=503,
-            detail="Admin is not configured. Set ADMIN_SECRET on the API service.",
+            detail="Admin is not configured on this environment.",
         )
     if not x_admin_secret or not secrets.compare_digest(x_admin_secret, ADMIN_SECRET):
         raise HTTPException(status_code=401, detail="Invalid admin secret")
@@ -985,7 +985,7 @@ def admin_create_reply(
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    text = payload.text.strip()
+    text = text_parse.sanitize_user_text(payload.text).strip()
     reply = models.Reply(
         post_id=post.id,
         author_id=author.id,
@@ -1765,7 +1765,7 @@ async def create_post(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    text = text.strip()
+    text = text_parse.sanitize_user_text(text).strip()
     if not text:
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
     if len(text) > MAX_POST_LENGTH:
@@ -2150,7 +2150,7 @@ def create_reply(
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    text = payload.text.strip()
+    text = text_parse.sanitize_user_text(payload.text).strip()
     if not text:
         raise HTTPException(status_code=400, detail="Reply text cannot be empty")
     if len(text) > MAX_REPLY_LENGTH:

@@ -30,6 +30,7 @@ import Spaces from "./pages/Spaces";
 import SpaceRoom from "./pages/SpaceRoom";
 import OnboardingTopics from "./pages/OnboardingTopics";
 import Rewards from "./pages/Rewards";
+import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 import PlazaTopBar from "./components/PlazaTopBar";
 import PlazaSideMenu from "./components/PlazaSideMenu";
@@ -120,7 +121,7 @@ function AppRoutes() {
       <Route path="/guidelines" element={<Guidelines />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="*" element={<Navigate to="/feed" replace />} />
+      <Route path="*" element={<NotFound homeTo="/feed" homeLabel="Back to Square" />} />
     </Routes>
   );
 }
@@ -222,8 +223,8 @@ export default function App() {
             </AuthChrome>
           }
         />
-        {/* Unknown logged-out URLs → public landing (GTM share target), not a bare login bounce */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Unknown logged-out URLs → explicit 404 (not a silent landing bounce) */}
+        <Route path="*" element={<NotFound homeTo="/" homeLabel="Back to BarathX" />} />
       </Routes>
     );
   }

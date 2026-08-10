@@ -267,6 +267,10 @@ export default function Feed() {
       setPostError("Write something first.");
       return;
     }
+    if (text.trim().length > MAX_LEN) {
+      setPostError(`Post must be ${MAX_LEN} characters or fewer`);
+      return;
+    }
     setPosting(true);
     try {
       const newPost = await postsApi.create(token, {
@@ -367,7 +371,10 @@ export default function Feed() {
               quotePreview ? "Add a comment and tag people with @…" : "What's your take?"
             }
             value={text}
-            onChange={setText}
+            onChange={(v) => {
+              setPostError("");
+              setText(v);
+            }}
             maxLength={MAX_LEN}
             rows={3}
           />
@@ -456,7 +463,11 @@ export default function Feed() {
               />
             </label>
             {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
-            <button type="submit" className="post-btn" disabled={posting || !text.trim()}>
+            <button
+              type="submit"
+              className="post-btn"
+              disabled={posting || !text.trim() || text.trim().length > MAX_LEN}
+            >
               {posting ? "Posting..." : "Post"}
             </button>
           </div>

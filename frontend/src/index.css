@@ -4358,6 +4358,29 @@ a.post-time:hover {
   box-shadow: 0 10px 30px rgba(61, 35, 20, 0.08);
 }
 
+.not-found-page {
+  max-width: 28rem;
+  margin: 4rem auto;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.not-found-page h1 {
+  margin: 0.75rem 0 0.35rem;
+  font-family: var(--font-display, inherit);
+  font-size: 1.75rem;
+}
+
+.not-found-page .hint {
+  margin: 0 0 1.25rem;
+}
+
+.not-found-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 auto;
+}
+
 .admin-unlock h1,
 .admin-header h1 {
   margin: 0 0 0.35rem;
@@ -8741,8 +8764,8 @@ html:has(.bx-home) {
   background: rgba(13, 13, 18, 0.94);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  /* Never let Join free escape the viewport */
-  overflow: hidden;
+  /* Keep nav in-flow; avoid clipping Join free on ~390px */
+  overflow: visible;
   box-sizing: border-box;
   width: 100%;
   max-width: 100vw;
@@ -8961,7 +8984,7 @@ html:has(.bx-home) {
   max-width: 42rem;
   margin: 0 auto;
   text-align: center;
-  scroll-margin-top: calc(var(--bx-home-nav-h) + 1.25rem);
+  scroll-margin-top: calc(var(--bx-home-nav-h) + 1.75rem);
 }
 
 .bx-home-section h2,
@@ -8972,7 +8995,7 @@ html:has(.bx-home) {
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1.15;
-  scroll-margin-top: calc(var(--bx-home-nav-h) + 1.25rem);
+  scroll-margin-top: calc(var(--bx-home-nav-h) + 1.75rem);
   /* Keep sticky nav from covering the first line while scrolling */
   padding-top: 0.15rem;
 }
@@ -9280,7 +9303,7 @@ html:has(.bx-home) {
   .bx-home-nav-brand {
     min-width: 0;
     flex: 1 1 auto;
-    max-width: calc(100% - 9.5rem); /* reserve room for Sign in + Join free */
+    max-width: calc(100% - 10.5rem); /* reserve room for Sign in + Join free */
   }
 
   .bx-home-nav-brand .logo-full {
@@ -9322,12 +9345,12 @@ html:has(.bx-home) {
 
   .bx-home-section {
     padding-top: clamp(4.25rem, 12vh, 5.75rem);
-    scroll-margin-top: calc(var(--bx-home-nav-h) + 1.5rem);
+    scroll-margin-top: calc(var(--bx-home-nav-h) + 2rem);
   }
 
   .bx-home-section h2,
   .bx-home-closing h2 {
-    scroll-margin-top: calc(var(--bx-home-nav-h) + 1.5rem);
+    scroll-margin-top: calc(var(--bx-home-nav-h) + 2.25rem);
     font-size: clamp(1.55rem, 7vw, 2rem);
   }
 }
@@ -9335,7 +9358,7 @@ html:has(.bx-home) {
 @media (max-width: 400px) {
   /* Prefer a fully tappable Join free over Sign in chrome */
   .bx-home-nav-brand {
-    max-width: calc(100% - 7.25rem);
+    max-width: calc(100% - 8rem);
   }
 
   .bx-home-nav-signin {
