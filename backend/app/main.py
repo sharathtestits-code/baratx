@@ -519,6 +519,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         quoted_post=quoted,
         hashtags=tags,
         debate_side=getattr(post, "debate_side", None),
+        space_id=getattr(post, "space_id", None),
     )
 
 
@@ -1581,6 +1582,7 @@ def get_user_posts(
     username: str,
     limit: int = 20,
     before: Optional[str] = None,
+    tab: str = "square",  # square | echoes | media | arenas
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
@@ -1589,7 +1591,36 @@ def get_user_posts(
         raise HTTPException(status_code=404, detail="User not found")
 
     limit = max(1, min(limit, 50))
-    query = db.query(models.Post).filter(models.Post.author_id == user.id).order_by(models.Post.created_at.desc())
+    tab_key = (tab or "square").strip().lower()
+    if tab_key not in ("square", "echoes", "media", "arenas"):
+        raise HTTPException(status_code=400, detail="Invalid tab")
+
+    if tab_key == "echoes":
+        # Echoes = posts this user reposted (not engagement on their own posts).
+        query = (
+            db.query(models.Post)
+            .join(models.Repost, models.Repost.post_id == models.Post.id)
+            .filter(models.Repost.user_id == user.id)
+            .order_by(models.Repost.created_at.desc())
+        )
+        if before:
+            try:
+                cursor = datetime.fromisoformat(before)
+                query = query.filter(models.Repost.created_at < cursor)
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid 'before' timestamp")
+        posts = query.limit(limit).all()
+        return [serialize_post(p, current_user) for p in posts]
+
+    query = db.query(models.Post).filter(models.Post.author_id == user.id)
+    if tab_key == "media":
+        query = query.filter(models.Post.image_url.isnot(None), models.Post.image_url != "")
+    elif tab_key == "arenas":
+        query = query.filter(models.Post.space_id.isnot(None))
+    else:
+        # Square: authored posts that aren't live-room-only noise preference — keep all authored.
+        pass
+    query = query.order_by(models.Post.created_at.desc())
     if before:
         try:
             cursor = datetime.fromisoformat(before)
@@ -1866,12 +1897,44 @@ async def create_post(
 
     # Founding 100: quiet reward for one real civic problem (≥50 chars, flagged).
     mark_problem = str(civic_problem or "").strip().lower() in ("1", "true", "yes", "on")
-    if mark_problem and rewards.qualifies_as_problem(text):
-        rewards.try_award(db, user=current_user, kind="problem", post_id=post.id)
+    founding_awarded = False
+    founding_status = None
+    founding_message = None
+    if mark_problem:
+        if not rewards.qualifies_as_problem(text):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Civic problems need at least {rewards.MIN_PROBLEM_CHARS} characters for First 100 floor.",
+            )
+        awarded = rewards.try_award(db, user=current_user, kind="problem", post_id=post.id)
+        if awarded:
+            founding_awarded = True
+            founding_status = awarded.status
+            founding_message = "Floor cleared — you're in First 100. India rates next."
+        else:
+            existing = rewards.my_reward(db, current_user.id)
+            if existing:
+                founding_status = existing.status
+                founding_message = f"Already in First 100 ({existing.status})."
+            elif rewards.slots_remaining(db) <= 0:
+                founding_message = "First 100 is full — post still published."
+            else:
+                founding_message = "Could not claim First 100 floor — post still published."
 
     db.commit()
     db.refresh(post)
-    return serialize_post(post, current_user)
+    out = serialize_post(post, current_user)
+    if mark_problem:
+        payload = out.model_dump() if hasattr(out, "model_dump") else out.dict()
+        payload.update(
+            {
+                "founding_awarded": founding_awarded,
+                "founding_status": founding_status,
+                "founding_message": founding_message,
+            }
+        )
+        out = schemas.PostOut(**payload)
+    return out
 
 
 @app.get("/posts", response_model=list[schemas.FeedItemOut])
@@ -2021,7 +2084,32 @@ def delete_post(
         {models.Post.quoted_post_id: None}, synchronize_session=False
     )
 
+    # Debate tallies = people on a side. If this was the author's last sided
+    # post in the room, clear their stance so the count matches active takes.
+    space_id = getattr(post, "space_id", None)
+    debate_side = getattr(post, "debate_side", None)
+    author_id = post.author_id
+
     db.delete(post)
+    db.flush()
+
+    if space_id and debate_side in ("for", "against"):
+        remaining = (
+            db.query(models.Post.id)
+            .filter(
+                models.Post.space_id == space_id,
+                models.Post.author_id == author_id,
+                models.Post.debate_side == debate_side,
+            )
+            .first()
+        )
+        if remaining is None:
+            db.query(models.SpaceStance).filter(
+                models.SpaceStance.space_id == space_id,
+                models.SpaceStance.user_id == author_id,
+                models.SpaceStance.side == debate_side,
+            ).delete(synchronize_session=False)
+
     db.commit()
     return {"message": "Post deleted"}
 

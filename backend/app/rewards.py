@@ -332,8 +332,15 @@ def race_leaderboard(db: Session, *, limit: int = 10, at: Optional[datetime] = N
         likes = _post_like_count(db, p.id, author_id=p.author_id)
         ranked.append((likes, p))
     ranked.sort(key=lambda t: (-t[0], t[1].created_at))
+    # One row per author — best Home post only (TC-QA2-REWARDS-DUPE-01).
+    best_by_author: dict[str, tuple[int, models.Post]] = {}
+    for likes, p in ranked:
+        prev = best_by_author.get(p.author_id)
+        if prev is None or likes > prev[0] or (likes == prev[0] and p.created_at < prev[1].created_at):
+            best_by_author[p.author_id] = (likes, p)
+    deduped = sorted(best_by_author.values(), key=lambda t: (-t[0], t[1].created_at))
     top = []
-    for likes, p in ranked[:limit]:
+    for likes, p in deduped[:limit]:
         top.append(
             {
                 "post_id": p.id,
@@ -402,13 +409,16 @@ def race_status_for_user(db: Session, user: Optional[models.User] = None) -> dic
                     "display_name": user.display_name,
                     "created_at": best.created_at,
                 }
-                # Rank among all period posts
-                all_ranked = []
+                # Rank among authors' best posts (matches leaderboard dedupe).
+                best_likes: dict[str, tuple[int, str]] = {}
                 for p in _home_posts_in_period(db, start, end):
                     if p.author and p.author.is_official:
                         continue
-                    all_ranked.append((_post_like_count(db, p.id, author_id=p.author_id), p.id))
-                all_ranked.sort(key=lambda t: (-t[0], t[1]))
+                    likes = _post_like_count(db, p.id, author_id=p.author_id)
+                    prev = best_likes.get(p.author_id)
+                    if prev is None or likes > prev[0]:
+                        best_likes[p.author_id] = (likes, p.id)
+                all_ranked = sorted(best_likes.values(), key=lambda t: (-t[0], t[1]))
                 for i, (_likes, pid) in enumerate(all_ranked, start=1):
                     if pid == best.id:
                         my_rank = i

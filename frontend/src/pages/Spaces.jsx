@@ -73,7 +73,6 @@ export default function Spaces() {
       <section className={`live-amphitheatre${empty ? " is-empty-hero" : ""}`}>
         <div className="live-amphitheatre-glow" aria-hidden="true" />
         <span className="live-pill">{empty ? "Start one" : "Live now"}</span>
-        <p className="live-eyebrow">Live now</p>
         <h2 className="live-amphitheatre-title">
           {featured
             ? featured.title
@@ -120,7 +119,7 @@ export default function Spaces() {
           )}
           {featured ? (
             <a href="#go-live" className="btn btn-secondary">
-              Jump in
+              Host your own
             </a>
           ) : (
             <Link to="/arenas" className="btn btn-secondary">

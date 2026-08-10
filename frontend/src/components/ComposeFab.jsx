@@ -14,7 +14,14 @@ export default function ComposeFab() {
     pathname.startsWith("/onboarding") ||
     pathname === "/rewards" ||
     pathname === "/settings" ||
-    pathname === "/guidelines";
+    pathname === "/guidelines" ||
+    pathname === "/notifications" ||
+    pathname === "/communities" ||
+    pathname.startsWith("/communities/") ||
+    pathname === "/messages" ||
+    pathname.startsWith("/messages/") ||
+    pathname === "/bookmarks" ||
+    pathname === "/lists";
 
   if (hide) return null;
 

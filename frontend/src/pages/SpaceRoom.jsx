@@ -21,6 +21,7 @@ export default function SpaceRoom() {
   const [error, setError] = useState("");
   const [stanceHint, setStanceHint] = useState(false);
   const [talkJoinToken, setTalkJoinToken] = useState(0);
+  const [inConversation, setInConversation] = useState(false);
   const composeRef = useRef(null);
   const talkRef = useRef(null);
 
@@ -45,6 +46,7 @@ export default function SpaceRoom() {
 
   useEffect(() => {
     load();
+    setInConversation(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, spaceId]);
 
@@ -110,6 +112,7 @@ export default function SpaceRoom() {
         setSpace(updated);
       }
       if (talkRef.current?.leave) await talkRef.current.leave();
+      setInConversation(false);
     } catch (err) {
       setError(err.message || "Could not leave conversation");
       load();
@@ -124,6 +127,7 @@ export default function SpaceRoom() {
       return;
     }
     // Always join Live Talk (mute / video / reactions). Stance is only required to post text.
+    setInConversation(true);
     setTalkJoinToken((n) => n + 1);
     talkRef.current?.scrollIntoView?.();
     if (isDebate && !space?.my_side) {
@@ -196,12 +200,12 @@ export default function SpaceRoom() {
           <span />
         </div>
         <div className="live-stage-actions">
-          {open && token && (
+          {open && token && !inConversation && !(isDebate && space.my_side) && (
             <button type="button" className="btn btn-primary" onClick={joinConversation}>
               Join conversation
             </button>
           )}
-          {open && (
+          {open && (inConversation || (isDebate && space.my_side)) && (
             <button
               type="button"
               className="profile-edit-btn live-leave-btn"
@@ -246,7 +250,9 @@ export default function SpaceRoom() {
               onClick={() => pickSide("for")}
             >
               <span className="debate-side-label">{space.side_for_label}</span>
-              <span className="debate-side-count">{space.for_count}</span>
+              <span className="debate-side-count" title="People on this side">
+                {space.for_count}
+              </span>
             </button>
             <button
               type="button"
@@ -256,9 +262,12 @@ export default function SpaceRoom() {
               onClick={() => pickSide("against")}
             >
               <span className="debate-side-label">{space.side_against_label}</span>
-              <span className="debate-side-count">{space.against_count}</span>
+              <span className="debate-side-count" title="People on this side">
+                {space.against_count}
+              </span>
             </button>
           </div>
+          <p className="hint debate-tally-hint">Counts are people on each side — not post totals.</p>
           {space.my_side ? (
             <p className="hint ok-hint">
               You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong> —
@@ -354,7 +363,18 @@ export default function SpaceRoom() {
                   {post.debate_side === "for" ? space.side_for_label : space.side_against_label}
                 </span>
               )}
-              <PostCard post={post} onDeleted={(id) => setPosts((p) => p.filter((x) => x.id !== id))} />
+              <PostCard
+                post={post}
+                onDeleted={async (id) => {
+                  setPosts((p) => p.filter((x) => x.id !== id));
+                  try {
+                    const s = await spacesApi.get(token, spaceId);
+                    setSpace(s);
+                  } catch {
+                    /* keep local list */
+                  }
+                }}
+              />
             </div>
           ))}
         </div>

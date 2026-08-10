@@ -42,12 +42,16 @@ export default function Profile() {
 
   useEffect(() => {
     loadProfile();
-    loadPosts();
     setEditMenuOpen(false);
     setEditModalOpen(false);
     setProfileTab("square");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
+
+  useEffect(() => {
+    loadPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username, profileTab]);
 
   useEffect(() => {
     if (!editMenuOpen) return;
@@ -77,7 +81,7 @@ export default function Profile() {
     setPostsLoading(true);
     setHasMore(true);
     try {
-      const data = await api.getUserPosts(username, token);
+      const data = await api.getUserPosts(username, token, null, profileTab);
       setPosts(data);
       setHasMore(data.length >= PAGE_SIZE);
     } catch {
@@ -94,7 +98,7 @@ export default function Profile() {
     setLoadingMore(true);
     const before = posts[posts.length - 1]?.created_at;
     try {
-      const data = await api.getUserPosts(username, token, before);
+      const data = await api.getUserPosts(username, token, before, profileTab);
       setPosts((prev) => {
         const seen = new Set(prev.map((p) => p.id));
         const next = [...prev];
@@ -113,7 +117,7 @@ export default function Profile() {
       loadingMoreRef.current = false;
       setLoadingMore(false);
     }
-  }, [username, token, hasMore, posts]);
+  }, [username, token, hasMore, posts, profileTab]);
 
   const setSentinel = useInfiniteScroll({
     disabled: postsLoading || loadingMore || !hasMore || posts.length === 0,
@@ -525,20 +529,21 @@ export default function Profile() {
         >
           Media
         </button>
-        <Link to="/arenas" className="feed-tab feed-tab-link">
+        <button
+          type="button"
+          className={`feed-tab${profileTab === "arenas" ? " active" : ""}`}
+          role="tab"
+          aria-selected={profileTab === "arenas"}
+          onClick={() => setProfileTab("arenas")}
+        >
           Arenas
-        </Link>
+        </button>
       </div>
 
       {postsLoading ? (
         <p className="hint profile-posts-hint">Loading posts...</p>
       ) : (() => {
-        const visible =
-          profileTab === "media"
-            ? posts.filter((p) => p.image_url)
-            : profileTab === "echoes"
-              ? posts.filter((p) => (p.repost_count || 0) > 0 || (p.reply_count || 0) > 0)
-              : posts;
+        const visible = posts;
         if (visible.length === 0) {
           return (
             <div className="empty-state">
@@ -547,10 +552,22 @@ export default function Profile() {
                   ? "No media yet"
                   : profileTab === "echoes"
                     ? "No echoes yet"
-                    : "No posts yet"}
+                    : profileTab === "arenas"
+                      ? "No arena takes yet"
+                      : "No posts yet"}
               </p>
               <p className="hint">
-                {isMe ? "Share your first post from The Square." : "Nothing here yet."}
+                {profileTab === "echoes"
+                  ? isMe
+                    ? "Repost takes from the Square to see them here."
+                    : "Nothing echoed yet."
+                  : profileTab === "arenas"
+                    ? isMe
+                      ? "Jump into an arena debate and post a take."
+                      : "No arena posts yet."
+                    : isMe
+                      ? "Share your first post from The Square."
+                      : "Nothing here yet."}
               </p>
             </div>
           );
