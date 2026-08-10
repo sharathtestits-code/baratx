@@ -40,54 +40,70 @@ PEAK_SLOTS = (
     (20, 0, "evening"),
 )
 
-# Founder-voice captions (human, not corporate). Privacy mentioned sparingly.
+# Founder-voice captions — sound like a real human building in public.
+# Standing approval from founder (2026-08-10): post on IST peak slots with this
+# grunge template; captions may be AI-assisted but must stay founder-tone.
+# Privacy mentioned sparingly (midday pack).
 CAPTIONS = {
     "morning": [
         (
-            "Building BarathX in public.\n\n"
-            "Not another feed to scroll. A square where India actually argues — "
-            "drop a take, pick a side, get a real reply.\n\n"
-            "Human takes only. No AI slop.\n\n"
-            "If you’ve been looking for that → https://barathx.com\n"
-            "Comment BX and I’ll send you the link myself.\n\n"
+            "okay real talk before the day gets loud —\n\n"
+            "i’m building BarathX because india deserved a square that isn’t "
+            "someone else’s product with desi stickers.\n\n"
+            "drop a take. pick a side. get a real reply.\n"
+            "human takes only. no ai slop.\n\n"
+            "if that sounds like home → https://barathx.com\n"
+            "or comment BX and i’ll send it myself.\n\n"
             "#BarathX #India #GenZ #PublicSquare #PickASide #BuildInPublic"
         ),
         (
-            "Morning check-in from the founder.\n\n"
-            "BarathX = India’s public square. Square · Arenas · Live.\n"
-            "Real replies — not a performance.\n\n"
-            "Come leave the take you’d only say to friends.\n"
-            "→ https://barathx.com\n\n"
+            "founder morning note —\n\n"
+            "BarathX = India’s public square.\n"
+            "Square · Arenas · Live.\n\n"
+            "not a performance feed. just the take you’d only say to friends — "
+            "said in public.\n\n"
+            "come leave yours → https://barathx.com\n\n"
             "#BarathX #India #GenZ #Debate #CampusLife #PublicSquare"
         ),
     ],
     "midday": [
         (
-            "Quick one —\n\n"
-            "WhatsApp buries your best takes. Reels don’t want your opinion.\n\n"
-            "On BarathX you pick a side and argue it. Sports, cinema, campus, "
-            "startups — in public.\n\n"
-            "Also: we don’t sell your personal data. That’s non‑negotiable.\n\n"
-            "Sign up → https://barathx.com\n"
-            "Or comment BX for an invite.\n\n"
+            "quick one from me —\n\n"
+            "whatsapp buries your best takes.\n"
+            "reels don’t want your opinion. they want your thumb.\n\n"
+            "on BarathX you pick a side and argue it. sports, cinema, campus, "
+            "startups — out loud.\n\n"
+            "and we don’t sell your personal data. non‑negotiable.\n\n"
+            "sign up → https://barathx.com\n"
+            "or comment BX for an invite.\n\n"
             "#BarathX #India #GenZ #Privacy #PickASide #PublicSquare"
+        ),
+        (
+            "midday check —\n\n"
+            "if your hottest take died in a group chat today, that’s the product "
+            "gap. i’m fixing it.\n\n"
+            "BarathX: drop it, pick a side, fight it out with people who care.\n"
+            "we don’t sell your data.\n\n"
+            "→ https://barathx.com · comment BX\n\n"
+            "#BarathX #India #GenZ #PublicSquare #PickASide #Privacy"
         ),
     ],
     "evening": [
         (
-            "End of day thought from me:\n\n"
-            "Every app we grew up on was built for someone else’s culture.\n\n"
-            "BarathX is India’s own public square. Drop a take. Pick a side. "
-            "Real replies — not a performance.\n\n"
-            "Swipe the carousel, then just join.\n"
+            "end of day, from the founder —\n\n"
+            "every app we grew up on was built for someone else’s culture.\n"
+            "language. norms. what “counts” as a take.\n\n"
+            "BarathX is india’s own public square.\n"
+            "drop a take. pick a side. real replies — not a performance.\n\n"
+            "swipe, then just join.\n"
             "https://barathx.com\n\n"
             "#BarathX #India #GenZ #PublicSquare #BuildInPublic #DesiApp"
         ),
         (
-            "If you only do one thing tonight — leave one honest take on BarathX.\n\n"
-            "No Reels firehose inside. No AI slop. Just sides, arenas, and people "
-            "who showed up for the same fight.\n\n"
-            "I’m building this for us.\n"
+            "one ask tonight — leave one honest take on BarathX.\n\n"
+            "no reels firehose inside. no ai slop.\n"
+            "just sides, arenas, and people who showed up for the same fight.\n\n"
+            "i’m building this for us.\n"
             "→ https://barathx.com · comment BX\n\n"
             "#BarathX #India #GenZ #PickASide #PublicSquare"
         ),

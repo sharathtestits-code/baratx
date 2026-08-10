@@ -1,8 +1,8 @@
-# IG carousel draft — What is BarathX? (GRUNGE template)
+# IG carousel — What is BarathX? (GRUNGE template)
 
-**Do not post until approved.**
+**Standing approval:** see `brand/ig/STANDING-APPROVAL.md` — schedule posts OK with this template + founder-voice captions.
 
-Style: street-grunge Pehchaan collage (torn paper, duct tape, BX sticker, spray).
+Style: street-grunge Pehchaan collage (torn paper, duct tape, BX sticker, spray).  
 Spelling: **BarathX**. Privacy = **one slide only** (#4). No First 100 / ₹150.
 
 ## Slides
@@ -13,20 +13,26 @@ Spelling: **BarathX**. Privacy = **one slide only** (#4). No First 100 / ₹150.
 5. Human takes only
 6. This is BarathX — CTA
 
-Files: `brand/ig/posted/2026-08-10-grunge/bx-grunge-what-1.jpg` … `-6.jpg`
+Stable files: `brand/ig/carousel/grunge-what/slide-01.jpg` … `slide-06.jpg`  
+Posted pack: `brand/ig/posted/2026-08-10-grunge/`
 
-## Caption
+## Caption style (founder / human)
+Live variants rotate in `backend/app/instagram_publish.py` (`morning` / `midday` / `evening`).
+
+Example midday:
+
 ```
-What is BarathX? (swipe)
+quick one from me —
 
-India’s public square — for Gen Z who want real arguments, not another algorithm feed.
+whatsapp buries your best takes.
+reels don’t want your opinion. they want your thumb.
 
-Drop a take. Pick a side. Real replies — not a performance.
+on BarathX you pick a side and argue it. sports, cinema, campus, startups — out loud.
 
-We don’t sell your personal data.
+and we don’t sell your personal data. non‑negotiable.
 
-Sign up → barathx.com
-Comment BX for an invite.
+sign up → https://barathx.com
+or comment BX for an invite.
 
-#BarathX #India #GenZ #PublicSquare #PickASide #Privacy #BuildInPublic
+#BarathX #India #GenZ #Privacy #PickASide #PublicSquare
 ```
