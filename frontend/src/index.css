@@ -5914,18 +5914,18 @@ a.reply-username.name-badge-gold,
 }
 
 .badge-grant-btn.gold {
-  border-color: #ca8a04;
-  color: #a16207;
+  border-color: #ca8a04 !important;
+  color: #a16207 !important;
 }
 
 .badge-grant-btn.blue {
-  border-color: #1d9bf0;
-  color: #0284c7;
+  border-color: #1d9bf0 !important;
+  color: #1d9bf0 !important;
 }
 
 .badge-grant-btn.demote {
-  border-color: #9ca3af;
-  color: #4b5563;
+  border-color: var(--border-strong) !important;
+  color: var(--text-secondary) !important;
 }
 
 .badge-mod-wrap {
@@ -5947,14 +5947,17 @@ a.reply-username.name-badge-gold,
 
 .badge-notify-opt input {
   margin: 0;
+  accent-color: var(--link, #1d9bf0);
 }
 
 .badge-control-panel {
   margin: 0.75rem 1.25rem 0.25rem;
   padding: 0.85rem 1rem;
-  border: 1px solid var(--border, #e5e7eb);
+  border: 1px solid var(--border-strong);
   border-radius: 12px;
-  background: var(--surface-2, #fff8f2);
+  background: var(--surface-solid, var(--surface));
+  color: var(--text);
+  box-shadow: var(--shadow-card);
 }
 
 .badge-control-head {
@@ -5968,6 +5971,7 @@ a.reply-username.name-badge-gold,
 
 .badge-control-head strong {
   font-size: 0.95rem;
+  color: var(--text);
 }
 
 .badge-control-status {
@@ -5978,7 +5982,7 @@ a.reply-username.name-badge-gold,
 
 .badge-control-protected {
   font-size: 0.8rem;
-  color: #0369a1;
+  color: var(--link, #1d9bf0);
   font-weight: 600;
 }
 
@@ -5991,6 +5995,20 @@ a.reply-username.name-badge-gold,
 
 .badge-control-hint.muted {
   margin: 0.5rem 1.25rem;
+}
+
+[data-theme="midnight"] .badge-grant-btn.gold {
+  border-color: #eab308 !important;
+  color: #facc15 !important;
+}
+
+[data-theme="midnight"] .badge-grant-btn.blue {
+  border-color: #38bdf8 !important;
+  color: #7dd3fc !important;
+}
+
+[data-theme="midnight"] .badge-control-protected {
+  color: #7dd3fc;
 }
 
 /* Admin badge / moderation */
