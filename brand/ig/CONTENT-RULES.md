@@ -1,22 +1,34 @@
-# BaratX IG content rules
+# BarathX IG content rules
+
+**Parent brief:** `brand/SOCIAL-MARKETING-LEAD.md` (Social & Marketing Lead).  
+Spelling: **BarathX**.
 
 ## Primary job of every post
-Make a stranger understand **why they should sign up** at barathx.com.
+Make a stranger understand **why they should try BarathX** — without faking scale.
 
-Not: “here is a feature.”
-Yes: “here is the pain → BaratX fix → create an account.”
+Not: “here is a feature.”  
+Yes: pain → mechanic → soft ask. Honest that we’re early.
 
-## Caption formula
-1. **Hook pain** (1 line) — something they already feel
-2. **Product proof** (1–2 lines) — one feature/mechanic
-3. **Signup CTA** (1 line) — sign up / join / leave first take
-4. **barathx.com**
-5. **Hashtags**
+## Caption formula (merge of lead brief + launch formula)
+1. **Hook** — one type only: pain dunk / real stat / counter-narrative / behind-curtain  
+2. **Problem** — specific, not abstract  
+3. **Mechanic** — how BarathX actually works (3–4 steps when it’s a launch-style post)  
+4. **Soft CTA** — comment BX / reply for link / try it and tell me it’s not different  
+5. **barathx.com**  
+6. Light hashtags (optional on X; keep short on IG)
 
 ## Visual rule
-Headline on creative should sell the *outcome* (why join), not only the feature name.
-Example: “Your takes die in group chats” > “220-char replies”
+- Standing creative: street-grunge Pehchaan collage (`brand/ig/carousel/grunge-what/`)
+- Headline sells the *outcome*, not only the feature name  
+  Example: “Your takes die in group chats” > “220-char replies”
+- Marketing Reels = clips *of* real debates (when founder provides them). No inventing moments.
 
 ## Always include
-- Clear reason to create an account
-- One concrete next step (sign up / comment BX / pick a side)
+- Clear reason to try the product
+- One concrete next step
+- No fake traction
+
+## Never
+- AI-smooth brand voice / banned phrases in `SOCIAL-MARKETING-LEAD.md`
+- Hard-sell urgency
+- Invented quotes, user counts, or “moments”

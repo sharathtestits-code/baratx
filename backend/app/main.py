@@ -2553,7 +2553,7 @@ def admin_instagram_carousel(
     """Publish BarathX app carousel to @getbaratx (Instagram Graph API)."""
     from app import instagram_publish
 
-    if pack not in ("morning", "evening"):
+    if pack not in ("morning", "midday", "evening"):
         pack = "evening"
     return instagram_publish.publish_carousel(pack=pack)
 

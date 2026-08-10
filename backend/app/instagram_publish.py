@@ -1,6 +1,6 @@
 """Instagram carousel publisher + IST peak scheduler for @getbaratx.
 
-Publishes BarathX app carousels via Meta Graph API. Slides are pulled by Meta
+Publishes BarathX grunge carousels via Meta Graph API. Slides are pulled by Meta
 from public GitHub raw URLs (no image bytes in the API container).
 
 Trending IG music cannot be attached via Graph API for feed carousels.
@@ -24,57 +24,89 @@ logger = logging.getLogger("baratx.instagram")
 
 IST = ZoneInfo("Asia/Kolkata")
 GRAPH = "https://graph.facebook.com/v21.0"
+
+# Grunge "What is BarathX" pack (6 slides). Override with INSTAGRAM_IMAGE_BASE.
 DEFAULT_IMAGE_BASE = (
-    "https://raw.githubusercontent.com/sharathtestits-code/baratx/main/brand/carousel/export"
+    "https://raw.githubusercontent.com/sharathtestits-code/baratx/"
+    "cursor/ig-carousel-what-is-2af5/brand/ig/carousel/grunge-what"
 )
+SLIDE_COUNT = 6
+SLIDE_EXT = "jpg"
 
 # India peak windows — up to 3 posts/day.
 PEAK_SLOTS = (
     (9, 0, "morning"),
-    (13, 30, "evening"),
+    (13, 30, "midday"),
     (20, 0, "evening"),
 )
 
+# Founder-voice captions — sound like a real human building in public.
+# Standing approval from founder (2026-08-10): post on IST peak slots with this
+# grunge template; captions may be AI-assisted but must stay founder-tone.
+# Privacy mentioned sparingly (midday pack).
 CAPTIONS = {
     "morning": [
         (
-            "India doesn’t need another foreign firehose.\n"
-            "It needs a public square.\n\n"
-            "BarathX = short posts, real replies, arenas that matter —\n"
-            "Sports · Politics · Entertainment · News · Spirituality.\n\n"
-            "Open the app. Drop your city. Argue like you mean it.\n"
-            "→ https://barathx.com\n\n"
-            "#BarathX #BarathXApp #IndiaPublicSquare #MakeInIndia #IndianApp "
-            "#SocialMediaIndia #Hyderabad #DesiTwitter #CivicIndia #PublicSquare"
+            "okay real talk before the day gets loud —\n\n"
+            "i’m building BarathX because india deserved a square that isn’t "
+            "someone else’s product with desi stickers.\n\n"
+            "drop a take. pick a side. get a real reply.\n"
+            "human takes only. no ai slop.\n\n"
+            "we’re early. that’s kind of the point — come argue with actual "
+            "people, not a feed.\n"
+            "→ https://barathx.com · comment BX and i’ll send it.\n\n"
+            "#BarathX #India #GenZ #PublicSquare #PickASide #BuildInPublic"
         ),
         (
-            "Stop scrolling. Start arguing.\n\n"
-            "Inside BarathX:\n"
-            "• Home feed that feels Indian\n"
-            "• Arenas for real fights\n"
-            "• Replies > empty likes\n\n"
-            "Built in India. For India.\n"
-            "→ https://barathx.com\n\n"
-            "#BarathX #BarathXApp #IndianStartup #TechIndia #SocialApp #Debate "
-            "#BarathX #ProductIndia #JoinBarathX"
+            "founder morning note —\n\n"
+            "BarathX = India’s public square.\n"
+            "Square · Arenas · Live.\n\n"
+            "not a performance feed. just the take you’d only say to friends — "
+            "said in public.\n\n"
+            "come leave yours → https://barathx.com\n\n"
+            "#BarathX #India #GenZ #Debate #CampusLife #PublicSquare"
+        ),
+    ],
+    "midday": [
+        (
+            "quick one from me —\n\n"
+            "whatsapp buries your best takes.\n"
+            "reels don’t want your opinion. they want your thumb.\n\n"
+            "on BarathX you pick a side and argue it. sports, cinema, campus, "
+            "startups — out loud.\n\n"
+            "and we don’t sell your personal data. non‑negotiable.\n\n"
+            "sign up → https://barathx.com\n"
+            "or comment BX for an invite.\n\n"
+            "#BarathX #India #GenZ #Privacy #PickASide #PublicSquare"
+        ),
+        (
+            "midday check —\n\n"
+            "if your hottest take died in a group chat today, that’s the product "
+            "gap. i’m fixing it.\n\n"
+            "BarathX: drop it, pick a side, fight it out with people who care.\n"
+            "we don’t sell your data.\n\n"
+            "→ https://barathx.com · comment BX\n\n"
+            "#BarathX #India #GenZ #PublicSquare #PickASide #Privacy"
         ),
     ],
     "evening": [
         (
-            "Your city has a take. The feed should hear it.\n\n"
-            "Post one real problem from your street / ward / campus on BarathX.\n"
-            "Founding voices get seen — and rewarded for real civic posts.\n\n"
-            "→ https://barathx.com\n\n"
-            "#BarathX #BarathXApp #CivicTech #India2026 #LocalIssues #Hyd "
-            "#Telangana #Democracy #PublicSquare #Founding100"
+            "end of day, from the founder —\n\n"
+            "every app we grew up on was built for someone else’s culture.\n"
+            "language. norms. what “counts” as a take.\n\n"
+            "BarathX is india’s own public square.\n"
+            "drop a take. pick a side. real replies — not a performance.\n\n"
+            "swipe, then just join.\n"
+            "https://barathx.com\n\n"
+            "#BarathX #India #GenZ #PublicSquare #BuildInPublic #DesiApp"
         ),
         (
-            "Every social app you use was built for someone else.\n\n"
-            "Culture. Language. Rules. Not ours.\n\n"
-            "BarathX is India’s own public square.\n"
-            "Comment BX if you want the link — or just go: https://barathx.com\n\n"
-            "#BarathX #BarathXApp #IndiaFirst #DesiApp #ViralIndia #InstagramIndia "
-            "#StartupIndia #JoinBarathX #PublicSquare"
+            "one ask tonight — leave one honest take on BarathX.\n\n"
+            "no reels firehose inside. no ai slop.\n"
+            "just sides, arenas, and people who showed up for the same fight.\n\n"
+            "i’m building this for us.\n"
+            "→ https://barathx.com · comment BX\n\n"
+            "#BarathX #India #GenZ #PickASide #PublicSquare"
         ),
     ],
 }
@@ -105,6 +137,17 @@ def _caption(pack: str) -> str:
     return rows[idx]
 
 
+def _image_base() -> str:
+    return (_env("INSTAGRAM_IMAGE_BASE") or DEFAULT_IMAGE_BASE).rstrip("/")
+
+
+def _slide_urls(image_base_url: str | None = None) -> list[str]:
+    base = (image_base_url or _image_base()).rstrip("/")
+    ext = (_env("INSTAGRAM_SLIDE_EXT") or SLIDE_EXT).lstrip(".")
+    count = int(_env("INSTAGRAM_SLIDE_COUNT") or SLIDE_COUNT)
+    return [f"{base}/slide-{i:02d}.{ext}" for i in range(1, count + 1)]
+
+
 def _post_form(url: str, data: dict) -> dict:
     body = urllib.parse.urlencode(data).encode()
     req = urllib.request.Request(url, data=body, method="POST")
@@ -121,15 +164,14 @@ def _get(url: str) -> dict:
         return json.loads(resp.read().decode())
 
 
-def publish_carousel(*, pack: str = "evening", image_base_url: str = DEFAULT_IMAGE_BASE) -> dict:
+def publish_carousel(*, pack: str = "evening", image_base_url: str | None = None) -> dict:
     token = _env("INSTAGRAM_ACCESS_TOKEN")
     ig_user_id = _env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
     if not token or not ig_user_id:
         raise RuntimeError("INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_BUSINESS_ACCOUNT_ID not set")
 
     caption = _caption(pack)
-    base = image_base_url.rstrip("/")
-    urls = [f"{base}/slide-{i:02d}.png" for i in range(1, 11)]
+    urls = _slide_urls(image_base_url)
 
     child_ids = []
     for url in urls:
@@ -170,6 +212,7 @@ def publish_carousel(*, pack: str = "evening", image_base_url: str = DEFAULT_IMA
         "creation_id": creation_id,
         "media_id": published.get("id"),
         "when_ist": datetime.now(IST).isoformat(),
+        "caption_preview": caption.split("\n", 1)[0],
     }
 
 
@@ -210,6 +253,7 @@ def start_instagram_scheduler() -> None:
 
     threading.Thread(target=loop, name="baratx-ig-schedule", daemon=True).start()
     logger.info(
-        "Instagram scheduler started (@getbaratx) slots=%s",
+        "Instagram scheduler started (@getbaratx) slots=%s base=%s",
         ",".join(f"{h:02d}:{m:02d}/{p}" for h, m, p in PEAK_SLOTS),
+        _image_base(),
     )
