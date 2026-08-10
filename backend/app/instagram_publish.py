@@ -47,10 +47,29 @@ PEAK_SLOTS = (
     (20, 0, "evening"),
 )
 
+# Cross-post social links (always BarathX product; handles as provided).
+LINK_SITE = "https://barathx.com"
+LINK_IG = "https://www.instagram.com/getbarathx/"
+LINK_X = "https://x.com/getbaratx"
+LINK_WA = "https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+
+# Footers appended to captions (platform-specific cross-links).
+FOOTER_IG = (
+    f"app → {LINK_SITE}\n"
+    f"X → {LINK_X}\n"
+    f"WhatsApp → {LINK_WA}"
+)
+FOOTER_X = (
+    f"app → {LINK_SITE}\n"
+    f"IG → {LINK_IG}\n"
+    f"WhatsApp → {LINK_WA}"
+)
+
 # Founder-voice captions — sound like a real human building in public.
 # Standing approval from founder (2026-08-10): post on IST peak slots with this
 # grunge template; captions may be AI-assisted but must stay founder-tone.
 # Privacy mentioned sparingly (midday pack).
+# IG posts always include X + WhatsApp (FOOTER_IG).
 CAPTIONS = {
     "morning": [
         (
@@ -61,7 +80,8 @@ CAPTIONS = {
             "human takes only. no ai slop.\n\n"
             "we’re early. that’s kind of the point — come argue with actual "
             "people, not a feed.\n"
-            "→ https://barathx.com · comment BX and i’ll send it.\n\n"
+            "comment BX if you want an invite.\n\n"
+            f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PublicSquare #PickASide #BuildInPublic"
         ),
         (
@@ -70,7 +90,8 @@ CAPTIONS = {
             "Square · Arenas · Live.\n\n"
             "not a performance feed. just the take you’d only say to friends — "
             "said in public.\n\n"
-            "come leave yours → https://barathx.com\n\n"
+            "come leave yours. comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #Debate #CampusLife #PublicSquare"
         ),
     ],
@@ -82,8 +103,8 @@ CAPTIONS = {
             "on BarathX you pick a side and argue it. sports, cinema, campus, "
             "startups — out loud.\n\n"
             "and we don’t sell your personal data. non‑negotiable.\n\n"
-            "sign up → https://barathx.com\n"
-            "or comment BX for an invite.\n\n"
+            "comment BX for an invite.\n\n"
+            f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #Privacy #PickASide #PublicSquare"
         ),
         (
@@ -92,7 +113,8 @@ CAPTIONS = {
             "gap. i’m fixing it.\n\n"
             "BarathX: drop it, pick a side, fight it out with people who care.\n"
             "we don’t sell your data.\n\n"
-            "→ https://barathx.com · comment BX\n\n"
+            "comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PublicSquare #PickASide #Privacy"
         ),
     ],
@@ -103,16 +125,16 @@ CAPTIONS = {
             "language. norms. what “counts” as a take.\n\n"
             "BarathX is india’s own public square.\n"
             "drop a take. pick a side. real replies — not a performance.\n\n"
-            "swipe, then just join.\n"
-            "https://barathx.com\n\n"
+            "swipe, then just join. or reply BX.\n\n"
+            f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PublicSquare #BuildInPublic #DesiApp"
         ),
         (
             "one ask tonight — leave one honest take on BarathX.\n\n"
             "no reels firehose inside. no ai slop.\n"
             "just sides, arenas, and people who showed up for the same fight.\n\n"
-            "i’m building this for us.\n"
-            "→ https://barathx.com · comment BX\n\n"
+            "i’m building this for us. comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PickASide #PublicSquare"
         ),
     ],
