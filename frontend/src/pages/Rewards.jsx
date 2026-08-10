@@ -39,7 +39,7 @@ function dedupeRaceRows(rows) {
 
 /**
  * User progress page — see your Founding status + Square Race rank.
- * Blue accounts also get a read-only ops queue (payouts stay on /bx-ops).
+ * Blue accounts also get a read-only ops queue (no link to the private console).
  */
 export default function Rewards() {
   const { token, user } = useAuth();
@@ -222,8 +222,8 @@ export default function Rewards() {
         <section className="rewards-card rewards-ops" aria-labelledby="ops-title">
           <h2 id="ops-title">Blue ops view (read-only)</h2>
           <p className="rewards-card-sub">
-            Review who cleared the floor and who’s leading the race. Payout actions stay in the{" "}
-            <Link to="/bx-ops">ops console</Link>.
+            Review who cleared the floor and who’s leading the race. Payouts are handled privately by
+            BarathX ops — not from this page.
           </p>
           {!ops && <p className="hint">Loading ops queue…</p>}
           {ops && (

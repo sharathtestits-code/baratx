@@ -52,15 +52,20 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
 
 ### See who registered / post & comment as BarathX
 
-**Production:** https://barathx.com/bx-ops  
-**QA:** https://qa.barathx.com/bx-ops (separate Railway QA service + secrets)
+**Production ops (owner only):** log in as `@sharath`, then open https://barathx.com/bx-ops  
+**QA ops (owner only):** log in as `@sharath`, then open https://qa.barathx.com/bx-ops  
 
 1. Set `ADMIN_SECRET` on the Railway API service (long random string).
 2. Redeploy the API if needed.
-3. Open the matching **ops** URL (`/bx-ops`, not `/admin`) and enter that secret.
-4. You’ll see total users, last 24h / 7d counts, a newest-first list, **Post as BarathX**, and **Comment on new users**.
+3. Log in as **@sharath** (ops owner). Other accounts — including blue — get a normal 404 at the ops URL.
+4. Open `/bx-ops` (not `/admin`) and enter the unlock code.
+5. You’ll see users, Engage, Post as BarathX, Payouts, Tools.
 
-`/admin` is intentionally a public 404 so scanners don’t see an unlock screen. Optional: set Cloudflare Pages/Vite `VITE_OPS_CONSOLE_PATH` to a private path of your choosing.
+`/admin` and `/bx-ops` show **Page not found** for everyone except the ops owner account. Optional Cloudflare Pages/Vite vars:
+- `VITE_OPS_CONSOLE_PATH` — private path (default `/bx-ops`)
+- `VITE_OPS_OWNER_USERNAMES` — comma-separated usernames allowed to open the UI (default `sharath`)
+
+Do not link the ops URL from the public app.
 
 QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
 

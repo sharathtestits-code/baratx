@@ -8,6 +8,7 @@ import { badgeOf, badgeNameClass, canManageBadges } from "../components/Official
 import EditProfileModal from "../components/EditProfileModal";
 import { IconCamera } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
+import { postHasAttachedMedia } from "../postMedia";
 
 const PAGE_SIZE = 20;
 const PROTECTED_BLUE = new Set(["baratx", "sharath"]);
@@ -88,7 +89,7 @@ export default function Profile() {
       if (reqId !== postsReqRef.current) return;
       const rows = Array.isArray(data) ? data : [];
       const filtered =
-        profileTab === "media" ? rows.filter((p) => !!(p.image_url || "").trim()) : rows;
+        profileTab === "media" ? rows.filter((p) => postHasAttachedMedia(p)) : rows;
       setPosts(filtered);
       setHasMore(profileTab === "square" && rows.length >= PAGE_SIZE);
     } catch {
@@ -553,9 +554,7 @@ export default function Profile() {
         <p className="hint profile-posts-hint">Loading posts...</p>
       ) : (() => {
         const visible =
-          profileTab === "media"
-            ? posts.filter((p) => !!(p.image_url || "").trim())
-            : posts;
+          profileTab === "media" ? posts.filter((p) => postHasAttachedMedia(p)) : posts;
         if (visible.length === 0) {
           return (
             <div className="empty-state">
@@ -573,14 +572,35 @@ export default function Profile() {
                   ? isMe
                     ? "Repost takes from the Square to see them here."
                     : "Nothing echoed yet."
-                  : profileTab === "arenas"
+                  : profileTab === "media"
                     ? isMe
-                      ? "Jump into an arena debate and post a take."
-                      : "No arena posts yet."
-                    : isMe
-                      ? "Share your first post from The Square."
-                      : "Nothing here yet."}
+                      ? "Attach a photo when you post — only image posts show here."
+                      : "No photos yet."
+                    : profileTab === "arenas"
+                      ? isMe
+                        ? "Jump into an arena debate and post a take."
+                        : "No arena posts yet."
+                      : isMe
+                        ? "Share your first post from The Square."
+                        : "Nothing here yet."}
               </p>
+            </div>
+          );
+        }
+        if (profileTab === "media") {
+          return (
+            <div className="profile-media-grid" role="list">
+              {visible.map((post) => (
+                <Link
+                  key={post.id}
+                  to={`/posts/${post.id}`}
+                  className="profile-media-tile"
+                  role="listitem"
+                  aria-label="Open media post"
+                >
+                  <img src={mediaUrl(post.image_url)} alt="" loading="lazy" />
+                </Link>
+              ))}
             </div>
           );
         }
