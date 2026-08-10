@@ -40,6 +40,7 @@ import ThemeOnboarding from "./components/ThemeOnboarding";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
+import { canAccessOpsConsole, opsConsolePath } from "./opsAccess";
 
 function AuthChrome({ children, legal = false }) {
   return (
@@ -61,10 +62,10 @@ function AdminChrome({ children }) {
       <header className="admin-topbar">
         <Link to="/" className="admin-brand" aria-label="BarathX Home">
           <Logo variant="full" className="admin-topbar-logo" />
-          <span className="admin-topbar-badge">Admin</span>
+          <span className="admin-topbar-badge">Ops</span>
         </Link>
-        <Link to="/" className="admin-topbar-back">
-          Back to BarathX
+        <Link to="/feed" className="admin-topbar-back">
+          Back to Square
         </Link>
       </header>
       <main className="admin-main">{children}</main>
@@ -127,17 +128,26 @@ function AppRoutes() {
 }
 
 export default function App() {
-  const { token, loading } = useAuth();
+  const { token, user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return <div className="page-loading">Starting BarathX…</div>;
   }
 
-  // Ops console — not advertised at /admin (TC-QA-ADMIN-01).
-  // Public /admin returns a normal 404 so scanners don't see an unlock screen.
-  const opsPath = (import.meta.env.VITE_OPS_CONSOLE_PATH || "/bx-ops").replace(/\/$/, "") || "/bx-ops";
-  if (location.pathname === opsPath) {
+  // Private ops console — owner account only. Everyone else (incl. logged-out) gets a
+  // normal 404 so the unlock screen is not public. Path defaults to /bx-ops.
+  const opsPath = opsConsolePath();
+  const onOpsPath =
+    location.pathname === opsPath || location.pathname.startsWith(`${opsPath}/`);
+  if (onOpsPath) {
+    if (!canAccessOpsConsole(user)) {
+      return (
+        <AuthChrome>
+          <NotFound homeTo={token ? "/feed" : "/"} homeLabel={token ? "Back to Square" : "Back to BarathX"} />
+        </AuthChrome>
+      );
+    }
     return (
       <AdminChrome>
         <Admin />
@@ -147,7 +157,7 @@ export default function App() {
   if (location.pathname === "/admin" || location.pathname.startsWith("/admin/")) {
     return (
       <AuthChrome>
-        <NotFound homeTo="/" homeLabel="Back to BarathX" />
+        <NotFound homeTo={token ? "/feed" : "/"} homeLabel={token ? "Back to Square" : "Back to BarathX"} />
       </AuthChrome>
     );
   }

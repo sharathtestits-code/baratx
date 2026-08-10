@@ -901,10 +901,10 @@ class RaceStatusOut(BaseModel):
 
 
 class RewardsOpsOut(BaseModel):
-    """Read-only queue for blue accounts (payout actions stay in the ops console)."""
+    """Read-only queue for blue accounts (payouts are private)."""
     founding: FoundingRewardsOut
     race: RaceStatusOut
-    note: str = "Blue can review progress. Payouts are handled in the ops console."
+    note: str = "Blue can review progress. Payouts are handled privately by BarathX ops."
 
 
 class RaceRewardRow(BaseModel):

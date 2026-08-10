@@ -221,7 +221,7 @@ export default function Admin() {
     e.preventDefault();
     const next = draft.trim();
     if (!next) {
-      setError("Enter the ops unlock code");
+      setError("Enter your unlock code");
       return;
     }
     setBusy(true);
@@ -447,12 +447,12 @@ export default function Admin() {
   if (!secret) {
     return (
       <div className="admin-unlock">
-        <h1>Admin</h1>
-        <p className="admin-lead">Enter the ops unlock code to open the console.</p>
+        <h1>Ops</h1>
+        <p className="admin-lead">Enter your unlock code to open the console.</p>
         {error && <div className="admin-error">{error}</div>}
         <form className="admin-unlock-form" onSubmit={handleUnlock}>
           <label className="admin-field" htmlFor="admin-secret">
-            Ops secret
+            Unlock code
           </label>
           <input
             id="admin-secret"
@@ -493,7 +493,7 @@ export default function Admin() {
     <div className="admin-panel">
       <header className="admin-header">
         <div>
-          <h1>Admin</h1>
+          <h1>Ops</h1>
           <p className="admin-lead">Jump to what you need — no endless scroll.</p>
         </div>
         <div className="admin-actions">
@@ -511,7 +511,7 @@ export default function Admin() {
         </div>
       </header>
 
-      <nav className="admin-tabs" aria-label="Admin sections">
+      <nav className="admin-tabs" aria-label="Ops sections">
         {TABS.map((t) => {
           const badge = tabBadges[t.id];
           return (

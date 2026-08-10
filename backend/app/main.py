@@ -1,4 +1,5 @@
 import os
+import re
 import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -1578,6 +1579,20 @@ def set_user_badge(
     return serialize_user(target, current_user)
 
 
+def _post_has_attached_media(url: Optional[str]) -> bool:
+    u = (url or "").strip()
+    if not u or u in ("null", "undefined"):
+        return False
+    low = u.lower()
+    if "/media/" in low:
+        return True
+    if low.startswith("data:image/"):
+        return True
+    if low.startswith("http://") or low.startswith("https://"):
+        return bool(re.search(r"\.(png|jpe?g|gif|webp|avif)(\?|#|$)", low) or "/media/" in low)
+    return bool(re.search(r"\.(png|jpe?g|gif|webp|avif)(\?|#|$)", low))
+
+
 @app.get("/users/{username}/posts", response_model=list[schemas.PostOut])
 def get_user_posts(
     username: str,
@@ -1625,9 +1640,9 @@ def get_user_posts(
             raise HTTPException(status_code=400, detail="Invalid 'before' timestamp")
 
     if tab_key == "media":
-        # Pull a wider window then keep only posts with a real image URL.
-        candidates = query.limit(max(limit * 5, 50)).all()
-        media_posts = [p for p in candidates if (getattr(p, "image_url", None) or "").strip()]
+        # Wider window, then keep only posts with a real attached image.
+        candidates = query.limit(max(limit * 8, 80)).all()
+        media_posts = [p for p in candidates if _post_has_attached_media(getattr(p, "image_url", None))]
         return [serialize_post(p, current_user) for p in media_posts[:limit]]
 
     posts = query.limit(limit).all()
