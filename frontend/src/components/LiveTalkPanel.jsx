@@ -1,16 +1,17 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { spacesApi } from "../api";
+import { useLiveTalkRtc } from "../hooks/useLiveTalkRtc";
 import Avatar from "./Avatar";
 
 const REACTIONS = ["👍", "❤️", "😂", "👏", "🔥", "😮", "🎉", "👎"];
 
 /**
  * Live Talk — under Live rooms.
- * Join conversation → mute / video primary; pin, chat, DM, remove under ⋯.
+ * Join conversation → real WebRTC audio between seats; mute / video; pin, chat, DM, remove under ⋯.
  */
 const LiveTalkPanel = forwardRef(function LiveTalkPanel(
-  { spaceId, token, isHost, autoJoinToken = 0 },
+  { spaceId, token, isHost, autoJoinToken = 0, onTalkChange },
   ref
 ) {
   const [state, setState] = useState(null);
@@ -21,10 +22,24 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   const [moreOpen, setMoreOpen] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [floatReacts, setFloatReacts] = useState([]);
+  const [localStream, setLocalStream] = useState(null);
   const localVideoRef = useRef(null);
   const mediaRef = useRef(null);
   const seenReactIds = useRef(new Set());
   const moreRef = useRef(null);
+
+  const inTalk = !!state?.in_talk;
+  const myUserId = state?.my_user_id || null;
+
+  const { resumeRemoteAudio } = useLiveTalkRtc({
+    spaceId,
+    token,
+    myUserId,
+    inTalk,
+    participants: state?.participants || [],
+    localStream,
+    myMuted: !!state?.my_muted,
+  });
 
   async function refresh() {
     if (!token || !spaceId) return;
@@ -78,6 +93,10 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   }, [state?.my_video, state?.participant_count]);
 
   useEffect(() => {
+    onTalkChange?.(!!state?.in_talk);
+  }, [state?.in_talk, onTalkChange]);
+
+  useEffect(() => {
     function onDoc(e) {
       if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
     }
@@ -102,19 +121,25 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
       stream.getTracks().forEach((tr) => tr.stop());
       mediaRef.current = null;
     }
+    setLocalStream(null);
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
   }
 
   async function ensureMedia({ wantVideo }) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
         video: wantVideo ? { facingMode: "user", width: { ideal: 640 } } : false,
       });
       if (mediaRef.current) {
         mediaRef.current.getTracks().forEach((tr) => tr.stop());
       }
       mediaRef.current = stream;
+      setLocalStream(stream);
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = wantVideo ? stream : null;
       }
@@ -132,13 +157,14 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
     try {
       const data = await spacesApi.talkJoin(token, spaceId);
       setState(data);
-      await ensureMedia({ wantVideo: false });
-      const stream = mediaRef.current;
+      const stream = await ensureMedia({ wantVideo: false });
       if (stream) {
+        // Join muted by default — unmute publishes audio to peers
         stream.getAudioTracks().forEach((tr) => {
           tr.enabled = false;
         });
       }
+      resumeRemoteAudio();
       requestAnimationFrame(() => {
         document.getElementById("live-talk-panel")?.scrollIntoView({
           behavior: "smooth",
@@ -177,9 +203,12 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
         stream.getAudioTracks().forEach((tr) => {
           tr.enabled = !next;
         });
+        setLocalStream(stream);
       }
       const data = await spacesApi.talkUpdateMe(token, spaceId, { muted: next });
       setState(data);
+      // Unmute click is a user gesture — unlock remote audio autoplay
+      resumeRemoteAudio();
     } catch (err) {
       setError(err.message || "Could not update mute");
     } finally {
@@ -213,6 +242,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
       }
       const data = await spacesApi.talkUpdateMe(token, spaceId, { video_enabled: next });
       setState(data);
+      resumeRemoteAudio();
     } catch (err) {
       setError(err.message || "Could not update video");
     } finally {
@@ -282,7 +312,6 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
 
   const count = state?.participant_count ?? 0;
   const max = state?.max_participants ?? 15;
-  const inTalk = !!state?.in_talk;
   const mePinned = (state?.pinned_usernames || []).includes(
     state?.participants?.find((p) => p.is_self)?.user?.username
   );
@@ -293,7 +322,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
         <div>
           <h2 className="live-talk-title">Live conversation</h2>
           <p className="live-talk-sub">
-            Audio & video · {count}/{max} on call · profiles show when you join
+            Audio & video · {count}/{max} on call · unmute to speak — others hear you live
           </p>
         </div>
         {!inTalk && (
@@ -368,8 +397,8 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
           {count === 0 && (
             <li className="live-talk-empty">
               <p className="hint">
-                Tap <strong>Join conversation</strong> to go on audio. Then mute / unmute and turn video on or
-                off. Max {max} people.
+                Tap <strong>Join conversation</strong> to go on audio. Then unmute so others can hear you.
+                Max {max} people.
               </p>
             </li>
           )}

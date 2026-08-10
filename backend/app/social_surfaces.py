@@ -7,6 +7,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Callable, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from app import models, schemas
@@ -1155,6 +1156,7 @@ def register_social_surfaces(
             in_talk=me is not None,
             my_muted=bool(me.muted) if me else True,
             my_video=bool(me.video_enabled) if me else False,
+            my_user_id=current_user.id,
             participants=[
                 _talk_participant_out(r, current_user=current_user, host_id=space.host_id, pinned_ids=pinned_ids)
                 for r in rows_sorted
@@ -1259,6 +1261,7 @@ def register_social_surfaces(
             row.left_at = datetime.now(timezone.utc)
             row.muted = True
             row.video_enabled = False
+            _clear_talk_signals_for_user(db, s.id, current_user.id)
             db.commit()
         return _talk_state(db, s, current_user)
 
@@ -1475,5 +1478,107 @@ def register_social_surfaces(
         mod.maybe_auto_delete_user(db, target, purge_fn=mod.purge_user)
         db.commit()
         return _talk_state(db, s, current_user)
+
+    def _purge_old_talk_signals(db: Session, space_id: str):
+        cutoff = datetime.now(timezone.utc) - timedelta(minutes=2)
+        db.query(models.LiveTalkSignal).filter(
+            models.LiveTalkSignal.space_id == space_id,
+            models.LiveTalkSignal.created_at < cutoff,
+        ).delete(synchronize_session=False)
+
+    def _clear_talk_signals_for_user(db: Session, space_id: str, user_id: str):
+        db.query(models.LiveTalkSignal).filter(
+            models.LiveTalkSignal.space_id == space_id,
+            or_(
+                models.LiveTalkSignal.from_user_id == user_id,
+                models.LiveTalkSignal.to_user_id == user_id,
+            ),
+        ).delete(synchronize_session=False)
+
+    @router.post("/spaces/{space_id}/talk/signals", response_model=schemas.LiveTalkSignalOut)
+    def post_live_talk_signal(
+        space_id: str,
+        payload: schemas.LiveTalkSignalCreate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        me = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        if not me:
+            raise HTTPException(status_code=400, detail="Join the conversation first")
+        if payload.to_user_id == current_user.id:
+            raise HTTPException(status_code=400, detail="Cannot signal yourself")
+        peer = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == payload.to_user_id)
+            .first()
+        )
+        if not peer:
+            raise HTTPException(status_code=404, detail="Peer is not on this call")
+        row = models.LiveTalkSignal(
+            space_id=s.id,
+            from_user_id=current_user.id,
+            to_user_id=payload.to_user_id,
+            kind=payload.kind,
+            payload=payload.payload,
+        )
+        db.add(row)
+        _purge_old_talk_signals(db, s.id)
+        db.commit()
+        db.refresh(row)
+        return schemas.LiveTalkSignalOut(
+            id=row.id,
+            from_user_id=row.from_user_id,
+            to_user_id=row.to_user_id,
+            kind=row.kind,
+            payload=row.payload,
+            created_at=row.created_at,
+        )
+
+    @router.get("/spaces/{space_id}/talk/signals", response_model=list[schemas.LiveTalkSignalOut])
+    def list_live_talk_signals(
+        space_id: str,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        s = _get_space(db, space_id)
+        me = (
+            _active_talk_q(db, s.id)
+            .filter(models.LiveTalkParticipant.user_id == current_user.id)
+            .first()
+        )
+        if not me:
+            return []
+        _purge_old_talk_signals(db, s.id)
+        rows = (
+            db.query(models.LiveTalkSignal)
+            .filter(
+                models.LiveTalkSignal.space_id == s.id,
+                models.LiveTalkSignal.to_user_id == current_user.id,
+                models.LiveTalkSignal.delivered.is_(False),
+            )
+            .order_by(models.LiveTalkSignal.created_at.asc())
+            .limit(80)
+            .all()
+        )
+        out = []
+        for row in rows:
+            row.delivered = True
+            out.append(
+                schemas.LiveTalkSignalOut(
+                    id=row.id,
+                    from_user_id=row.from_user_id,
+                    to_user_id=row.to_user_id,
+                    kind=row.kind,
+                    payload=row.payload,
+                    created_at=row.created_at,
+                )
+            )
+        db.commit()
+        return out
 
     app.include_router(router)

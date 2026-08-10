@@ -765,10 +765,50 @@ class LiveTalkStateOut(BaseModel):
     in_talk: bool = False
     my_muted: bool = True
     my_video: bool = False
+    my_user_id: Optional[str] = None
     participants: list[LiveTalkParticipantOut] = []
     messages: list[LiveTalkMessageOut] = []
     reactions: list[LiveTalkReactionOut] = []
     pinned_usernames: list[str] = []
+
+
+class LiveTalkSignalCreate(BaseModel):
+    to_user_id: str
+    kind: str
+    payload: str
+
+    @field_validator("to_user_id")
+    @classmethod
+    def valid_to(cls, v):
+        v = (v or "").strip()
+        if len(v) < 8:
+            raise ValueError("to_user_id required")
+        return v
+
+    @field_validator("kind")
+    @classmethod
+    def valid_kind(cls, v):
+        v = (v or "").strip().lower()
+        if v not in {"offer", "answer", "ice"}:
+            raise ValueError("kind must be offer, answer, or ice")
+        return v
+
+    @field_validator("payload")
+    @classmethod
+    def valid_payload(cls, v):
+        v = (v or "").strip()
+        if len(v) < 2 or len(v) > 64000:
+            raise ValueError("payload too large or empty")
+        return v
+
+
+class LiveTalkSignalOut(BaseModel):
+    id: str
+    from_user_id: str
+    to_user_id: str
+    kind: str
+    payload: str
+    created_at: datetime
 
 
 class TopicOut(BaseModel):
