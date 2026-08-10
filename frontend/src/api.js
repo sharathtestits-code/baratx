@@ -464,6 +464,14 @@ export const spacesApi = {
       headers: authHeaders(token),
       body: JSON.stringify({ emoji }),
     }),
+  talkSignal: (token, id, body) =>
+    request(`/spaces/${id}/talk/signals`, {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+  talkSignals: (token, id) =>
+    request(`/spaces/${id}/talk/signals`, { headers: authHeaders(token) }),
 };
 
 export const topicsApi = {

@@ -200,12 +200,12 @@ export default function SpaceRoom() {
           <span />
         </div>
         <div className="live-stage-actions">
-          {open && token && !inConversation && !(isDebate && space.my_side) && (
+          {open && token && !inConversation && (
             <button type="button" className="btn btn-primary" onClick={joinConversation}>
               Join conversation
             </button>
           )}
-          {open && (inConversation || (isDebate && space.my_side)) && (
+          {open && inConversation && (
             <button
               type="button"
               className="profile-edit-btn live-leave-btn"
@@ -232,6 +232,7 @@ export default function SpaceRoom() {
           token={token}
           isHost={!!space.is_host}
           autoJoinToken={talkJoinToken}
+          onTalkChange={setInConversation}
         />
       )}
 

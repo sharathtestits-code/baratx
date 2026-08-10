@@ -464,6 +464,21 @@ class LiveTalkReaction(Base):
     user = relationship("User", foreign_keys=[user_id])
 
 
+class LiveTalkSignal(Base):
+    """WebRTC signaling (offer / answer / ICE) between two talk participants."""
+
+    __tablename__ = "live_talk_signals"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
+    from_user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    to_user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, index=True)  # offer | answer | ice
+    payload = Column(Text, nullable=False, default="")
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+    delivered = Column(Boolean, default=False, nullable=False, index=True)
+
+
 class ModerationStrike(Base):
     """Auto-moderation strikes — stack toward account removal."""
 
