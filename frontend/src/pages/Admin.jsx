@@ -221,7 +221,7 @@ export default function Admin() {
     e.preventDefault();
     const next = draft.trim();
     if (!next) {
-      setError("Enter the admin secret");
+      setError("Enter the ops unlock code");
       return;
     }
     setBusy(true);
@@ -448,7 +448,7 @@ export default function Admin() {
     return (
       <div className="admin-unlock">
         <h1>Admin</h1>
-        <p className="admin-lead">Enter the ops secret to open the console.</p>
+        <p className="admin-lead">Enter the ops unlock code to open the console.</p>
         {error && <div className="admin-error">{error}</div>}
         <form className="admin-unlock-form" onSubmit={handleUnlock}>
           <label className="admin-field" htmlFor="admin-secret">

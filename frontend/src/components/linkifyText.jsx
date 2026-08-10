@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { sanitizeUserText } from "../sanitizeUserText";
 
 /** Split post/reply text into plain + @mention/#hashtag links (matches backend text_parse). */
 export function linkifyText(text) {
-  const parts = String(text || "").split(/([@#][A-Za-z0-9][A-Za-z0-9._-]{1,39})/g);
+  const safe = sanitizeUserText(text);
+  const parts = String(safe || "").split(/([@#][A-Za-z0-9][A-Za-z0-9._-]{1,39})/g);
   return parts.map((part, i) => {
     if (part.startsWith("@") && part.length >= 3) {
       const u = part.slice(1);

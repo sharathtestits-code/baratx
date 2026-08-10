@@ -14,6 +14,7 @@ import MentionTextarea from "../components/MentionTextarea";
 import { IconImage, IconClose, IconLive } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
+import { sanitizeUserText } from "../sanitizeUserText";
 
 const MAX_LEN = 500;
 const PAGE_SIZE = 20;
@@ -307,8 +308,9 @@ export default function Feed() {
     }
     setPosting(true);
     try {
+      const cleanText = sanitizeUserText(text).trim();
       const newPost = await postsApi.create(token, {
-        text: text.trim(),
+        text: cleanText,
         image: imageFile,
         quotePostId: quotePostId || undefined,
         civicProblem: civicProblem || undefined,
@@ -412,7 +414,7 @@ export default function Feed() {
             value={text}
             onChange={(v) => {
               setPostError("");
-              setText(v);
+              setText(sanitizeUserText(v));
             }}
             maxLength={MAX_LEN}
             rows={3}

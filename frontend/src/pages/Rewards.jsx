@@ -23,6 +23,20 @@ function daysLeft(endsAt) {
   return Math.ceil(ms / 86400000);
 }
 
+/** One row per author — mirrors backend race_leaderboard dedupe. */
+function dedupeRaceRows(rows) {
+  const best = new Map();
+  for (const row of rows || []) {
+    const key = row.author_id || row.username;
+    if (!key) continue;
+    const prev = best.get(key);
+    if (!prev || (row.like_count || 0) > (prev.like_count || 0)) {
+      best.set(key, row);
+    }
+  }
+  return Array.from(best.values()).sort((a, b) => (b.like_count || 0) - (a.like_count || 0));
+}
+
 /**
  * User progress page — see your Founding status + Square Race rank.
  * Blue accounts also get a read-only ops queue (payouts stay on /bx-ops).
@@ -184,8 +198,10 @@ export default function Rewards() {
           </div>
           {(race.leaderboard || []).length > 0 && (
             <ol className="rewards-board">
-              {race.leaderboard.slice(0, 10).map((row, i) => (
-                <li key={row.post_id} className={row.username === user.username ? "is-you" : ""}>
+              {dedupeRaceRows(race.leaderboard)
+                .slice(0, 10)
+                .map((row, i) => (
+                <li key={row.post_id || `${row.author_id}-${i}`} className={row.username === user.username ? "is-you" : ""}>
                   <span className="rewards-board-rank">#{i + 1}</span>
                   <span className="rewards-board-user">
                     <Link to={`/u/${row.username}`}>@{row.username}</Link>
@@ -206,9 +222,8 @@ export default function Rewards() {
         <section className="rewards-card rewards-ops" aria-labelledby="ops-title">
           <h2 id="ops-title">Blue ops view (read-only)</h2>
           <p className="rewards-card-sub">
-            Review who cleared the floor and who’s leading the race.{" "}
-            <strong>Mark paid / lock winner</strong> stays in the{" "}
-            <Link to="/bx-ops">ops console</Link> (money actions).
+            Review who cleared the floor and who’s leading the race. Payout actions stay in the{" "}
+            <Link to="/bx-ops">ops console</Link>.
           </p>
           {!ops && <p className="hint">Loading ops queue…</p>}
           {ops && (
@@ -238,8 +253,8 @@ export default function Rewards() {
               )}
               <h3 className="admin-subhead">Race top right now</h3>
               <ul className="rewards-ops-list">
-                {(ops.race.leaderboard || []).slice(0, 8).map((row, i) => (
-                  <li key={row.post_id}>
+                {dedupeRaceRows(ops.race.leaderboard || []).slice(0, 8).map((row, i) => (
+                  <li key={row.post_id || `${row.author_id}-${i}`}>
                     #{i + 1} @{row.username} · {row.like_count} likes · ₹{row.prize_inr || "—"}
                   </li>
                 ))}

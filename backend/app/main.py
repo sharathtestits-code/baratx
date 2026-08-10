@@ -496,17 +496,18 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         qp = post.quoted_post
         quoted = schemas.QuotedPostOut(
             id=qp.id,
-            text=qp.text,
+            text=text_parse.sanitize_user_text(qp.text or ""),
             image_url=qp.image_url,
             created_at=qp.created_at,
             author=author_out(qp.author),
         )
 
     tags = text_parse.extract_hashtags(post.text)
+    safe_text = text_parse.sanitize_user_text(post.text or "")
 
     return schemas.PostOut(
         id=post.id,
-        text=post.text,
+        text=safe_text,
         image_url=post.image_url,
         created_at=post.created_at,
         author=author_out(post.author),
@@ -530,7 +531,7 @@ def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) ->
     return schemas.ReplyOut(
         id=reply.id,
         post_id=reply.post_id,
-        text=reply.text,
+        text=text_parse.sanitize_user_text(reply.text or ""),
         created_at=reply.created_at,
         author=author_out(reply.author),
         like_count=len(reply.likes),
@@ -1613,13 +1614,8 @@ def get_user_posts(
         return [serialize_post(p, current_user) for p in posts]
 
     query = db.query(models.Post).filter(models.Post.author_id == user.id)
-    if tab_key == "media":
-        query = query.filter(models.Post.image_url.isnot(None), models.Post.image_url != "")
-    elif tab_key == "arenas":
+    if tab_key == "arenas":
         query = query.filter(models.Post.space_id.isnot(None))
-    else:
-        # Square: authored posts that aren't live-room-only noise preference — keep all authored.
-        pass
     query = query.order_by(models.Post.created_at.desc())
     if before:
         try:
@@ -1627,6 +1623,13 @@ def get_user_posts(
             query = query.filter(models.Post.created_at < cursor)
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid 'before' timestamp")
+
+    if tab_key == "media":
+        # Pull a wider window then keep only posts with a real image URL.
+        candidates = query.limit(max(limit * 5, 50)).all()
+        media_posts = [p for p in candidates if (getattr(p, "image_url", None) or "").strip()]
+        return [serialize_post(p, current_user) for p in media_posts[:limit]]
+
     posts = query.limit(limit).all()
     return [serialize_post(p, current_user) for p in posts]
 
@@ -1916,6 +1919,10 @@ async def create_post(
             if existing:
                 founding_status = existing.status
                 founding_message = f"Already in First 100 ({existing.status})."
+            elif getattr(current_user, "is_official", False) or (
+                (getattr(current_user, "badge", None) or "").lower() == "blue"
+            ):
+                founding_message = "Official/blue accounts aren't eligible for First 100 — post still published."
             elif rewards.slots_remaining(db) <= 0:
                 founding_message = "First 100 is full — post still published."
             else:
@@ -2567,10 +2574,10 @@ def rewards_ops_for_blue(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Blue accounts: read-only Founding queue + race board. Money actions stay on /admin."""
+    """Blue accounts: read-only Founding queue + race board. Money actions stay in the ops console."""
     if not _is_blue(current_user):
         raise HTTPException(status_code=403, detail="Blue accounts only")
-    # Reuse admin serializers without admin secret.
+    # Reuse admin serializers without requiring the ops unlock here.
     founding = admin_founding_rewards(status=None, _=True, db=db)
     race = schemas.RaceStatusOut(**rewards.race_status_for_user(db, None))
     return schemas.RewardsOpsOut(founding=founding, race=race)

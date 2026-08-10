@@ -37,6 +37,7 @@ export default function Profile() {
   const coverInputRef = useRef(null);
   const editMenuRef = useRef(null);
   const loadingMoreRef = useRef(false);
+  const postsReqRef = useRef(0);
 
   const [profileTab, setProfileTab] = useState("square");
 
@@ -78,22 +79,30 @@ export default function Profile() {
   }
 
   async function loadPosts() {
+    const reqId = ++postsReqRef.current;
     setPostsLoading(true);
     setHasMore(true);
+    setPosts([]);
     try {
       const data = await api.getUserPosts(username, token, null, profileTab);
-      setPosts(data);
-      setHasMore(data.length >= PAGE_SIZE);
+      if (reqId !== postsReqRef.current) return;
+      const rows = Array.isArray(data) ? data : [];
+      const filtered =
+        profileTab === "media" ? rows.filter((p) => !!(p.image_url || "").trim()) : rows;
+      setPosts(filtered);
+      setHasMore(profileTab === "square" && rows.length >= PAGE_SIZE);
     } catch {
+      if (reqId !== postsReqRef.current) return;
       setPosts([]);
       setHasMore(false);
     } finally {
-      setPostsLoading(false);
+      if (reqId === postsReqRef.current) setPostsLoading(false);
     }
   }
 
   const loadMore = useCallback(async () => {
     if (!username || loadingMoreRef.current || !hasMore || posts.length === 0) return;
+    if (profileTab !== "square") return;
     loadingMoreRef.current = true;
     setLoadingMore(true);
     const before = posts[posts.length - 1]?.created_at;
@@ -543,7 +552,10 @@ export default function Profile() {
       {postsLoading ? (
         <p className="hint profile-posts-hint">Loading posts...</p>
       ) : (() => {
-        const visible = posts;
+        const visible =
+          profileTab === "media"
+            ? posts.filter((p) => !!(p.image_url || "").trim())
+            : posts;
         if (visible.length === 0) {
           return (
             <div className="empty-state">
