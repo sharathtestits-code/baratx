@@ -47,7 +47,7 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
    - Public URL: https://baratx-production.up.railway.app
    - Docs: https://baratx-production.up.railway.app/docs
    - Vars set: `DATABASE_URL`, `JWT_SECRET`, `ENVIRONMENT`, `CORS_ORIGINS`
-   - Optional: `ADMIN_SECRET` for the ops console at https://barathx.com/bx-ops
+   - Optional: `ADMIN_SECRET` — unlock code for the **owner-only** ops console (see below)
 2. MSG91 later for SMS OTP
 
 ### See who registered / post & comment as BarathX
