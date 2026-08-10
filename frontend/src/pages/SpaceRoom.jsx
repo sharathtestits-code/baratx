@@ -314,13 +314,18 @@ export default function SpaceRoom() {
                       : "Type your take — pick For or Against above to post"
                     : "Say something in this Space — type @ to tag"
                 }
-                maxLength={280}
+                maxLength={500}
                 rows={3}
               />
               <button
                 type="submit"
                 className="post-btn"
-                disabled={posting || !text.trim() || (isDebate && !space.my_side)}
+                disabled={
+                  posting ||
+                  !text.trim() ||
+                  text.trim().length > 500 ||
+                  (isDebate && !space.my_side)
+                }
               >
                 {posting
                   ? "Posting…"

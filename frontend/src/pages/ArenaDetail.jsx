@@ -360,10 +360,14 @@ export default function ArenaDetail() {
             value={text}
             onChange={setText}
             placeholder={`What’s your take on ${arena.name}? Type @ to tag`}
-            maxLength={280}
+            maxLength={500}
             rows={3}
           />
-          <button type="submit" className="post-btn" disabled={posting || !text.trim()}>
+          <button
+            type="submit"
+            className="post-btn"
+            disabled={posting || !text.trim() || text.trim().length > 500}
+          >
             {posting ? "Posting…" : "Post"}
           </button>
         </form>
