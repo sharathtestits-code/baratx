@@ -24,11 +24,13 @@ On each run:
 - Pull a fresh template direction from what’s working online that week — still on-brand (street / human / not corporate), still BarathX spelling.
 - If the Drive doc already includes or links to assets, use those.
 
-## Blockers (must be resolved before this run can execute)
+## Access (resolved 2026-08-10)
 
-- [ ] Google Drive read + rename access for this agent (MCP, shared service account, or OAuth token in secrets)
-- [ ] Confirm: caption-only drafts → which default visual pack / rotation rules
-- [ ] Confirm: Drive posts **replace** a peak slot that day, or are **extra** on top of 09:00 / 13:30 / 20:00 Railway schedule
+- [x] Google Drive SA `barathx@baratx.iam.gserviceaccount.com` + folder shared Editor
+- [x] Key path: `~/.config/baratx/google-drive.json` (also upload path under workspace uploads)
+- [ ] Automation cloud runs still need the same key + IG token in **Cursor environment secrets** (not only this VM)
+- [ ] Caption-only drafts → default visual: approved grunge pack unless draft links assets
+- [x] Drive posts are **extra** when a draft exists; Railway 09:00 / 13:30 / 20:00 still runs unless disabled
 
 ## Local ops notes
 
