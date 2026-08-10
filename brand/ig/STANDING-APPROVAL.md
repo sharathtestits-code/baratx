@@ -16,6 +16,6 @@
 - Off-schedule extra posts beyond the 3 daily peaks
 
 ## Ops notes
-- Publisher: `backend/app/instagram_publish.py`
-- Today’s runner (if Railway lagging): `brand/ig/schedule_today_posts.py`
+- Publisher: `backend/app/instagram_publish.py` (Railway in-process scheduler)
+- Fallback if Railway misses a slot by ~5 min: `brand/ig/schedule_watchdog.py`
 - Spelling: **BarathX** (not BharathX)
