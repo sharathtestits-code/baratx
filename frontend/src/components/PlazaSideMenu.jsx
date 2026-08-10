@@ -250,8 +250,8 @@ export default function PlazaSideMenu() {
 
             <button type="button" className="plaza-side-manage" onClick={() => goLink("/rewards")}>
               <span className="plaza-side-manage-copy">
-                <strong>First 100 · ₹150</strong>
-                <em>Open a live that gets real engagement</em>
+                <strong>Founding 100</strong>
+                <em>Earn a spot with a real debate</em>
               </span>
               <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
                 <path

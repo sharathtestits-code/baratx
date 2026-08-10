@@ -72,14 +72,15 @@ export default function Arenas() {
         <p className="arena-featured-kicker">Builders only</p>
         <h2>Startups — Fund it or Pass</h2>
         <p className="hint">
-          Argue the pitch and the raise live. First 100 · ₹150 for early rooms with real engagement.
+          Argue the pitch and the raise live. Founding 100 spots go to early rooms with real
+          engagement — earned, not claimed at signup.
         </p>
         <div className="arena-featured-actions">
           <Link to="/arenas/startups" className="btn btn-primary">
             Enter Startups
           </Link>
           <Link to="/rewards" className="btn btn-secondary">
-            First 100 · ₹150
+            Founding 100
           </Link>
         </div>
       </div>

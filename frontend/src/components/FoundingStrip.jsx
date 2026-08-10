@@ -71,8 +71,9 @@ export default function FoundingStrip({ onPostProblem }) {
     <section className="founding-strip" aria-label="Founding square">
       <p className="founding-strip-label">Founding {status.cap}</p>
       <p className="founding-strip-body">
-        Post one real city problem or open any arena debate. First {status.cap} get ₹
-        {status.amount_inr} after likes/replies — {status.slots_remaining} spots left.
+        {status.cap} Founding spots — earn one with a real city problem or arena debate that gets
+        real engagement, not by signing up. ₹{status.amount_inr} after the rating bar ·{" "}
+        {status.slots_remaining} left.
       </p>
       <div className="founding-strip-actions">
         <button type="button" className="founding-strip-cta" onClick={() => onPostProblem?.()}>

@@ -10,7 +10,8 @@ Arenas: Sports · Politics · Entertainment · News · Spirituality
 | 2. Community rating | Likes / replies (problems) or stances / debate posts | India cared — this is the rating |
 | 3. Admin payout | You send UPI + Mark paid | Human veto for spam / self-like rings |
 
-**Founding 100 (₹150, first 100 people, once):**
+**Founding 100 (membership; ₹150 thank-you once):**
+- Pitch: earned by a real debate / civic post with real engagement — **not** by signing up (see `brand/gtm/BarathX_Sales_Playbook_KunalShah.md`)
 - Status `eligible` = floor cleared
 - Status `payable` = rating bar met (≥25 likes **or** ≥5 replies from someone else; debates: ≥2 stances **or** ≥3 posts)
 - Pay when `payable` (or after manual review if you intentionally override)
@@ -31,7 +32,7 @@ Arenas: Sports · Politics · Entertainment · News · Spirituality
 
 Users **don’t rate themselves**. Progress = likes/replies India gives them. They watch the meter on `/rewards`.
 
-> Post a real city problem or open any arena debate. First 100 get ₹150 after people engage. Every 2 weeks the highest-liked Home post wins up to ₹500. barathx.com
+> Founding 100 spots — earn one with a real city problem or arena debate that gets real engagement (not by signing up). ₹150 after the rating bar. Every 2 weeks the highest-liked Home post wins up to ₹500. barathx.com
 
 ## Don’t
 - Pay for bare signup

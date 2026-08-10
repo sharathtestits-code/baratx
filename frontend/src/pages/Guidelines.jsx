@@ -47,10 +47,11 @@ export default function Guidelines() {
           </li>
         </ul>
 
-        <h2>Founding ₹150</h2>
+        <h2>Founding 100</h2>
         <p>
-          Early creators who open a live debate that shows real engagement can earn Founding status
-          and ₹150. Details on <Link to="/rewards">Rewards</Link> after you join.
+          Only 100 Founding spots. You earn one by opening a live debate that shows real engagement —
+          not by signing up. ₹150 is a thank-you after that bar. Details on{" "}
+          <Link to="/rewards">Rewards</Link> after you join.
         </p>
 
         <p className="hint">

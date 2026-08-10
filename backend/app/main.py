@@ -1922,26 +1922,26 @@ async def create_post(
         if not rewards.qualifies_as_problem(text):
             raise HTTPException(
                 status_code=400,
-                detail=f"Civic problems need at least {rewards.MIN_PROBLEM_CHARS} characters for First 100 floor.",
+                detail=f"Civic problems need at least {rewards.MIN_PROBLEM_CHARS} characters for Founding 100 floor.",
             )
         awarded = rewards.try_award(db, user=current_user, kind="problem", post_id=post.id)
         if awarded:
             founding_awarded = True
             founding_status = awarded.status
-            founding_message = "Floor cleared — you're in First 100. India rates next."
+            founding_message = "Floor cleared — you're on Founding 100. India rates next."
         else:
             existing = rewards.my_reward(db, current_user.id)
             if existing:
                 founding_status = existing.status
-                founding_message = f"Already in First 100 ({existing.status})."
+                founding_message = f"Already on Founding 100 ({existing.status})."
             elif getattr(current_user, "is_official", False) or (
                 (getattr(current_user, "badge", None) or "").lower() == "blue"
             ):
-                founding_message = "Official/blue accounts aren't eligible for First 100 — post still published."
+                founding_message = "Official/blue accounts aren't eligible for Founding 100 — post still published."
             elif rewards.slots_remaining(db) <= 0:
-                founding_message = "First 100 is full — post still published."
+                founding_message = "Founding 100 is full — post still published."
             else:
-                founding_message = "Could not claim First 100 floor — post still published."
+                founding_message = "Could not claim Founding 100 floor — post still published."
 
     db.commit()
     db.refresh(post)
