@@ -5,8 +5,9 @@ Evaluation (no AI judge, no self-rating alone):
 2. Community rating — likes (and replies / debate stances) prove others cared.
 3. Admin payout — human marks paid after UPI; spam/self-like can be rejected.
 
-Founding 100: first 100 who clear the floor get on the list; pay only when the
-quality bar is met (likes/replies) or admin overrides after review.
+Founding 100: membership earned by clearing the floor (real debate / civic post);
+pay only when the quality bar is met (likes/replies) or admin overrides after review.
+Not a signup coupon — entry proves the behavior, then India rates.
 
 Square Race (biweekly): highest-liked home post in the period wins ₹150–₹500
 scaled by likes. Drives return logins without paying for bare signup.

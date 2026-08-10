@@ -5,7 +5,7 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 /**
  * Debate-first brand landing (audit Week 1).
  * Hero: brand + wedge + Answer today's question / Watch a live debate.
- * Founding ₹150 within first scroll. Arenas ≠ Communities clarified.
+ * Founding 100 = earned membership (not a signup coupon). Arenas ≠ Communities.
  */
 export default function Landing() {
   return (
@@ -37,7 +37,7 @@ export default function Landing() {
           <p className="bx-home-hero-tag">India&apos;s public square</p>
           <p className="bx-home-hero-line">Pick a side. Argue it live.</p>
           <p className="bx-home-hero-sub">
-            Drop a take. Pick a side. Real replies — not a performance.
+            The place people who actually have an opinion go — not another feed to like and leave.
           </p>
           <p className="bx-home-hero-anti-ai">Human takes only. No AI slop.</p>
           <div className="bx-home-hero-ctas">
@@ -52,8 +52,8 @@ export default function Landing() {
             <GoogleSignInButton label="Continue with Google" confirmAge18 />
           </div>
           <p className="bx-home-founding-chip">
-            <Link to="/signup?next=/rewards">First 100 · ₹150</Link> — open a live debate that gets
-            real engagement.
+            <Link to="/signup?next=/rewards">Founding 100</Link> — earn a spot with a real debate,
+            not by signing up.
           </p>
           <p className="bx-home-hero-legal">
             18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
@@ -66,9 +66,10 @@ export default function Landing() {
         <p className="bx-home-kicker">Why BarathX</p>
         <h2 id="bx-home-why">Not another feed to scroll</h2>
         <p className="bx-home-copy">
-          Most social apps bury your take in an algorithm. BarathX starts from one shared question and
-          a live room where you pick Agree or Disagree and argue it — audio, video, or just your
-          words — with people who showed up for the same debate.
+          Old way: argue in an Instagram thread that vanishes in an hour, or a WhatsApp group where
+          fifteen people talk past each other. BarathX: a live, sided debate — Agree vs Disagree —
+          where a real person answers you on the record. We&apos;re early on purpose so those rooms
+          stay real, not performed for growth numbers.
         </p>
       </section>
 
@@ -133,15 +134,15 @@ export default function Landing() {
       </section>
 
       <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-founding">
-        <p className="bx-home-kicker">Founding creators</p>
-        <h2 id="bx-home-founding">₹150 for the first 100 real rooms</h2>
+        <p className="bx-home-kicker">Founding 100</p>
+        <h2 id="bx-home-founding">100 spots. Earned by a real debate.</h2>
         <p className="bx-home-copy">
-          Open a live debate that gets real engagement and earn Founding creator status plus ₹150 —
-          a thank-you for seeding the first rooms, not a business model. Free to use forever for
-          everyone else.
+          Founding membership closes at 100. You get in by opening a live debate that gets real
+          engagement — not by signing up. Status first; ₹150 is a thank-you after India rates the
+          room. Free forever for everyone else.
         </p>
         <Link to="/signup?next=/rewards" className="btn btn-secondary bx-home-inline-cta">
-          See Founding rewards
+          How Founding works
         </Link>
       </section>
 
@@ -169,9 +170,10 @@ export default function Landing() {
             </dd>
           </div>
           <div>
-            <dt>What&apos;s First 100 · ₹150?</dt>
+            <dt>What&apos;s Founding 100?</dt>
             <dd>
-              First 100 people who open a live that gets real engagement earn status and ₹150.
+              Only 100 Founding spots. You earn one by opening a live debate (or civic problem post)
+              that gets real engagement — not by signing up. ₹150 is paid after that bar, once.
             </dd>
           </div>
           <div>

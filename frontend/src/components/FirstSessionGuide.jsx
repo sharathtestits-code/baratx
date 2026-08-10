@@ -152,8 +152,8 @@ export default function FirstSessionGuide({ token, onComplete }) {
           {busy ? "Entering…" : "Post & enter"}
         </button>
         <p className="first-session-founding">
-          First 100 · ₹150 — open a live debate that gets real engagement. Details in Rewards after
-          you enter.
+          Founding 100 — earn a spot by opening a live debate that gets real engagement, not by
+          signing up. Details in Rewards after you enter.
         </p>
         <p className="first-session-foot">
           <Link to="/settings" className="first-session-settings">

@@ -190,9 +190,10 @@ export default function Settings() {
       </section>
 
       <section className="settings-section">
-        <h2>First 100 · ₹150</h2>
+        <h2>Founding 100</h2>
         <p className="hint">
-          First 100 creators who open a live that gets real engagement earn status and ₹150.
+          100 membership spots — earned by opening a live that gets real engagement, not by signing
+          up. ₹150 once after the rating bar.
         </p>
         <Link className="btn btn-secondary" to="/rewards">
           View rewards

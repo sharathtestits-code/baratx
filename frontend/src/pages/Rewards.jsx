@@ -67,7 +67,7 @@ export default function Rewards() {
     return (
       <div className="feed-wrap surface-page">
         <p className="hint">
-          <Link to="/login">Log in</Link> to track Founding 100 and Square Race progress.
+          <Link to="/login">Log in</Link> to track Founding membership and Square Race progress.
         </p>
       </div>
     );
@@ -89,9 +89,11 @@ export default function Rewards() {
 
       {founding && (
         <section className="rewards-card" aria-labelledby="founding-progress-title">
-          <h2 id="founding-progress-title">Founding {founding.cap} · ₹{founding.amount_inr}</h2>
+          <h2 id="founding-progress-title">Founding {founding.cap}</h2>
           <p className="rewards-card-sub">
-            First {founding.cap} people · {founding.slots_remaining} spots left. One payout per person.
+            {founding.cap} membership spots — earned by a real debate or civic post with real
+            engagement, not by signing up. {founding.slots_remaining} left. ₹{founding.amount_inr}{" "}
+            once after the rating bar.
           </p>
           <ol className="rewards-steps">
             <Step
