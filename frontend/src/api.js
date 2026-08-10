@@ -123,11 +123,15 @@ export const api = {
   getProfile: (username, token) =>
     request(`/users/${encodeURIComponent(username)}`, { headers: authHeaders(token) }),
 
-  getUserPosts: (username, token, before) =>
-    request(
-      `/users/${encodeURIComponent(username)}/posts${before ? `?before=${encodeURIComponent(before)}` : ""}`,
-      { headers: authHeaders(token) }
-    ),
+  getUserPosts: (username, token, before, tab = "square") => {
+    const params = new URLSearchParams();
+    if (before) params.set("before", before);
+    if (tab && tab !== "square") params.set("tab", tab);
+    const q = params.toString();
+    return request(`/users/${encodeURIComponent(username)}/posts${q ? `?${q}` : ""}`, {
+      headers: authHeaders(token),
+    });
+  },
 
   follow: (token, username) =>
     request(`/users/${encodeURIComponent(username)}/follow`, {

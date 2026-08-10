@@ -16,7 +16,8 @@ export default function PlazaSideMenu() {
   const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
   const listId = useId();
-  const [pickerOpen, setPickerOpen] = useState(true);
+  // Arena picker collapsed by default so site nav (Alerts, Settings, …) is usable.
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [unread, setUnread] = useState(0);
   const switchRef = useRef(null);
 
@@ -28,7 +29,7 @@ export default function PlazaSideMenu() {
   }, [location.pathname, close]);
 
   useEffect(() => {
-    if (open) setPickerOpen(true);
+    if (open) setPickerOpen(false);
   }, [open]);
 
   useEffect(() => {
@@ -186,114 +187,119 @@ export default function PlazaSideMenu() {
           <p className="plaza-side-picker-hint">Tap Change Arena to pick Sports, Politics, and more.</p>
         )}
 
-        <button type="button" className="plaza-side-manage" onClick={() => goLink("/notifications")}>
-          <span className="plaza-side-manage-copy">
-            <strong>
-              Alerts
-              {unread > 0 ? (
-                <span className="plaza-side-unread" aria-label={`${unread} unread`}>
-                  {unread > 9 ? "9+" : unread}
-                </span>
-              ) : null}
-            </strong>
-            <em>Replies, follows, and new posts</em>
-          </span>
-          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-            <path
-              d="M6 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        {/* Site links only when arena picker is closed — avoids overlapping layers. */}
+        {!pickerOpen && (
+          <div className="plaza-side-nav-links">
+            <button type="button" className="plaza-side-manage" onClick={() => goLink("/notifications")}>
+              <span className="plaza-side-manage-copy">
+                <strong>
+                  Alerts
+                  {unread > 0 ? (
+                    <span className="plaza-side-unread" aria-label={`${unread} unread`}>
+                      {unread > 9 ? "9+" : unread}
+                    </span>
+                  ) : null}
+                </strong>
+                <em>Replies, follows, and new posts</em>
+              </span>
+              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M6 4l4 4-4 4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-        <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
-          <span className="plaza-side-manage-copy">
-            <strong>My Arenas</strong>
-            <em>Pick a side. Jump in.</em>
-          </span>
-          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-            <path
-              d="M6 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
+              <span className="plaza-side-manage-copy">
+                <strong>My Arenas</strong>
+                <em>Pick a side. Jump in.</em>
+              </span>
+              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M6 4l4 4-4 4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-        <button type="button" className="plaza-side-manage" onClick={() => goLink("/communities")}>
-          <span className="plaza-side-manage-copy">
-            <strong>Communities</strong>
-            <em>Member-run groups — not Arenas</em>
-          </span>
-          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-            <path
-              d="M6 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            <button type="button" className="plaza-side-manage" onClick={() => goLink("/communities")}>
+              <span className="plaza-side-manage-copy">
+                <strong>Communities</strong>
+                <em>Member-run groups — not Arenas</em>
+              </span>
+              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M6 4l4 4-4 4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-        <button type="button" className="plaza-side-manage" onClick={() => goLink("/rewards")}>
-          <span className="plaza-side-manage-copy">
-            <strong>First 100 · ₹150</strong>
-            <em>Open a live that gets real engagement</em>
-          </span>
-          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-            <path
-              d="M6 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            <button type="button" className="plaza-side-manage" onClick={() => goLink("/rewards")}>
+              <span className="plaza-side-manage-copy">
+                <strong>First 100 · ₹150</strong>
+                <em>Open a live that gets real engagement</em>
+              </span>
+              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M6 4l4 4-4 4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-        <button type="button" className="plaza-side-manage plaza-side-settings" onClick={goSettings}>
-          <span className="plaza-side-manage-copy">
-            <strong>Settings</strong>
-            <em>Appearance, privacy, mutes</em>
-          </span>
-          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-            <path
-              d="M6 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            <button type="button" className="plaza-side-manage plaza-side-settings" onClick={goSettings}>
+              <span className="plaza-side-manage-copy">
+                <strong>Settings</strong>
+                <em>Appearance, privacy, mutes</em>
+              </span>
+              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M6 4l4 4-4 4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-        <button type="button" className="plaza-side-manage" onClick={() => goLink("/guidelines")}>
-          <span className="plaza-side-manage-copy">
-            <strong>Guidelines</strong>
-            <em>House rules + how badges work</em>
-          </span>
-          <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-            <path
-              d="M6 4l4 4-4 4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            <button type="button" className="plaza-side-manage" onClick={() => goLink("/guidelines")}>
+              <span className="plaza-side-manage-copy">
+                <strong>Guidelines</strong>
+                <em>House rules + how badges work</em>
+              </span>
+              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  d="M6 4l4 4-4 4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
       </aside>
     </>,
     document.body

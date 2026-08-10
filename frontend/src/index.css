@@ -6323,6 +6323,24 @@ button.topic-chip.selected {
   user-select: none;
 }
 
+.compose-civic.is-guided {
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.65rem;
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--brand) 55%, transparent);
+  animation: civic-guide-pulse 1.2s ease 2;
+}
+
+@keyframes civic-guide-pulse {
+  0%,
+  100% {
+    outline-color: color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+  50% {
+    outline-color: color-mix(in srgb, var(--brand) 80%, transparent);
+  }
+}
+
 .compose-civic input {
   accent-color: var(--brand);
 }
@@ -8098,8 +8116,19 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 }
 
 .plaza-side-arenas {
-  flex: 1;
+  flex: 0 1 auto;
   min-height: 0;
+  max-height: min(55vh, 22rem);
+  overflow-y: auto;
+}
+
+.plaza-side-nav-links {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 0.35rem;
 }
 
 .plaza-side-arenas[hidden] {

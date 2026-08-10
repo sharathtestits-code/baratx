@@ -121,13 +121,13 @@ export default function Rewards() {
                   ? "Paid — you’re in."
                   : status === "payable"
                     ? "You’re on the payable list. BarathX sends ₹150 via UPI."
-                    : "Admin pays after the rating bar is met."
+                    : "Ops pays after the rating bar is met."
               }
             />
           </ol>
           {!status && founding.open && (
             <div className="rewards-actions">
-              <Link to="/feed" className="founding-strip-cta">
+              <Link to="/feed?civic=1" className="founding-strip-cta">
                 Post a problem
               </Link>
               <Link to="/arenas" className="founding-strip-link">
@@ -136,9 +136,14 @@ export default function Rewards() {
             </div>
           )}
           {status && (
-            <p className="rewards-status-pill">
-              Your status: <strong>{status}</strong>
+            <p className="rewards-status-pill" data-status={status}>
+              Floor cleared · status: <strong>{status}</strong>
               {founding.my_kind ? ` · ${founding.my_kind}` : ""}
+            </p>
+          )}
+          {!status && founding.open && (
+            <p className="hint rewards-floor-hint">
+              Floor stays open until you post a civic problem (≥50 characters with the checkbox) or start an arena debate.
             </p>
           )}
         </section>
@@ -153,7 +158,7 @@ export default function Rewards() {
             </p>
           </div>
           <p className="rewards-card-sub">
-            Every {race.cadence_days} days. Highest-liked Home post wins. Likes = the scoreboard.
+            Every {race.cadence_days} days. Highest-liked Home post wins. Likes = the scoreboard. One entry per person.
           </p>
           <div className="rewards-my-race">
             {race.my_best ? (
@@ -202,8 +207,8 @@ export default function Rewards() {
           <h2 id="ops-title">Blue ops view (read-only)</h2>
           <p className="rewards-card-sub">
             Review who cleared the floor and who’s leading the race.{" "}
-            <strong>Mark paid / lock winner</strong> stays on{" "}
-            <Link to="/bx-ops">/bx-ops</Link> with the ops secret (money actions).
+            <strong>Mark paid / lock winner</strong> stays in the{" "}
+            <Link to="/bx-ops">ops console</Link> (money actions).
           </p>
           {!ops && <p className="hint">Loading ops queue…</p>}
           {ops && (

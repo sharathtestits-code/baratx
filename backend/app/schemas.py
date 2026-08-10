@@ -268,6 +268,11 @@ class PostOut(BaseModel):
     quoted_post: Optional[QuotedPostOut] = None
     hashtags: list[str] = []
     debate_side: Optional[str] = None
+    space_id: Optional[str] = None
+    # Set only on create when civic/floor award is evaluated.
+    founding_awarded: Optional[bool] = None
+    founding_status: Optional[str] = None
+    founding_message: Optional[str] = None
 
     class Config:
         from_attributes = True

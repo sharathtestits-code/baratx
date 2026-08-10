@@ -36,6 +36,7 @@ export default function Feed() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const quotePostId = searchParams.get("quote");
+  const wantCivic = searchParams.get("civic") === "1";
   const wantWelcome =
     searchParams.get("welcome") === "1" || sessionStorage.getItem("bx_welcome") === "1";
 
@@ -73,6 +74,8 @@ export default function Feed() {
   const [liveDebates, setLiveDebates] = useState([]);
   const [civicProblem, setCivicProblem] = useState(false);
   const [foundingRefresh, setFoundingRefresh] = useState(0);
+  const [foundingNotice, setFoundingNotice] = useState("");
+  const [civicHighlight, setCivicHighlight] = useState(false);
 
   const fileInputRef = useRef(null);
   const composeRef = useRef(null);
@@ -153,6 +156,30 @@ export default function Feed() {
       cancelled = true;
     };
   }, [token]);
+
+  useEffect(() => {
+    if (!wantCivic) return undefined;
+    setCivicProblem(true);
+    setCivicHighlight(true);
+    const t = window.setTimeout(() => {
+      composeRef.current?.focus?.();
+      document.querySelector(".compose-civic")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 80);
+    const clearHilite = window.setTimeout(() => setCivicHighlight(false), 4000);
+    // Drop the query param so refresh doesn't keep flashing.
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("civic");
+        return next;
+      },
+      { replace: true }
+    );
+    return () => {
+      window.clearTimeout(t);
+      window.clearTimeout(clearHilite);
+    };
+  }, [wantCivic, setSearchParams]);
 
   useEffect(() => {
     if (!token || !user) return;
@@ -263,12 +290,19 @@ export default function Feed() {
   async function handlePost(e) {
     e.preventDefault();
     setPostError("");
+    setFoundingNotice("");
     if (!text.trim()) {
       setPostError("Write something first.");
       return;
     }
     if (text.trim().length > MAX_LEN) {
       setPostError(`Post must be ${MAX_LEN} characters or fewer`);
+      return;
+    }
+    if (civicProblem && text.trim().length < 50) {
+      setPostError("Civic problems need at least 50 characters to clear the First 100 floor.");
+      setCivicHighlight(true);
+      document.querySelector(".compose-civic")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     setPosting(true);
@@ -291,6 +325,11 @@ export default function Feed() {
       sessionStorage.removeItem("bx_welcome");
       setShowFirstSession(false);
       setFoundingRefresh((n) => n + 1);
+      if (newPost?.founding_message) {
+        setFoundingNotice(newPost.founding_message);
+      } else if (civicProblem) {
+        setFoundingNotice("Posted.");
+      }
       window.dispatchEvent(new CustomEvent("bx:first-post"));
       api.bootstrapFollows(token).catch(() => {});
     } catch (err) {
@@ -443,14 +482,18 @@ export default function Feed() {
               ))}
             </div>
           )}
-          <label className="compose-civic">
+          <label className={`compose-civic${civicHighlight ? " is-guided" : ""}`}>
             <input
               type="checkbox"
               checked={civicProblem}
-              onChange={(e) => setCivicProblem(e.target.checked)}
+              onChange={(e) => {
+                setCivicProblem(e.target.checked);
+                setCivicHighlight(false);
+              }}
             />
-            <span>This is a real civic / city problem</span>
+            <span>This is a real civic / city problem{civicProblem ? " (≥50 chars for First 100)" : ""}</span>
           </label>
+          {foundingNotice && <p className="hint ok-hint compose-founding-notice">{foundingNotice}</p>}
           <div className="compose-footer">
             <label className="attach-btn" title="Add image">
               <IconImage />
