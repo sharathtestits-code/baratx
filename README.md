@@ -5,6 +5,9 @@ FastAPI + SQLite (local), frontend is React (Vite).
 
 **Brand:** BarathX · **Domain:** https://barathx.com
 
+**Branches:** `main` = PROD · `qa` = QA · `dev` = development — [brand/qa/BRANCHING.md](./brand/qa/BRANCHING.md)  
+**Prod label:** `MVP{n}` auto-increments on each push to `main` — [brand/qa/MVP.md](./brand/qa/MVP.md)
+
 **Canonical local path:** `~/Projects/barathx` (do not run from Google Drive).
 
 Public hosting checklist: see [DEPLOY.md](./DEPLOY.md).

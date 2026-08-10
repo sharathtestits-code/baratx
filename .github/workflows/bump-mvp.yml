@@ -1,0 +1,37 @@
+name: Bump MVP on prod (main)
+
+# Every push to main that isn't already an MVP bump increments VERSION (MVP1 → MVP2 → …).
+# Cloudflare Pages / Railway then pick up the new VERSION on the follow-up commit.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(mvp):') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump VERSION
+        id: bump
+        run: |
+          chmod +x scripts/bump-mvp.sh
+          LABEL=$(./scripts/bump-mvp.sh)
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
+          echo "Bumped to $LABEL"
+
+      - name: Commit and push
+        run: |
+          git config user.name "barathx-mvp-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "chore(mvp): bump to ${{ steps.bump.outputs.label }}"
+          git push origin HEAD:main

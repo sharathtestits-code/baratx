@@ -5392,6 +5392,13 @@ button.admin-btn-ghost:hover:not(:disabled),
   border-bottom: 1px solid var(--border, rgba(127, 127, 127, 0.18));
 }
 
+.settings-mvp-label {
+  margin: 1.5rem 0 0.75rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
 .settings-section h2 {
   margin: 0 0 0.35rem;
   font-size: 1.05rem;

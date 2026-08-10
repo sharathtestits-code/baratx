@@ -6,12 +6,16 @@ WORKDIR /fe
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend/ ./
+COPY VERSION /VERSION
 # Same-origin API when the SPA is served from this container.
 ARG VITE_API_BASE=
 ARG VITE_GOOGLE_CLIENT_ID=682923055091-imk39450dk207psnoetvhnvseslvq0qp.apps.googleusercontent.com
+ARG VITE_MVP_VERSION=
 ENV VITE_API_BASE=$VITE_API_BASE \
     VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
-RUN npm run build
+RUN if [ -z "$VITE_MVP_VERSION" ]; then export VITE_MVP_VERSION="$(tr -d '[:space:]' </VERSION)"; fi \
+    && export VITE_MVP_VERSION \
+    && npm run build
 
 FROM python:3.13-slim
 
@@ -28,6 +32,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/app ./app
+COPY VERSION /app/VERSION
 COPY --from=frontend /fe/dist ./frontend_dist
 
 EXPOSE 8000
