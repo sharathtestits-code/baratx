@@ -47,18 +47,20 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
    - Public URL: https://baratx-production.up.railway.app
    - Docs: https://baratx-production.up.railway.app/docs
    - Vars set: `DATABASE_URL`, `JWT_SECRET`, `ENVIRONMENT`, `CORS_ORIGINS`
-   - Optional: `ADMIN_SECRET` for the registrations page at https://barathx.com/admin
+   - Optional: `ADMIN_SECRET` for the ops console at https://barathx.com/bx-ops
 2. MSG91 later for SMS OTP
 
 ### See who registered / post & comment as BarathX
 
-**Production:** https://barathx.com/admin  
-**QA:** https://qa.barathx.com/admin (separate Railway QA service + secrets)
+**Production:** https://barathx.com/bx-ops  
+**QA:** https://qa.barathx.com/bx-ops (separate Railway QA service + secrets)
 
 1. Set `ADMIN_SECRET` on the Railway API service (long random string).
 2. Redeploy the API if needed.
-3. Open the matching admin URL and enter that secret.
+3. Open the matching **ops** URL (`/bx-ops`, not `/admin`) and enter that secret.
 4. You’ll see total users, last 24h / 7d counts, a newest-first list, **Post as BarathX**, and **Comment on new users**.
+
+`/admin` is intentionally a public 404 so scanners don’t see an unlock screen. Optional: set Cloudflare Pages/Vite `VITE_OPS_CONSOLE_PATH` to a private path of your choosing.
 
 QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
 
@@ -79,7 +81,7 @@ QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
   - `JWT_SECRET` = long random string
   - `ENVIRONMENT=production`
   - `CORS_ORIGINS` = frontend URL when ready
-  - `ADMIN_SECRET` = long random string (for /admin)
+  - `ADMIN_SECRET` = long random string (for /bx-ops ops console)
 
 
 ## 2. Create free accounts (no code yet)

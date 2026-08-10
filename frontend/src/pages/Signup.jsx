@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import { validateUsername } from "../username";
+import { safeNextPath } from "../safeNextPath";
 
 export default function Signup() {
   const [params] = useSearchParams();
@@ -30,11 +31,7 @@ export default function Signup() {
     params.get("arena") ||
     (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_arena") : "") ||
     "";
-  const nextPath = (() => {
-    const raw = (params.get("next") || "").trim();
-    if (raw.startsWith("/") && !raw.startsWith("//")) return raw;
-    return "";
-  })();
+  const nextPath = safeNextPath(params.get("next") || "", "");
 
   useEffect(() => {
     const a = params.get("arena");
@@ -45,11 +42,9 @@ export default function Signup() {
   function afterJoinPath() {
     const stored =
       (typeof sessionStorage !== "undefined" && sessionStorage.getItem("bx_next")) || nextPath;
-    if (stored && stored.startsWith("/") && !stored.startsWith("//")) {
-      sessionStorage.removeItem("bx_next");
-      return stored;
-    }
-    return "/feed?welcome=1";
+    const safe = safeNextPath(stored || "", "/feed?welcome=1");
+    sessionStorage.removeItem("bx_next");
+    return safe;
   }
 
   function goAfterSignup() {

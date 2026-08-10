@@ -134,12 +134,21 @@ export default function App() {
     return <div className="page-loading">Starting BarathX…</div>;
   }
 
-  // Admin + email confirm / password reset stay outside the app shell.
-  if (location.pathname === "/admin") {
+  // Ops console — not advertised at /admin (TC-QA-ADMIN-01).
+  // Public /admin returns a normal 404 so scanners don't see an unlock screen.
+  const opsPath = (import.meta.env.VITE_OPS_CONSOLE_PATH || "/bx-ops").replace(/\/$/, "") || "/bx-ops";
+  if (location.pathname === opsPath) {
     return (
       <AdminChrome>
         <Admin />
       </AdminChrome>
+    );
+  }
+  if (location.pathname === "/admin" || location.pathname.startsWith("/admin/")) {
+    return (
+      <AuthChrome>
+        <NotFound homeTo="/" homeLabel="Back to BarathX" />
+      </AuthChrome>
     );
   }
   if (location.pathname === "/verify-email") {

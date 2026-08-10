@@ -571,7 +571,9 @@ class CommunityCreate(BaseModel):
     @field_validator("name")
     @classmethod
     def valid_name(cls, v):
-        v = (v or "").strip()
+        v = sanitize_user_text(v or "").strip()
+        # Neutralize HTML-ish payloads even though React escapes text nodes.
+        v = v.replace("<", "").replace(">", "").replace('"', "")
         if len(v) < 2 or len(v) > 60:
             raise ValueError("Community name must be 2–60 characters")
         return v
@@ -581,6 +583,7 @@ class CommunityCreate(BaseModel):
     def valid_description(cls, v):
         if v is None:
             return ""
+        v = sanitize_user_text(v)
         if len(v) > 280:
             raise ValueError("Description must be 280 characters or fewer")
         return v

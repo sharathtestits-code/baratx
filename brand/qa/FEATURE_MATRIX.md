@@ -11,7 +11,7 @@
 | Member A | Email/password or Google test user | Primary poster |
 | Member B | Second email account | Follower / replier |
 | Official | `sharath` or `baratx` + QA `OFFICIAL_ACCOUNT_PASSWORD` | Ops on QA |
-| Admin console | `https://qa.barathx.com/admin` + QA `ADMIN_SECRET` | No user JWT |
+| Ops console | `https://qa.barathx.com/bx-ops` + QA `ADMIN_SECRET` | No user JWT; `/admin` is a public 404 |
 
 Env for agent (copy `brand/qa/env.qa.example` → repo-root `.env.qa`, gitignored):
 ```
@@ -92,7 +92,7 @@ PROD_API_BASE=https://baratx-production.up.railway.app
 | ID | Feature | Steps | Expect |
 |----|---------|-------|--------|
 | W1 | Rewards | `/rewards` | Founding + Race copy |
-| W2 | Admin unlock | `/admin` + secret | Overview tabs |
+| W2 | Ops unlock | `/bx-ops` + secret | Overview tabs; `/admin` → 404 |
 | W3 | Admin engage | Engage tab | List new posts; comment as official |
 | W4 | Admin tools | Digest / prompts | Success or skip message |
 

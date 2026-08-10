@@ -36,7 +36,7 @@ Likes/replies from `@baratx`, `@sharath`, other seeded officials, and any `blue`
 
 ## Manual
 Admin → Engage tab still works for extra human comments.
-Admin → **Run peak digest now** (`POST /admin/daily-digest?force=true&slot=morning|midday|evening`).
+Ops → **Run peak digest now** (`POST /admin/daily-digest?force=true&slot=morning|midday|evening`).
 
 ## Infra note
 Scheduler runs in the API process. For multi-instance Railway deploys, move to a single worker / cron later.

@@ -25,7 +25,7 @@ function daysLeft(endsAt) {
 
 /**
  * User progress page — see your Founding status + Square Race rank.
- * Blue accounts also get a read-only ops queue (payouts stay on /admin).
+ * Blue accounts also get a read-only ops queue (payouts stay on /bx-ops).
  */
 export default function Rewards() {
   const { token, user } = useAuth();
@@ -203,7 +203,7 @@ export default function Rewards() {
           <p className="rewards-card-sub">
             Review who cleared the floor and who’s leading the race.{" "}
             <strong>Mark paid / lock winner</strong> stays on{" "}
-            <Link to="/admin">/admin</Link> with the admin secret (money actions).
+            <Link to="/bx-ops">/bx-ops</Link> with the ops secret (money actions).
           </p>
           {!ops && <p className="hint">Loading ops queue…</p>}
           {ops && (

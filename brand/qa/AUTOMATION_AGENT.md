@@ -48,7 +48,7 @@ POST /posts  (multipart or form as app does)
 UI path: `/login` → fill email/password → submit → wait for `/feed`.
 
 Official: username `sharath` + `QA_OFFICIAL_PASSWORD`.  
-Admin: open `/admin`, type `QA_ADMIN_SECRET`, Open.
+Ops: open `/bx-ops`, type `QA_ADMIN_SECRET`, Open. (`/admin` is a public 404.)
 
 ## Selectors (stable-ish)
 

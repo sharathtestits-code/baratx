@@ -3,7 +3,7 @@
 BX wins when newcomers get a reply. Ship does the product half; you do the human half.
 
 ## Every day
-1. Open https://barathx.com/admin → skim Engage for posts that need a *second* human touch
+1. Open https://barathx.com/bx-ops → skim Engage for posts that need a *second* human touch
 2. Answer every notification reply within an hour when you can
 3. Post **Today’s Square** question yourself first (set the tone)
 4. Confirm **@sharath / @baratx daily digest** ran (~09:05 IST) — or hit **Run peak digest now**

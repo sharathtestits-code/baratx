@@ -27,7 +27,7 @@ Arenas: Sports · Politics · Entertainment · News · Spirituality
 | Logged-out | — | Nothing (no reward strips) |
 | Logged-in user | Home strips + **/rewards** | Own Founding steps + race rank / scoreboard |
 | Blue account | **/rewards** → Blue ops view | Read-only founding queue + race top (no Mark paid) |
-| Admin (ADMIN_SECRET) | **/admin** | Full tables, Mark paid, Lock race winner |
+| Ops (ADMIN_SECRET) | **/bx-ops** | Full tables, Mark paid, Lock race winner |
 
 Users **don’t rate themselves**. Progress = likes/replies India gives them. They watch the meter on `/rewards`.
 
