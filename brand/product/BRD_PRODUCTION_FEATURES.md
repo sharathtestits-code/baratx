@@ -32,7 +32,7 @@ It is a **feature baseline**, not a wishlist. Future LLM / legal / cloud work is
 |---|---|---|
 | **App** | https://barathx.com | https://qa.barathx.com *(provision if not live yet)* |
 | **API** | https://baratx-production.up.railway.app | https://baratx-qa.up.railway.app |
-| **Admin** | https://barathx.com/admin | https://qa.barathx.com/admin |
+| **Ops console** | https://barathx.com/bx-ops | https://qa.barathx.com/bx-ops |
 | **Docs map** | `DEPLOY.md` | `brand/qa/ENVIRONMENTS.md` |
 
 **Rule for automation:** use `QA_*` URLs only. Do not run destructive admin actions on production.
@@ -183,13 +183,13 @@ Same **feature set** when QA is deployed from the same `main` branch; data and s
 | B3 | Badge change | Admin / blue user tools | Optional notify user |
 | B4 | Report post | Post menu | Reasons; auto-mod after repeated reports |
 | B5 | Mute / Block | Profile + Settings | Hide from feed/DMs as designed |
-| B6 | Admin delete | `/admin` Users / Engage | Delete misleading user/post (not protected blues) |
+| B6 | Ops delete | `/bx-ops` Users / Engage | Delete misleading user/post (not protected blues) |
 
 ### 5.11 Admin console
 
 | ID | Feature | Path | Requirement / expected behavior |
 |----|---------|------|--------------------------------|
-| AD1 | Unlock | `/admin` | Requires `ADMIN_SECRET` |
+| AD1 | Unlock | `/bx-ops` | Requires `ADMIN_SECRET`; `/admin` is a public 404 |
 | AD2 | Overview | Tab | Stats, needs-attention cards, quick jumps, newest signups |
 | AD3 | Users | Tab | Search; expand details; badge actions; delete |
 | AD4 | Engage | Tab | Comment on posts as official; delete post; auto-engage note |
@@ -263,7 +263,7 @@ The build is accepted for tester baseline when:
 1. All **P0** flows work on the target environment (Prod smoke or QA when available).  
 2. Square **For you** is not empty solely because the tester follows nobody.  
 3. Official auto-replies appear on new community posts without counting toward Founding.  
-4. Admin can open `/admin`, view users, and reach Engage / Payouts / Tools.  
+4. Ops can open `/bx-ops`, view users, and reach Engage / Payouts / Tools.  
 5. Legal pages `/terms`, `/privacy`, `/guidelines` render content (not blank).  
 6. No requirement to test unshipped items in §6.
 

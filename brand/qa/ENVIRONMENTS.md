@@ -7,7 +7,7 @@ Keep these separate. Automation agents and Playwright must use **QA**, never Pro
 | **Web app** | `https://qa.barathx.com` | `https://barathx.com` |
 | **API** | `https://baratx-qa.up.railway.app` | `https://baratx-production.up.railway.app` |
 | **API docs** | `https://baratx-qa.up.railway.app/docs` | `https://baratx-production.up.railway.app/docs` |
-| **Admin** | `https://qa.barathx.com/admin` | `https://barathx.com/admin` |
+| **Ops console** | `https://qa.barathx.com/bx-ops` | `https://barathx.com/bx-ops` |
 | **DB** | Separate Railway Postgres (QA) | Production Postgres |
 | **Secrets** | `ADMIN_SECRET` / passwords for QA only | Prod secrets — never in QA docs |
 

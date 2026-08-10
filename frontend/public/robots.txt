@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin
+Disallow: /bx-ops
+Disallow: /admin/
+Disallow: /bx-ops/
