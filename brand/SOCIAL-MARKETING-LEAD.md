@@ -46,25 +46,26 @@ Soft CTAs that fit us: "comment BX," "reply and I'll send the link," "try it and
 
 If there isn't an actual moment (real debate, real number, real screen recording) — **ask before writing**. Don't invent traction or quotes. If nothing real happened this week, write mechanic / positioning instead.
 
-## Standing ops (merged with live schedule)
+## Standing ops
 
-See also: `STANDING-APPROVAL.md`, `CONTENT-RULES.md`, `instagram_publish.py`.
+See also: `brand/ig/STANDING-APPROVAL.md`, `brand/ig/FORMAT-ROTATION.md`, `brand/ig/CONTENT-RULES.md`.
 
 | Channel | Cadence | Format | Status |
 | --- | --- | --- | --- |
-| Instagram @getbarathx | 09:00 / 13:30 / 20:00 IST | Grunge carousel + founder captions | Standing approval · Railway scheduler |
-| X | Manual paste for now | Founder tweet + grunge still | Founder posts; agent drafts |
-| Reels / short video | TBD — ask for real Live clips | Marketing *of* debates, not product Reels tab | Need real footage from founder |
+| Instagram @getbarathx | Prefer Drive drafts near 08:15 / 12:15 / 19:15 IST | **Rotate** per FORMAT-ROTATION — not grunge-every-time | Fixed-pack Railway schedule **paused** |
+| X | Manual paste | Founder tweet + matching still/Reel frame | Founder posts; agent drafts |
+| Reels | When real footage exists | Marketing *of* debates / founder UGC — not a product Reels tab | Ask founder for clips |
 
 ## What’s working online right now (refresh before major campaigns)
 
 Checked ~2026-08-10 — fold into posts, don't become a trend zombie:
 
-1. **IG mix:** Reels = reach; carousels = saves / dwell. Small accounts overweight Reels for discovery; keep carousels as the explain/save engine (our grunge pack fits). Aim ~70/30 Reels:carousel once we have real debate clips.
-2. **Carousel craft:** Hook slide → value slides → CTA. 6 slides structured story (we already do this). Saves matter more than vanity reach.
-3. **Timing (India):** Evening IST still strong; our 20:00 slot aligns. Midday for saveable explainers.
-4. **X / build-in-public:** Replies > likes. Specific numbers (even tiny). Problem → mechanic → soft ask. Engage in the first 30 minutes. Don't announce features — show the fight.
-5. **Authenticity tax:** Gen Z bounces on AI-smooth brand voice. Uneven, opinionated, early-and-honest wins.
+1. **Launch mix:** Reels = reach; carousels = saves. Small accounts overweight Reels. Big beat = Reel first, carousel within 24h.
+2. **Creative that converts for new products:** UGC/raw phone-cam, problem in 1.5s, product by ~3s, soft CTA — not polished studio decks.
+3. **Carousel craft:** Hook → value → CTA; **rotate visual systems**. Grunge is one tool, not the uniform.
+4. **India:** Short Reels, mute-friendly text, Hinglish/regional hooks when natural, save/share CTAs.
+5. **X / build-in-public:** Replies > likes. Real numbers even if tiny. Engage in first 30 minutes.
+6. **Authenticity tax:** Gen Z bounces on AI-smooth brand voice and on repeating the same template.
 
 ## Feedback loop
 

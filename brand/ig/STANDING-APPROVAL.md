@@ -1,27 +1,25 @@
-# Standing approval — Instagram schedule
+# Standing approval — Instagram
 
-**Approved by founder:** 2026-08-10  
+**Approved by founder:** 2026-08-10 (updated same day after wrong-template incident)  
 **Account:** @getbarathx  
-**Voice / strategy parent:** `brand/SOCIAL-MARKETING-LEAD.md`
+**Voice / strategy:** `brand/SOCIAL-MARKETING-LEAD.md`  
+**Format rules:** `brand/ig/FORMAT-ROTATION.md` ← **do not grunge every time**
 
 ## What is approved (no per-post ask)
-- Post on IST peak slots: **09:00 / 13:30 / 20:00**
-- **Same creative template:** street-grunge Pehchaan collage (`brand/ig/carousel/grunge-what/`)
-- Captions may be AI-assisted; must sound like **founder / real human** (lead brief voice rules)
-- Privacy line sparingly (prefer midday / one slide only)
-- Stay honest we’re early — no fake scale
+- Post when a Drive **`Social Draft — …`** exists (playbook), or when founder green-lights a specific asset
+- Captions: founder / real human; early-and-honest; soft CTA (comment BX)
+- Spelling: **BarathX** only
+- Format: pick from **FORMAT-ROTATION** (Reels for reach, carousel for saves, UGC/raw for trust) — **grunge is optional, not default**
+- Privacy sparingly
 
-## What still needs a new ask
-- New visual systems (not grunge)
-- Putting Founding ₹150 / First 100 back on creative (omitted from current grunge pack)
-- New copy that needs a **real moment** (debate clip, real number, screen recording)
-- Paid boost / ads
-- Deleting or replacing live posts
-- Off-schedule extra posts beyond the 3 daily peaks
-- X posts (draft OK; founder posts unless separately approved)
+## What is NOT approved on autopilot
+- Repeating the same grunge 6-pack every peak slot
+- Old plain `brand/carousel/export` pack / any **BaratX** misspelling
+- Invented traction, quotes, or fake Live clips
+- Paid boost / ads without ask
+- Re-enabling Railway fixed-pack scheduler without founder OK
 
 ## Ops notes
-- Publisher: `backend/app/instagram_publish.py` (Railway in-process scheduler)
-- Fallback if Railway misses a slot by ~5 min: `brand/ig/schedule_watchdog.py`
-- Optional: Cursor **Automations** cron to wake an agent for drafts / watchdog — not a native IG scheduler
-- Spelling: **BarathX** (not BharathX)
+- Railway `DISABLE_INSTAGRAM_SCHEDULE=1` until rotation + main fix are solid
+- Drive playbook: `brand/ig/DRIVE-DRAFT-PLAYBOOK.md`
+- Publisher: `backend/app/instagram_publish.py` (only when chosen format is that carousel pipeline)
