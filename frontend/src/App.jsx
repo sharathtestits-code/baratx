@@ -128,11 +128,26 @@ function AppRoutes() {
 }
 
 export default function App() {
-  const { token, user, loading } = useAuth();
+  const { token, user, loading, bootError, retryBoot } = useAuth();
   const location = useLocation();
 
   if (loading) {
     return <div className="page-loading">Starting BarathX…</div>;
+  }
+
+  // Session still present but API was briefly unreachable (deploy blip).
+  if (token && !user && bootError) {
+    return (
+      <div className="page page-auth">
+        <div className="auth-card" style={{ margin: "4rem auto", maxWidth: 420 }}>
+          <h1>Can’t reach BarathX</h1>
+          <p className="hint">{bootError}</p>
+          <button type="button" className="btn btn-primary" onClick={() => retryBoot?.()}>
+            Try again
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Private ops console — owner account only. Everyone else (incl. logged-out) gets a
@@ -239,6 +254,23 @@ export default function App() {
           element={
             <AuthChrome legal>
               <Guidelines />
+            </AuthChrome>
+          }
+        />
+        {/* Public profiles/posts while logged out — avoid false 404 after session blips */}
+        <Route
+          path="/u/:username"
+          element={
+            <AuthChrome>
+              <Profile />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/posts/:postId"
+          element={
+            <AuthChrome>
+              <PostDetail />
             </AuthChrome>
           }
         />
