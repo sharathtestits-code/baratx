@@ -8369,11 +8369,14 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 .founding-chip {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.28rem;
   flex-shrink: 0;
-  max-width: 12.5rem;
+  max-width: min(100%, 16rem);
   margin-top: 0.35rem;
-  padding: 0.38rem 0.65rem;
+  box-sizing: border-box;
+  min-height: 1.85rem;
+  padding: 0 0.72rem;
   border-radius: 999px;
   border: 1px solid var(--border-strong);
   background: var(--hover-overlay);
@@ -8381,8 +8384,14 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   text-decoration: none;
   font-size: 0.72rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.founding-chip > span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .founding-chip:hover {
@@ -8393,10 +8402,14 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 .founding-chip-star {
   color: var(--brand);
   font-size: 0.78rem;
+  line-height: 1;
+  /* ★ sits high in system fonts — nudge for optical center */
+  transform: translateY(0.05em);
 }
 
 .founding-chip-sep {
   color: var(--text-tertiary);
+  line-height: 1;
 }
 
 .founding-chip-done {
