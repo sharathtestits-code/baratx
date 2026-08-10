@@ -8825,18 +8825,18 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   bottom: 8%;
   left: 50%;
   font-size: 1.75rem;
-  animation: live-react-float 2.4s ease-out forwards;
+  animation: live-react-float 1.8s ease-out forwards;
+  will-change: transform, opacity;
 }
 
-.live-talk-float-react:nth-child(2) { left: 35%; animation-delay: 0.05s; }
-.live-talk-float-react:nth-child(3) { left: 65%; animation-delay: 0.1s; }
-.live-talk-float-react:nth-child(4) { left: 42%; animation-delay: 0.08s; }
-.live-talk-float-react:nth-child(5) { left: 58%; animation-delay: 0.12s; }
+.live-talk-float-react:nth-child(2) { left: 35%; animation-delay: 0s; }
+.live-talk-float-react:nth-child(3) { left: 65%; animation-delay: 0s; }
+.live-talk-float-react:nth-child(4) { left: 42%; animation-delay: 0s; }
+.live-talk-float-react:nth-child(5) { left: 58%; animation-delay: 0s; }
 
 @keyframes live-react-float {
-  0% { transform: translate(-50%, 0) scale(0.7); opacity: 0; }
-  15% { opacity: 1; transform: translate(-50%, -20px) scale(1.1); }
-  100% { transform: translate(-50%, -140px) scale(1); opacity: 0; }
+  0% { transform: translate(-50%, 0) scale(0.85); opacity: 1; }
+  100% { transform: translate(-50%, -140px) scale(1.05); opacity: 0; }
 }
 
 /* ---------- Brand landing (logged-out home) ---------- */

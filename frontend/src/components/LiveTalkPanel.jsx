@@ -27,6 +27,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   const mediaRef = useRef(null);
   const seenReactIds = useRef(new Set());
   const moreRef = useRef(null);
+  const reactInFlight = useRef(false);
 
   const inTalk = !!state?.in_talk;
   const myUserId = state?.my_user_id || null;
@@ -41,29 +42,37 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
     myMuted: !!state?.my_muted,
   });
 
+  function pushFloatReacts(items) {
+    if (!items.length) return;
+    setFloatReacts((prev) => [...prev, ...items].slice(-12));
+    const keys = new Set(items.map((x) => x.key));
+    setTimeout(() => {
+      setFloatReacts((prev) => prev.filter((x) => !keys.has(x.key)));
+    }, 2200);
+  }
+
+  function ingestReactions(reactions, { skipFloat = false } = {}) {
+    const next = [];
+    for (const r of reactions || []) {
+      if (!r?.id || seenReactIds.current.has(r.id)) continue;
+      seenReactIds.current.add(r.id);
+      if (skipFloat) continue;
+      next.push({
+        key: `${r.id}-${Date.now()}`,
+        emoji: r.emoji,
+        name: r.user?.display_name || r.user?.username || "",
+      });
+    }
+    pushFloatReacts(next);
+  }
+
   async function refresh() {
     if (!token || !spaceId) return;
     try {
       const data = await spacesApi.talkGet(token, spaceId);
       setState(data);
       setError("");
-      // Float new reactions
-      const next = [];
-      for (const r of data.reactions || []) {
-        if (seenReactIds.current.has(r.id)) continue;
-        seenReactIds.current.add(r.id);
-        next.push({
-          key: `${r.id}-${Date.now()}`,
-          emoji: r.emoji,
-          name: r.user?.display_name || r.user?.username || "",
-        });
-      }
-      if (next.length) {
-        setFloatReacts((prev) => [...prev, ...next].slice(-12));
-        setTimeout(() => {
-          setFloatReacts((prev) => prev.filter((x) => !next.some((n) => n.key === x.key)));
-        }, 2600);
-      }
+      ingestReactions(data.reactions);
     } catch (err) {
       setError(err.message || "Could not load conversation audio");
     }
@@ -71,10 +80,12 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
 
   useEffect(() => {
     refresh();
-    const t = setInterval(refresh, 3000);
+    // Faster while on call so reactions / seats feel live
+    const ms = inTalk ? 900 : 3000;
+    const t = setInterval(refresh, ms);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, spaceId]);
+  }, [token, spaceId, inTalk]);
 
   useEffect(() => {
     return () => stopMedia();
@@ -301,12 +312,25 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   }
 
   async function react(emoji) {
-    if (!state?.in_talk || busy) return;
+    if (!state?.in_talk || reactInFlight.current) return;
+    reactInFlight.current = true;
+    // Optimistic float — don't wait for the round-trip / poll
+    pushFloatReacts([
+      {
+        key: `local-${emoji}-${Date.now()}`,
+        emoji,
+        name: "You",
+      },
+    ]);
     try {
       const data = await spacesApi.talkReact(token, spaceId, emoji);
+      // Mark server ids seen so the next poll doesn't replay the same emoji
+      ingestReactions(data.reactions, { skipFloat: true });
       setState(data);
     } catch (err) {
       setError(err.message || "Could not react");
+    } finally {
+      reactInFlight.current = false;
     }
   }
 
@@ -422,7 +446,6 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
                 type="button"
                 className="live-talk-react-btn"
                 onClick={() => react(emoji)}
-                disabled={busy}
                 aria-label={`React ${emoji}`}
               >
                 {emoji}
