@@ -25,11 +25,18 @@ logger = logging.getLogger("baratx.instagram")
 IST = ZoneInfo("Asia/Kolkata")
 GRAPH = "https://graph.facebook.com/v21.0"
 
-# Grunge "What is BarathX" pack (6 slides). Override with INSTAGRAM_IMAGE_BASE.
-DEFAULT_IMAGE_BASE = (
+# Rotate visual packs by slot — do NOT ship the same creative 3×/day.
+# Override any pack with INSTAGRAM_IMAGE_BASE_* or global INSTAGRAM_IMAGE_BASE.
+_RAW = (
     "https://raw.githubusercontent.com/sharathtestits-code/baratx/"
-    "cursor/ig-carousel-what-is-2af5/brand/ig/carousel/grunge-what"
+    "cursor/ig-carousel-what-is-2af5/brand/ig/carousel"
 )
+PACK_IMAGE_BASE = {
+    "morning": f"{_RAW}/launch-pain",  # charcoal pain→product (launch style)
+    "midday": f"{_RAW}/grunge-what",  # street-grunge — occasional, not default-only
+    "evening": f"{_RAW}/how-it-works",  # navy paper how-it-works
+}
+DEFAULT_IMAGE_BASE = PACK_IMAGE_BASE["midday"]
 SLIDE_COUNT = 6
 SLIDE_EXT = "jpg"
 
@@ -137,12 +144,25 @@ def _caption(pack: str) -> str:
     return rows[idx]
 
 
-def _image_base() -> str:
-    return (_env("INSTAGRAM_IMAGE_BASE") or DEFAULT_IMAGE_BASE).rstrip("/")
+def _image_base(pack: str | None = None) -> str:
+    pack = (pack or "midday").strip().lower()
+    # Per-slot override, then global, then pack default.
+    specific = _env(f"INSTAGRAM_IMAGE_BASE_{pack.upper()}")
+    if specific:
+        return specific.rstrip("/")
+    global_base = _env("INSTAGRAM_IMAGE_BASE")
+    # Only use global if it doesn't force one pack for every slot.
+    if global_base and _env("INSTAGRAM_FORCE_SINGLE_PACK").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    ):
+        return global_base.rstrip("/")
+    return (PACK_IMAGE_BASE.get(pack) or DEFAULT_IMAGE_BASE).rstrip("/")
 
 
-def _slide_urls(image_base_url: str | None = None) -> list[str]:
-    base = (image_base_url or _image_base()).rstrip("/")
+def _slide_urls(image_base_url: str | None = None, pack: str | None = None) -> list[str]:
+    base = (image_base_url or _image_base(pack)).rstrip("/")
     ext = (_env("INSTAGRAM_SLIDE_EXT") or SLIDE_EXT).lstrip(".")
     count = int(_env("INSTAGRAM_SLIDE_COUNT") or SLIDE_COUNT)
     return [f"{base}/slide-{i:02d}.{ext}" for i in range(1, count + 1)]
@@ -171,7 +191,7 @@ def publish_carousel(*, pack: str = "evening", image_base_url: str | None = None
         raise RuntimeError("INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_BUSINESS_ACCOUNT_ID not set")
 
     caption = _caption(pack)
-    urls = _slide_urls(image_base_url)
+    urls = _slide_urls(image_base_url, pack=pack)
 
     child_ids = []
     for url in urls:
@@ -255,5 +275,5 @@ def start_instagram_scheduler() -> None:
     logger.info(
         "Instagram scheduler started (@getbaratx) slots=%s base=%s",
         ",".join(f"{h:02d}:{m:02d}/{p}" for h, m, p in PEAK_SLOTS),
-        _image_base(),
+        {p: _image_base(p) for _, _, p in PEAK_SLOTS},
     )
