@@ -2,8 +2,11 @@
 
 Keep these separate. Automation agents and Playwright must use **QA**, never Production, unless ops explicitly request a prod smoke.
 
+**Git:** `main` = PROD · `qa` = QA · `dev` = development — see [BRANCHING.md](./BRANCHING.md).
+
 | | **QA (staging)** | **Production (prod)** |
 |---|---|---|
+| **Git branch** | **`qa`** | **`main`** |
 | **Web app** | `https://qa.barathx.com` | `https://barathx.com` |
 | **API** | `https://baratx-qa.up.railway.app` | `https://baratx-production.up.railway.app` |
 | **API docs** | `https://baratx-qa.up.railway.app/docs` | `https://baratx-production.up.railway.app/docs` |
@@ -15,8 +18,15 @@ Keep these separate. Automation agents and Playwright must use **QA**, never Pro
 
 | Env | Project / branch | `VITE_API_BASE` | `VITE_PUBLIC_URL` (OG tags) |
 |-----|------------------|-----------------|------------------------------|
-| QA | Pages project `baratx-qa` · branch `main` or `qa` | `https://baratx-qa.up.railway.app` (or empty if same-origin proxy) | `https://qa.barathx.com` |
-| Prod | Pages project `baratx` · production | `https://baratx-production.up.railway.app` | `https://barathx.com` |
+| QA | Pages project `baratx-qa` · branch **`qa`** | `https://baratx-qa.up.railway.app` (or empty if same-origin proxy) | `https://qa.barathx.com` |
+| Prod | Pages project `baratx` · branch **`main`** | `https://baratx-production.up.railway.app` | `https://barathx.com` |
+
+### Railway API
+
+| Env | Service deploy branch | Notes |
+|-----|----------------------|--------|
+| QA | **`qa`** | `ENVIRONMENT=qa` |
+| Prod | **`main`** | `ENVIRONMENT=production` |
 
 ### Railway API env (critical for email links)
 
@@ -54,5 +64,6 @@ QA_ADMIN_SECRET=
 
 1. Feature matrix + Playwright default to **QA_*** URLs.  
 2. Never run destructive admin actions (delete user, force IG) on **prod**.  
-3. When QA service is not provisioned yet, create Railway service `baratx-qa` + Pages `baratx-qa` + DNS `qa.barathx.com` CNAME before enabling CI.  
-4. Prod remains the live user-facing stack in `DEPLOY.md`.
+3. Promote code: `dev` → `qa` → `main` (prod). Wire Cloudflare Pages QA + Railway QA to watch **`qa`**, not `main`.  
+4. Prod remains the live user-facing stack in `DEPLOY.md`.  
+5. `dev` is for integration; it should not deploy to barathx.com or qa.barathx.com.

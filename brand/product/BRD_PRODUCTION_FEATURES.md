@@ -37,7 +37,7 @@ It is a **feature baseline**, not a wishlist. Future LLM / legal / cloud work is
 
 **Rule for automation:** use `QA_*` URLs only. Do not run destructive admin actions on production.
 
-Same **feature set** when QA is deployed from the same `main` branch; data and secrets differ.
+Same **feature set** when QA is deployed from the **`qa`** branch and prod from **`main`**; data and secrets differ. Branch ladder: [BRANCHING.md](../qa/BRANCHING.md).
 
 ---
 
@@ -218,7 +218,7 @@ Same **feature set** when QA is deployed from the same `main` branch; data and s
 
 | Item | Status |
 |------|--------|
-| Separate QA host live | May still need provisioning — features same as prod when deployed from `main` |
+| Separate QA host live | Deploy from **`qa`** branch; prod from **`main`** — see `brand/qa/BRANCHING.md` |
 | Real MSG91 SMS always on | UI exists; SMS depends on env |
 | Automated UPI payouts | Admin marks paid manually |
 | Full LLM rewrite / “argue my side” | Roadmap; suggestions may optionally LLM-rank if `AI_ASSIST_*` set |

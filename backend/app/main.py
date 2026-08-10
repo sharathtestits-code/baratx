@@ -237,6 +237,32 @@ with SessionLocal() as _seed_db:
 app = FastAPI(title="BarathX API", version="0.5.0")
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
+
+def mvp_version_info() -> dict:
+    """Prod MVP label from VERSION file or MVP_VERSION / VITE_MVP_VERSION env."""
+    env_n = (os.environ.get("MVP_VERSION") or os.environ.get("VITE_MVP_VERSION") or "").strip()
+    n = env_n if env_n.isdigit() else ""
+    if not n:
+        for candidate in (
+            Path(__file__).resolve().parents[2] / "VERSION",
+            Path("/app/VERSION"),
+            Path.cwd() / "VERSION",
+        ):
+            try:
+                raw = candidate.read_text(encoding="utf-8").strip()
+                if raw.isdigit():
+                    n = raw
+                    break
+            except OSError:
+                continue
+    if not n:
+        n = "1"
+    return {"version": n, "mvp": f"MVP{n}"}
+
+
+_MVP = mvp_version_info()
+app.version = _MVP["mvp"]
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "").strip()
 _cors_raw = os.environ.get("CORS_ORIGINS", "").strip()
 if _cors_raw:
@@ -688,7 +714,8 @@ def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    info = mvp_version_info()
+    return {"status": "ok", "mvp": info["mvp"], "version": info["version"], "environment": ENVIRONMENT}
 
 
 # ---------- Admin (password-protected signup insights) ----------

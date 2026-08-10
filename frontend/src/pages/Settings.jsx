@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
 import ThemePicker from "../components/ThemePicker";
 import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
+import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
   const { user, token, logout, updateUser } = useAuth();
@@ -206,6 +207,10 @@ export default function Settings() {
           Log out
         </button>
       </section>
+
+      <p className="hint settings-mvp-label" aria-label="App version">
+        BarathX {mvpLabel()}
+      </p>
     </div>
   );
 }

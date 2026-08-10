@@ -5,7 +5,7 @@ English-only public path. Do these in order. You must complete payments/signups 
 ## 0. Project location (done)
 
 - Local path: `~/Projects/barathx` (not Google Drive)
-- Git initialized on `main`
+- Git: **`main` = PROD** · **`qa` = QA** · **`dev` = development** — see [brand/qa/BRANCHING.md](./brand/qa/BRANCHING.md)
 - Backend venv + frontend `node_modules` reinstalled
 - Local secrets file: `backend/.env` (gitignored)
 

@@ -1,14 +1,14 @@
 name: Deploy Cloudflare Pages
 
-# Deploys frontend/dist to Cloudflare Pages when secrets exist.
+# main → prod (barathx.com) · qa → QA (qa.barathx.com)
 # Required repo secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
-# Optional: CLOUDFLARE_PAGES_PROJECT (default baratx)
 
 on:
   push:
-    branches: [main]
+    branches: [main, qa]
     paths:
       - "frontend/**"
+      - "VERSION"
       - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 
@@ -21,20 +21,43 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+      - name: Resolve env
+        id: env
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            echo "project=${CLOUDFLARE_PAGES_PROJECT:-baratx}" >> "$GITHUB_OUTPUT"
+            echo "api=https://baratx-production.up.railway.app" >> "$GITHUB_OUTPUT"
+            echo "public_url=https://barathx.com" >> "$GITHUB_OUTPUT"
+          else
+            echo "project=${CLOUDFLARE_PAGES_PROJECT_QA:-baratx-qa}" >> "$GITHUB_OUTPUT"
+            echo "api=https://baratx-qa.up.railway.app" >> "$GITHUB_OUTPUT"
+            echo "public_url=https://qa.barathx.com" >> "$GITHUB_OUTPUT"
+          fi
+        working-directory: .
+        env:
+          CLOUDFLARE_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+          CLOUDFLARE_PAGES_PROJECT_QA: ${{ vars.CLOUDFLARE_PAGES_PROJECT_QA }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      - name: Read MVP version
+        id: mvp
+        run: |
+          n=$(tr -d '[:space:]' < ../VERSION 2>/dev/null || echo 1)
+          echo "n=$n" >> "$GITHUB_OUTPUT"
       - run: npm run build
         env:
-          VITE_API_BASE: https://baratx-production.up.railway.app
+          VITE_API_BASE: ${{ steps.env.outputs.api }}
+          VITE_PUBLIC_URL: ${{ steps.env.outputs.public_url }}
+          VITE_MVP_VERSION: ${{ steps.mvp.outputs.n }}
           VITE_GOOGLE_CLIENT_ID: 682923055091-imk39450dk207psnoetvhnvseslvq0qp.apps.googleusercontent.com
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ vars.CLOUDFLARE_PAGES_PROJECT || 'baratx' }}
+          command: pages deploy dist --project-name=${{ steps.env.outputs.project }}
           workingDirectory: frontend
