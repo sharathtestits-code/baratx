@@ -91,10 +91,16 @@ export default function Rewards() {
         <section className="rewards-card" aria-labelledby="founding-progress-title">
           <h2 id="founding-progress-title">Founding {founding.cap}</h2>
           <p className="rewards-card-sub">
-            {founding.cap} membership spots — earned by a real debate or civic post with real
-            engagement, not by signing up. {founding.slots_remaining} left. ₹{founding.amount_inr}{" "}
-            once after the rating bar.
+            {founding.cap} Founding spots, earned by opening a debate that gets real engagement, not
+            by signing up. {founding.slots_remaining} left.
           </p>
+          {(status === "payable" || status === "paid") && founding.amount_inr != null && (
+            <p className="hint ok-hint rewards-surprise">
+              {status === "paid"
+                ? `You're in. Thank-you sent — ₹${founding.amount_inr}, no strings.`
+                : `You're in. Small thank-you on the way — ₹${founding.amount_inr}, no strings.`}
+            </p>
+          )}
           <ol className="rewards-steps">
             <Step
               done={!!status}
@@ -111,21 +117,21 @@ export default function Rewards() {
                   ? founding.my_kind === "debate"
                     ? `Need ${q.need_stances || 2} stances or ${q.need_posts || 3} posts — now ${q.stance_count || 0} / ${q.post_count || 0}.`
                     : `Need ${q.need_likes || 25} likes or ${q.need_replies || 5} replies — now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
-                  : `≥${founding.eval?.min_likes || 25} likes or ≥${founding.eval?.min_replies || 5} human replies (official welcome doesn’t count).`
+                  : `Real engagement from people who aren’t official accounts — likes, replies, or debate stances.`
               }
             />
-            <Step
-              done={status === "paid"}
-              current={status === "payable"}
-              label="3. UPI payout"
-              detail={
-                status === "paid"
-                  ? "Paid — you’re in."
-                  : status === "payable"
-                    ? "You’re on the payable list. BarathX sends ₹150 via UPI."
-                    : "Ops pays after the rating bar is met."
-              }
-            />
+            {(status === "payable" || status === "paid") && (
+              <Step
+                done={status === "paid"}
+                current={status === "payable"}
+                label="3. You're in"
+                detail={
+                  status === "paid"
+                    ? `Thank-you sent — ₹${founding.amount_inr}, no strings.`
+                    : `Small thank-you on the way — ₹${founding.amount_inr}, no strings.`
+                }
+              />
+            )}
           </ol>
           {!status && founding.open && (
             <div className="rewards-actions">

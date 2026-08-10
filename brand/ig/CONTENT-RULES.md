@@ -20,3 +20,9 @@ Example: “Your takes die in group chats” > “220-char replies”
 ## Always include
 - Clear reason to create an account
 - One concrete next step (sign up / comment BX / pick a side)
+
+## Founding 100 (surprise — don't advertise pay)
+- Public line only: **100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.**
+- **Never** put ₹150 / any rupee amount in captions, bios, carousels, or Reels about Founding.
+- Cash thank-you is private, in-app, only after someone has already earned the spot.
+- Full rule: `brand/gtm/SALES-GROWTH-BRIEF.md` · `brand/social/FOUNDING-PUBLIC-COPY.md`

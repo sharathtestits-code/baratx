@@ -192,8 +192,8 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Founding 100</h2>
         <p className="hint">
-          100 membership spots — earned by opening a live that gets real engagement, not by signing
-          up. ₹150 once after the rating bar.
+          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
+          up.
         </p>
         <Link className="btn btn-secondary" to="/rewards">
           View rewards

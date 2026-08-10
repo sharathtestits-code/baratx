@@ -829,7 +829,7 @@ class SurfacePostCreate(BaseModel):
 
 class FoundingStatusOut(BaseModel):
     cap: int
-    amount_inr: int
+    amount_inr: Optional[int] = None
     min_problem_chars: int
     slots_remaining: int
     open: bool

@@ -21,14 +21,17 @@ That gap — *disappearing vs. permanent, algorithmic vs. live, passive vs. actu
 
 CRED didn't require a 750+ credit score to keep people out — it required it to make getting in *mean something*. Rejection became the marketing. Acceptance became a status signal people posted about voluntarily.
 
-You already have the raw material for this and are underselling it: **the Founding 100.** Right now it reads like a small referral bonus. Reframe it as membership, not a coupon:
+You already have the raw material for this and are underselling it: **the Founding 100.** Treat it as membership, not a coupon — and **surprise the thank-you, don't advertise it:**
 
-- Don't say: "first 100 people get ₹150."
-- Say: "we're only taking 100 Founding members before this closes — you get in by actually posting a real debate that gets real engagement, not by signing up." (This is *already true* per your product — you're just not selling it as exclusivity.)
+- Lead everywhere (bio, outreach, posts, site): **"100 Founding spots, earned by opening a debate that gets real engagement, not by signing up."**
+- No number, no rupee sign, nothing that reads as task-for-payment in public copy.
+- Let ₹150 show up only in a **private** confirmation after they've earned the spot: *"you're in. Small thank-you on the way — ₹150, no strings."*
+
+Why: if they see ₹150 before they act, the money becomes the reason — you attract people farming low-effort debates. Hide the amount until after the real behavior, and getting in means something; the cash is recognition on top. Same ~₹15k total either way.
 
 The mechanism that makes this work isn't the money, it's that **entry is earned by doing the real behavior** (a real debate, real engagement) — same as CRED's credit score, it's a filter that becomes the flex. Someone who got into the Founding 100 has a reason to tell people, because getting in proves something about them, not just about you.
 
-**Sales application:** when you pitch a campus ambassador or an early user, don't frame it as "come join," frame it as "there are only X spots left and you get one by actually doing something, not by signing up" — scarcity that's tied to a real, honest number (per your existing honesty rule — never inflate it).
+**Sales application:** when you pitch a campus ambassador or an early user, don't frame it as "come join," frame it as "there are only X spots left and you get one by actually doing something, not by signing up" — scarcity that's tied to a real, honest number (per your existing honesty rule — never inflate it). Never mention ₹ in that pitch.
 
 ## 3. Entertain first, explain later — sell the moment, not the feature
 
@@ -58,7 +61,7 @@ Don't try to borrow trust you don't have yet (fake traction, vague "growing fast
 
 CRED didn't just pay for referrals — CRED Coins rewarded on-time payment (the exact behavior CRED needed to become a habit), not just app opens. The lesson isn't "add a rewards program," it's **reward the specific action that makes the product work**, not vanity signups.
 
-For BarathX, the behavior that actually matters is: opening a real debate, or arguing back with a real reply — not installs. Your Founding ₹150 already does this correctly (tied to real engagement, not signup) — the fix is purely in how it's talked about (see #2), not in the mechanic itself.
+For BarathX, the behavior that actually matters is: opening a real debate, or arguing back with a real reply — not installs. Founding membership already ties entry to real engagement — keep cash **off** the public pitch (see #2); the mechanic stays, the advertising of ₹ goes away.
 
 **Sales application:** if you ever add a referral incentive, tie the reward to *the referred person opening or winning a real debate*, not to them downloading the app. Installs you can buy. Real arguments you can't fake, and that's the whole point of the product.
 
@@ -72,11 +75,11 @@ Be honest with yourself about the differences, or this playbook backfires:
 
 ## 8. The 30-day version of this, concretely
 
-1. Rewrite the Founding 100 pitch everywhere (bio, outreach opener, any copy) from "first 100 get ₹150" to "100 Founding spots, earned by a real debate that gets real engagement — not by signing up." One sentence, no hype.
+1. Lead Founding 100 everywhere with: **"100 Founding spots, earned by opening a debate that gets real engagement, not by signing up."** No rupee amount in public copy. ₹150 only in the private in-app surprise after `payable`.
 2. Record and save 3-5 real Live debate clips (10-25 seconds, the funniest or most heated real moments) — these become both your Social Lead's raw material and your Sales Lead's opening line in cold outreach ("watch this, then I'll tell you what it is").
 3. In every outreach message (already governed by your Sales brief), add one identity-line before the feature-line — test "the people who actually have an opinion" framing against your current opener and see which gets replies.
 4. Never patch over "we're early" — say it first, on purpose, in the same breath as your ask. It's a trust move, not a weakness, for this specific audience.
-5. Do not add a rewards mechanic that pays for installs. If you add anything, it pays for a real debate opened or a real reply posted.
+5. Do not add a rewards mechanic that pays for installs. If you add anything, it pays for a real debate opened or a real reply posted. Never advertise Founding cash up front.
 
 ---
 

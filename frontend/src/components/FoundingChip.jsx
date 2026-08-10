@@ -28,7 +28,7 @@ export default function FoundingChip({ refreshKey = 0 }) {
 
   if (status.my_status === "paid") {
     return (
-      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership paid">
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership — thank-you sent">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
@@ -36,14 +36,14 @@ export default function FoundingChip({ refreshKey = 0 }) {
         <span className="founding-chip-sep" aria-hidden="true">
           ·
         </span>
-        <span>Paid</span>
+        <span>You&apos;re in</span>
       </Link>
     );
   }
 
   if (status.my_status === "payable") {
     return (
-      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership payout">
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership — you're in">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
@@ -51,7 +51,7 @@ export default function FoundingChip({ refreshKey = 0 }) {
         <span className="founding-chip-sep" aria-hidden="true">
           ·
         </span>
-        <span>Payable</span>
+        <span>You&apos;re in</span>
       </Link>
     );
   }

@@ -28,9 +28,10 @@ export default function FoundingStrip({ onPostProblem }) {
 
   if (status.my_status === "paid") {
     return (
-      <section className="founding-strip founding-strip-done" aria-label="Founding reward">
+      <section className="founding-strip founding-strip-done" aria-label="Founding membership">
         <p>
-          Founding {status.cap} — ₹{status.amount_inr} paid.{" "}
+          You&apos;re in. Thank-you sent
+          {status.amount_inr != null ? ` — ₹${status.amount_inr}, no strings` : ""}.{" "}
           <Link to="/rewards">See rewards</Link>
         </p>
       </section>
@@ -39,10 +40,11 @@ export default function FoundingStrip({ onPostProblem }) {
 
   if (status.my_status === "payable") {
     return (
-      <section className="founding-strip founding-strip-done" aria-label="Founding reward">
+      <section className="founding-strip founding-strip-done" aria-label="Founding membership">
         <p>
-          You’re payable for Founding {status.cap} (₹{status.amount_inr}).{" "}
-          <Link to="/rewards">Track payout</Link>
+          You&apos;re in. Small thank-you on the way
+          {status.amount_inr != null ? ` — ₹${status.amount_inr}, no strings` : ""}.{" "}
+          <Link to="/rewards">Details</Link>
         </p>
       </section>
     );
@@ -71,9 +73,8 @@ export default function FoundingStrip({ onPostProblem }) {
     <section className="founding-strip" aria-label="Founding square">
       <p className="founding-strip-label">Founding {status.cap}</p>
       <p className="founding-strip-body">
-        {status.cap} Founding spots — earn one with a real city problem or arena debate that gets
-        real engagement, not by signing up. ₹{status.amount_inr} after the rating bar ·{" "}
-        {status.slots_remaining} left.
+        {status.cap} Founding spots, earned by opening a debate that gets real engagement, not by
+        signing up. {status.slots_remaining} left.
       </p>
       <div className="founding-strip-actions">
         <button type="button" className="founding-strip-cta" onClick={() => onPostProblem?.()}>

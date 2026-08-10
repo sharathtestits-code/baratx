@@ -196,7 +196,9 @@ Search: `Campus Ambassador` + college name → message students who already run 
 
 **Do:** Entertainment first · First 50 / shoutout / WhatsApp only · signup-first captions · warm intros  
 
-**Don’t:** claim live audio · promise ₹150 without cash process · paid ads into empty rooms · lead Gen Z with NGO “public square” tone · push Sports/Startups Reels until debates exist there  
+**Don’t:** claim live audio · advertise Founding ₹150 (or any cash) in public copy · paid ads into empty rooms · lead Gen Z with NGO “public square” tone · push Sports/Startups Reels until debates exist there  
+
+**Founding public line:** `100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.` — see [SALES-GROWTH-BRIEF.md](./SALES-GROWTH-BRIEF.md)
 
 ---
 
