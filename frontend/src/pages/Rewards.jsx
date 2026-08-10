@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { rewardsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
-import { canManageBadges } from "../components/OfficialBadge";
 
 function Step({ done, current, label, detail }) {
   return (
@@ -38,16 +37,14 @@ function dedupeRaceRows(rows) {
 }
 
 /**
- * User progress page — see your Founding status + Square Race rank.
- * Blue accounts also get a read-only ops queue (no link to the private console).
+ * User progress page — Founding status + Square Race rank.
+ * No links to the private ops console (owner opens that URL directly).
  */
 export default function Rewards() {
   const { token, user } = useAuth();
   const [founding, setFounding] = useState(null);
   const [race, setRace] = useState(null);
-  const [ops, setOps] = useState(null);
   const [error, setError] = useState("");
-  const isBlue = canManageBadges(user);
 
   useEffect(() => {
     if (!token) return undefined;
@@ -61,21 +58,10 @@ export default function Rewards() {
       .catch((err) => {
         if (!cancelled) setError(err.message || "Could not load rewards");
       });
-
-    if (isBlue) {
-      rewardsApi
-        .ops(token)
-        .then((data) => {
-          if (!cancelled) setOps(data);
-        })
-        .catch(() => {
-          /* non-blue or misconfigured — ignore */
-        });
-    }
     return () => {
       cancelled = true;
     };
-  }, [token, isBlue]);
+  }, [token]);
 
   if (!user) {
     return (
@@ -214,52 +200,6 @@ export default function Rewards() {
                 </li>
               ))}
             </ol>
-          )}
-        </section>
-      )}
-
-      {isBlue && (
-        <section className="rewards-card rewards-ops" aria-labelledby="ops-title">
-          <h2 id="ops-title">Blue ops view (read-only)</h2>
-          <p className="rewards-card-sub">
-            Review who cleared the floor and who’s leading the race. Payouts are handled privately by
-            BarathX ops — not from this page.
-          </p>
-          {!ops && <p className="hint">Loading ops queue…</p>}
-          {ops && (
-            <>
-              <h3 className="admin-subhead">
-                Founding queue · {ops.founding.payable_count || 0} payable ·{" "}
-                {ops.founding.eligible_count} waiting on rating
-              </h3>
-              {(ops.founding.rewards || []).length === 0 ? (
-                <p className="admin-empty-inline">No Founding entries yet.</p>
-              ) : (
-                <ul className="rewards-ops-list">
-                  {ops.founding.rewards.slice(0, 25).map((r) => {
-                    const qrow = r.quality || {};
-                    const rating =
-                      r.kind === "debate"
-                        ? `${qrow.stance_count ?? 0} stances · ${qrow.post_count ?? 0} posts`
-                        : `${qrow.like_count ?? 0} likes · ${qrow.reply_count ?? 0} replies`;
-                    return (
-                      <li key={r.id}>
-                        <Link to={`/u/${r.username}`}>@{r.username}</Link> · {r.kind} ·{" "}
-                        <strong>{r.status}</strong> · {rating}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-              <h3 className="admin-subhead">Race top right now</h3>
-              <ul className="rewards-ops-list">
-                {dedupeRaceRows(ops.race.leaderboard || []).slice(0, 8).map((row, i) => (
-                  <li key={row.post_id || `${row.author_id}-${i}`}>
-                    #{i + 1} @{row.username} · {row.like_count} likes · ₹{row.prize_inr || "—"}
-                  </li>
-                ))}
-              </ul>
-            </>
           )}
         </section>
       )}

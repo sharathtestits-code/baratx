@@ -62,10 +62,10 @@ function AdminChrome({ children }) {
       <header className="admin-topbar">
         <Link to="/" className="admin-brand" aria-label="BarathX Home">
           <Logo variant="full" className="admin-topbar-logo" />
-          <span className="admin-topbar-badge">Admin</span>
+          <span className="admin-topbar-badge">Ops</span>
         </Link>
-        <Link to="/" className="admin-topbar-back">
-          Back to BarathX
+        <Link to="/feed" className="admin-topbar-back">
+          Back to Square
         </Link>
       </header>
       <main className="admin-main">{children}</main>
