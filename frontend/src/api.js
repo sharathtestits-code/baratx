@@ -1,6 +1,15 @@
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const DEFAULT_TIMEOUT_MS = 15000;
 
+export class ApiError extends Error {
+  constructor(message, { status = 0, code = "" } = {}) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
+}
+
 /** Resolve post/avatar/cover media paths (relative, absolute, or data URLs). */
 export function mediaUrl(path) {
   if (!path) return null;
@@ -51,16 +60,23 @@ async function request(path, options = {}) {
       const detail = Array.isArray(data.detail)
         ? data.detail.map((d) => d.msg).join(", ")
         : data.detail || "Something went wrong";
-      throw new Error(detail);
+      throw new ApiError(detail, { status: res.status });
     }
 
     return data;
   } catch (err) {
+    if (err instanceof ApiError) throw err;
     if (err?.name === "AbortError") {
-      throw new Error("Request timed out. Check your connection and try again.");
+      throw new ApiError("Request timed out. Check your connection and try again.", {
+        status: 0,
+        code: "timeout",
+      });
     }
     if (err instanceof TypeError || /failed to fetch/i.test(err?.message || "")) {
-      throw new Error("Could not reach BarathX. Check your connection and try again.");
+      throw new ApiError("Could not reach BarathX. Check your connection and try again.", {
+        status: 0,
+        code: "network",
+      });
     }
     throw err;
   } finally {
