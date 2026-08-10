@@ -310,8 +310,8 @@ export default function ArenaDetail() {
       <section className="arena-section" id="arena-live-debates">
         <h2 className="section-title">Live debates</h2>
         <p className="hint surface-lead">
-          Open a sharp debate here. Founding 100 spots are earned by a real room with real
-          engagement (any arena) — not by signing up.
+          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
+          up.
         </p>
         <form className="surface-create arena-debate-form" onSubmit={startDebate}>
           <input

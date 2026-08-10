@@ -169,7 +169,7 @@ Same **feature set** when QA is deployed from the same `main` branch; data and s
 | ID | Feature | Path | Requirement / expected behavior |
 |----|---------|------|--------------------------------|
 | W1 | Rewards page | `/rewards` | Founding 100 + Square Race explained + status |
-| W2 | Founding 100 | — | First **100** people · **₹150** once · floor = civic problem post (≥50 chars + flag) **or** open any arena debate · then community rating · admin marks UPI paid |
+| W2 | Founding 100 | — | **100** spots earned by debate/civic + engagement (not signup). **Public copy: no ₹.** Private surprise thank-you **₹150** after `payable`. Floor → rating → admin UPI paid |
 | W3 | Founding rating bar | — | Problem: ≥**25** likes **or** ≥**5** human replies; Debate: ≥**2** stances **or** ≥**3** posts |
 | W4 | Square Race | — | Every **14** days; highest-liked Home post; min **25** likes; prize **₹150–₹500**; admin locks winner + marks paid |
 | W5 | Official exclusion | — | Official / blue engagement never counts toward W3/W4 |

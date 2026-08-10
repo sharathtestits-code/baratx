@@ -6,6 +6,7 @@ This is the actionable pack. Read in this order:
 | File | Use when |
 |---|---|
 | **[GENZ-START-NOW.md](./GENZ-START-NOW.md)** | **Start today** — checklist, DMs, contacts, Day 1–7 |
+| **[SALES-GROWTH-BRIEF.md](./SALES-GROWTH-BRIEF.md)** | Founding public line + surprise-pay rule (no ₹ up front) |
 | **[BarathX_Sales_Playbook_KunalShah.md](./BarathX_Sales_Playbook_KunalShah.md)** | How to sell: Delta 4, Founding exclusivity, identity, trust |
 | **[SALES-AUTOMATION.md](./SALES-AUTOMATION.md)** | Cursor Automation prompt — daily outreach drafts |
 | **[CONTACTS.csv](./CONTACTS.csv)** | Track seed posters + Campus Voices |

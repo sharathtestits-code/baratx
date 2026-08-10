@@ -49,9 +49,8 @@ export default function Guidelines() {
 
         <h2>Founding 100</h2>
         <p>
-          Only 100 Founding spots. You earn one by opening a live debate that shows real engagement —
-          not by signing up. ₹150 is a thank-you after that bar. Details on{" "}
-          <Link to="/rewards">Rewards</Link> after you join.
+          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
+          up. Details on <Link to="/rewards">Rewards</Link> after you join.
         </p>
 
         <p className="hint">

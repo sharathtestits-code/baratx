@@ -7,6 +7,7 @@ Evaluation (no AI judge, no self-rating alone):
 
 Founding 100: membership earned by clearing the floor (real debate / civic post);
 pay only when the quality bar is met (likes/replies) or admin overrides after review.
+Public copy never leads with ₹ — amount is a private surprise after payable.
 Not a signup coupon — entry proves the behavior, then India rates.
 
 Square Race (biweekly): highest-liked home post in the period wins ₹150–₹500
@@ -176,9 +177,11 @@ def status_payload(db: Session, user: Optional[models.User] = None) -> dict:
             db.refresh(mine)
     remaining = slots_remaining(db)
     quality = quality_snapshot(db, mine) if mine else None
+    # Hide rupee amount until the user has earned payable/paid — surprise, don't advertise.
+    reveal_amount = bool(mine and mine.status in ("payable", "paid"))
     return {
         "cap": FOUNDING_CAP,
-        "amount_inr": FOUNDING_AMOUNT_INR,
+        "amount_inr": FOUNDING_AMOUNT_INR if reveal_amount else None,
         "min_problem_chars": MIN_PROBLEM_CHARS,
         "slots_remaining": remaining,
         "open": remaining > 0,
@@ -192,7 +195,7 @@ def status_payload(db: Session, user: Optional[models.User] = None) -> dict:
             "rating": "Community likes / replies (or debate stances) — official @baratx/@sharath replies never count",
             "min_likes": FOUNDING_MIN_LIKES,
             "min_replies": FOUNDING_MIN_REPLIES,
-            "payout": "Admin pays via UPI after bar met (or after manual review)",
+            "payout": "Private thank-you after bar met — never advertised up front",
         },
     }
 

@@ -52,8 +52,8 @@ export default function Landing() {
             <GoogleSignInButton label="Continue with Google" confirmAge18 />
           </div>
           <p className="bx-home-founding-chip">
-            <Link to="/signup?next=/rewards">Founding 100</Link> — earn a spot with a real debate,
-            not by signing up.
+            <Link to="/signup?next=/rewards">100 Founding spots</Link>, earned by opening a debate
+            that gets real engagement, not by signing up.
           </p>
           <p className="bx-home-hero-legal">
             18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
@@ -135,11 +135,11 @@ export default function Landing() {
 
       <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-founding">
         <p className="bx-home-kicker">Founding 100</p>
-        <h2 id="bx-home-founding">100 spots. Earned by a real debate.</h2>
+        <h2 id="bx-home-founding">100 Founding spots. Earned, not claimed.</h2>
         <p className="bx-home-copy">
-          Founding membership closes at 100. You get in by opening a live debate that gets real
-          engagement — not by signing up. Status first; ₹150 is a thank-you after India rates the
-          room. Free forever for everyone else.
+          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
+          up. Getting in means something — we&apos;re early on purpose. Free forever for everyone
+          else.
         </p>
         <Link to="/signup?next=/rewards" className="btn btn-secondary bx-home-inline-cta">
           How Founding works
@@ -172,8 +172,8 @@ export default function Landing() {
           <div>
             <dt>What&apos;s Founding 100?</dt>
             <dd>
-              Only 100 Founding spots. You earn one by opening a live debate (or civic problem post)
-              that gets real engagement — not by signing up. ₹150 is paid after that bar, once.
+              100 Founding spots, earned by opening a debate that gets real engagement, not by
+              signing up. Membership — not a signup bonus.
             </dd>
           </div>
           <div>

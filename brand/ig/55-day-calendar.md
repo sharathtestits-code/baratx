@@ -163,9 +163,7 @@ barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -303,15 +301,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -322,9 +320,7 @@ Sign up: barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -682,15 +678,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -1062,9 +1058,7 @@ barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -1074,15 +1068,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -1283,9 +1277,7 @@ barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -1442,9 +1434,7 @@ Comment BX for an invite.
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -1467,15 +1457,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -1859,15 +1849,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -2182,9 +2172,7 @@ barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -2238,15 +2226,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -2385,9 +2373,7 @@ barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -2548,9 +2534,7 @@ Sign up: barathx.com
 ```
 Early users shape the square — late users just scroll it.
 
-First 50 scouts get the public list + IG shoutout + WhatsApp group.
-
-Sign up now while Founding Scout seats are open.
+100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.
 
 barathx.com
 
@@ -2644,15 +2628,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
@@ -3023,15 +3007,15 @@ barathx.com
 ### Carousel: First 50 — why now
 Slides: Public First 50 list · IG shoutout · WhatsApp scout group · Shape the early culture · barathx.com — sign up today
 ```
-Why sign up this week: Founding Scout seats. (swipe)
+Why this week: Founding 100. (swipe)
 
-1) Public First 50 list
-2) IG shoutout
-3) WhatsApp scout group
-4) Shape the early culture
-5) barathx.com — sign up today
+1) 100 Founding spots
+2) Earned by a real debate + real engagement
+3) Not by signing up
+4) Getting in means something
+5) barathx.com — open a debate
 
-Sign up: barathx.com
+barathx.com
 
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```

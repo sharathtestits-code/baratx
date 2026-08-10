@@ -171,7 +171,7 @@ CURATED: dict[str, list[str]] = {
         "What’s the most dishonest metric founders still brag about?",
         "Remote vs office for early teams?",
         "Government startup schemes: useful or paperwork?",
-        "Who should get Founding ₹150 — rooms or replies?",
+        "Who should earn a Founding 100 spot — rooms or replies?",
         "Hiring: pedigree or proof of work?",
         "What’s broken in Indian SaaS go-to-market?",
         "Creator → founder path: overhyped?",
