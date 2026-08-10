@@ -52,8 +52,9 @@ CAPTIONS = {
             "someone else’s product with desi stickers.\n\n"
             "drop a take. pick a side. get a real reply.\n"
             "human takes only. no ai slop.\n\n"
-            "if that sounds like home → https://barathx.com\n"
-            "or comment BX and i’ll send it myself.\n\n"
+            "we’re early. that’s kind of the point — come argue with actual "
+            "people, not a feed.\n"
+            "→ https://barathx.com · comment BX and i’ll send it.\n\n"
             "#BarathX #India #GenZ #PublicSquare #PickASide #BuildInPublic"
         ),
         (
