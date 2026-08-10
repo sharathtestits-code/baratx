@@ -901,10 +901,10 @@ class RaceStatusOut(BaseModel):
 
 
 class RewardsOpsOut(BaseModel):
-    """Read-only queue for blue accounts (payout actions stay on /admin)."""
+    """Read-only queue for blue accounts (payout actions stay in the ops console)."""
     founding: FoundingRewardsOut
     race: RaceStatusOut
-    note: str = "Blue can review progress. Mark paid / lock winner stays on /admin with ADMIN_SECRET."
+    note: str = "Blue can review progress. Payouts are handled in the ops console."
 
 
 class RaceRewardRow(BaseModel):

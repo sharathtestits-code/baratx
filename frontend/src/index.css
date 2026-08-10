@@ -1400,6 +1400,7 @@ button:disabled {
   color: var(--text);
   pointer-events: auto;
   caret-color: var(--brand);
+  unicode-bidi: plaintext;
 }
 
 .compose textarea:disabled {
@@ -1667,6 +1668,8 @@ a.post-username:hover {
   word-break: break-word;
   line-height: 1.5;
   font-size: 0.98rem;
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
 }
 
 .post-image {
@@ -1841,6 +1844,8 @@ a.post-username:hover {
   margin: 0.2rem 0 0.3rem;
   font-size: 0.88rem;
   line-height: 1.45;
+  unicode-bidi: plaintext;
+  overflow-wrap: anywhere;
 }
 
 .reply-form {
@@ -9386,21 +9391,40 @@ html:has(.bx-home) {
 
 @media (max-width: 400px) {
   /* Prefer a fully tappable Join free over Sign in chrome */
+  .bx-home-nav {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+
   .bx-home-nav-brand {
-    max-width: calc(100% - 8rem);
+    max-width: calc(100% - 7.25rem);
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .bx-home-nav-signin {
     display: none;
   }
 
+  .bx-home-nav-actions {
+    flex: 0 0 auto;
+    max-width: 7rem;
+  }
+
   .bx-home-nav-join {
-    padding: 0.45rem 0.85rem;
-    font-size: 0.82rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    max-width: 100%;
   }
 
   .bx-home-nav-brand .logo-wordmark {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
+  }
+
+  .bx-home-nav-brand .logo-mark {
+    width: 1.45rem;
+    height: 1.45rem;
   }
 }
 
