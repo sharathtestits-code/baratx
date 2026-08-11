@@ -1,12 +1,14 @@
 """
 Official first replies — @baratx + @sharath.
 
-- New user's first Home post → welcome from both (kept), plus content-aware takes.
-- Every community post → both accounts reply in a human voice (not twin scripts).
-- Official / digest posts are skipped.
+Rules (anti-slop):
+- Read the post. Answer *that* post — not a recycled “say more / uncomfortable detail” line.
+- Prefer ONE official reply per post (not twin bots). First-post welcome is also one voice.
+- Bug / product reports → support tone (“where are you seeing that?”), never philosophy.
 - Replies never count toward Founding / Race (official usernames excluded in rewards).
 
 Disable: DISABLE_OFFICIAL_ENGAGE=1
+Purge old slop: POST /admin/engage/purge-slop (ops) or PURGE_ENGAGE_SLOP_ON_BOOT=1
 """
 
 from __future__ import annotations
@@ -34,7 +36,65 @@ POLL_SECONDS = 45
 LOOKBACK_HOURS = 48
 BATCH_LIMIT = 25
 
+# Phrases from the old template bot — used to purge + never regenerate.
+SLOP_PHRASES = (
+    "almost deleted",
+    "uncomfortable detail",
+    "don’t leave it at the headline",
+    "don't leave it at the headline",
+    "say more. what’s the part",
+    "say more. what's the part",
+    "sitting with “",
+    "sitting with \"",
+    "who disagrees with you hardest",
+    "next sentence you didn’t type",
+    "next sentence you didn't type",
+    "real take — what’s the version from your city",
+    "real take - what's the version from your city",
+    "who should disagree with this — the vibe",
+    "drop one real take from your city",
+    "i’ll read the replies",
+    "stick around and pick a side",
+    "don’t polish the next one to death",
+    "builders energy. ₹150",
+)
+
 _TOPIC_CUES: list[tuple[tuple[str, ...], str]] = [
+    (
+        (
+            "audio",
+            "mic",
+            "unmute",
+            "mute",
+            "speaker",
+            "can't hear",
+            "cant hear",
+            "cannot hear",
+            "not hearing",
+            "no sound",
+            "sound not",
+            "video not",
+            "camera",
+            "not working",
+            "not coming",
+            "isn't working",
+            "isnt working",
+            "broken",
+            "bug",
+            "glitch",
+            "crash",
+            "error",
+            "lag",
+            "freeze",
+            "live talk",
+            "live conversation",
+            "can't join",
+            "cant join",
+            "won't load",
+            "wont load",
+        ),
+        "support",
+    ),
     (("reel", "reels", "instagram", "tiktok", "short form", "shorts"), "reels_speed"),
     (("gen z", "genz", "gen-z", "zoomer"), "genz"),
     (("startup", "founder", "funding", "saas", "pitch"), "startup"),
@@ -43,7 +103,7 @@ _TOPIC_CUES: list[tuple[tuple[str, ...], str]] = [
     (("exam", "jee", "neet", "upsc", "college", "campus"), "campus"),
     (("job", "layoff", "salary", "wfh", "office"), "work"),
     (("election", "vote", "modi", "bjp", "congress", "politics"), "politics"),
-    (("ai", "chatgpt", "llm", "robot"), "ai"),
+    (("ai", "chatgpt", "llm", "robot", "ai slop"), "ai"),
     (("food", "biryani", "chai", "street food"), "food"),
     (("climate", "pollution", "flood", "heatwave"), "climate"),
     (("movie", "bollywood", "tollywood", "cinema", "ott"), "culture"),
@@ -73,180 +133,260 @@ def _snippet(post_text: str, words: int = 8) -> str:
     return " ".join(parts[:words]).rstrip(".,") + "…"
 
 
+def _word_count(post_text: str) -> int:
+    return len(re.findall(r"[A-Za-z0-9']+", post_text or ""))
+
+
 def detect_topic(post_text: str) -> str:
     low = (post_text or "").lower()
     for keys, topic in _TOPIC_CUES:
         if any(k in low for k in keys):
             return topic
+    if _word_count(post_text) <= 6:
+        return "short"
     if "?" in (post_text or ""):
         return "question"
     return "general"
 
 
+def _looks_like_slop(text: str) -> bool:
+    low = (text or "").lower()
+    return any(p in low for p in SLOP_PHRASES)
+
+
 def _welcome_baratx(username: str, post_text: str) -> str:
     who = _handle(username)
     bit = _snippet(post_text, 6)
-    variants = [
-        f"Welcome to BarathX, {who}. Glad you’re here — what’s your city, and what should this square never become?",
-        f"Hey {who} — welcome. First post landed. Tell us your city; this square runs on real takes, not performance.",
-    ]
-    if bit:
-        variants.append(
-            f"Welcome, {who}. That open about “{bit}” is a solid start — stick around and pick a side."
+    topic = detect_topic(post_text)
+    if topic == "support":
+        return _clip(
+            f"Hey {who} — thanks for flagging this. Where are you seeing it (Live room, phone/desktop), "
+            f"and did unmute ask for mic permission?"
         )
+    variants = [
+        f"Hey {who} — welcome. What’s your city?",
+        f"Welcome {who}. Glad you’re here — what’s one thing you want this square to stay honest about?",
+    ]
+    if bit and topic != "short":
+        variants.append(f"Welcome {who}. Caught “{bit}” — curious what you meant by that.")
     return _clip(random.choice(variants))
 
 
 def _welcome_sharath(username: str, post_text: str) -> str:
     who = _handle(username)
-    bit = _snippet(post_text, 7)
-    variants = [
-        f"Hey {who} — Sharath here. Welcome. One real take from your city beats ten perfect posts.",
-        f"{who} welcome. I’ll actually read what you write here — keep it honest.",
-    ]
-    if bit:
-        variants.append(
-            f"Hey {who} — Sharath. Welcome. You opened with “{bit}” — don’t polish the next one to death."
+    topic = detect_topic(post_text)
+    if topic == "support":
+        return _clip(
+            f"Hey {who}, Sharath here — sorry that’s broken for you. Browser + phone or laptop? "
+            f"I’ll dig if you drop one more detail."
         )
+    variants = [
+        f"Hey {who} — Sharath. Welcome. Tell me your city.",
+        f"{who} welcome. Write like you talk — that’s the whole point here.",
+    ]
     return _clip(random.choice(variants))
+
+
+def _engage_support(username: str, post_text: str, *, voice: str) -> str:
+    """Product / bug reports — sound like a person on support, not a growth bot."""
+    who = _handle(username)
+    low = (post_text or "").lower()
+    bit = _snippet(post_text, 8) or "that"
+    if any(k in low for k in ("audio", "mic", "unmute", "sound", "hear", "speaker")):
+        pool = [
+            f"Hey {who} — audio’s dead for you too? Live room or somewhere else, and mic permission on?",
+            f"{who} ugh, that’s annoying. After you hit Unmute, does the browser ask for mic? "
+            f"What device are you on?",
+            f"Got it {who} — “{bit}”. Can you hear others, or is it both ways? Phone or desktop?",
+        ]
+    elif any(k in low for k in ("video", "camera")):
+        pool = [
+            f"Hey {who} — camera acting up? Did the browser block camera permission, or is the button grey?",
+            f"{who} on video: phone or laptop, and Chrome/Safari? I’ll try to reproduce.",
+        ]
+    elif any(k in low for k in ("crash", "freeze", "lag", "error", "bug", "glitch", "broken", "not working", "not coming")):
+        pool = [
+            f"Hey {who} — sorry that’s busted. What were you doing right before it happened?",
+            f"{who} thanks for the report. Phone/desktop + roughly when — so we can chase it.",
+        ]
+    else:
+        pool = [
+            f"Hey {who} — sounds like something’s off. What exactly are you stuck on?",
+            f"{who} got it. One more detail so we can fix it — screen + what you tapped?",
+        ]
+    if voice == "sharath":
+        pool.append(
+            f"{who} Sharath here — yeah that’s not okay. Drop device + step and I’ll look."
+        )
+    return _clip(random.choice(pool))
+
+
+def _engage_short(username: str, post_text: str, *, voice: str) -> str:
+    who = _handle(username)
+    bit = _snippet(post_text, 10) or "that"
+    pool = [
+        f"Hey {who} — what do you mean by “{bit}”? Where are you seeing it?",
+        f"{who} got your note. Can you add one line — what broke / what you expected?",
+        f"Hmm {who}, thin on detail. Phone or desktop, and which screen?",
+    ]
+    if voice == "sharath":
+        pool.append(f"{who} say more in plain words — what happened?")
+    return _clip(random.choice(pool))
 
 
 def _engage_baratx(username: str, post_text: str) -> str:
     who = _handle(username)
     topic = detect_topic(post_text)
     bit = _snippet(post_text, 7)
+    if topic == "support":
+        return _engage_support(username, post_text, voice="baratx")
+    if topic == "short":
+        return _engage_short(username, post_text, voice="baratx")
+
     by_topic = {
         "reels_speed": [
-            f"{who} reels feel fast because the algo rewards the cut, not the thought. Do you miss slower takes, or is speed the point?",
-            f"Wild, {who}. Short video trained a generation to decide in 1.5s. Skill… or just twitch?",
+            f"{who} reels vs a real argument — which one do you trust more with your own time?",
+            f"Ha {who}. Do you still finish thoughts, or has the feed trained that out?",
         ],
         "genz": [
-            f"{who} Gen Z isn’t “fast” — the feed is. What still feels worth slowing down for?",
-            f"Fair, {who}. Half of “Gen Z energy” is platforms built like slot machines. Where do you still go deep?",
+            f"{who} fair. What’s one place you still go slow on purpose?",
+            f"{who} “Gen Z is fast” is half marketing. What does your crowd actually care about?",
         ],
         "startup": [
-            f"{who} builders talk — what’s the unglamorous part nobody puts on LinkedIn?",
-            f"Noted, {who}. Startup India loves the pitch. What’s the boring constraint that actually decides winners?",
+            f"{who} what’s the boring part of that idea that usually kills it?",
+            f"Noted {who}. Who’s the customer in one sentence — not the pitch deck version?",
         ],
         "cricket": [
-            f"{who} cricket takes hit different here. Heat, nostalgia, or Sunday brain?",
-            f"Okay {who} — for or against that take? The Square loves a clean split.",
+            f"{who} for or against — clean side. Why?",
+            f"Okay {who}, who’s actually wrong in that take?",
         ],
         "city": [
-            f"{who} city problems are the real Square. Which city’s version of this is worse?",
-            f"Felt that, {who}. Commute trauma is a national sport. Where are you writing from?",
+            f"{who} which city, and what’s the street-level version of that?",
+            f"Felt that {who}. Commute or civic — which one are you mad about today?",
         ],
         "campus": [
-            f"{who} campus pressure is underrated. What would you change first?",
-            f"Respect, {who}. Exams vs life — which side are you on today?",
+            f"{who} campus pressure hits different. What would you change first?",
+            f"Respect {who}. Exam grind or life admin — which is worse right now?",
         ],
         "work": [
-            f"{who} work takes land hard here. Money, dignity, or both?",
-            f"Hmm {who}. Less LinkedIn gloss — what won’t people say out loud?",
+            f"{who} money, dignity, or both — which bit is the post really about?",
+            f"Hmm {who}. What won’t people say out loud at work about this?",
         ],
         "politics": [
-            f"{who} civic takes welcome — keep it specific. One policy lever you wish more people named?",
-            f"Square heard you, {who}. What’s the local version where you live?",
+            f"{who} keep it concrete — one policy or local example?",
+            f"Square heard you {who}. What’s the version where you live?",
         ],
         "ai": [
-            f"{who} AI talk is everywhere. Tool for you, or watching it flatten the voice?",
-            f"Fair, {who}. Human takes only here — where do you still want the messy version?",
+            f"{who} we don’t want AI slop here. What’s the human bit only you can add?",
+            f"Fair {who}. Tool for you, or is it flattening how people talk?",
         ],
         "food": [
-            f"{who} food takes are undefeated. Name the city and the dish — we’ll take sides.",
-            f"Okay {who}, you’ve started something. Best plate this month?",
+            f"{who} name the city and the dish — then we can actually fight about it.",
+            f"Okay {who}, best plate this month?",
         ],
         "climate": [
-            f"{who} climate hits different when it’s your street. What are you seeing locally?",
-            f"Heavy, {who}. One fix your city could do this year that isn’t a slogan?",
+            f"{who} what are you seeing on your street, not the headline?",
+            f"Heavy {who}. One local fix that isn’t a slogan?",
         ],
         "culture": [
-            f"{who} culture keeps the Square awake. Hot take or soft take?",
-            f"Saw that, {who}. Would you defend it out loud to your friends?",
+            f"{who} hot take or soft take — which are you claiming?",
+            f"Saw that {who}. Would you say it the same way to friends IRL?",
         ],
         "question": [
-            f"Good question, {who}. Curious what answers you get from people living it.",
-            f"{who} asking the right thing. What’s your own answer before the room piles on?",
+            f"Good question {who}. What’s your own answer before the room piles on?",
+            f"{who} curious — who do you most want an answer from?",
         ],
         "general": [
-            f"Heard, {who}. Real take — what’s the version from your city?",
-            f"{who} solid open. Who disagrees with you hardest?",
-            f"Okay {who}, listening. What made you post this today?",
+            f"Hey {who} — what’s the bit you care about most in that?",
+            f"{who} okay, listening. What made you post it today?",
+            f"Got you {who}. Who around you would push back on that?",
         ],
     }
     pool = list(by_topic.get(topic, by_topic["general"]))
-    if bit and topic in ("general", "question"):
-        pool.append(f"{who} “{bit}” — say more. What’s the part you almost deleted?")
-    return _clip(random.choice(pool))
+    if bit and topic in ("general", "question") and len(bit) > 3:
+        pool.append(f"{who} on “{bit}” — what happened right before you typed that?")
+    text = _clip(random.choice(pool))
+    # Never ship the old slop even if someone reintroduces a phrase.
+    if _looks_like_slop(text):
+        text = _clip(f"Hey {who} — what’s going on, in one plain sentence?")
+    return text
 
 
 def _engage_sharath(username: str, post_text: str) -> str:
     who = _handle(username)
     topic = detect_topic(post_text)
     bit = _snippet(post_text, 7)
+    if topic == "support":
+        return _engage_support(username, post_text, voice="sharath")
+    if topic == "short":
+        return _engage_short(username, post_text, voice="sharath")
+
     by_topic = {
         "reels_speed": [
-            f"{who} I don’t think reels made Gen Z fast — boredom did. Attention got farmed. You feel that too?",
-            f"Sharath here — {who}, the scary part isn’t speed, it’s how rarely we finish a thought. Defend the reel era for me.",
+            f"{who} I think boredom got farmed, not just “Gen Z speed”. You feel that?",
+            f"Sharath — {who}, defend the reel era for me in one line.",
         ],
         "genz": [
-            f"{who} Gen Z gets roasted for pace, but millennials invented the scroll. What does your lot do better?",
-            f"Real talk {who}: “fast” is marketing. Who around you still goes deep?",
+            f"{who} millennials invented the scroll. What does your lot do better?",
+            f"Real talk {who}: who around you still goes deep?",
         ],
         "startup": [
-            f"{who} honest founders sound like this. What’s broken in your world right now?",
-            f"{who} builders energy. ₹150 and one week — what would you ship?",
+            f"{who} what’s broken in your world right now — not the LinkedIn version?",
+            f"{who} if you had a week and no slides, what would you ship?",
         ],
         "cricket": [
-            f"{who} cricket arguments are peak India. Who’s actually wrong in your view?",
-            f"Haha {who}. Quiet part: cricket or ego?",
+            f"{who} peak India argument. Who’s wrong?",
+            f"Haha {who}. Cricket or ego — honest answer?",
         ],
         "city": [
-            f"{who} city takes > national slogans. Paint the street you’re on.",
-            f"{who} if your city’s CM read this, what one line should scare them?",
+            f"{who} paint the street you’re on. National slogans can wait.",
+            f"{who} if your CM read this, what one line should sting?",
         ],
         "campus": [
-            f"{who} campus India is a pressure cooker with wifi. What should adults stop pretending?",
-            f"Listening, {who}. Would you tell a younger sibling the same thing?",
+            f"{who} what should adults stop pretending about campus?",
+            f"Listening {who}. Would you tell a younger sibling the same thing?",
         ],
         "work": [
-            f"{who} work chat without HR language — rare. What would you quit if money wasn’t the issue?",
-            f"Felt that, {who}. Dignity > title. Agree, or am I soft?",
+            f"{who} what would you quit if money wasn’t the issue?",
+            f"Felt that {who}. Dignity over title — agree, or am I soft?",
         ],
         "politics": [
-            f"{who} party labels are easy, mechanisms are hard. What’s the mechanism?",
-            f"I’m in, {who}. Local proof > TV panel. Example from your state?",
+            f"{who} party labels are easy. What’s the mechanism?",
+            f"I’m in {who}. Local proof from your state?",
         ],
         "ai": [
-            f"{who} if AI writes the take, the Square dies. What’s the human part only you can add?",
-            f"Sharath — {who}, allergic to AI slop. Your line felt human. More of that.",
+            f"{who} if a bot writes the take, this place dies. What’s only you can add?",
+            f"Sharath — {who}, allergic to AI slop. Keep it messy and human.",
         ],
         "food": [
-            f"{who} don’t start a food war unless you’re ready. Pick a city side.",
-            f"Okay {who}, aftertaste review — overrated or underrated?",
+            f"{who} pick a city side if you’re starting a food fight.",
+            f"Okay {who}, overrated or underrated?",
         ],
         "climate": [
-            f"{who} climate without guilt-trip — what are you seeing with your own eyes?",
-            f"Heavy, {who}. One fix that isn’t “awareness”?",
+            f"{who} what are you seeing with your own eyes?",
+            f"Heavy {who}. One fix that isn’t “awareness”?",
         ],
         "culture": [
-            f"{who} culture takes reveal the person. Nostalgia or calling a bluff?",
-            f"Hooked, {who}. What’s the unpopular half of that opinion?",
+            f"{who} nostalgia or calling a bluff?",
+            f"Hooked {who}. What’s the unpopular half?",
         ],
         "question": [
-            f"{who} I’ll answer after you do — gut answer in one line?",
-            f"Good prompt, {who}. My bias: people move fast when the platform pays for speed. You?",
+            f"{who} gut answer in one line first — then I’ll pile on.",
+            f"Good prompt {who}. My bias: platforms pay for speed. Yours?",
         ],
         "general": [
-            f"Sharath here — {who}, that landed. What’s the next sentence you didn’t type?",
-            f"{who} don’t leave it at the headline. Give me the uncomfortable detail.",
-            f"Reading you, {who}. Who should disagree with this — the vibe, not a person.",
+            f"Sharath here — {who}, that landed. What are you actually asking for?",
+            f"Reading you {who}. What should someone do after reading this?",
+            f"{who} plain words — what happened?",
         ],
     }
     pool = list(by_topic.get(topic, by_topic["general"]))
-    if bit:
-        pool.append(f"{who} sitting with “{bit}”. Push back if I’m reading it wrong.")
-    return _clip(random.choice(pool))
+    if bit and topic not in ("support", "short"):
+        pool.append(f"{who} re: “{bit}” — am I reading that right?")
+    text = _clip(random.choice(pool))
+    if _looks_like_slop(text):
+        text = _clip(f"{who} Sharath — say that again with one more concrete detail?")
+    return text
 
 
 def _official_pair(db: Session) -> tuple[Optional[models.User], Optional[models.User]]:
@@ -284,6 +424,30 @@ def _reply_count(db: Session, post_id: str, author_id: str) -> int:
     )
 
 
+def _official_reply_count(db: Session, post_id: str, official_ids: list[str]) -> int:
+    if not official_ids:
+        return 0
+    return (
+        db.query(models.Reply.id)
+        .filter(models.Reply.post_id == post_id, models.Reply.author_id.in_(official_ids))
+        .count()
+    )
+
+
+def _pick_voice(
+    admin: Optional[models.User],
+    sharath: Optional[models.User],
+    topic: str,
+) -> Optional[models.User]:
+    """One human voice per post — product bugs → @baratx, else either."""
+    if topic == "support" and admin:
+        return admin
+    choices = [u for u in (admin, sharath) if u is not None]
+    if not choices:
+        return None
+    return random.choice(choices)
+
+
 def _add_reply(
     db: Session,
     *,
@@ -292,14 +456,14 @@ def _add_reply(
     text: str,
     recipient_id: str,
     create_notification,
-    allow_second: bool = False,
 ) -> Optional[models.Reply]:
     if not text or official.id == recipient_id:
         return None
-    count = _reply_count(db, post.id, official.id)
-    if count >= 1 and not allow_second:
+    if _looks_like_slop(text):
+        logger.warning("Blocked slop reply for post %s", post.id)
         return None
-    if count >= 2:
+    # Cap: at most one reply per official account per post
+    if _reply_count(db, post.id, official.id) >= 1:
         return None
     reply = models.Reply(
         post_id=post.id,
@@ -330,9 +494,8 @@ def engage_on_new_post(
     create_notification,
 ) -> dict:
     """
-    First post: welcome from @baratx + @sharath, then content replies from both.
-    Later posts: content replies from both.
-    Idempotent for the poller (won't duplicate beyond welcome+engage caps).
+    One official reply per community post (welcome OR engage — not twin scripts).
+    Idempotent for the poller.
     """
     if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
         return {"ok": True, "skipped": True, "reason": "disabled"}
@@ -345,64 +508,95 @@ def engage_on_new_post(
         return {"ok": True, "skipped": True, "reason": "empty"}
 
     admin, sharath = _official_pair(db)
-    created: list[str] = []
+    official_ids = [u.id for u in (admin, sharath) if u is not None]
+    if _official_reply_count(db, post.id, official_ids) >= 1:
+        return {"ok": True, "skipped": True, "reason": "already_engaged"}
+
+    topic = detect_topic(text)
+    voice = _pick_voice(admin, sharath, topic)
+    if not voice:
+        return {"ok": False, "error": "officials_missing"}
 
     if is_first_post:
-        if admin:
-            r = _add_reply(
-                db,
-                post=post,
-                official=admin,
-                text=_welcome_baratx(author.username, text),
-                recipient_id=author.id,
-                create_notification=create_notification,
-            )
-            if r:
-                created.append("baratx_welcome")
-        if sharath:
-            r = _add_reply(
-                db,
-                post=post,
-                official=sharath,
-                text=_welcome_sharath(author.username, text),
-                recipient_id=author.id,
-                create_notification=create_notification,
-            )
-            if r:
-                created.append("sharath_welcome")
+        body = (
+            _welcome_baratx(author.username, text)
+            if voice.username == ADMIN_USERNAME
+            else _welcome_sharath(author.username, text)
+        )
+        tag = f"{voice.username}_welcome"
+    else:
+        body = (
+            _engage_baratx(author.username, text)
+            if voice.username == ADMIN_USERNAME
+            else _engage_sharath(author.username, text)
+        )
+        tag = f"{voice.username}_engage"
 
-    # Content replies on ALL posts (including first) — second beat after welcome.
-    if admin:
-        r = _add_reply(
-            db,
-            post=post,
-            official=admin,
-            text=_engage_baratx(author.username, text),
-            recipient_id=author.id,
-            create_notification=create_notification,
-            allow_second=is_first_post,
-        )
-        if r:
-            created.append("baratx_engage")
-    if sharath:
-        r = _add_reply(
-            db,
-            post=post,
-            official=sharath,
-            text=_engage_sharath(author.username, text),
-            recipient_id=author.id,
-            create_notification=create_notification,
-            allow_second=is_first_post,
-        )
-        if r:
-            created.append("sharath_engage")
+    created: list[str] = []
+    r = _add_reply(
+        db,
+        post=post,
+        official=voice,
+        text=body,
+        recipient_id=author.id,
+        create_notification=create_notification,
+    )
+    if r:
+        created.append(tag)
 
     return {
         "ok": True,
         "created": created,
-        "topic": detect_topic(text),
+        "topic": topic,
         "first": is_first_post,
+        "voice": voice.username,
     }
+
+
+def purge_engage_slop_replies(db: Session, *, only_slop_phrases: bool = False) -> dict:
+    """
+    Delete auto-engage replies from @baratx / @sharath.
+
+    Default: wipe all replies by those accounts (they were almost entirely auto-engage;
+    digests are posts, not replies). Set only_slop_phrases=True to delete phrase matches only.
+    Also clears reply likes + notifications pointing at those replies.
+    """
+    officials = (
+        db.query(models.User)
+        .filter(models.User.username.in_((ADMIN_USERNAME, SHARATH_USERNAME)))
+        .all()
+    )
+    if not officials:
+        return {"ok": False, "error": "officials_missing", "deleted": 0}
+    ids = [u.id for u in officials]
+    q = db.query(models.Reply).filter(models.Reply.author_id.in_(ids))
+    rows = q.all()
+    to_delete: list[models.Reply] = []
+    for row in rows:
+        if only_slop_phrases and not _looks_like_slop(row.text or ""):
+            continue
+        to_delete.append(row)
+
+    deleted = 0
+    for row in to_delete:
+        rid = row.id
+        db.query(models.ReplyLike).filter(models.ReplyLike.reply_id == rid).delete(
+            synchronize_session=False
+        )
+        db.query(models.Notification).filter(models.Notification.reply_id == rid).delete(
+            synchronize_session=False
+        )
+        # Nested replies pointing at this as parent
+        db.query(models.Reply).filter(models.Reply.parent_reply_id == rid).update(
+            {models.Reply.parent_reply_id: None},
+            synchronize_session=False,
+        )
+        db.delete(row)
+        deleted += 1
+    if deleted:
+        db.commit()
+    logger.info("Purged %s official engage replies (only_slop=%s)", deleted, only_slop_phrases)
+    return {"ok": True, "deleted": deleted, "only_slop_phrases": only_slop_phrases}
 
 
 def backfill_missing_replies(db: Session, *, create_notification, limit: int = BATCH_LIMIT) -> dict:
@@ -429,14 +623,15 @@ def backfill_missing_replies(db: Session, *, create_notification, limit: int = B
         .all()
     )
 
+    official_ids = [admin.id, sharath.id]
     touched = 0
     for post in posts:
         author = post.author
         if _author_is_official(author):
             continue
-        admin_n = _reply_count(db, post.id, admin.id)
-        sharath_n = _reply_count(db, post.id, sharath.id)
-        # Prefer lifetime flag; fall back to "no other posts" for legacy rows.
+        if _official_reply_count(db, post.id, official_ids) >= 1:
+            continue
+
         has_once = bool(getattr(author, "has_posted_once", False))
         prior = (
             db.query(models.Post.id)
@@ -447,14 +642,7 @@ def backfill_missing_replies(db: Session, *, create_notification, limit: int = B
         if prior is not None and not has_once:
             author.has_posted_once = True
             has_once = True
-        # True first post only when the account has never completed a post before.
         is_first = not has_once
-        # First posts need up to 2 each (welcome + engage); others need 1 each.
-        need = (is_first and (admin_n < 2 or sharath_n < 2)) or (
-            not is_first and (admin_n < 1 or sharath_n < 1)
-        )
-        if not need:
-            continue
 
         engage_on_new_post(
             db,
@@ -473,10 +661,11 @@ def backfill_missing_replies(db: Session, *, create_notification, limit: int = B
 
 
 _scheduler_started = False
+_boot_purge_done = False
 
 
 def start_engagement_scheduler(*, create_notification) -> None:
-    global _scheduler_started
+    global _scheduler_started, _boot_purge_done
     if _scheduler_started:
         return
     if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
@@ -484,11 +673,19 @@ def start_engagement_scheduler(*, create_notification) -> None:
         return
 
     def loop() -> None:
+        global _boot_purge_done
         time.sleep(12)
         while True:
             try:
                 db = SessionLocal()
                 try:
+                    # One-shot cleanup of twin-bot / slop replies (default on; set PURGE_ENGAGE_SLOP_ON_BOOT=0 to skip)
+                    if not _boot_purge_done:
+                        flag = os.environ.get("PURGE_ENGAGE_SLOP_ON_BOOT", "1").strip().lower()
+                        if flag not in ("0", "false", "no"):
+                            res = purge_engage_slop_replies(db, only_slop_phrases=False)
+                            logger.info("Boot purge of official engage replies: %s", res)
+                        _boot_purge_done = True
                     res = backfill_missing_replies(db, create_notification=create_notification)
                     if res.get("engaged_posts"):
                         logger.info("Official engage backfill: %s", res)

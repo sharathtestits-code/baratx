@@ -1045,6 +1045,18 @@ def admin_create_reply(
     return serialize_reply(reply, author)
 
 
+@app.post("/admin/engage/purge-slop")
+def admin_purge_engage_slop(
+    only_slop_phrases: bool = False,
+    _: bool = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    """Delete @baratx / @sharath auto-engage replies (default: all of them)."""
+    from app import engagement_replies
+
+    return engagement_replies.purge_engage_slop_replies(db, only_slop_phrases=only_slop_phrases)
+
+
 @app.post("/admin/backfill-post-notifications")
 def admin_backfill_post_notifications(
     days: int = 14,
