@@ -565,6 +565,11 @@ export const adminApi = {
       headers: { "X-Admin-Secret": adminSecret },
       body: JSON.stringify(body),
     }),
+  purgeEngageSlop: (adminSecret, onlySlopPhrases = false) =>
+    request(`/admin/engage/purge-slop?only_slop_phrases=${onlySlopPhrases ? "true" : "false"}`, {
+      method: "POST",
+      headers: { "X-Admin-Secret": adminSecret },
+    }),
   refreshPrompts: (adminSecret, force = true) =>
     request(`/admin/prompts/refresh?force=${force ? "true" : "false"}`, {
       method: "POST",

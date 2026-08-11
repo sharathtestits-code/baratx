@@ -844,8 +844,39 @@ export default function Admin() {
               <div>
                 <h2 id="admin-engage-title">Comment on new users</h2>
                 <p className="admin-lead">
-                  Auto: @baratx + @sharath already welcome first posts and reply on every take.
-                  Use this tab for an extra human comment when you want.
+                  Auto-replies: one human voice per post (@baratx or @sharath), content-aware —
+                  bug reports get support questions, not growth-bait. Use this tab for an extra
+                  manual comment when you want.
+                </p>
+                <p className="admin-lead">
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-danger"
+                    disabled={busy}
+                    onClick={async () => {
+                      if (
+                        !window.confirm(
+                          "Delete all @baratx / @sharath auto-replies on posts? Digests (posts) stay."
+                        )
+                      ) {
+                        return;
+                      }
+                      setBusy(true);
+                      setError("");
+                      setMsg("");
+                      try {
+                        const res = await adminApi.purgeEngageSlop(secret, false);
+                        setMsg(`Purged ${res.deleted ?? 0} official engage replies`);
+                        load(secret);
+                      } catch (err) {
+                        setError(err.message || "Could not purge engage replies");
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  >
+                    Delete bot auto-replies
+                  </button>
                 </p>
               </div>
               <label className="admin-toggle">
