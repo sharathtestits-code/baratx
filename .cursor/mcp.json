@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "cloudflare": {
+      "url": "https://mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-docs": {
+      "url": "https://docs.mcp.cloudflare.com/mcp"
+    },
+    "cloudflare-dns-analytics": {
+      "url": "https://dns-analytics.mcp.cloudflare.com/mcp"
+    }
+  }
+}
