@@ -32,11 +32,11 @@ _RAW = (
     "cursor/ig-carousel-what-is-2af5/brand/ig/carousel"
 )
 PACK_IMAGE_BASE = {
-    "morning": f"{_RAW}/launch-pain",  # charcoal pain→product (launch style)
-    "midday": f"{_RAW}/grunge-what",  # street-grunge — occasional, not default-only
-    "evening": f"{_RAW}/how-it-works",  # navy paper how-it-works
+    "morning": f"{_RAW}/signup-excite",  # why join / first take — signup energy
+    "midday": f"{_RAW}/how-it-works",  # mechanic depth (not grunge repeat)
+    "evening": f"{_RAW}/launch-pain",  # pain dunk — different from morning
 }
-DEFAULT_IMAGE_BASE = PACK_IMAGE_BASE["midday"]
+DEFAULT_IMAGE_BASE = PACK_IMAGE_BASE["morning"]
 SLIDE_COUNT = 6
 SLIDE_EXT = "jpg"
 
@@ -73,37 +73,34 @@ FOOTER_X = (
 CAPTIONS = {
     "morning": [
         (
-            "okay real talk before the day gets loud —\n\n"
-            "i’m building BarathX because india deserved a square that isn’t "
-            "someone else’s product with desi stickers.\n\n"
-            "drop a take. pick a side. get a real reply.\n"
-            "human takes only. no ai slop.\n\n"
-            "we’re early. that’s kind of the point — come argue with actual "
-            "people, not a feed.\n"
-            "comment BX if you want an invite.\n\n"
+            "your take deserves a side — not a like.\n\n"
+            "on BarathX you pick Agree or Disagree and people actually argue back.\n"
+            "Square · Arenas · Live. human takes only. no ai slop.\n\n"
+            "we’re early. first voices get seen.\n"
+            "create an account, leave one honest take.\n"
+            "comment BX if you want the invite personally.\n\n"
             f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PublicSquare #PickASide #BuildInPublic"
         ),
         (
-            "founder morning note —\n\n"
+            "stop performing. start arguing.\n\n"
             "BarathX = India’s public square.\n"
-            "Square · Arenas · Live.\n\n"
-            "not a performance feed. just the take you’d only say to friends — "
-            "said in public.\n\n"
-            "come leave yours. comment BX.\n\n"
+            "drop a take → pick a side → get a real reply.\n\n"
+            "takes 60 seconds to sign up. we’re small on purpose.\n"
+            "comment BX.\n\n"
             f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #Debate #CampusLife #PublicSquare"
         ),
     ],
     "midday": [
         (
-            "quick one from me —\n\n"
-            "whatsapp buries your best takes.\n"
-            "reels don’t want your opinion. they want your thumb.\n\n"
-            "on BarathX you pick a side and argue it. sports, cinema, campus, "
-            "startups — out loud.\n\n"
-            "and we don’t sell your personal data. non‑negotiable.\n\n"
-            "comment BX for an invite.\n\n"
+            "how BarathX actually works —\n\n"
+            "1. drop a take in the Square\n"
+            "2. pick a side (no fence)\n"
+            "3. jump an Arena or go Live\n\n"
+            "real replies. not a performance feed.\n"
+            "sign up and leave your first take today.\n"
+            "comment BX.\n\n"
             f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #Privacy #PickASide #PublicSquare"
         ),
@@ -111,8 +108,8 @@ CAPTIONS = {
             "midday check —\n\n"
             "if your hottest take died in a group chat today, that’s the product "
             "gap. i’m fixing it.\n\n"
-            "BarathX: drop it, pick a side, fight it out with people who care.\n"
-            "we don’t sell your data.\n\n"
+            "BarathX: drop it, pick a side, fight it out.\n"
+            "create an account → leave one take.\n"
             "comment BX.\n\n"
             f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PublicSquare #PickASide #Privacy"
@@ -120,12 +117,12 @@ CAPTIONS = {
     ],
     "evening": [
         (
-            "end of day, from the founder —\n\n"
-            "every app we grew up on was built for someone else’s culture.\n"
-            "language. norms. what “counts” as a take.\n\n"
-            "BarathX is india’s own public square.\n"
-            "drop a take. pick a side. real replies — not a performance.\n\n"
-            "swipe, then just join. or reply BX.\n\n"
+            "end of day —\n\n"
+            "whatsapp buries your best takes.\n"
+            "reels want your thumb, not your opinion.\n\n"
+            "BarathX is the square where india actually argues.\n"
+            "sign up. leave one honest take tonight.\n"
+            "comment BX.\n\n"
             f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PublicSquare #BuildInPublic #DesiApp"
         ),
@@ -133,7 +130,8 @@ CAPTIONS = {
             "one ask tonight — leave one honest take on BarathX.\n\n"
             "no reels firehose inside. no ai slop.\n"
             "just sides, arenas, and people who showed up for the same fight.\n\n"
-            "i’m building this for us. comment BX.\n\n"
+            "create your account. i’m building this for us.\n"
+            "comment BX.\n\n"
             f"{FOOTER_IG}\n\n"
             "#BarathX #India #GenZ #PickASide #PublicSquare"
         ),
