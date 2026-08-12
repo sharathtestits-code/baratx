@@ -272,7 +272,73 @@ def _seconds_until(hour: int, minute: int) -> float:
     return max(30.0, (target - now).total_seconds())
 
 
+def _slot_dt_on(day: datetime, hour: int, minute: int) -> datetime:
+    return day.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+
+def _recent_media_times(token: str, ig_user_id: str, *, limit: int = 12) -> list[datetime]:
+    """IST timestamps of recent IG media (for dedupe / catch-up)."""
+    q = urllib.parse.urlencode(
+        {
+            "fields": "timestamp",
+            "limit": str(limit),
+            "access_token": token,
+        }
+    )
+    data = _get(f"{GRAPH}/{ig_user_id}/media?{q}")
+    out: list[datetime] = []
+    for row in data.get("data") or []:
+        raw = row.get("timestamp") or ""
+        try:
+            ts = datetime.fromisoformat(raw.replace("Z", "+00:00")).astimezone(IST)
+            out.append(ts)
+        except ValueError:
+            continue
+    return out
+
+
+def _already_posted_near(slot: datetime, recent: list[datetime], *, window_min: int = 50) -> bool:
+    for ts in recent:
+        if abs((ts - slot).total_seconds()) <= window_min * 60:
+            return True
+    return False
+
+
+def _publish_slot_if_needed(pack: str, slot: datetime, *, reason: str) -> dict | None:
+    token = _env("INSTAGRAM_ACCESS_TOKEN")
+    ig_user_id = _env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
+    if not token or not ig_user_id:
+        return None
+    recent = _recent_media_times(token, ig_user_id)
+    if _already_posted_near(slot, recent):
+        logger.info("Skip %s (%s) — already have media near %s", pack, reason, slot.isoformat())
+        return None
+    logger.info("Publishing %s (%s) for slot %s", pack, reason, slot.isoformat())
+    return publish_carousel(pack=pack)
+
+
+def _catch_up_missed_slots() -> None:
+    """After Railway redeploys, fire any of today's slots we already missed (within grace)."""
+    now = datetime.now(IST)
+    # Catch up if we're up to 3h after the slot (covers midday killed by a deploy).
+    grace = timedelta(hours=3)
+    for hour, minute, pack in PEAK_SLOTS:
+        slot = _slot_dt_on(now, hour, minute)
+        if slot <= now <= slot + grace:
+            try:
+                _publish_slot_if_needed(pack, slot, reason="catch-up")
+            except Exception:  # noqa: BLE001
+                logger.exception("Instagram catch-up failed for pack=%s", pack)
+            time.sleep(5)
+
+
 def start_instagram_scheduler() -> None:
+    """Run all 3 IST peak slots (09:00 / 13:30 / 20:00) every day.
+
+    Railway redeploys used to kill the sleeping thread and skip midday/evening.
+    On boot we catch up any missed slot still inside a 3h grace window, and we
+    dedupe against recent IG media so catch-up cannot double-post.
+    """
     global _scheduler_started
     with _scheduler_lock:
         if _scheduler_started:
@@ -290,22 +356,38 @@ def start_instagram_scheduler() -> None:
         _scheduler_started = True
 
     def loop():
+        try:
+            _catch_up_missed_slots()
+        except Exception:  # noqa: BLE001
+            logger.exception("Instagram catch-up sweep failed")
+
         while True:
-            waits = [(_seconds_until(h, m), pack) for h, m, pack in PEAK_SLOTS]
+            now = datetime.now(IST)
+            waits: list[tuple[float, str, datetime]] = []
+            for hour, minute, pack in PEAK_SLOTS:
+                slot = _slot_dt_on(now, hour, minute)
+                if slot <= now:
+                    slot = slot + timedelta(days=1)
+                waits.append(((slot - now).total_seconds(), pack, slot))
             waits.sort(key=lambda x: x[0])
-            wait, pack = waits[0]
-            logger.info("Instagram schedule sleeping %.0fs until %s slot", wait, pack)
+            wait, pack, slot = waits[0]
+            wait = max(30.0, wait)
+            logger.info(
+                "Instagram schedule sleeping %.0fs until %s slot (%s IST)",
+                wait,
+                pack,
+                slot.strftime("%Y-%m-%d %H:%M"),
+            )
             time.sleep(wait)
             try:
-                result = publish_carousel(pack=pack)
-                logger.info("Instagram published: %s", result)
+                _publish_slot_if_needed(pack, slot, reason="scheduled")
             except Exception:  # noqa: BLE001
-                logger.exception("Instagram scheduled publish failed")
+                logger.exception("Instagram scheduled publish failed for pack=%s", pack)
             time.sleep(90)
 
     threading.Thread(target=loop, name="baratx-ig-schedule", daemon=True).start()
     logger.info(
-        "Instagram scheduler started (@getbarathx) slots=%s base=%s",
+        "Instagram scheduler started (@getbarathx) 3 slots/day=%s base=%s",
         ",".join(f"{h:02d}:{m:02d}/{p}" for h, m, p in PEAK_SLOTS),
         {p: _image_base(p) for _, _, p in PEAK_SLOTS},
     )
