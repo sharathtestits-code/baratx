@@ -1,10 +1,17 @@
-# BaratX IG content rules
+# BarathX IG content rules
+
+## Brand spelling (non-negotiable)
+**BarathX** — never BaratX, never BharathX. Captions, slides, hashtags, CTAs.
 
 ## Primary job of every post
 Make a stranger understand **why they should sign up** at barathx.com.
 
 Not: “here is a feature.”
-Yes: “here is the pain → BaratX fix → create an account.”
+Yes: “here is the pain → BarathX fix → create an account.”
+
+## Visuals
+Use **current** product screens from `brand/ig/carousel/live-product` (live barathx.com).
+Do **not** use the retired `brand/carousel/export` plain pack.
 
 ## Caption formula
 1. **Hook pain** (1 line) — something they already feel

@@ -1,7 +1,12 @@
-"""Instagram carousel publisher + IST peak scheduler for @getbaratx.
+"""Instagram carousel publisher + IST peak scheduler for @getbarathx.
 
-Publishes BarathX app carousels via Meta Graph API. Slides are pulled by Meta
-from public GitHub raw URLs (no image bytes in the API container).
+Publishes BarathX carousels via Meta Graph API. Slides are pulled by Meta
+from public GitHub raw URLs on **main** (never a stale feature-branch pack).
+
+Hard rules:
+- Brand spelling is **BarathX** (never BaratX / BharathX on creatives or captions)
+- Visuals must use current product screens under brand/ig/carousel/live-product
+- Old brand/carousel/export pack is retired — do not point DEFAULT_IMAGE_BASE there
 
 Trending IG music cannot be attached via Graph API for feed carousels.
 """
@@ -24,57 +29,107 @@ logger = logging.getLogger("baratx.instagram")
 
 IST = ZoneInfo("Asia/Kolkata")
 GRAPH = "https://graph.facebook.com/v21.0"
-DEFAULT_IMAGE_BASE = (
-    "https://raw.githubusercontent.com/sharathtestits-code/baratx/main/brand/carousel/export"
+
+# Always serve packs from main so Railway Git deploys cannot drift to old assets.
+_RAW = (
+    "https://raw.githubusercontent.com/sharathtestits-code/baratx/"
+    "main/brand/ig/carousel"
 )
+
+# Live product screens (BarathX) — captured from https://barathx.com.
+# Slot captions still rotate; creatives stay on the current UI until new packs land.
+PACK_IMAGE_BASE = {
+    "morning": f"{_RAW}/live-product",
+    "midday": f"{_RAW}/live-product",
+    "evening": f"{_RAW}/live-product",
+}
+DEFAULT_IMAGE_BASE = PACK_IMAGE_BASE["morning"]
+SLIDE_COUNT = 6
+SLIDE_EXT = "jpg"
 
 # India peak windows — up to 3 posts/day.
 PEAK_SLOTS = (
     (9, 0, "morning"),
-    (13, 30, "evening"),
+    (13, 30, "midday"),
     (20, 0, "evening"),
+)
+
+# Cross-post social links (always BarathX product; handles as provided).
+LINK_SITE = "https://barathx.com"
+LINK_IG = "https://www.instagram.com/getbarathx/"
+LINK_X = "https://x.com/getbaratx"
+LINK_WA = "https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+
+FOOTER_IG = (
+    f"app → {LINK_SITE}\n"
+    f"X → {LINK_X}\n"
+    f"WhatsApp → {LINK_WA}"
 )
 
 CAPTIONS = {
     "morning": [
         (
-            "India doesn’t need another foreign firehose.\n"
-            "It needs a public square.\n\n"
-            "BarathX = short posts, real replies, arenas that matter —\n"
-            "Sports · Politics · Entertainment · News · Spirituality.\n\n"
-            "Open the app. Drop your city. Argue like you mean it.\n"
-            "→ https://barathx.com\n\n"
-            "#BarathX #BarathXApp #IndiaPublicSquare #MakeInIndia #IndianApp "
-            "#SocialMediaIndia #Hyderabad #DesiTwitter #CivicIndia #PublicSquare"
+            "this is BarathX — India’s public square.\n\n"
+            "Square · Arenas · Live.\n"
+            "pick a side. argue it live. human takes only — no AI slop.\n\n"
+            "we’re early. first voices get seen.\n"
+            "create an account, leave one honest take.\n"
+            "comment BX if you want the invite personally.\n\n"
+            f"{FOOTER_IG}\n\n"
+            "#BarathX #India #GenZ #PublicSquare #PickASide #BuildInPublic"
         ),
         (
-            "Stop scrolling. Start arguing.\n\n"
-            "Inside BarathX:\n"
-            "• Home feed that feels Indian\n"
-            "• Arenas for real fights\n"
-            "• Replies > empty likes\n\n"
-            "Built in India. For India.\n"
-            "→ https://barathx.com\n\n"
-            "#BarathX #BarathXApp #IndianStartup #TechIndia #SocialApp #Debate "
-            "#BarathX #ProductIndia #JoinBarathX"
+            "stop performing. start arguing.\n\n"
+            "BarathX = India’s public square.\n"
+            "drop a take → pick a side → get a real reply.\n\n"
+            "takes 60 seconds to sign up. we’re small on purpose.\n"
+            "comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
+            "#BarathX #India #GenZ #Debate #CampusLife #PublicSquare"
+        ),
+    ],
+    "midday": [
+        (
+            "how BarathX actually works —\n\n"
+            "1. drop a take in the Square\n"
+            "2. pick a side (no fence)\n"
+            "3. jump an Arena or go Live\n\n"
+            "real replies. not a performance feed.\n"
+            "sign up and leave your first take today.\n"
+            "comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
+            "#BarathX #India #GenZ #PickASide #PublicSquare"
+        ),
+        (
+            "midday check —\n\n"
+            "if your hottest take died in a group chat today, that’s the product "
+            "gap. i’m fixing it.\n\n"
+            "BarathX: drop it, pick a side, fight it out.\n"
+            "create an account → leave one take.\n"
+            "comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
+            "#BarathX #India #GenZ #PublicSquare #PickASide"
         ),
     ],
     "evening": [
         (
-            "Your city has a take. The feed should hear it.\n\n"
-            "Post one real problem from your street / ward / campus on BarathX.\n"
-            "Founding voices get seen — and rewarded for real civic posts.\n\n"
-            "→ https://barathx.com\n\n"
-            "#BarathX #BarathXApp #CivicTech #India2026 #LocalIssues #Hyd "
-            "#Telangana #Democracy #PublicSquare #Founding100"
+            "end of day —\n\n"
+            "whatsapp buries your best takes.\n"
+            "reels want your thumb, not your opinion.\n\n"
+            "BarathX is the square where india actually argues.\n"
+            "sign up. leave one honest take tonight.\n"
+            "comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
+            "#BarathX #India #GenZ #PublicSquare #BuildInPublic #DesiApp"
         ),
         (
-            "Every social app you use was built for someone else.\n\n"
-            "Culture. Language. Rules. Not ours.\n\n"
-            "BarathX is India’s own public square.\n"
-            "Comment BX if you want the link — or just go: https://barathx.com\n\n"
-            "#BarathX #BarathXApp #IndiaFirst #DesiApp #ViralIndia #InstagramIndia "
-            "#StartupIndia #JoinBarathX #PublicSquare"
+            "one ask tonight — leave one honest take on BarathX.\n\n"
+            "no reels firehose inside. no ai slop.\n"
+            "just sides, arenas, and people who showed up for the same fight.\n\n"
+            "create your account. i’m building this for us.\n"
+            "comment BX.\n\n"
+            f"{FOOTER_IG}\n\n"
+            "#BarathX #India #GenZ #PickASide #PublicSquare"
         ),
     ],
 }
@@ -102,7 +157,41 @@ def _env(name: str) -> str:
 def _caption(pack: str) -> str:
     rows = CAPTIONS.get(pack) or CAPTIONS["evening"]
     idx = (datetime.now(IST).timetuple().tm_yday + datetime.now(IST).hour) % len(rows)
-    return rows[idx]
+    caption = rows[idx]
+    # Guardrail: never ship the misspelled brand in captions.
+    if "BaratX" in caption or "BharathX" in caption:
+        raise RuntimeError("Caption contains banned brand misspelling (BaratX/BharathX)")
+    return caption
+
+
+def _image_base(pack: str | None = None) -> str:
+    pack = (pack or "midday").strip().lower()
+    specific = _env(f"INSTAGRAM_IMAGE_BASE_{pack.upper()}")
+    if specific:
+        base = specific.rstrip("/")
+    else:
+        global_base = _env("INSTAGRAM_IMAGE_BASE")
+        if global_base and _env("INSTAGRAM_FORCE_SINGLE_PACK").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
+            base = global_base.rstrip("/")
+        else:
+            base = (PACK_IMAGE_BASE.get(pack) or DEFAULT_IMAGE_BASE).rstrip("/")
+
+    # Never fall back to the retired plain export pack on main.
+    if "/brand/carousel/export" in base:
+        logger.warning("Blocked retired carousel export path; using live-product")
+        return PACK_IMAGE_BASE["morning"]
+    return base
+
+
+def _slide_urls(image_base_url: str | None = None, pack: str | None = None) -> list[str]:
+    base = (image_base_url or _image_base(pack)).rstrip("/")
+    ext = (_env("INSTAGRAM_SLIDE_EXT") or SLIDE_EXT).lstrip(".")
+    count = int(_env("INSTAGRAM_SLIDE_COUNT") or SLIDE_COUNT)
+    return [f"{base}/slide-{i:02d}.{ext}" for i in range(1, count + 1)]
 
 
 def _post_form(url: str, data: dict) -> dict:
@@ -121,15 +210,14 @@ def _get(url: str) -> dict:
         return json.loads(resp.read().decode())
 
 
-def publish_carousel(*, pack: str = "evening", image_base_url: str = DEFAULT_IMAGE_BASE) -> dict:
+def publish_carousel(*, pack: str = "evening", image_base_url: str | None = None) -> dict:
     token = _env("INSTAGRAM_ACCESS_TOKEN")
     ig_user_id = _env("INSTAGRAM_BUSINESS_ACCOUNT_ID")
     if not token or not ig_user_id:
         raise RuntimeError("INSTAGRAM_ACCESS_TOKEN / INSTAGRAM_BUSINESS_ACCOUNT_ID not set")
 
     caption = _caption(pack)
-    base = image_base_url.rstrip("/")
-    urls = [f"{base}/slide-{i:02d}.png" for i in range(1, 11)]
+    urls = _slide_urls(image_base_url, pack=pack)
 
     child_ids = []
     for url in urls:
@@ -167,9 +255,12 @@ def publish_carousel(*, pack: str = "evening", image_base_url: str = DEFAULT_IMA
     return {
         "ok": True,
         "pack": pack,
+        "image_base": _image_base(pack) if image_base_url is None else image_base_url,
+        "slide_urls": urls,
         "creation_id": creation_id,
         "media_id": published.get("id"),
         "when_ist": datetime.now(IST).isoformat(),
+        "caption_preview": caption.split("\n", 1)[0],
     }
 
 
@@ -186,7 +277,11 @@ def start_instagram_scheduler() -> None:
     with _scheduler_lock:
         if _scheduler_started:
             return
-        if os.environ.get("DISABLE_INSTAGRAM_SCHEDULE", "").strip().lower() in ("1", "true", "yes"):
+        if os.environ.get("DISABLE_INSTAGRAM_SCHEDULE", "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        ):
             logger.info("Instagram scheduler disabled")
             return
         if not _env("INSTAGRAM_ACCESS_TOKEN") or not _env("INSTAGRAM_BUSINESS_ACCOUNT_ID"):
@@ -210,6 +305,7 @@ def start_instagram_scheduler() -> None:
 
     threading.Thread(target=loop, name="baratx-ig-schedule", daemon=True).start()
     logger.info(
-        "Instagram scheduler started (@getbaratx) slots=%s",
+        "Instagram scheduler started (@getbarathx) slots=%s base=%s",
         ",".join(f"{h:02d}:{m:02d}/{p}" for h, m, p in PEAK_SLOTS),
+        {p: _image_base(p) for _, _, p in PEAK_SLOTS},
     )
