@@ -147,14 +147,13 @@ export default function Sidebar() {
       </div>
 
       <div className="sidebar-user-wrap">
-        <button type="button" className="sidebar-user" onClick={handleLogout} title="Log out">
+        <Link to={`/u/${user.username}`} className="sidebar-user" title="Your profile">
           <Avatar name={user.display_name} username={user.username} url={user.avatar_url} size={40} />
           <div className="sidebar-user-info">
             <div className="sidebar-user-name">{user.display_name}</div>
             <div className="sidebar-user-username">@{user.username}</div>
           </div>
-          <IconMore className="sidebar-more-icon" />
-        </button>
+        </Link>
         <button type="button" className="sidebar-logout-text" onClick={handleLogout}>
           <IconLogout className="sidebar-logout-icon" />
           Log out

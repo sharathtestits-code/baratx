@@ -5,13 +5,14 @@ import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
 import { ARENA_TOPICS } from "../arenas";
+import { IconLogout } from "./Icons";
 
 /**
- * Change Arena drawer — arenas + Alerts + Settings (Appearance lives in Settings).
+ * Change Arena drawer — arenas + Alerts + Settings + Log out (Appearance lives in Settings).
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
-  const { token } = useAuth();
+  const { token, user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
@@ -102,6 +103,12 @@ export default function PlazaSideMenu() {
   function goLink(path) {
     close();
     navigate(path);
+  }
+
+  function handleLogout() {
+    close();
+    logout();
+    navigate("/");
   }
 
   if (typeof document === "undefined") return null;
@@ -268,7 +275,7 @@ export default function PlazaSideMenu() {
             <button type="button" className="plaza-side-manage plaza-side-settings" onClick={goSettings}>
               <span className="plaza-side-manage-copy">
                 <strong>Settings</strong>
-                <em>Appearance, privacy, mutes</em>
+                <em>Appearance, privacy, mutes, log out</em>
               </span>
               <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
                 <path
@@ -298,6 +305,22 @@ export default function PlazaSideMenu() {
                 />
               </svg>
             </button>
+
+            {user ? (
+              <button
+                type="button"
+                className="plaza-side-manage plaza-side-logout"
+                onClick={handleLogout}
+              >
+                <span className="plaza-side-manage-copy">
+                  <strong>
+                    <IconLogout className="plaza-side-logout-icon" aria-hidden="true" />
+                    Log out
+                  </strong>
+                  <em>@{user.username}</em>
+                </span>
+              </button>
+            ) : null}
           </div>
         )}
       </aside>

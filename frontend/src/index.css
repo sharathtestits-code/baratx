@@ -695,6 +695,9 @@ button {
   text-align: left;
   width: 100%;
   margin-top: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
 }
 
 .sidebar-user:hover {
@@ -4278,7 +4281,25 @@ a.post-time:hover {
 }
 
 .sidebar-logout-text {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 650;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar-logout-text:hover {
+  background: var(--hover-overlay);
+  color: var(--text);
 }
 
 @media (max-width: 900px) {
@@ -8329,6 +8350,18 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   height: 1rem;
   flex-shrink: 0;
   opacity: 0.55;
+  color: var(--text-secondary);
+}
+
+.plaza-side-logout {
+  margin-top: 0.55rem;
+  border-style: dashed;
+}
+
+.plaza-side-logout-icon {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
   color: var(--text-secondary);
 }
 
