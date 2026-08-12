@@ -10,7 +10,12 @@ Not: “here is a feature.”
 Yes: “here is the pain → BarathX fix → create an account.”
 
 ## Visuals
-Use **current** product screens from `brand/ig/carousel/live-product` (live barathx.com).
+Each daily slot uses a **different** pack (never the same pictures 3×):
+- morning → `brand/ig/carousel/signup-excite`
+- midday → `brand/ig/carousel/how-it-works`
+- evening → `brand/ig/carousel/launch-pain`
+
+All packs: **BarathX** spelling + current barathx.com screens.
 Do **not** use the retired `brand/carousel/export` plain pack.
 
 ## Caption formula

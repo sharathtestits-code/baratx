@@ -5,8 +5,9 @@ from public GitHub raw URLs on **main** (never a stale feature-branch pack).
 
 Hard rules:
 - Brand spelling is **BarathX** (never BaratX / BharathX on creatives or captions)
-- Visuals must use current product screens under brand/ig/carousel/live-product
+- Each IST slot MUST use a different visual pack (signup-excite / how-it-works / launch-pain)
 - Old brand/carousel/export pack is retired — do not point DEFAULT_IMAGE_BASE there
+- Do not reuse one pack for all three daily captions
 
 Trending IG music cannot be attached via Graph API for feed carousels.
 """
@@ -36,12 +37,16 @@ _RAW = (
     "main/brand/ig/carousel"
 )
 
-# Live product screens (BarathX) — captured from https://barathx.com.
-# Slot captions still rotate; creatives stay on the current UI until new packs land.
+# Rotate visual packs by slot — DIFFERENT pictures for DIFFERENT captions.
+# Never ship the same creative 3×/day.
+_RAW = (
+    "https://raw.githubusercontent.com/sharathtestits-code/baratx/"
+    "main/brand/ig/carousel"
+)
 PACK_IMAGE_BASE = {
-    "morning": f"{_RAW}/live-product",
-    "midday": f"{_RAW}/live-product",
-    "evening": f"{_RAW}/live-product",
+    "morning": f"{_RAW}/signup-excite",  # signup energy + landing
+    "midday": f"{_RAW}/how-it-works",  # Square / Arenas mechanics
+    "evening": f"{_RAW}/launch-pain",  # pain dunk / tonight CTA
 }
 DEFAULT_IMAGE_BASE = PACK_IMAGE_BASE["morning"]
 SLIDE_COUNT = 6
