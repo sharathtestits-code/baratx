@@ -52,18 +52,19 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
 
 ### See who registered / post & comment as BarathX
 
-**Production ops (owner only):** log in as `@sharath`, then open https://barathx.com/bx-ops  
-**QA ops (owner only):** log in as `@sharath`, then open https://qa.barathx.com/bx-ops  
+**Production ops (owner only):** log in as an ops owner, then open the console path.
 
-1. Set `ADMIN_SECRET` on the Railway API service (long random string).
-2. Redeploy the API if needed.
-3. Log in as **@sharath** (ops owner). Other accounts — including blue — get a normal 404 at the ops URL.
-4. Open `/bx-ops` (not `/admin`) and enter the unlock code.
-5. You’ll see users, Engage, Post as BarathX, Payouts, Tools.
+1. On the **Railway API** service set:
+   - `ADMIN_SECRET` = long random unlock code
+   - `OPS_OWNER_USERNAMES` = comma-separated logins that may open the UI (e.g. `testits,sharath`)
+   - `OPS_CONSOLE_PATH` = unguessable path (e.g. `/hq-9f3k-console`; default `/bx-ops`)
+2. Redeploy / restart the **API** (no Cloudflare Pages rebuild required for these).
+3. Log in as one of those usernames → open `https://barathx.com{OPS_CONSOLE_PATH}` → enter `ADMIN_SECRET`.
+4. You’ll see users, Engage, Post as BarathX, Payouts, Tools.
 
-`/admin` and `/bx-ops` show **Page not found** for everyone except the ops owner account. Optional Cloudflare Pages/Vite vars:
-- `VITE_OPS_CONSOLE_PATH` — private path (default `/bx-ops`)
-- `VITE_OPS_OWNER_USERNAMES` — comma-separated usernames allowed to open the UI (default `sharath`)
+`/admin` is always a public 404. The ops path shows **Page not found** for everyone except accounts listed in `OPS_OWNER_USERNAMES`. Owner checks and path come from the API (`/users/me.is_ops_owner`, `GET /ops/config`) so Railway env changes apply without baking `VITE_*` into the SPA.
+
+Optional Vite fallbacks (only if API config is unreachable): `VITE_OPS_OWNER_USERNAMES`, `VITE_OPS_CONSOLE_PATH`.
 
 Do not link the ops URL from the public app.
 

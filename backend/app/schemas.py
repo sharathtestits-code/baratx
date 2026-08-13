@@ -221,6 +221,7 @@ class UserOut(BaseModel):
     is_phone_verified: bool
     badge: str = "none"  # none | gold | blue
     is_official: bool = False
+    is_ops_owner: bool = False
     created_at: datetime
     follower_count: int = 0
     following_count: int = 0
@@ -228,6 +229,12 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class OpsConfigOut(BaseModel):
+    """Public ops routing hint — path only (owners are never listed)."""
+
+    console_path: str = "/bx-ops"
 
 
 class AuthorOut(BaseModel):
