@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, media_store, models, rewards, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, media_store, models, ops_access, rewards, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -477,6 +477,12 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         is_phone_verified=user.is_phone_verified,
         badge=badge,
         is_official=is_official,
+        # Only expose on self — never leak owner status via profiles/followers.
+        is_ops_owner=(
+            ops_access.is_ops_owner_user(user)
+            if current_user is not None and current_user.id == user.id
+            else False
+        ),
         created_at=user.created_at,
         avatar_url=user.avatar_url,
         cover_url=user.cover_url,
@@ -716,6 +722,12 @@ def serialize_notification(n: models.Notification) -> schemas.NotificationOut:
 def health():
     info = mvp_version_info()
     return {"status": "ok", "mvp": info["mvp"], "version": info["version"], "environment": ENVIRONMENT}
+
+
+@app.get("/ops/config", response_model=schemas.OpsConfigOut)
+def ops_config():
+    """Console path from Railway OPS_CONSOLE_PATH — no rebuild of the SPA required."""
+    return schemas.OpsConfigOut(console_path=ops_access.ops_console_path())
 
 
 # ---------- Admin (password-protected signup insights) ----------

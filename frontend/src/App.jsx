@@ -1,4 +1,5 @@
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -40,7 +41,7 @@ import ThemeOnboarding from "./components/ThemeOnboarding";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
-import { canAccessOpsConsole, opsConsolePath } from "./opsAccess";
+import { canAccessOpsConsole, loadOpsConsolePath, opsConsolePath } from "./opsAccess";
 
 function AuthChrome({ children, legal = false }) {
   return (
@@ -130,8 +131,24 @@ function AppRoutes() {
 export default function App() {
   const { token, user, loading, bootError, retryBoot } = useAuth();
   const location = useLocation();
+  const [opsPath, setOpsPath] = useState(() => opsConsolePath());
+  const [opsPathReady, setOpsPathReady] = useState(false);
 
-  if (loading) {
+  useEffect(() => {
+    let cancelled = false;
+    loadOpsConsolePath()
+      .then((path) => {
+        if (!cancelled) setOpsPath(path);
+      })
+      .finally(() => {
+        if (!cancelled) setOpsPathReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading || !opsPathReady) {
     return <div className="page-loading">Starting BarathX…</div>;
   }
 
@@ -150,9 +167,8 @@ export default function App() {
     );
   }
 
-  // Private ops console — owner account only. Everyone else (incl. logged-out) gets a
-  // normal 404 so the unlock screen is not public. Path defaults to /bx-ops.
-  const opsPath = opsConsolePath();
+  // Private ops console — owner from Railway OPS_OWNER_USERNAMES (/users/me.is_ops_owner).
+  // Path from Railway OPS_CONSOLE_PATH via GET /ops/config (no Vite rebuild needed).
   const onOpsPath =
     location.pathname === opsPath || location.pathname.startsWith(`${opsPath}/`);
   if (onOpsPath) {
