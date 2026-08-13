@@ -338,6 +338,52 @@ def seed_arenas(db: Session) -> None:
         db.rollback()
 
 
+# Seasonal / campaign posts — idempotent by unique marker substring in text.
+# India's Independence Day is 15 August (not the 18th).
+SEASONAL_POSTS = [
+    {
+        "username": "baratx",
+        "marker": "Independence Day is 15 August",
+        "text": (
+            "Independence Day is 15 August — almost here. "
+            "What does freedom look like in your city this year? "
+            "One honest sentence. Reply."
+        ),
+    },
+]
+
+
+def seed_seasonal_posts(db: Session) -> int:
+    """Create timed campaign posts from official accounts if missing. Returns new count."""
+    created = 0
+    for item in SEASONAL_POSTS:
+        author = db.query(models.User).filter(models.User.username == item["username"]).first()
+        if not author:
+            continue
+        marker = (item.get("marker") or "").strip()
+        text = (item.get("text") or "").strip()
+        if not marker or not text:
+            continue
+        exists = (
+            db.query(models.Post)
+            .filter(
+                models.Post.author_id == author.id,
+                models.Post.text.contains(marker),
+            )
+            .first()
+        )
+        if exists:
+            continue
+        db.add(models.Post(author_id=author.id, text=text))
+        created += 1
+        logger.info("Seeded seasonal post (@%s): %s", item["username"], marker)
+    if created:
+        db.commit()
+    else:
+        db.rollback()
+    return created
+
+
 def follow_official_accounts(db: Session, user: models.User) -> int:
     """Auto-follow official BarathX accounts. Returns number of new follows."""
     added = 0

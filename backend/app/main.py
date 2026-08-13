@@ -201,6 +201,12 @@ with SessionLocal() as _seed_db:
 
         logging.getLogger("baratx").exception("Official account seed failed")
     try:
+        seed.seed_seasonal_posts(_seed_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("Seasonal post seed failed")
+    try:
         seed.seed_default_communities(_seed_db)
     except Exception:  # noqa: BLE001
         import logging
