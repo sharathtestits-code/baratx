@@ -48,3 +48,5 @@ def test_shell_skips_docs_and_health():
     assert spa_shell_allowed("/health") is False
     assert spa_shell_allowed("/docs") is False
     assert spa_shell_allowed("/assets/index.js") is False
+    assert spa_shell_allowed("/ops") is False
+    assert spa_shell_allowed("/ops/config") is False
