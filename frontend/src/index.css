@@ -3560,6 +3560,71 @@ a.profile-edit-btn:hover {
   margin: 0 !important;
 }
 
+.profile-photo-sheet {
+  max-width: 380px;
+}
+
+.profile-photo-sheet-body {
+  padding: 1.15rem 1.15rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.profile-photo-sheet-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  background: color-mix(in srgb, var(--border) 55%, transparent);
+  overflow: hidden;
+}
+
+.profile-photo-sheet-preview.is-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+}
+
+.profile-photo-sheet-preview.is-cover {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 3 / 1;
+  border-radius: var(--radius-md, 12px);
+  background-size: cover;
+  background-position: center;
+}
+
+.profile-photo-sheet-empty {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.profile-photo-sheet-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.profile-photo-sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.profile-photo-sheet-actions .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.profile-photo-sheet-remove {
+  color: var(--danger, #c62828);
+}
+
 .modal-form {
   padding: 1rem 1.15rem 1.25rem;
 }
