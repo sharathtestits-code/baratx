@@ -47,10 +47,14 @@ export default function Guidelines() {
           </li>
         </ul>
 
-        <h2>Founding 100</h2>
+        <h2>Early members</h2>
         <p>
-          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
-          up. Details on <Link to="/rewards">Rewards</Link> after you join.
+          Among the first 100–1,000 people who join and post, BarathX admin and the founder may leave
+          a welcome reply. A surprise gift may apply — details revealed later. Limited offer;{" "}
+          <strong>T&amp;Cs apply</strong> (
+          <Link to="/terms">Terms</Link>). Founding 100 is separate: 100 spots earned by opening a
+          debate that gets real engagement, not by signing up. Details on{" "}
+          <Link to="/rewards">Rewards</Link> after you join.
         </p>
 
         <p className="hint">

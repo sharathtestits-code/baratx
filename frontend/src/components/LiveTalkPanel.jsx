@@ -6,9 +6,33 @@ import Avatar from "./Avatar";
 
 const REACTIONS = ["👍", "❤️", "😂", "👏", "🔥", "😮", "🎉", "👎"];
 
+/** Remote seat camera — muted here; audio plays via the WebRTC audio element. */
+function RemoteSeatVideo({ stream, tick = 0 }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    el.srcObject = stream || null;
+    const play = () => {
+      el.play().catch(() => {});
+    };
+    play();
+    if (!stream) return undefined;
+    const onAdd = () => play();
+    stream.addEventListener("addtrack", onAdd);
+    stream.getVideoTracks().forEach((tr) => {
+      tr.addEventListener("unmute", play);
+    });
+    return () => {
+      stream.removeEventListener("addtrack", onAdd);
+    };
+  }, [stream, tick]);
+  return <video ref={ref} className="live-talk-seat-video" autoPlay playsInline muted />;
+}
+
 /**
  * Live Talk — under Live rooms.
- * Join conversation → real WebRTC audio between seats; mute / video; pin, chat, DM, remove under ⋯.
+ * Join conversation → real WebRTC audio/video between seats; mute / video; pin, chat, DM, remove under ⋯.
  */
 const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   { spaceId, token, isHost, autoJoinToken = 0, onTalkChange },
@@ -32,7 +56,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   const inTalk = !!state?.in_talk;
   const myUserId = state?.my_user_id || null;
 
-  const { resumeRemoteAudio } = useLiveTalkRtc({
+  const { remoteStreams, remoteTick, resumeRemoteAudio } = useLiveTalkRtc({
     spaceId,
     token,
     myUserId,
@@ -100,8 +124,9 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
   useEffect(() => {
     if (state?.my_video && localVideoRef.current && mediaRef.current) {
       localVideoRef.current.srcObject = mediaRef.current;
+      localVideoRef.current.play().catch(() => {});
     }
-  }, [state?.my_video, state?.participant_count]);
+  }, [state?.my_video, state?.participant_count, localStream]);
 
   useEffect(() => {
     onTalkChange?.(!!state?.in_talk);
@@ -136,8 +161,36 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
   }
 
-  async function ensureMedia({ wantVideo }) {
+  async function ensureMedia({ wantVideo, muted = true }) {
     try {
+      // Prefer extending the existing stream so audio doesn't drop when video toggles
+      if (mediaRef.current) {
+        const stream = mediaRef.current;
+        if (wantVideo && stream.getVideoTracks().length === 0) {
+          const cam = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 } },
+          });
+          cam.getVideoTracks().forEach((tr) => stream.addTrack(tr));
+        }
+        if (!wantVideo) {
+          stream.getVideoTracks().forEach((tr) => {
+            tr.stop();
+            stream.removeTrack(tr);
+          });
+        }
+        stream.getAudioTracks().forEach((tr) => {
+          tr.enabled = !muted;
+        });
+        // New MediaStream identity so WebRTC effect re-runs with updated tracks
+        const next = new MediaStream(stream.getTracks());
+        mediaRef.current = next;
+        setLocalStream(next);
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = wantVideo ? next : null;
+        }
+        return next;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
@@ -146,9 +199,9 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
         },
         video: wantVideo ? { facingMode: "user", width: { ideal: 640 } } : false,
       });
-      if (mediaRef.current) {
-        mediaRef.current.getTracks().forEach((tr) => tr.stop());
-      }
+      stream.getAudioTracks().forEach((tr) => {
+        tr.enabled = !muted;
+      });
       mediaRef.current = stream;
       setLocalStream(stream);
       if (localVideoRef.current) {
@@ -168,7 +221,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
     try {
       const data = await spacesApi.talkJoin(token, spaceId);
       setState(data);
-      const stream = await ensureMedia({ wantVideo: false });
+      const stream = await ensureMedia({ wantVideo: false, muted: true });
       if (stream) {
         // Join muted by default — unmute publishes audio to peers
         stream.getAudioTracks().forEach((tr) => {
@@ -209,7 +262,9 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
     const next = !state.my_muted;
     setBusy(true);
     try {
-      const stream = mediaRef.current || (await ensureMedia({ wantVideo: state.my_video }));
+      const stream =
+        mediaRef.current ||
+        (await ensureMedia({ wantVideo: state.my_video, muted: next }));
       if (stream) {
         stream.getAudioTracks().forEach((tr) => {
           tr.enabled = !next;
@@ -233,23 +288,13 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
     setBusy(true);
     try {
       if (next) {
-        const stream = await ensureMedia({ wantVideo: true });
+        const stream = await ensureMedia({ wantVideo: true, muted: state.my_muted });
         if (!stream) {
           setBusy(false);
           return;
         }
-        stream.getAudioTracks().forEach((tr) => {
-          tr.enabled = !state.my_muted;
-        });
-      } else if (mediaRef.current) {
-        mediaRef.current.getVideoTracks().forEach((tr) => tr.stop());
-        if (localVideoRef.current) localVideoRef.current.srcObject = null;
-        await ensureMedia({ wantVideo: false });
-        if (mediaRef.current) {
-          mediaRef.current.getAudioTracks().forEach((tr) => {
-            tr.enabled = !state.my_muted;
-          });
-        }
+      } else {
+        await ensureMedia({ wantVideo: false, muted: state.my_muted });
       }
       const data = await spacesApi.talkUpdateMe(token, spaceId, { video_enabled: next });
       setState(data);
@@ -346,7 +391,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
         <div>
           <h2 className="live-talk-title">Live conversation</h2>
           <p className="live-talk-sub">
-            Audio & video · {count}/{max} on call · unmute to speak — others hear you live
+            Audio & video · {count}/{max} on call · unmute to speak · turn video on to be seen
           </p>
         </div>
         {!inTalk && (
@@ -360,7 +405,15 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
 
       <div className="live-talk-stage">
         <ul className="live-talk-grid">
-          {(state?.participants || []).map((p) => (
+          {(state?.participants || []).map((p) => {
+            const peerId = String(p.user.id);
+            const remote = remoteStreams[peerId];
+            const remoteHasLiveVideo = Boolean(
+              remote?.getVideoTracks?.().some((t) => t.readyState === "live")
+            );
+            const showLocalVideo = p.is_self && (p.video_enabled || state.my_video) && state.my_video;
+            const showRemoteVideo = !p.is_self && (p.video_enabled || remoteHasLiveVideo) && remote;
+            return (
             <li
               key={p.user.id}
               className={`live-talk-seat${p.is_pinned ? " is-pinned" : ""}${p.is_self ? " is-self" : ""}${
@@ -373,7 +426,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
                 onClick={() => setMenuUser(menuUser === p.user.username ? null : p.user.username)}
                 aria-label={`@${p.user.username} options`}
               >
-                {p.video_enabled && p.is_self && state.my_video ? (
+                {showLocalVideo ? (
                   <video
                     ref={localVideoRef}
                     className="live-talk-seat-video"
@@ -381,6 +434,8 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
                     playsInline
                     muted
                   />
+                ) : showRemoteVideo ? (
+                  <RemoteSeatVideo stream={remote} tick={remoteTick} />
                 ) : (
                   <Avatar
                     name={p.user.display_name}
@@ -395,7 +450,7 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
                 </span>
                 <span className="live-talk-meta">
                   {p.muted ? "Muted" : "Mic on"}
-                  {p.video_enabled ? " · Video" : ""}
+                  {p.video_enabled || remoteHasLiveVideo || showLocalVideo ? " · Video" : ""}
                   {p.is_pinned ? " · Pinned" : ""}
                 </span>
               </button>
@@ -417,7 +472,8 @@ const LiveTalkPanel = forwardRef(function LiveTalkPanel(
                 </div>
               )}
             </li>
-          ))}
+            );
+          })}
           {count === 0 && (
             <li className="live-talk-empty">
               <p className="hint">
