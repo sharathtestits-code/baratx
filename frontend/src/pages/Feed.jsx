@@ -629,7 +629,13 @@ export default function Feed() {
         </div>
         {tab === "global" && (
           <p className="hint plaza-takes-hint">
-            Everyone’s takes — you don’t need to follow them first.
+            Everyone&apos;s takes on the Square and in Arenas — you don&apos;t need to follow them
+            first. Switch to Following to see only people you follow.
+          </p>
+        )}
+        {tab === "following" && (
+          <p className="hint plaza-takes-hint">
+            Only people you follow (and you). For the common public feed, use For you.
           </p>
         )}
 
