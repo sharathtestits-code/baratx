@@ -6,9 +6,11 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import { validateUsername } from "../username";
 import { safeNextPath } from "../safeNextPath";
+import { isNativeApp } from "../native";
 
 export default function Signup() {
   const [params] = useSearchParams();
+  const native = isNativeApp();
   const [method, setMethod] = useState(params.get("method") === "email" ? "email" : "phone");
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -195,16 +197,26 @@ export default function Signup() {
       {!otpSent && (
         <>
           {ageGate}
-          <GoogleSignInButton
-            label="Sign up with Google"
-            onError={setError}
-            confirmAge18={confirmAge18}
-            requireAgeConfirm
-          />
+          {!native && (
+            <>
+              <GoogleSignInButton
+                label="Sign up with Google"
+                onError={setError}
+                confirmAge18={confirmAge18}
+                requireAgeConfirm
+                nativeFallback="hidden"
+              />
 
-          <div className="x-auth-or" role="separator">
-            <span>or</span>
-          </div>
+              <div className="x-auth-or" role="separator">
+                <span>or</span>
+              </div>
+            </>
+          )}
+          {native && (
+            <p className="hint bx-login-native-hint">
+              In the app, create your account with phone OTP (fastest) or email below.
+            </p>
+          )}
 
           <div className="method-toggle">
             <button

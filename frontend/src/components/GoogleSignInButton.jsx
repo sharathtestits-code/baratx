@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { api, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { isNativeApp } from "../native";
@@ -12,13 +12,18 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
  * (popup account chooser next to the control) — not One Tap in the top-right.
  *
  * In Capacitor native shells, GIS popup/WebView OAuth is unreliable until
- * platform OAuth clients are configured — prefer phone/email there.
+ * platform OAuth clients are configured — never show a dead Google button that
+ * errors; offer phone/email paths instead (see MOBILE.md).
+ *
+ * @param {"links"|"hidden"} nativeFallback — landing uses links; login/signup hide
+ *   Google entirely because phone/email controls are already on the page.
  */
 export default function GoogleSignInButton({
   label = "Continue with Google",
   onError,
   confirmAge18 = false,
   requireAgeConfirm = false,
+  nativeFallback = "links",
 }) {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -150,23 +155,20 @@ export default function GoogleSignInButton({
   }, [native]);
 
   if (native) {
+    if (nativeFallback === "hidden") {
+      return null;
+    }
     return (
-      <div className="x-google-wrap">
-        <button
-          type="button"
-          className="x-btn x-btn-google"
-          onClick={() => {
-            const msg =
-              "In the BarathX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
-            setError(msg);
-            onError?.(msg);
-          }}
-        >
-          <GoogleG className="x-btn-icon" />
-          {label}
-        </button>
-        <p className="hint x-google-loading">App tip: phone OTP or email works best.</p>
-        {error && <p className="x-inline-error">{error}</p>}
+      <div className="x-google-wrap x-native-auth-fallback" role="group" aria-label="Sign in options">
+        <Link to="/login?method=phone" className="x-btn x-btn-phone x-native-auth-primary">
+          Continue with phone
+        </Link>
+        <Link to="/login?method=email" className="x-btn x-btn-google x-native-auth-secondary">
+          Continue with email
+        </Link>
+        <p className="hint x-google-loading">
+          Google Sign-In is not in this app build yet — phone OTP is fastest in India.
+        </p>
       </div>
     );
   }
