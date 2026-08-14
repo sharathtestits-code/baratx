@@ -152,8 +152,9 @@ export default function FirstSessionGuide({ token, onComplete }) {
           {busy ? "Entering…" : "Post & enter"}
         </button>
         <p className="first-session-founding">
-          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
-          up.
+          Early members (first 100–1,000): welcome reply from admin and the founder on your first
+          take, plus a surprise gift revealed later. T&amp;Cs apply. Separately: 100 Founding spots,
+          earned by opening a debate that gets real engagement, not by signing up.
         </p>
         <p className="first-session-foot">
           <Link to="/settings" className="first-session-settings">

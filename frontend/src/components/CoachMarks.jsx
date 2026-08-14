@@ -14,7 +14,7 @@ const STEPS = [
     id: "compose",
     target: "[data-coach='compose']",
     title: "Drop a take",
-    body: "Start here. Write what you think — short posts, real conversation. This is the Square.",
+    body: "Start here — this is where you post on The Square. Early members (first 100–1,000) get a welcome reply from admin and the founder, plus a surprise gift revealed later (T&Cs apply).",
     path: "/feed",
   },
   {

@@ -36,6 +36,16 @@ export default function Terms() {
         a clean username (letters, numbers, underscore/period/hyphen as allowed).
       </p>
 
+      <h2>Early member welcome</h2>
+      <p>
+        During soft launch, some of the first 100–1,000 people who join and post may receive a
+        welcome reply from BarathX admin and the founder, and may be eligible for a surprise gift
+        whose details are revealed later. This is a limited promotional offer — not a purchase,
+        lottery, or guarantee. Eligibility, timing, and fulfilment are at BarathX&apos;s discretion
+        and may change or end without notice. Void where prohibited.{" "}
+        <strong>T&amp;Cs apply</strong>.
+      </p>
+
       <h2>Contact</h2>
       <p>
         Questions: <a href="mailto:hello@barathx.com">hello@barathx.com</a>
