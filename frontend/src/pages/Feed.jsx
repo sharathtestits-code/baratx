@@ -7,6 +7,7 @@ import Avatar from "../components/Avatar";
 import FirstSessionGuide from "../components/FirstSessionGuide";
 import CoachMarks, { shouldShowNavTour } from "../components/CoachMarks";
 import FoundingChip from "../components/FoundingChip";
+import SoftLaunchBanner from "../components/SoftLaunchBanner";
 import SuggestionsStrip from "../components/SuggestionsStrip";
 import EmptyState from "../components/EmptyState";
 import TodaysSquare from "../components/TodaysSquare";
@@ -368,6 +369,7 @@ export default function Feed() {
   return (
     <div className="plaza-page plaza-square">
       {showNavTour ? <CoachMarks onDone={() => setShowNavTour(false)} /> : null}
+      <SoftLaunchBanner compact />
       <header className="square-home-head">
         <div className="square-home-head-main">
           <p className="square-home-kicker">India&apos;s public square</p>
