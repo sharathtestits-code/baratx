@@ -110,7 +110,7 @@ Official soft launch · India’s public square — pick a side, argue it live.
 ```
 BarathX is India’s public square.
 
-Official soft launch on Independence Day — 15 August — on web and the mobile app.
+Official soft launch on Independence Day — 15 August — in the browser (phone & desktop). iOS and Android apps coming soon.
 
 Short posts. Real sides. Real debate.
 

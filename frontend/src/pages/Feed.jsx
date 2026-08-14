@@ -5,6 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import FirstSessionGuide from "../components/FirstSessionGuide";
+import FirstPostWelcomeModal, {
+  markFirstPostWelcomeSeen,
+  shouldShowFirstPostWelcome,
+} from "../components/FirstPostWelcomeModal";
 import CoachMarks, { shouldShowNavTour } from "../components/CoachMarks";
 import FoundingChip from "../components/FoundingChip";
 import SoftLaunchBanner from "../components/SoftLaunchBanner";
@@ -58,6 +62,15 @@ export default function Feed() {
   const [showFirstSession, setShowFirstSession] = useState(() => {
     try {
       return localStorage.getItem("bx_first_post_done") !== "1";
+    } catch {
+      return true;
+    }
+  });
+  const [showFirstPostWelcome, setShowFirstPostWelcome] = useState(() => {
+    try {
+      return (
+        localStorage.getItem("bx_first_post_done") !== "1" && shouldShowFirstPostWelcome()
+      );
     } catch {
       return true;
     }
@@ -200,6 +213,9 @@ export default function Feed() {
     if (wantWelcome) {
       sessionStorage.setItem("bx_welcome", "1");
       setShowFirstSession(true);
+      if (shouldShowFirstPostWelcome()) {
+        setShowFirstPostWelcome(true);
+      }
     }
   }, [wantWelcome]);
 
@@ -254,9 +270,12 @@ export default function Feed() {
         if (cancelled) return;
         if (!Array.isArray(posts) || posts.length === 0) {
           setShowFirstSession(true);
+          if (shouldShowFirstPostWelcome()) setShowFirstPostWelcome(true);
         } else {
           localStorage.setItem("bx_first_post_done", "1");
+          markFirstPostWelcomeSeen();
           setShowFirstSession(false);
+          setShowFirstPostWelcome(false);
         }
       })
       .catch(() => {});
@@ -265,8 +284,10 @@ export default function Feed() {
     };
   }, [user, token]);
 
-  async function finishFirstSession() {
+  async function finishFirstSession(result) {
     setShowFirstSession(false);
+    markFirstPostWelcomeSeen();
+    setShowFirstPostWelcome(false);
     markTopicOnboardingSeen();
     setFoundingRefresh((n) => n + 1);
     if (shouldShowNavTour()) {
@@ -274,6 +295,37 @@ export default function Feed() {
     } else {
       await loadFeed(tab);
     }
+    if (result?.skipped) {
+      // Still nudge them toward compose when they skipped the guided take.
+      window.setTimeout(() => composeRef.current?.focus?.(), 300);
+    }
+  }
+
+  function dismissFirstPostWelcome() {
+    markFirstPostWelcomeSeen();
+    setShowFirstPostWelcome(false);
+  }
+
+  function showWhereToPost() {
+    markFirstPostWelcomeSeen();
+    setShowFirstPostWelcome(false);
+    setShowFirstSession(false);
+    markTopicOnboardingSeen();
+    sessionStorage.removeItem("bx_welcome");
+    setShowNavTour(true);
+    window.setTimeout(() => {
+      document.querySelector("[data-coach='compose']")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      composeRef.current?.focus?.();
+    }, 200);
+  }
+
+  function writeFirstTakeHere() {
+    markFirstPostWelcomeSeen();
+    setShowFirstPostWelcome(false);
+    setShowFirstSession(true);
   }
 
   function handleImageChange(e) {
@@ -357,10 +409,16 @@ export default function Feed() {
   const remaining = MAX_LEN - text.length;
   const charCountClass = remaining < 20 ? "char-count char-count-low" : "char-count";
 
-  // First session: one guided screen only — no stacked strips / feed.
+  // First session: guided take — welcome popup can sit on top.
   if (showFirstSession) {
     return (
       <div className="plaza-page plaza-square plaza-square-first">
+        <FirstPostWelcomeModal
+          open={showFirstPostWelcome}
+          onShowWhere={showWhereToPost}
+          onWriteHere={writeFirstTakeHere}
+          onDismiss={dismissFirstPostWelcome}
+        />
         <FirstSessionGuide token={token} onComplete={finishFirstSession} />
       </div>
     );
@@ -368,6 +426,12 @@ export default function Feed() {
 
   return (
     <div className="plaza-page plaza-square">
+      <FirstPostWelcomeModal
+        open={showFirstPostWelcome}
+        onShowWhere={showWhereToPost}
+        onWriteHere={writeFirstTakeHere}
+        onDismiss={dismissFirstPostWelcome}
+      />
       {showNavTour ? <CoachMarks onDone={() => setShowNavTour(false)} /> : null}
       <SoftLaunchBanner compact />
       <header className="square-home-head">
