@@ -41,6 +41,14 @@ export default function FirstSessionGuide({ token, onComplete }) {
 
   function applyPrompt(prompt) {
     setText(prompt);
+    setError("");
+    // Make the next action obvious after picking a starter
+    window.requestAnimationFrame(() => {
+      document.querySelector(".first-session-cta")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
   }
 
   async function submit(e) {
@@ -113,7 +121,10 @@ export default function FirstSessionGuide({ token, onComplete }) {
           <textarea
             className="first-session-take"
             value={text}
-            onChange={(e) => setText(e.target.value.slice(0, 500))}
+            onChange={(e) => {
+              setText(e.target.value.slice(0, 500));
+              setError("");
+            }}
             rows={4}
             maxLength={500}
             placeholder={PROMPTS[0]}
@@ -121,7 +132,12 @@ export default function FirstSessionGuide({ token, onComplete }) {
           />
           <div className="first-session-prompts">
             {PROMPTS.map((p) => (
-              <button key={p} type="button" className="first-session-prompt" onClick={() => applyPrompt(p)}>
+              <button
+                key={p}
+                type="button"
+                className={`first-session-prompt${text === p ? " is-selected" : ""}`}
+                onClick={() => applyPrompt(p)}
+              >
                 {p}
               </button>
             ))}
@@ -147,9 +163,14 @@ export default function FirstSessionGuide({ token, onComplete }) {
         </div>
 
         {error && <div className="error">{error}</div>}
+        {!text.trim() ? (
+          <p className="hint first-session-next-hint">
+            Tap a starter take above (or write your own), then Post &amp; enter.
+          </p>
+        ) : null}
 
         <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>
-          {busy ? "Entering…" : "Post & enter"}
+          {busy ? "Entering…" : "Post & enter →"}
         </button>
         <p className="first-session-founding">
           Early members (first 100–1,000): welcome reply from admin and the founder on your first

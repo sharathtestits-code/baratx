@@ -59,7 +59,9 @@ export default function OnboardingTopics() {
         ]);
         if (cancelled) return;
         setTopics(rows || []);
-        const ids = (Array.isArray(mine) ? mine : []).map((t) => t.id).filter(Boolean);
+        const ids = (Array.isArray(mine) ? mine : [])
+          .map((t) => String(t.id))
+          .filter(Boolean);
         setSelected(new Set(ids));
       } catch (err) {
         if (!cancelled) setError(err.message);
@@ -88,12 +90,14 @@ export default function OnboardingTopics() {
   }, [fromArena, returnArena]);
 
   function toggle(id) {
+    const key = String(id);
     setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < MAX_PICKS) next.add(id);
+      const next = new Set([...prev].map(String));
+      if (next.has(key)) next.delete(key);
+      else if (next.size < MAX_PICKS) next.add(key);
       return next;
     });
+    setError("");
   }
 
   function leave(path) {
@@ -102,19 +106,20 @@ export default function OnboardingTopics() {
   }
 
   async function saveAndContinue() {
-    if (selected.size < MIN_PICKS) {
+    const ids = [...selected].map(String).filter(Boolean);
+    if (ids.length < MIN_PICKS) {
       setError(`Pick at least ${MIN_PICKS} topic${MIN_PICKS === 1 ? "" : "s"}`);
       return;
     }
     setBusy(true);
     setError("");
     try {
-      await topicsApi.setInterests(token, [...selected], true);
+      await topicsApi.setInterests(token, ids, true);
       markTopicOnboardingSeen();
       if (!fromArena) sessionStorage.setItem("bx_welcome", "1");
       leave(fromArena ? undefined : "/feed?welcome=1");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Could not save topics — try again");
     } finally {
       setBusy(false);
     }
@@ -153,7 +158,7 @@ export default function OnboardingTopics() {
           <h2 className="topic-arena-title">{ARENA_LABEL[arena] || arena}</h2>
           <div className="topic-chip-grid">
             {(byArena[arena] || []).map((t) => {
-              const on = selected.has(t.id);
+              const on = selected.has(String(t.id));
               return (
                 <button
                   key={t.id}
@@ -184,8 +189,11 @@ export default function OnboardingTopics() {
           onClick={saveAndContinue}
           disabled={busy || selected.size < MIN_PICKS}
         >
-          {busy ? "Saving…" : fromArena ? "Save topics" : "See my debates"}
+          {busy ? "Saving…" : fromArena ? "Save topics" : "Continue → See my debates"}
         </button>
+        {selected.size < MIN_PICKS ? (
+          <p className="hint topic-onboarding-hint">Tap a topic above, then Continue.</p>
+        ) : null}
       </div>
     </div>
   );
