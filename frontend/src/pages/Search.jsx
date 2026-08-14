@@ -9,6 +9,7 @@ import PlazaPageHeader from "../components/PlazaPageHeader";
 import SuggestedFollows from "../components/SuggestedFollows";
 
 const QUICK_SEARCHES = [
+  { label: "Geopolitics", query: "Geopolitics" },
   { label: "BarathX", query: "BarathX" },
   { label: "Startup India", query: "StartupIndia" },
   { label: "IPL", query: "IPL" },
