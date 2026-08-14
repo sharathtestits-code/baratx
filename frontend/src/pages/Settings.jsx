@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import Logo from "../components/Logo";
 import ThemePicker from "../components/ThemePicker";
 import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
-import { LOCALES, applyDocumentLanguage, getStoredLanguage } from "../i18n";
+import { LOCALES, applyDocumentLanguage, getStoredLanguage, localeMeta } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
@@ -20,6 +21,8 @@ export default function Settings() {
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
+
+  const selectedLocale = localeMeta(language);
 
   useEffect(() => {
     if (user?.theme) setTheme(user.theme);
@@ -138,11 +141,18 @@ export default function Settings() {
         {themeSaving && <p className="hint">Saving…</p>}
       </section>
 
-      <section className="settings-section">
+      <section className="settings-section settings-language">
+        <div className="settings-lang-brand" aria-label="BarathX">
+          <Logo variant="full" className="settings-lang-logo" />
+          <p className="settings-lang-brand-native" lang={selectedLocale.id}>
+            {selectedLocale.brandNative}
+            {selectedLocale.id !== "en" ? ` · ${selectedLocale.tagline}` : ` · ${selectedLocale.tagline}`}
+          </p>
+        </div>
         <h2>Language</h2>
         <p className="hint">
           English is the default. Hindi and Telugu preferences are saved to your account now; full
-          translated UI ships in a later update.
+          translated UI ships in a later update. The BarathX logo stays the same in every language.
         </p>
         <div className="settings-lang-grid" role="radiogroup" aria-label="Language">
           {LOCALES.map((loc) => (
@@ -155,8 +165,17 @@ export default function Settings() {
               disabled={languageSaving}
               onClick={() => saveLanguage(loc.id)}
             >
+              <span className="settings-lang-option-logo" aria-hidden="true">
+                <Logo variant="mark" />
+              </span>
               <span className="settings-lang-native">{loc.native}</span>
               <span className="hint">{loc.label}</span>
+              {language === loc.id ? (
+                <span className="settings-lang-selected-brand" lang={loc.id}>
+                  BarathX
+                  {loc.id !== "en" ? ` · ${loc.brandNative}` : ""}
+                </span>
+              ) : null}
             </button>
           ))}
         </div>

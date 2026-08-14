@@ -10328,6 +10328,50 @@ a.suggestions-chip-link {
   margin-top: 0.75rem;
 }
 
+.settings-lang-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+  padding: 1rem 1.05rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(ellipse 90% 80% at 0% 0%, color-mix(in srgb, var(--brand) 18%, transparent), transparent 60%),
+    var(--surface);
+}
+
+.settings-lang-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.settings-lang-logo .logo-mark {
+  width: 2.35rem;
+  height: 2.35rem;
+}
+
+.settings-lang-logo .logo-wordmark {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.settings-lang-logo .logo-wordmark-x {
+  color: var(--brand);
+}
+
+.settings-lang-brand-native {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary, var(--muted));
+  letter-spacing: -0.01em;
+}
+
 .settings-lang-option {
   display: flex;
   flex-direction: column;
@@ -10341,6 +10385,23 @@ a.suggestions-chip-link {
   font: inherit;
   cursor: pointer;
   text-align: left;
+}
+
+.settings-lang-option-logo {
+  display: inline-flex;
+  margin-bottom: 0.35rem;
+}
+
+.settings-lang-option-logo .logo-mark {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.settings-lang-selected-brand {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--brand);
 }
 
 .settings-lang-option.is-active {
