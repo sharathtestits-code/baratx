@@ -261,18 +261,13 @@ export default function Login() {
             </form>
           )}
 
-          {!otpSent && !native && (
+          {!otpSent && (
             <>
               <div className="x-auth-or bx-login-or" role="separator">
                 <span>or continue with</span>
               </div>
               <GoogleSignInButton label="Continue with Google" onError={setError} confirmAge18 />
             </>
-          )}
-          {!otpSent && native && (
-            <p className="hint bx-login-native-hint">
-              In the app, use phone OTP or email above. Google Sign-In lands in a later update.
-            </p>
           )}
 
           <p className="bx-login-switch">

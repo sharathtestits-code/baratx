@@ -1,4 +1,4 @@
-"""Google ID token verification (Google Identity Services / Gmail sign-in)."""
+"""Google ID token verification (Google Identity Services / native Sign-In)."""
 
 from __future__ import annotations
 
@@ -7,13 +7,29 @@ import os
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Any, Optional
+from typing import Any
 
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+# Primary web client ID (GIS + Android Credential Manager server client / iOS serverClientId).
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+# Optional extra audiences (comma-separated), e.g. iOS client ID if tokens are not
+# minted with iOSServerClientId=web.
+_EXTRA = os.environ.get("GOOGLE_CLIENT_IDS", "").strip()
+
+
+def _allowed_audiences() -> set[str]:
+    ids = set()
+    if GOOGLE_CLIENT_ID:
+        ids.add(GOOGLE_CLIENT_ID)
+    if _EXTRA:
+        for part in _EXTRA.split(","):
+            part = part.strip()
+            if part:
+                ids.add(part)
+    return ids
 
 
 def google_configured() -> bool:
-    return bool(GOOGLE_CLIENT_ID)
+    return bool(_allowed_audiences())
 
 
 def verify_google_id_token(id_token: str) -> dict[str, Any]:
@@ -21,7 +37,8 @@ def verify_google_id_token(id_token: str) -> dict[str, Any]:
     Verify a Google ID token via Google's tokeninfo endpoint.
     Returns claims (email, sub, name, picture, email_verified, ...).
     """
-    if not GOOGLE_CLIENT_ID:
+    allowed = _allowed_audiences()
+    if not allowed:
         raise RuntimeError("GOOGLE_CLIENT_ID is not configured")
 
     url = "https://oauth2.googleapis.com/tokeninfo?" + urllib.parse.urlencode(
@@ -36,7 +53,7 @@ def verify_google_id_token(id_token: str) -> dict[str, Any]:
         raise ValueError(f"Invalid Google token ({exc.code}): {detail}") from exc
 
     aud = claims.get("aud")
-    if aud != GOOGLE_CLIENT_ID:
+    if aud not in allowed:
         raise ValueError("Google token audience mismatch")
 
     if claims.get("email_verified") not in (True, "true", "1"):
