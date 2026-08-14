@@ -51,6 +51,18 @@ export default function FirstSessionGuide({ token, onComplete }) {
     });
   }
 
+  function pickArena(key) {
+    setArena(key);
+    setError("");
+    window.requestAnimationFrame(() => {
+      document.querySelector(".first-session-take")?.focus?.();
+      document.getElementById("first-session-take-block")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
   async function submit(e) {
     e.preventDefault();
     if (!text.trim()) {
@@ -108,7 +120,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
                 type="button"
                 className={`first-session-arena${arena === a.key ? " is-selected" : ""}`}
                 aria-pressed={arena === a.key}
-                onClick={() => setArena(a.key)}
+                onClick={() => pickArena(a.key)}
               >
                 {a.label}
               </button>
@@ -116,7 +128,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
           </div>
         </div>
 
-        <div className="first-session-block">
+        <div className="first-session-block" id="first-session-take-block">
           <p className="first-session-label">2 · Drop your first take</p>
           <textarea
             className="first-session-take"
@@ -130,6 +142,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
             placeholder={PROMPTS[0]}
             aria-label="Your first take"
           />
+          <p className="hint first-session-prompts-label">Or tap a starter take:</p>
           <div className="first-session-prompts">
             {PROMPTS.map((p) => (
               <button
@@ -165,12 +178,14 @@ export default function FirstSessionGuide({ token, onComplete }) {
         {error && <div className="error">{error}</div>}
         {!text.trim() ? (
           <p className="hint first-session-next-hint">
-            Tap a starter take above (or write your own), then Post &amp; enter.
+            Tap a starter take above (or write your own), then <strong>Post &amp; enter</strong>.
           </p>
-        ) : null}
+        ) : (
+          <p className="hint first-session-next-hint">Ready — tap <strong>Post &amp; enter</strong> below.</p>
+        )}
 
         <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>
-          {busy ? "Entering…" : "Post & enter →"}
+          {busy ? "Entering…" : text.trim() ? "Post & enter →" : "Pick a take to continue"}
         </button>
         <p className="first-session-founding">
           Early members (first 100–1,000): welcome reply from admin and the founder on your first

@@ -2990,6 +2990,13 @@ a.profile-edit-btn:hover {
   font-weight: 600;
 }
 
+.first-session-prompts-label {
+  margin: 0.55rem 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
 .first-session-count {
   margin: 0.35rem 0 0;
   text-align: right;
@@ -2997,7 +3004,9 @@ a.profile-edit-btn:hover {
 
 .first-session-cta {
   width: 100%;
-  margin-top: 0.25rem;
+  margin-top: 0.35rem;
+  position: relative;
+  z-index: 2;
 }
 
 .first-session-foot {
@@ -6472,7 +6481,8 @@ button.topic-chip.selected {
   position: sticky;
   /* Sit above the fixed bottom nav so Continue is tappable on mobile */
   bottom: calc(3.75rem + env(safe-area-inset-bottom, 0px));
-  z-index: 18;
+  /* Must beat .bottom-nav (20) and .compose-fab (40) */
+  z-index: 45;
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
@@ -6483,6 +6493,19 @@ button.topic-chip.selected {
   background: var(--surface, var(--bg, #fff));
   border-top: 1px solid var(--border, #e5e7eb);
   box-shadow: 0 -6px 16px rgba(15, 20, 25, 0.06);
+}
+
+.onboarding-topics {
+  /* Room for sticky Continue + bottom nav */
+  padding-bottom: calc(7.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.topic-onboarding-actions .post-btn:disabled {
+  opacity: 0.55;
+}
+
+.topic-onboarding-actions .post-btn:not(:disabled) {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand, #ff671f) 35%, transparent);
 }
 
 @media (min-width: 900px) {
@@ -8786,6 +8809,8 @@ body.plaza-menu-is-open .plaza-menu-toggle {
 
 .plaza-square-first .first-session {
   margin-top: 0.35rem;
+  /* Keep Post & enter above the bottom nav on mobile */
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
 }
 
 .plaza-search-form {
