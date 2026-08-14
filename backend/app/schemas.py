@@ -222,6 +222,8 @@ class UserOut(BaseModel):
     badge: str = "none"  # none | gold | blue
     is_official: bool = False
     is_ops_owner: bool = False
+    # Only set on self when OPS owner — secret console path (never for other profiles).
+    ops_console_path: Optional[str] = None
     created_at: datetime
     follower_count: int = 0
     following_count: int = 0
@@ -232,7 +234,7 @@ class UserOut(BaseModel):
 
 
 class OpsConfigOut(BaseModel):
-    """Public ops routing hint — path only (owners are never listed)."""
+    """Owner-only ops routing hint — path only (owners are never listed)."""
 
     console_path: str = "/bx-ops"
 
