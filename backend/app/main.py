@@ -730,10 +730,11 @@ def health():
 
 
 @app.get("/ops/config", response_model=schemas.OpsConfigOut)
-def ops_config(current_user: models.User = Depends(get_current_user)):
-    """Owner-only. Public callers get 404 — do not leak the console path."""
-    if not ops_access.is_ops_owner_user(current_user):
-        raise HTTPException(status_code=404, detail="Not found")
+def ops_config():
+    """Path only — needed so the SPA can route the secret URL.
+
+    Opening the console UI still requires an OPS owner login + ADMIN_SECRET unlock.
+    """
     return schemas.OpsConfigOut(console_path=ops_access.ops_console_path())
 
 

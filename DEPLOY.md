@@ -62,9 +62,7 @@ Without Resend/SMTP, local/dev still creates accounts and shows a **dev verify l
 3. Log in as one of those usernames → open `https://barathx.com{OPS_CONSOLE_PATH}` → enter `ADMIN_SECRET`.
 4. You’ll see users, Engage, Post as BarathX, Payouts, Tools.
 
-`/admin` is always a public 404. The ops path shows **Page not found** for everyone except accounts listed in `OPS_OWNER_USERNAMES`. Owner checks and path come from the API (`/users/me.is_ops_owner` + `ops_console_path`, authenticated `GET /ops/config`) — the path is **not** public. Vite vars are not used to grant access.
-
-Money actions still require `ADMIN_SECRET` after the owner unlocks the UI.
+`/admin` is always a public 404. The real console path is only useful if you are listed in `OPS_OWNER_USERNAMES` — everyone else sees **Page not found**. Path comes from `GET /ops/config` (routing) + `/users/me.is_ops_owner` (gate). Unlock still needs `ADMIN_SECRET`.
 
 Do not link the ops URL from the public app.
 
