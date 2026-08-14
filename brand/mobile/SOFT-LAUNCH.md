@@ -26,7 +26,7 @@ Do **not** wait for public Production store listing to start Campus Voice testin
 | Privacy Policy URL | **Added** `/privacy` | Deploy frontend so https://barathx.com/privacy works |
 | Terms of Service URL | **Added** `/terms` | Deploy frontend so https://barathx.com/terms works |
 | Real SMS OTP (MSG91) | Often demo OTP in API | Soft launch **needs real OTP** — set `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` on Railway |
-| Google Sign-In in app | Gated on purpose | OK for soft launch — use **phone OTP** as primary |
+| Google Sign-In in app | **Wired** — needs Cloud SHA-1 | Create Android OAuth client (`com.baratx.app` + SHA-1). Phone OTP still works. |
 | Play Console account | You | Create / pay $25 one-time |
 | Apple Developer | You | $99/year — only when iOS week starts |
 | Release keystore | You | Generate once; never commit |

@@ -3956,6 +3956,31 @@ a.post-time:hover {
   width: 100%;
 }
 
+.x-native-auth-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.x-native-auth-fallback .x-native-auth-primary,
+.x-native-auth-fallback .x-native-auth-secondary {
+  width: 100%;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.x-native-auth-fallback .hint {
+  text-align: center;
+  margin: 0.15rem 0 0;
+}
+
+.bx-login-native-hint {
+  margin: 1rem 0 0;
+  text-align: center;
+}
+
 .x-google-shell {
   position: relative;
   width: 100%;
