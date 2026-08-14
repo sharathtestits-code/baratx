@@ -21,6 +21,10 @@ function iceConfig() {
   return { iceServers: servers };
 }
 
+function peerKey(id) {
+  return id == null ? "" : String(id);
+}
+
 /**
  * WebRTC mesh for Live Talk — publishes local mic/cam and plays remote audio + video.
  * Signaling goes through REST (/talk/signals); no SFU required for small rooms.
@@ -40,6 +44,7 @@ export function useLiveTalkRtc({
   const myIdRef = useRef(myUserId);
   const audioRootRef = useRef(null);
   const [remoteStreams, setRemoteStreams] = useState({});
+  const [remoteTick, setRemoteTick] = useState(0);
 
   streamRef.current = localStream;
   mutedRef.current = myMuted;
@@ -55,21 +60,18 @@ export function useLiveTalkRtc({
       document.body.appendChild(root);
     }
     audioRootRef.current = root;
-    return () => {
-      // keep root for remounts within the same page session
-    };
   }, []);
 
   function ensureAudioEl(peerId) {
     const root = audioRootRef.current || document.body;
-    let el = root.querySelector(`audio[data-peer="${peerId}"]`);
+    const key = peerKey(peerId);
+    let el = root.querySelector(`audio[data-peer="${key}"]`);
     if (!el) {
       el = document.createElement("audio");
-      el.dataset.peer = peerId;
+      el.dataset.peer = key;
       el.autoplay = true;
       el.playsInline = true;
       el.setAttribute("playsinline", "true");
-      // Must NOT be muted — this is how we hear others
       el.muted = false;
       el.volume = 1;
       root.appendChild(el);
@@ -92,24 +94,25 @@ export function useLiveTalkRtc({
 
   function setPeerStream(peerId, stream) {
     if (!stream) return;
-    setRemoteStreams((prev) => {
-      if (prev[peerId] === stream) return prev;
-      return { ...prev, [peerId]: stream };
-    });
+    const key = peerKey(peerId);
+    setRemoteStreams((prev) => ({ ...prev, [key]: stream }));
+    // Force UI refresh when a video track is added to an existing stream
+    setRemoteTick((n) => n + 1);
   }
 
   function clearPeerStream(peerId) {
+    const key = peerKey(peerId);
     setRemoteStreams((prev) => {
-      if (!prev[peerId]) return prev;
+      if (!prev[key]) return prev;
       const next = { ...prev };
-      delete next[peerId];
+      delete next[key];
       return next;
     });
+    setRemoteTick((n) => n + 1);
   }
 
   /**
-   * Attach or replace local audio/video on an existing peer connection.
-   * Uses replaceTrack when a sender already exists so mid-call video on/off works.
+   * Prefer transceiver replaceTrack so mid-call camera on/off renegotiates cleanly.
    */
   function attachLocalTracks(pc) {
     const stream = streamRef.current;
@@ -118,42 +121,40 @@ export function useLiveTalkRtc({
 
     const audioTrack = stream.getAudioTracks()[0] || null;
     const videoTrack = stream.getVideoTracks()[0] || null;
-    const senders = pc.getSenders();
 
-    const audioSender = senders.find((s) => s.track && s.track.kind === "audio");
+    let audioTc = pc.getTransceivers().find((t) => t.receiver?.track?.kind === "audio");
+    let videoTc = pc.getTransceivers().find((t) => t.receiver?.track?.kind === "video");
+
+    // Bootstrap sendrecv m-lines once so peers can receive video even before we have a cam
+    if (!audioTc) {
+      audioTc = pc.addTransceiver("audio", { direction: "sendrecv" });
+      changed = true;
+    }
+    if (!videoTc) {
+      videoTc = pc.addTransceiver("video", { direction: "sendrecv" });
+      changed = true;
+    }
+
     if (audioTrack) {
       audioTrack.enabled = !mutedRef.current;
-      if (audioSender) {
-        if (audioSender.track !== audioTrack) {
-          audioSender.replaceTrack(audioTrack);
-          changed = true;
-        }
-      } else {
-        pc.addTrack(audioTrack, stream);
+      if (audioTc.sender.track !== audioTrack) {
+        audioTc.sender.replaceTrack(audioTrack);
         changed = true;
       }
     }
 
-    const videoSender = senders.find((s) => s.track && s.track.kind === "video");
-    const idleVideoSender = pc
-      .getTransceivers()
-      .find((t) => t.receiver?.track?.kind === "video" && t.sender && !t.sender.track)?.sender;
-
     if (videoTrack) {
-      if (videoSender) {
-        if (videoSender.track !== videoTrack) {
-          videoSender.replaceTrack(videoTrack);
-          changed = true;
-        }
-      } else if (idleVideoSender) {
-        idleVideoSender.replaceTrack(videoTrack);
-        changed = true;
-      } else {
-        pc.addTrack(videoTrack, stream);
+      if (videoTc.sender.track !== videoTrack) {
+        videoTc.sender.replaceTrack(videoTrack);
         changed = true;
       }
-    } else if (videoSender?.track) {
-      videoSender.replaceTrack(null);
+      try {
+        if (videoTc.direction !== "sendrecv") videoTc.direction = "sendrecv";
+      } catch {
+        /* ignore */
+      }
+    } else if (videoTc.sender.track) {
+      videoTc.sender.replaceTrack(null);
       changed = true;
     }
 
@@ -182,10 +183,7 @@ export function useLiveTalkRtc({
     try {
       entry.makingOffer = true;
       attachLocalTracks(pc);
-      const offer = await pc.createOffer({
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: true,
-      });
+      const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       await sendSignal(peerId, "offer", pc.localDescription);
     } catch {
@@ -196,11 +194,12 @@ export function useLiveTalkRtc({
   }
 
   async function createPeer(peerId) {
-    if (peersRef.current.has(peerId)) return peersRef.current.get(peerId);
+    const key = peerKey(peerId);
+    if (peersRef.current.has(key)) return peersRef.current.get(key);
     const pc = new RTCPeerConnection(iceConfig());
-    const audioEl = ensureAudioEl(peerId);
-    const entry = { pc, audioEl, makingOffer: false, ignoreOffer: false };
-    peersRef.current.set(peerId, entry);
+    const audioEl = ensureAudioEl(key);
+    const entry = { pc, audioEl, makingOffer: false, ignoreOffer: false, peerId };
+    peersRef.current.set(key, entry);
 
     pc.onicecandidate = (ev) => {
       if (!ev.candidate) return;
@@ -210,26 +209,22 @@ export function useLiveTalkRtc({
     pc.ontrack = (ev) => {
       let stream = ev.streams?.[0];
       if (!stream) {
-        // Some browsers omit streams[] — build one from the track
-        stream = new MediaStream([ev.track]);
-      } else if (ev.track && !stream.getTracks().includes(ev.track)) {
-        stream.addTrack(ev.track);
+        const existing = entry.remoteStream || new MediaStream();
+        if (ev.track && !existing.getTracks().includes(ev.track)) {
+          existing.addTrack(ev.track);
+        }
+        stream = existing;
       }
-      setPeerStream(peerId, stream);
+      entry.remoteStream = stream;
+      setPeerStream(key, stream);
       audioEl.srcObject = stream;
       const play = () => {
-        audioEl.play().catch(() => {
-          // Autoplay may block until a click — Join / Unmute provides gesture
-        });
+        audioEl.play().catch(() => {});
       };
       play();
       audioEl.onloadedmetadata = play;
-    };
-
-    pc.onconnectionstatechange = () => {
-      if (pc.connectionState === "failed" || pc.connectionState === "closed") {
-        // Leave cleanup handles full teardown; failed may recover via ICE restart later
-      }
+      // When video arrives later on same stream, bump UI
+      ev.track?.addEventListener?.("unmute", () => setRemoteTick((n) => n + 1));
     };
 
     attachLocalTracks(pc);
@@ -257,8 +252,7 @@ export function useLiveTalkRtc({
 
     try {
       if (signal.kind === "offer") {
-        const offerCollision =
-          entry.makingOffer || pc.signalingState !== "stable";
+        const offerCollision = entry.makingOffer || pc.signalingState !== "stable";
         entry.ignoreOffer = !polite && offerCollision;
         if (entry.ignoreOffer) return;
         await pc.setRemoteDescription(payload);
@@ -274,9 +268,7 @@ export function useLiveTalkRtc({
         try {
           await pc.addIceCandidate(payload);
         } catch {
-          if (!entry.ignoreOffer) {
-            // candidate before remote description — usually recoverable
-          }
+          // candidate before remote description — usually recoverable
         }
       }
     } catch {
@@ -285,7 +277,8 @@ export function useLiveTalkRtc({
   }
 
   function closePeer(peerId) {
-    const entry = peersRef.current.get(peerId);
+    const key = peerKey(peerId);
+    const entry = peersRef.current.get(key);
     if (!entry) return;
     try {
       entry.pc.close();
@@ -296,16 +289,16 @@ export function useLiveTalkRtc({
       entry.audioEl.srcObject = null;
       entry.audioEl.remove();
     }
-    peersRef.current.delete(peerId);
-    clearPeerStream(peerId);
+    peersRef.current.delete(key);
+    clearPeerStream(key);
   }
 
   function closeAll() {
     Array.from(peersRef.current.keys()).forEach(closePeer);
     setRemoteStreams({});
+    setRemoteTick((n) => n + 1);
   }
 
-  // Sync peer set from participant list
   useEffect(() => {
     if (!inTalk || !myUserId || !token || !spaceId) {
       closeAll();
@@ -315,12 +308,10 @@ export function useLiveTalkRtc({
       .map((p) => p.user?.id)
       .filter((id) => id && id !== myUserId);
 
-    // Drop peers who left
     Array.from(peersRef.current.keys()).forEach((id) => {
-      if (!others.includes(id)) closePeer(id);
+      if (!others.map(peerKey).includes(peerKey(id))) closePeer(id);
     });
 
-    // Create / offer to new peers
     others.forEach((id) => {
       ensureOffer(id);
     });
@@ -329,23 +320,23 @@ export function useLiveTalkRtc({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inTalk, myUserId, token, spaceId, participants]);
 
-  // Local mute → sender tracks
   useEffect(() => {
     if (!inTalk) return;
     syncLocalMuteOnPeers();
   }, [inTalk, myMuted, localStream]);
 
-  // When mic/cam stream changes (esp. video on/off), replace tracks + renegotiate with all peers
+  // Camera/mic stream changed → replace tracks + renegotiate with every peer
   useEffect(() => {
     if (!inTalk || !localStream || !myUserId) return;
-    peersRef.current.forEach((entry, peerId) => {
-      attachLocalTracks(entry.pc);
-      renegotiate(peerId, entry);
+    peersRef.current.forEach((entry, key) => {
+      const changed = attachLocalTracks(entry.pc);
+      if (changed || localStream.getVideoTracks().length > 0) {
+        renegotiate(entry.peerId || key, entry);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inTalk, localStream, myUserId]);
 
-  // Poll signals
   useEffect(() => {
     if (!inTalk || !token || !spaceId) return undefined;
     let cancelled = false;
@@ -363,7 +354,7 @@ export function useLiveTalkRtc({
     }
 
     poll();
-    const t = setInterval(poll, 1000);
+    const t = setInterval(poll, 800);
     return () => {
       cancelled = true;
       clearInterval(t);
@@ -371,7 +362,6 @@ export function useLiveTalkRtc({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inTalk, token, spaceId, myUserId]);
 
-  // Teardown on leave / unmount
   useEffect(() => {
     if (!inTalk) closeAll();
     return () => closeAll();
@@ -380,6 +370,7 @@ export function useLiveTalkRtc({
 
   return {
     remoteStreams,
+    remoteTick,
     resumeRemoteAudio: () => {
       peersRef.current.forEach(({ audioEl }) => {
         if (audioEl?.srcObject) audioEl.play().catch(() => {});
