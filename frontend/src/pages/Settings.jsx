@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
 import ThemePicker from "../components/ThemePicker";
 import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
+import { LOCALES, applyDocumentLanguage, getStoredLanguage } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
@@ -14,6 +15,8 @@ export default function Settings() {
   const [msg, setMsg] = useState("");
   const [theme, setTheme] = useState(() => user?.theme || getStoredTheme());
   const [themeSaving, setThemeSaving] = useState(false);
+  const [language, setLanguage] = useState(() => user?.language || getStoredLanguage());
+  const [languageSaving, setLanguageSaving] = useState(false);
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
@@ -21,6 +24,13 @@ export default function Settings() {
   useEffect(() => {
     if (user?.theme) setTheme(user.theme);
   }, [user?.theme]);
+
+  useEffect(() => {
+    if (user?.language) {
+      setLanguage(user.language);
+      applyDocumentLanguage(user.language);
+    }
+  }, [user?.language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,6 +72,28 @@ export default function Settings() {
       setError(err.message);
     } finally {
       setThemeSaving(false);
+    }
+  }
+
+  async function saveLanguage(nextId) {
+    if (!nextId || nextId === language) return;
+    setLanguage(nextId);
+    applyDocumentLanguage(nextId);
+    setLanguageSaving(true);
+    setMsg("");
+    setError("");
+    try {
+      const updated = await api.updateMe(token, { language: nextId });
+      updateUser(updated);
+      setMsg(
+        nextId === "en"
+          ? "Language saved. English UI is active."
+          : "Language preference saved. Full Hindi/Telugu UI chrome is coming next — English remains until then."
+      );
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLanguageSaving(false);
     }
   }
 
@@ -109,8 +141,26 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Language</h2>
         <p className="hint">
-          BarathX is English-first for now. Hindi and Telugu UI will arrive in a later update.
+          English is the default. Hindi and Telugu preferences are saved to your account now; full
+          translated UI ships in a later update.
         </p>
+        <div className="settings-lang-grid" role="radiogroup" aria-label="Language">
+          {LOCALES.map((loc) => (
+            <button
+              key={loc.id}
+              type="button"
+              role="radio"
+              aria-checked={language === loc.id}
+              className={`settings-lang-option${language === loc.id ? " is-active" : ""}`}
+              disabled={languageSaving}
+              onClick={() => saveLanguage(loc.id)}
+            >
+              <span className="settings-lang-native">{loc.native}</span>
+              <span className="hint">{loc.label}</span>
+            </button>
+          ))}
+        </div>
+        {languageSaving && <p className="hint">Saving…</p>}
       </section>
 
       <section className="settings-section">

@@ -7851,7 +7851,7 @@ button.topic-chip.selected {
 
 .app-main-plaza {
   width: 100%;
-  max-width: 920px;
+  max-width: 1180px;
   margin: 0 auto;
   border-left: none;
   border-right: none;
@@ -7888,7 +7888,7 @@ button.topic-chip.selected {
 }
 
 .plaza-top-inner {
-  max-width: 920px;
+  max-width: 1180px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -8409,6 +8409,17 @@ button.topic-chip.selected {
 body.plaza-menu-is-open .plaza-menu-toggle {
   position: relative;
   z-index: 1220;
+}
+
+/* Menu is a fixed overlay — never reflow the plaza two-column layout */
+.app-shell-plaza.is-menu-open,
+.app-shell-plaza.is-menu-open .plaza-shell-body,
+.app-shell-plaza.is-menu-open .app-main-plaza,
+.app-shell-plaza.is-menu-open .plaza-layout {
+  transform: none;
+  width: 100%;
+  margin-left: 0;
+  padding-left: inherit;
 }
 
 .plaza-side-head {
@@ -10172,4 +10183,179 @@ html:has(.bx-home) {
 .suggestions-chip:hover {
   border-color: #ff671f;
   background: #fff1e6;
+}
+
+a.suggestions-chip-link {
+  display: block;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+/* ---- Plaza two-column layout (Square / Arenas / Live / Arena detail) ---- */
+
+.plaza-layout {
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "main-top"
+    "rail-q"
+    "main-compose"
+    "rail-live"
+    "main-feed";
+  align-items: start;
+}
+
+.plaza-main-top {
+  grid-area: main-top;
+  min-width: 0;
+}
+
+.plaza-main-compose {
+  grid-area: main-compose;
+  min-width: 0;
+}
+
+.plaza-main-feed {
+  grid-area: main-feed;
+  min-width: 0;
+}
+
+.plaza-rail-stack {
+  display: contents;
+}
+
+.plaza-rail-questions {
+  grid-area: rail-q;
+  min-width: 0;
+  margin: 0 0 1rem;
+}
+
+.plaza-rail-live {
+  grid-area: rail-live;
+  min-width: 0;
+}
+
+/* Mobile: questions + live as horizontal strips */
+@media (max-width: 1099px) {
+  .plaza-layout .suggestions-list,
+  .plaza-layout .plaza-onair-scroll {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.65rem;
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.35rem;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .plaza-layout .suggestions-list > li,
+  .plaza-layout .plaza-onair-scroll > li {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    max-width: 17.5rem;
+  }
+
+  .plaza-layout .suggestions-chip {
+    min-height: 4.5rem;
+    white-space: normal;
+  }
+
+  .plaza-layout .plaza-onair-card {
+    width: 16.5rem;
+  }
+
+  .plaza-layout .suggestions-sub {
+    display: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  .plaza-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+    grid-template-areas:
+      "main-top rail"
+      "main-compose rail"
+      "main-feed rail";
+    column-gap: 1.25rem;
+    align-items: start;
+  }
+
+  .plaza-rail-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    grid-area: rail;
+    position: sticky;
+    top: 4.75rem;
+    max-height: calc(100vh - 5.25rem);
+    max-height: calc(100dvh - 5.25rem);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 1.5rem;
+    margin: 0;
+    align-self: start;
+    min-width: 0;
+  }
+
+  .plaza-rail-questions,
+  .plaza-rail-live {
+    grid-area: unset;
+    margin: 0;
+  }
+
+  .plaza-layout .suggestions-list {
+    max-height: min(22rem, 42vh);
+  }
+
+  .plaza-layout .plaza-onair-scroll {
+    max-height: min(18rem, 36vh);
+    overflow-y: auto;
+  }
+}
+
+.plaza-rail-empty {
+  margin: 0;
+}
+
+.settings-lang-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+
+.settings-lang-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settings-lang-option.is-active {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 28%, transparent);
+}
+
+.settings-lang-native {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 520px) {
+  .settings-lang-grid {
+    grid-template-columns: 1fr;
+  }
 }
