@@ -11,6 +11,7 @@ export default function ComposeFab() {
   const hide =
     pathname === "/feed" ||
     pathname.startsWith("/spaces/") ||
+    pathname.startsWith("/arenas") ||
     pathname.startsWith("/onboarding") ||
     pathname === "/rewards" ||
     pathname === "/settings" ||

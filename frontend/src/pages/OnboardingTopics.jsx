@@ -59,7 +59,9 @@ export default function OnboardingTopics() {
         ]);
         if (cancelled) return;
         setTopics(rows || []);
-        const ids = (Array.isArray(mine) ? mine : []).map((t) => t.id).filter(Boolean);
+        const ids = (Array.isArray(mine) ? mine : [])
+          .map((t) => String(t.id))
+          .filter(Boolean);
         setSelected(new Set(ids));
       } catch (err) {
         if (!cancelled) setError(err.message);
@@ -87,13 +89,30 @@ export default function OnboardingTopics() {
     return [returnArena, ...ARENA_ORDER.filter((k) => k !== returnArena)];
   }, [fromArena, returnArena]);
 
+  const selectedCount = selected.size;
+  const canContinue = selectedCount >= MIN_PICKS;
+
+  function scrollToActions() {
+    window.requestAnimationFrame(() => {
+      document.getElementById("topic-onboarding-actions")?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    });
+  }
+
   function toggle(id) {
+    const key = String(id);
     setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else if (next.size < MAX_PICKS) next.add(id);
+      const next = new Set([...prev].map(String));
+      const wasEmpty = next.size === 0;
+      if (next.has(key)) next.delete(key);
+      else if (next.size < MAX_PICKS) next.add(key);
+      if (wasEmpty && next.size > 0) scrollToActions();
+      else if (next.size >= MIN_PICKS) scrollToActions();
       return next;
     });
+    setError("");
   }
 
   function leave(path) {
@@ -102,19 +121,25 @@ export default function OnboardingTopics() {
   }
 
   async function saveAndContinue() {
-    if (selected.size < MIN_PICKS) {
+    const ids = [...selected].map(String).filter(Boolean);
+    if (ids.length < MIN_PICKS) {
       setError(`Pick at least ${MIN_PICKS} topic${MIN_PICKS === 1 ? "" : "s"}`);
+      scrollToActions();
       return;
     }
     setBusy(true);
     setError("");
     try {
-      await topicsApi.setInterests(token, [...selected], true);
+      await topicsApi.setInterests(token, ids, true);
       markTopicOnboardingSeen();
       if (!fromArena) sessionStorage.setItem("bx_welcome", "1");
       leave(fromArena ? undefined : "/feed?welcome=1");
     } catch (err) {
-      setError(err.message);
+      // Don't trap the user — save failed but they can still enter the square
+      setError(err.message || "Could not save topics — continuing anyway");
+      markTopicOnboardingSeen();
+      if (!fromArena) sessionStorage.setItem("bx_welcome", "1");
+      window.setTimeout(() => leave(fromArena ? undefined : "/feed?welcome=1"), 600);
     } finally {
       setBusy(false);
     }
@@ -140,7 +165,7 @@ export default function OnboardingTopics() {
       <p className="hint surface-lead">
         {fromArena
           ? `Pick lanes for ${ARENA_LABEL[returnArena] || returnArena} (and any other arena). Saved topics shape home debates.`
-          : `Pick at least ${MIN_PICKS} topic once (up to ${MAX_PICKS}). We won’t ask again on every login — change anytime from Arenas.`}
+          : `Tap a topic below, then Continue (at least ${MIN_PICKS}). You can change this later in Arenas.`}
       </p>
       {error && <div className="error">{error}</div>}
 
@@ -153,7 +178,7 @@ export default function OnboardingTopics() {
           <h2 className="topic-arena-title">{ARENA_LABEL[arena] || arena}</h2>
           <div className="topic-chip-grid">
             {(byArena[arena] || []).map((t) => {
-              const on = selected.has(t.id);
+              const on = selected.has(String(t.id));
               return (
                 <button
                   key={t.id}
@@ -171,9 +196,9 @@ export default function OnboardingTopics() {
         </section>
       ))}
 
-      <div className="topic-onboarding-actions">
+      <div id="topic-onboarding-actions" className="topic-onboarding-actions">
         <span className="hint">
-          {selected.size}/{MAX_PICKS} selected
+          {selectedCount}/{MAX_PICKS} selected
         </span>
         <button type="button" className="btn-secondary" onClick={skip} disabled={busy}>
           {fromArena ? "Back to arena" : "Skip for now"}
@@ -182,10 +207,16 @@ export default function OnboardingTopics() {
           type="button"
           className="post-btn"
           onClick={saveAndContinue}
-          disabled={busy || selected.size < MIN_PICKS}
+          disabled={busy || !canContinue}
+          aria-disabled={busy || !canContinue}
         >
-          {busy ? "Saving…" : fromArena ? "Save topics" : "See my debates"}
+          {busy ? "Saving…" : fromArena ? "Save & continue →" : "Continue → See my debates"}
         </button>
+        {!canContinue ? (
+          <p className="hint topic-onboarding-hint">Tap a topic above, then Continue.</p>
+        ) : (
+          <p className="hint topic-onboarding-hint">Ready — tap Continue.</p>
+        )}
       </div>
     </div>
   );

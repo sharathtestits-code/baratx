@@ -76,10 +76,10 @@ export default function ArenaDetail() {
   }
 
   function pickTopicForDebate(topic) {
-    setSelectedTopicId(topic.id);
+    setSelectedTopicId(String(topic.id));
     setDebateTitle((prev) => {
       const trimmed = prev.trim();
-      if (!trimmed || trimmed.endsWith(":")) return `${topic.name}: `;
+      if (!trimmed || trimmed.endsWith(":")) return `${topic.name}: What's your take?`;
       if (trimmed.startsWith(`${topic.name}:`)) return trimmed;
       return `${topic.name}: ${trimmed}`;
     });
@@ -93,29 +93,38 @@ export default function ArenaDetail() {
       return;
     }
     if (topicBusy) return;
-    setTopicBusy(topic.id);
+    setTopicBusy(String(topic.id));
     setError("");
     setMsg("");
     pickTopicForDebate(topic);
     try {
       if (!topic.is_following) {
         const mine = await topicsApi.mine(token);
-        const mineIds = new Set((mine || []).map((t) => t.id));
-        mineIds.add(topic.id);
+        const mineIds = new Set((mine || []).map((t) => String(t.id)));
+        mineIds.add(String(topic.id));
         await topicsApi.setInterests(token, [...mineIds], true);
         setTopics((prev) =>
-          prev.map((t) => (t.id === topic.id ? { ...t, is_following: true } : t))
+          prev.map((t) => (String(t.id) === String(topic.id) ? { ...t, is_following: true } : t))
         );
       }
       if (!arena?.is_member) {
         const updated = await arenasApi.join(token, arenaKey);
         setArena(updated);
       }
-      setMsg(
-        `${topic.name} saved — write your question below and tap Open For vs Against.`
-      );
+      setMsg(`${topic.name} selected — edit the question below, then Open debate.`);
+      window.requestAnimationFrame(() => {
+        document.getElementById("arena-live-debates")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
     } catch (err) {
-      setError(err.message || "Could not save topic");
+      // Topic is still selected for the debate form even if follow/save failed
+      setError(err.message || "Could not save topic — you can still open the debate below");
+      document.getElementById("arena-live-debates")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     } finally {
       setTopicBusy("");
     }
@@ -245,7 +254,7 @@ export default function ArenaDetail() {
           <div className="topic-chip-grid arena-topic-grid" role="list">
             {topics.map((t) => {
               const on = !!t.is_following;
-              const active = selectedTopicId === t.id;
+              const active = String(selectedTopicId) === String(t.id);
               return (
                 <button
                   key={t.id}
@@ -253,7 +262,7 @@ export default function ArenaDetail() {
                   role="listitem"
                   className={`topic-chip${on ? " selected" : ""}${active ? " is-active-topic" : ""}`}
                   title={t.blurb || `Follow ${t.name} and use in debate`}
-                  aria-pressed={on}
+                  aria-pressed={on || active}
                   disabled={!!topicBusy}
                   onClick={() => selectTopic(t)}
                 >
