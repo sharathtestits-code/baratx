@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import { isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../softLaunch";
 
 /**
  * Debate-first brand landing (audit Week 1).
@@ -8,6 +9,7 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
  * Founding 100 = earned membership (not a signup coupon). Arenas ≠ Communities.
  */
 export default function Landing() {
+  const softLaunch = isSoftLaunchWindow();
   return (
     <div className="bx-home">
       <header className="bx-home-nav">
@@ -35,9 +37,15 @@ export default function Landing() {
             </h1>
           </div>
           <p className="bx-home-hero-tag">India&apos;s public square</p>
+          {softLaunch ? (
+            <p className="bx-home-hero-soft" role="status">
+              {SOFT_LAUNCH_LINE}
+            </p>
+          ) : null}
           <p className="bx-home-hero-line">Pick a side. Argue it live.</p>
           <p className="bx-home-hero-sub">
             The place people who actually have an opinion go — not another feed to like and leave.
+            Same experience on the website and the mobile app.
           </p>
           <p className="bx-home-hero-anti-ai">Human takes only. No AI slop.</p>
           <div className="bx-home-hero-ctas">
@@ -68,8 +76,9 @@ export default function Landing() {
         <p className="bx-home-copy">
           Old way: argue in an Instagram thread that vanishes in an hour, or a WhatsApp group where
           fifteen people talk past each other. BarathX: a live, sided debate — Agree vs Disagree —
-          where a real person answers you on the record. We&apos;re early on purpose so those rooms
-          stay real, not performed for growth numbers.
+          where a real person answers you on the record. We&apos;re officially soft launching on
+          Independence Day (15 August) — web and mobile — early on purpose so those rooms stay real,
+          not performed for growth numbers.
         </p>
       </section>
 
@@ -179,6 +188,13 @@ export default function Landing() {
           <div>
             <dt>Is this full of AI posts?</dt>
             <dd>No. Human takes only. No AI slop in the square.</dd>
+          </div>
+          <div>
+            <dt>When is the soft launch?</dt>
+            <dd>
+              Official soft launch on Independence Day — 15 August — on both the website and the
+              mobile app. Same BarathX, early on purpose.
+            </dd>
           </div>
           <div>
             <dt>Hindi or Telugu?</dt>

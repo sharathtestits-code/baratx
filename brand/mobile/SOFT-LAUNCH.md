@@ -100,31 +100,33 @@ npm run open:ios
 
 ---
 
-## C. Soft-launch store listing copy (Gen Z)
+## C. Soft-launch store listing copy (Independence Day · 15 August)
 
-**Title:** BaratX  
+**Title:** BarathX  
 **Short description (≤80 chars):**  
-Pick a side. India’s public square for short takes — not another Reels feed.
+Official soft launch · India’s public square — pick a side, argue it live.
 
 **Full description:**
 ```
-BaratX is India’s public square.
+BarathX is India’s public square.
+
+Official soft launch on Independence Day — 15 August — on web and the mobile app.
 
 Short posts. Real sides. Real debate.
 
-• 6 Arenas — Sports, Politics, Entertainment, News, Startups, Spirituality
-• Pick a topic, take a side, reply sharp (220 chars)
-• Fund it or Pass for startup pitches
-• Built for India first — English now; more languages later
+• Square — drop a take, get real replies
+• Arenas — Sports, Politics, Entertainment, News, Startups, Spirituality
+• Live rooms — pick a side, argue now (optional Live Talk audio)
+• Human takes only. No AI slop.
 
 No endless Reels feed inside the app.
 Just say it. Prove it.
 
-Join early → leave your first take.
+Join early → leave your first take → https://barathx.com
 ```
 
 **Category:** Social  
-**Tags:** debate, India, social, campus, startups  
+**Tags:** debate, India, social, campus, startups, Independence Day  
 **Contact:** hello@barathx.com  
 **WhatsApp:** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 
@@ -142,14 +144,15 @@ Capture from emulator or device after `build:app`.
 ## D. Soft-launch tester script (send to Campus Voices)
 
 ```
-BaratX Android soft launch — install + first take
+BarathX soft launch (Independence Day) — install + first take
 
-1) Join Play Internal test (link) OR install APK
-2) Sign up with phone OTP
-3) Pick 1 topic
+1) Open https://barathx.com OR Play Internal / TestFlight link
+2) Sign up (Google or phone OTP)
+3) Complete first take + quick nav tour (Square · Live · Arenas · Alerts · You)
 4) Open Entertainment → leave 1 take with a side
 5) Reply to someone else’s take
-6) Join WhatsApp: https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
+6) Try Settings → Appearance (theme)
+7) Join WhatsApp: https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 
 Bug? Screenshot + send to me.
 ```

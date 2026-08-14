@@ -72,6 +72,14 @@ export function applyTheme(themeId) {
   } catch {
     // ignore quota / private mode
   }
+  // Native shell (Capacitor) — keep status bar in sync with theme
+  try {
+    import("./native.js").then((native) => {
+      native.syncNativeChrome?.(id);
+    });
+  } catch {
+    // web / ignore
+  }
   return id;
 }
 
