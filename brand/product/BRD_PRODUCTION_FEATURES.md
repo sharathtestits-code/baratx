@@ -103,7 +103,7 @@ Same **feature set** when QA is deployed from the **`qa`** branch and prod from 
 | S7 | Today’s Square | Strip | Daily shared question → Answer fills compose; Later hides for the day |
 | S8 | Founding chip | Header | Shows First 100 status; links to `/rewards` |
 | S9 | First session | Gate on Square | Pick arena → take → city → Post & enter; **Skip for now** allowed |
-| S10 | Coach marks | Overlay after first session | Spotlight: compose → Square → Alerts → Arenas; **Next / Got it**; × closes; **no “Skip tour”** |
+| S10 | Coach marks | Overlay after first session | Spotlight: compose → Square → Live → Arenas → Alerts → You (why each tab); **Next / Got it**; × closes; **no “Skip tour”** |
 | S11 | Like / unlike | Post | Count updates; author gets Alert (+ email if configured) |
 | S12 | Reply | Post card / `/posts/:id` | Thread replies; author Alert |
 | S13 | Repost | Post | Shows in Following as repost |
