@@ -117,6 +117,7 @@ export default function ArenaDetail() {
           behavior: "smooth",
           block: "start",
         });
+        document.getElementById("arena-debate-title")?.focus?.();
       });
     } catch (err) {
       // Topic is still selected for the debate form even if follow/save failed
@@ -125,6 +126,7 @@ export default function ArenaDetail() {
         behavior: "smooth",
         block: "start",
       });
+      document.getElementById("arena-debate-title")?.focus?.();
     } finally {
       setTopicBusy("");
     }
@@ -280,23 +282,28 @@ export default function ArenaDetail() {
         <div className="arena-topic-actions">
           <button
             type="button"
-            className="btn btn-secondary"
-            disabled={!selectedTopicId}
+            className="btn btn-primary"
+            disabled={!selectedTopicId || creatingDebate}
             onClick={() => {
-              const t = topics.find((x) => x.id === selectedTopicId);
+              const t = topics.find((x) => String(x.id) === String(selectedTopicId));
               if (t) {
                 pickTopicForDebate(t);
                 setMsg(
-                  `Topic set to ${t.name}. Write your debate question and open it.`
+                  `Topic set to ${t.name}. Confirm or edit the question, then Open debate.`
                 );
                 document.getElementById("arena-live-debates")?.scrollIntoView({
                   behavior: "smooth",
                   block: "start",
                 });
+                window.requestAnimationFrame(() => {
+                  document.getElementById("arena-debate-title")?.focus?.();
+                });
               }
             }}
           >
-            Use selected topic in debate
+            {selectedTopicId
+              ? `Continue with topic →`
+              : "Select a topic to continue"}
           </button>
           {token ? (
             <p className="hint arena-personalize-copy">

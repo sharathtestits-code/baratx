@@ -16,6 +16,15 @@ const ARENAS = [
 
 const CITIES = ["Hyderabad", "Bangalore", "Delhi", "Mumbai", "Chennai", "Pune"];
 
+const PROMPTS_BY_ARENA = {
+  sports: "Who is the most overrated team in India right now — and why?",
+  politics: "What's one thing India gets wrong in public debate?",
+  entertainment: "What should every BarathX user stop pretending about Indian cinema?",
+  news: "Which story is India arguing about for the wrong reasons?",
+  spirituality: "What should this public square never become?",
+  startups: "Drop your hottest take on startups in India.",
+};
+
 const PROMPTS = [
   "What's one thing India gets wrong in public debate?",
   "Drop your hottest take on startups in India.",
@@ -30,7 +39,7 @@ const PROMPTS = [
 export default function FirstSessionGuide({ token, onComplete }) {
   const [arena, setArena] = useState("politics");
   const [city, setCity] = useState("Hyderabad");
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => PROMPTS_BY_ARENA.politics);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -54,11 +63,22 @@ export default function FirstSessionGuide({ token, onComplete }) {
   function pickArena(key) {
     setArena(key);
     setError("");
+    const starter = PROMPTS_BY_ARENA[key] || PROMPTS[0];
+    // If empty or still on a stock starter, swap to this arena’s pre-listed take
+    setText((prev) => {
+      const stock = new Set([...Object.values(PROMPTS_BY_ARENA), ...PROMPTS]);
+      if (!prev.trim() || stock.has(prev.trim())) return starter;
+      return prev;
+    });
     window.requestAnimationFrame(() => {
       document.querySelector(".first-session-take")?.focus?.();
       document.getElementById("first-session-take-block")?.scrollIntoView({
         behavior: "smooth",
         block: "start",
+      });
+      document.querySelector(".first-session-actions")?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
       });
     });
   }
@@ -176,17 +196,25 @@ export default function FirstSessionGuide({ token, onComplete }) {
         </div>
 
         {error && <div className="error">{error}</div>}
-        {!text.trim() ? (
-          <p className="hint first-session-next-hint">
-            Tap a starter take above (or write your own), then <strong>Post &amp; enter</strong>.
-          </p>
-        ) : (
-          <p className="hint first-session-next-hint">Ready — tap <strong>Post &amp; enter</strong> below.</p>
-        )}
+        <div className="first-session-actions">
+          {!text.trim() ? (
+            <p className="hint first-session-next-hint">
+              Tap a starter take above (or write your own), then <strong>Post &amp; enter</strong>.
+            </p>
+          ) : (
+            <p className="hint first-session-next-hint">
+              Ready — tap <strong>Post &amp; enter</strong> to go to the Square.
+            </p>
+          )}
 
-        <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>
-          {busy ? "Entering…" : text.trim() ? "Post & enter →" : "Pick a take to continue"}
-        </button>
+          <button
+            type="submit"
+            className="btn btn-primary first-session-cta"
+            disabled={busy || !text.trim()}
+          >
+            {busy ? "Entering…" : text.trim() ? "Post & enter →" : "Pick a take to continue"}
+          </button>
+        </div>
         <p className="first-session-founding">
           Early members (first 100–1,000): welcome reply from admin and the founder on your first
           take, plus a surprise gift revealed later. T&amp;Cs apply. Separately: 100 Founding spots,
