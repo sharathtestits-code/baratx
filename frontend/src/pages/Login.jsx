@@ -5,11 +5,13 @@ import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import Logo, { LogoMark } from "../components/Logo";
+import { isNativeApp } from "../native";
 
 export default function Login() {
   const [params] = useSearchParams();
   const initialId = params.get("email") || params.get("username") || "";
-  const preferPhone = params.get("method") === "phone";
+  const native = isNativeApp();
+  const preferPhone = params.get("method") === "phone" || (native && params.get("method") !== "email");
   const nextPath = (() => {
     const raw = (params.get("next") || "").trim();
     // Only allow same-origin relative paths (ops console, feed, etc.)
@@ -259,13 +261,18 @@ export default function Login() {
             </form>
           )}
 
-          {!otpSent && (
+          {!otpSent && !native && (
             <>
               <div className="x-auth-or bx-login-or" role="separator">
                 <span>or continue with</span>
               </div>
               <GoogleSignInButton label="Continue with Google" onError={setError} confirmAge18 />
             </>
+          )}
+          {!otpSent && native && (
+            <p className="hint bx-login-native-hint">
+              In the app, use phone OTP or email above. Google Sign-In lands in a later update.
+            </p>
           )}
 
           <p className="bx-login-switch">

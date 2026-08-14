@@ -54,7 +54,7 @@ Useful scripts:
 ## Auth in the native app
 
 - **Phone OTP** and **email** work against the production API (same as web).
-- **Google Sign-In** is intentionally gated in the native shell until you add Android/iOS OAuth clients in Google Cloud Console (package `com.baratx.app` + SHA-1 for Android; iOS client with reversed URL scheme). See “Google OAuth for stores” below.
+- **Google Sign-In** is not offered in the native shell yet (GIS/WebView OAuth needs Android/iOS OAuth clients). The landing screen offers **Continue with phone** / **Continue with email** instead of a dead Google button. See “Google OAuth for stores” below.
 - API CORS allows Capacitor origins: `https://localhost`, `capacitor://localhost`, `ionic://localhost`.
 
 ## Android → Play Store (AAB)
@@ -93,7 +93,7 @@ cd frontend/android
 
 ## Google OAuth for stores (phase 2)
 
-Until this is done, the in-app Google button tells users to use phone/email.
+Until this is done, the app does **not** show a Google button that errors — phone OTP / email are the in-app paths.
 
 1. Google Cloud Console → Credentials → create **Android** OAuth client:
    - Package name: `com.baratx.app`
