@@ -8,7 +8,7 @@ BarathX Android + iOS ship as **Capacitor** shells around the existing Vite Reac
 |------|--------|
 | App name | BarathX |
 | Bundle / application id | `com.baratx.app` |
-| Version | `0.1.0` (Android versionCode 2) |
+| Version | `0.1.2` (Android versionCode 4) |
 | Web assets | `frontend/dist` (synced into native projects) |
 | Production API | `https://baratx-production.up.railway.app` |
 | Privacy | https://barathx.com/privacy |
@@ -22,7 +22,7 @@ BarathX Android + iOS ship as **Capacitor** shells around the existing Vite Reac
 4. **iOS** TestFlight after Android testers are live.
 5. Keep acquisition on IG Reels → deep link to Play/TestFlight, not mobile browser.
 
-Phone OTP is the primary auth for India Gen Z in-app. Google Sign-In is phase 2 (store OAuth clients).
+Phone OTP remains a primary path for India Gen Z. **Native Google Sign-In is wired** (`@capgo/capacitor-social-login`) — finish Google Cloud Android/iOS clients (below) so the live button works on device.
 
 ---
 
@@ -54,8 +54,11 @@ Useful scripts:
 ## Auth in the native app
 
 - **Phone OTP** and **email** work against the production API (same as web).
-- **Google Sign-In** is intentionally gated in the native shell until you add Android/iOS OAuth clients in Google Cloud Console (package `com.baratx.app` + SHA-1 for Android; iOS client with reversed URL scheme). See “Google OAuth for stores” below.
+- **Google Sign-In** uses `@capgo/capacitor-social-login` on Android/iOS and Google Identity Services on web. Native login sends an ID token to `POST /auth/google` (same as web).
+- **Android live checklist:** Web client ID in the app build + Android OAuth client (`com.baratx.app` + SHA-1) in the **same** Google Cloud project. See “Google OAuth for stores” below.
+- **iOS:** also needs an iOS OAuth client, `VITE_GOOGLE_IOS_CLIENT_ID`, and the reversed client ID URL scheme in `Info.plist`.
 - API CORS allows Capacitor origins: `https://localhost`, `capacitor://localhost`, `ionic://localhost`.
+- API `GOOGLE_CLIENT_ID` must be the **Web** client ID (ID token audience). Optional `GOOGLE_CLIENT_IDS` for extra audiences.
 
 ## Android → Play Store (AAB)
 
@@ -91,16 +94,48 @@ cd frontend/android
 5. Product → Archive → Distribute App → App Store Connect.
 6. Complete App Store Connect metadata, screenshots, privacy nutrition labels, and age rating.
 
-## Google OAuth for stores (phase 2)
+## Google OAuth for stores (required for native Google)
 
-Until this is done, the in-app Google button tells users to use phone/email.
+The app already calls native Google Sign-In. Until Cloud Console matches your signing keys, Android shows an error like `[28444] Developer console is not set up correctly` — use phone OTP meanwhile.
 
-1. Google Cloud Console → Credentials → create **Android** OAuth client:
-   - Package name: `com.baratx.app`
-   - SHA-1 from your release (and debug) keystore
-2. Create **iOS** OAuth client with bundle id `com.baratx.app`.
-3. Prefer `@codetrix-studio/capacitor-google-auth` or similar for native token → existing `/auth/google` `id_token` endpoint.
-4. Keep the web GIS client for `barathx.com`.
+### 1) Same Google Cloud project as web
+
+You already have a **Web application** client (used as `VITE_GOOGLE_CLIENT_ID` / Railway `GOOGLE_CLIENT_ID`). Keep that ID — native Android passes it as `webClientId`. **Do not** put an Android client ID in `VITE_GOOGLE_CLIENT_ID`.
+
+### 2) Android OAuth client(s)
+
+1. [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) → **Create credentials → OAuth client ID → Android**
+2. Package name: `com.baratx.app`
+3. SHA-1: print with `./scripts/android-google-sha1.sh` or:
+
+   ```bash
+   cd frontend/android && ./gradlew signingReport
+   ```
+
+   Register **debug** SHA-1 for local APKs, **release/upload** SHA-1 for signed builds, and **Play App Signing** SHA-1 from Play Console → App integrity (for Internal testing / Production).
+
+4. OAuth consent screen: **External**. If status is Testing, add every tester Gmail under **Test users**.
+5. Rebuild the app after console changes (propagation can take a while):
+
+   ```bash
+   cd frontend && npm run build:app
+   ```
+
+### 3) iOS OAuth client (when shipping TestFlight)
+
+1. Create **iOS** OAuth client, bundle id `com.baratx.app`.
+2. Set `VITE_GOOGLE_IOS_CLIENT_ID` in the app build env.
+3. In `ios/App/App/Info.plist` add URL scheme = **reversed** iOS client ID  
+   (`123-abc.apps.googleusercontent.com` → `com.googleusercontent.apps.123-abc`).
+4. Optional: set Railway `GOOGLE_CLIENT_IDS` to the iOS client if tokens are not minted with `iOSServerClientId` = web.
+
+### 4) Smoke test
+
+1. Install a fresh APK signed with a SHA-1 you registered.
+2. Landing / Login → **Continue with Google** → pick account → land on Square.
+3. If it fails, Logcat filter `GoogleProvider` — confirm `package`, `signingSha1`, `webClientId`.
+
+Plugin: `@capgo/capacitor-social-login` (Capacitor 8). Providers other than Google are disabled in `capacitor.config.json` to keep APK size down.
 
 ## Icons & splash
 
