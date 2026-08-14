@@ -41,7 +41,7 @@ import ThemeOnboarding from "./components/ThemeOnboarding";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
-import { canAccessOpsConsole, loadOpsConsolePath, opsConsolePath } from "./opsAccess";
+import { canAccessOpsConsole, loadOpsConsolePath, opsConsolePath, applyOpsPathFromUser } from "./opsAccess";
 
 function AuthChrome({ children, legal = false }) {
   return (
@@ -135,8 +135,15 @@ export default function App() {
   const [opsPathReady, setOpsPathReady] = useState(false);
 
   useEffect(() => {
+    if (user?.is_ops_owner && user.ops_console_path) {
+      setOpsPath(applyOpsPathFromUser(user));
+      setOpsPathReady(true);
+    }
+  }, [user]);
+
+  useEffect(() => {
     let cancelled = false;
-    loadOpsConsolePath()
+    loadOpsConsolePath(undefined, token)
       .then((path) => {
         if (!cancelled) setOpsPath(path);
       })
@@ -146,7 +153,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [token]);
 
   if (loading || !opsPathReady) {
     return <div className="page-loading">Starting BarathX…</div>;
@@ -167,14 +174,16 @@ export default function App() {
     );
   }
 
-  // Private ops console — owner from Railway OPS_OWNER_USERNAMES (/users/me.is_ops_owner).
-  // Path from Railway OPS_CONSOLE_PATH via GET /ops/config (no Vite rebuild needed).
+  // Private ops console — ONLY OPS_OWNER_USERNAMES (+ ADMIN_SECRET unlock). Never public.
+  const ownerPath = user?.is_ops_owner && user.ops_console_path ? user.ops_console_path : null;
+  const effectiveOpsPath = ownerPath || opsPath;
   const onOpsPath =
-    location.pathname === opsPath || location.pathname.startsWith(`${opsPath}/`);
+    location.pathname === effectiveOpsPath ||
+    location.pathname.startsWith(`${effectiveOpsPath}/`);
   if (onOpsPath) {
-    // Logged out → send to login, then back to the secret path (do not fake 404).
     if (!token) {
-      const next = encodeURIComponent(opsPath);
+      // Known ops path only → login. Random public users still need an owner account after login.
+      const next = encodeURIComponent(effectiveOpsPath);
       return <Navigate to={`/login?next=${next}`} replace />;
     }
     if (!canAccessOpsConsole(user)) {

@@ -470,6 +470,8 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
     if badge not in ("none", "gold", "blue"):
         badge = "none"
     is_official = bool(getattr(user, "is_official", False) or badge == "blue")
+    self_view = current_user is not None and current_user.id == user.id
+    owner_self = self_view and ops_access.is_ops_owner_user(user)
     return schemas.UserOut(
         id=user.id,
         username=user.username,
@@ -484,11 +486,8 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         badge=badge,
         is_official=is_official,
         # Only expose on self — never leak owner status via profiles/followers.
-        is_ops_owner=(
-            ops_access.is_ops_owner_user(user)
-            if current_user is not None and current_user.id == user.id
-            else False
-        ),
+        is_ops_owner=owner_self,
+        ops_console_path=ops_access.ops_console_path() if owner_self else None,
         created_at=user.created_at,
         avatar_url=user.avatar_url,
         cover_url=user.cover_url,
@@ -731,8 +730,10 @@ def health():
 
 
 @app.get("/ops/config", response_model=schemas.OpsConfigOut)
-def ops_config():
-    """Console path from Railway OPS_CONSOLE_PATH — no rebuild of the SPA required."""
+def ops_config(current_user: models.User = Depends(get_current_user)):
+    """Owner-only. Public callers get 404 — do not leak the console path."""
+    if not ops_access.is_ops_owner_user(current_user):
+        raise HTTPException(status_code=404, detail="Not found")
     return schemas.OpsConfigOut(console_path=ops_access.ops_console_path())
 
 
