@@ -32,7 +32,7 @@ export default function ComposeFab() {
       const el = document.querySelector(".compose textarea, .plaza-studio textarea");
       if (el) {
         el.focus();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        el.closest(".plaza-studio, .compose")?.scrollIntoView?.({ behavior: "smooth", block: "center" });
       }
     });
   }

@@ -13,13 +13,15 @@ import CoachMarks, { shouldShowNavTour } from "../components/CoachMarks";
 import FoundingChip from "../components/FoundingChip";
 import SoftLaunchBanner from "../components/SoftLaunchBanner";
 import SuggestionsStrip from "../components/SuggestionsStrip";
+import LiveNowStrip from "../components/LiveNowStrip";
 import EmptyState from "../components/EmptyState";
 import TodaysSquare from "../components/TodaysSquare";
 import MentionTextarea from "../components/MentionTextarea";
-import { IconImage, IconClose, IconLive } from "../components/Icons";
+import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 import { sanitizeUserText } from "../sanitizeUserText";
+import { focusCompose } from "../focusCompose";
 
 const MAX_LEN = 500;
 const PAGE_SIZE = 20;
@@ -424,6 +426,13 @@ export default function Feed() {
     );
   }
 
+  function fillCompose(prompt, { asQuestion = false } = {}) {
+    const next = asQuestion ? `${prompt}\n\n` : prompt.slice(0, MAX_LEN);
+    setText(next.slice(0, MAX_LEN));
+    setShowStarters(false);
+    focusCompose(composeRef);
+  }
+
   return (
     <div className="plaza-page plaza-square">
       <FirstPostWelcomeModal
@@ -434,266 +443,234 @@ export default function Feed() {
       />
       {showNavTour ? <CoachMarks onDone={() => setShowNavTour(false)} /> : null}
       <SoftLaunchBanner compact />
-      <header className="square-home-head">
-        <div className="square-home-head-main">
-          <p className="square-home-kicker">India&apos;s public square</p>
-          <h1 className="square-home-title">Square</h1>
-          <p className="square-home-sub">One question. Your take. No Reels required.</p>
-        </div>
-        <FoundingChip refreshKey={foundingRefresh} />
-      </header>
 
-      <TodaysSquare
-        onAnswer={(question) => {
-          setText(`${question}\n\n`);
-          composeRef.current?.focus?.();
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      />
-
-      <SuggestionsStrip
-        token={token}
-        surface="square"
-        title="Top questions in the Square"
-        onPick={(prompt) => {
-          setText(prompt.slice(0, MAX_LEN));
-          setShowStarters(false);
-          composeRef.current?.focus?.();
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }}
-      />
-
-      <form className="plaza-studio compose" onSubmit={handlePost} data-coach="compose">
-        <div className="plaza-studio-head">
-          <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
-          <div>
-            <p className="plaza-studio-label">Drop a take</p>
-            <p className="hint">Short post. Real replies.</p>
-          </div>
-        </div>
-        <div className="compose-body">
-          <MentionTextarea
-            ref={composeRef}
-            placeholder={
-              quotePreview ? "Add a comment and tag people with @…" : "What's your take?"
-            }
-            value={text}
-            onChange={(v) => {
-              setPostError("");
-              setText(sanitizeUserText(v));
-            }}
-            maxLength={MAX_LEN}
-            rows={3}
-          />
-          {imagePreview && (
-            <div className="image-preview">
-              <img src={imagePreview} alt="attachment preview" />
-              <button type="button" className="remove-image" onClick={clearImage}>
-                <IconClose />
-              </button>
+      <div className="plaza-layout">
+        <div className="plaza-main-top">
+          <header className="square-home-head">
+            <div className="square-home-head-main">
+              <p className="square-home-kicker">India&apos;s public square</p>
+              <h1 className="square-home-title">Square</h1>
+              <p className="square-home-sub">One question. Your take. No Reels required.</p>
             </div>
-          )}
-          {quotePreview && (
-            <div className="quoted-post compose-quote">
-              <div className="quoted-head">
-                Quoting @{quotePreview.author.username}
-                <button
-                  type="button"
-                  className="remove-image"
-                  onClick={() => {
-                    setSearchParams({});
-                    setQuotePreview(null);
-                  }}
-                >
+            <FoundingChip refreshKey={foundingRefresh} />
+          </header>
+
+          <TodaysSquare onAnswer={(question) => fillCompose(question, { asQuestion: true })} />
+        </div>
+
+        <aside className="plaza-rail-stack" aria-label="Discover">
+          <SuggestionsStrip
+            token={token}
+            surface="square"
+            title="Top questions in the Square"
+            onPick={(prompt) => fillCompose(prompt)}
+          />
+          <LiveNowStrip items={liveDebates} limit={6} emptyHint="" />
+        </aside>
+
+        <form className="plaza-studio compose plaza-main-compose" onSubmit={handlePost} data-coach="compose">
+          <div className="plaza-studio-head">
+            <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
+            <div>
+              <p className="plaza-studio-label">Drop a take</p>
+              <p className="hint">Short post. Real replies.</p>
+            </div>
+          </div>
+          <div className="compose-body">
+            <MentionTextarea
+              ref={composeRef}
+              placeholder={
+                quotePreview ? "Add a comment and tag people with @…" : "What's your take?"
+              }
+              value={text}
+              onChange={(v) => {
+                setPostError("");
+                setText(sanitizeUserText(v));
+              }}
+              maxLength={MAX_LEN}
+              rows={3}
+            />
+            {imagePreview && (
+              <div className="image-preview">
+                <img src={imagePreview} alt="attachment preview" />
+                <button type="button" className="remove-image" onClick={clearImage}>
                   <IconClose />
                 </button>
               </div>
-              <p>{quotePreview.text}</p>
-            </div>
-          )}
-          {postError && <div className="error">{postError}</div>}
-          <div className="compose-studio-tiles" aria-label="Create studio">
-            <button type="button" className="compose-tile" onClick={() => fileInputRef.current?.click()}>
-              Photo
-            </button>
-            <button
-              type="button"
-              className={`compose-tile compose-tile-starters${showStarters ? " is-open" : ""}`}
-              aria-expanded={showStarters}
-              onClick={() => setShowStarters((v) => !v)}
-              title="Starter prompts — not AI drafts"
-            >
-              Hot take starters
-            </button>
-            <Link to="/spaces" className="compose-tile">
-              Start a live
-            </Link>
-            <Link to="/communities" className="compose-tile">
-              Community
-            </Link>
-          </div>
-          {showStarters && (
-            <div className="compose-starters-sheet" role="listbox" aria-label="Starter prompts">
-              {STARTER_PROMPTS.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  className="compose-starter-chip"
-                  onClick={() => {
-                    setText(prompt);
-                    setShowStarters(false);
-                    composeRef.current?.focus?.();
-                  }}
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          )}
-          <label className={`compose-civic${civicHighlight ? " is-guided" : ""}`}>
-            <input
-              type="checkbox"
-              checked={civicProblem}
-              onChange={(e) => {
-                setCivicProblem(e.target.checked);
-                setCivicHighlight(false);
-              }}
-            />
-            <span>This is a real civic / city problem{civicProblem ? " (≥50 chars for First 100)" : ""}</span>
-          </label>
-          {foundingNotice && <p className="hint ok-hint compose-founding-notice">{foundingNotice}</p>}
-          <div className="compose-footer">
-            <label className="attach-btn" title="Add image">
-              <IconImage />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/png,image/jpeg,image/gif,image/webp"
-                onChange={handleImageChange}
-                hidden
-              />
-            </label>
-            {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
-            <button
-              type="submit"
-              className="post-btn"
-              disabled={posting || !text.trim() || text.trim().length > MAX_LEN}
-            >
-              {posting ? "Posting..." : "Post"}
-            </button>
-          </div>
-        </div>
-      </form>
-
-      {liveDebates.length > 0 && (
-        <section className="plaza-onair" aria-label="Live now">
-          <div className="plaza-onair-head">
-            <h2>
-              <IconLive className="plaza-onair-icon" aria-hidden="true" /> Live now
-            </h2>
-            <Link to="/spaces">Enter Live</Link>
-          </div>
-          <ul className="plaza-onair-list">
-            {liveDebates.slice(0, 3).map((d) => (
-              <li key={d.id}>
-                <Link to={`/spaces/${d.id}`} className="plaza-onair-card">
-                  <span className="live-pill">Live</span>
-                  <strong>{d.title}</strong>
-                  <span className="hint">{d.topic_name || d.arena_name || "Debate"}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section className="plaza-takes">
-        <div className="plaza-takes-head">
-          <h2>Takes from the square</h2>
-          <div className="plaza-takes-tabs">
-            <button
-              type="button"
-              className={tab === "global" ? "is-active" : ""}
-              onClick={() => setTab("global")}
-            >
-              For you
-            </button>
-            <button
-              type="button"
-              className={tab === "following" ? "is-active" : ""}
-              onClick={() => setTab("following")}
-            >
-              Following
-            </button>
-          </div>
-        </div>
-        {tab === "global" && (
-          <p className="hint plaza-takes-hint">
-            Everyone&apos;s takes on the Square and in Arenas — you don&apos;t need to follow them
-            first. Switch to Following to see only people you follow.
-          </p>
-        )}
-        {tab === "following" && (
-          <p className="hint plaza-takes-hint">
-            Only people you follow (and you). For the common public feed, use For you.
-          </p>
-        )}
-
-        {feedError && <div className="error">{feedError}</div>}
-        {feedLoading ? (
-          <div className="skeleton-list">
-            {[1, 2, 3].map((i) => (
-              <div className="skeleton-post" key={i}>
-                <div className="skeleton-avatar" />
-                <div className="skeleton-lines">
-                  <div className="skeleton-line short" />
-                  <div className="skeleton-line" />
-                  <div className="skeleton-line medium" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : items.length === 0 ? (
-          <EmptyState
-            title={tab === "following" ? "Nothing here yet" : "No takes yet"}
-            hint={
-              tab === "following"
-                ? "Follow people in Explore, then come back."
-                : "Drop the first take in the square."
-            }
-            primaryLabel={tab === "following" ? "Explore people" : "Write a take"}
-            primaryTo={tab === "following" ? "/search" : undefined}
-            onPrimary={
-              tab === "following"
-                ? undefined
-                : () => {
-                    composeRef.current?.focus?.();
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }
-            }
-            secondaryLabel="Start a debate"
-            secondaryTo="/spaces"
-          />
-        ) : (
-          <>
-            <div className="post-list plaza-take-list">
-              {items.map((item) => (
-                <PostCard
-                  key={feedItemKey(item)}
-                  post={item.post}
-                  repostedBy={item.reposted_by}
-                  onDeleted={handleDeleted}
-                />
-              ))}
-            </div>
-            <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
-            {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
-            {!hasMore && items.length > 0 && (
-              <p className="hint load-more-hint">You are all caught up.</p>
             )}
-          </>
-        )}
-      </section>
+            {quotePreview && (
+              <div className="quoted-post compose-quote">
+                <div className="quoted-head">
+                  Quoting @{quotePreview.author.username}
+                  <button
+                    type="button"
+                    className="remove-image"
+                    onClick={() => {
+                      setSearchParams({});
+                      setQuotePreview(null);
+                    }}
+                  >
+                    <IconClose />
+                  </button>
+                </div>
+                <p>{quotePreview.text}</p>
+              </div>
+            )}
+            {postError && <div className="error">{postError}</div>}
+            <div className="compose-studio-tiles" aria-label="Create studio">
+              <button type="button" className="compose-tile" onClick={() => fileInputRef.current?.click()}>
+                Photo
+              </button>
+              <button
+                type="button"
+                className={`compose-tile compose-tile-starters${showStarters ? " is-open" : ""}`}
+                aria-expanded={showStarters}
+                onClick={() => setShowStarters((v) => !v)}
+                title="Starter prompts — not AI drafts"
+              >
+                Hot take starters
+              </button>
+              <Link to="/spaces" className="compose-tile">
+                Start a live
+              </Link>
+              <Link to="/communities" className="compose-tile">
+                Community
+              </Link>
+            </div>
+            {showStarters && (
+              <div className="compose-starters-sheet" role="listbox" aria-label="Starter prompts">
+                {STARTER_PROMPTS.map((prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    className="compose-starter-chip"
+                    onClick={() => fillCompose(prompt)}
+                  >
+                    {prompt}
+                  </button>
+                ))}
+              </div>
+            )}
+            <label className={`compose-civic${civicHighlight ? " is-guided" : ""}`}>
+              <input
+                type="checkbox"
+                checked={civicProblem}
+                onChange={(e) => {
+                  setCivicProblem(e.target.checked);
+                  setCivicHighlight(false);
+                }}
+              />
+              <span>This is a real civic / city problem{civicProblem ? " (≥50 chars for First 100)" : ""}</span>
+            </label>
+            {foundingNotice && <p className="hint ok-hint compose-founding-notice">{foundingNotice}</p>}
+            <div className="compose-footer">
+              <label className="attach-btn" title="Add image">
+                <IconImage />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/gif,image/webp"
+                  onChange={handleImageChange}
+                  hidden
+                />
+              </label>
+              {text.length > 0 && <span className={charCountClass}>{remaining}</span>}
+              <button
+                type="submit"
+                className="post-btn"
+                disabled={posting || !text.trim() || text.trim().length > MAX_LEN}
+              >
+                {posting ? "Posting..." : "Post"}
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <section className="plaza-takes plaza-main-feed">
+          <div className="plaza-takes-head">
+            <h2>Takes from the square</h2>
+            <div className="plaza-takes-tabs">
+              <button
+                type="button"
+                className={tab === "global" ? "is-active" : ""}
+                onClick={() => setTab("global")}
+              >
+                For you
+              </button>
+              <button
+                type="button"
+                className={tab === "following" ? "is-active" : ""}
+                onClick={() => setTab("following")}
+              >
+                Following
+              </button>
+            </div>
+          </div>
+          {tab === "global" && (
+            <p className="hint plaza-takes-hint">
+              Everyone&apos;s takes on the Square and in Arenas — you don&apos;t need to follow them
+              first. Switch to Following to see only people you follow.
+            </p>
+          )}
+          {tab === "following" && (
+            <p className="hint plaza-takes-hint">
+              Only people you follow (and you). For the common public feed, use For you.
+            </p>
+          )}
+
+          {feedError && <div className="error">{feedError}</div>}
+          {feedLoading ? (
+            <div className="skeleton-list">
+              {[1, 2, 3].map((i) => (
+                <div className="skeleton-post" key={i}>
+                  <div className="skeleton-avatar" />
+                  <div className="skeleton-lines">
+                    <div className="skeleton-line short" />
+                    <div className="skeleton-line" />
+                    <div className="skeleton-line medium" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : items.length === 0 ? (
+            <EmptyState
+              title={tab === "following" ? "Nothing here yet" : "No takes yet"}
+              hint={
+                tab === "following"
+                  ? "Follow people in Explore, then come back."
+                  : "Drop the first take in the square."
+              }
+              primaryLabel={tab === "following" ? "Explore people" : "Write a take"}
+              primaryTo={tab === "following" ? "/search" : undefined}
+              onPrimary={
+                tab === "following"
+                  ? undefined
+                  : () => focusCompose(composeRef)
+              }
+              secondaryLabel="Start a debate"
+              secondaryTo="/spaces"
+            />
+          ) : (
+            <>
+              <div className="post-list plaza-take-list">
+                {items.map((item) => (
+                  <PostCard
+                    key={feedItemKey(item)}
+                    post={item.post}
+                    repostedBy={item.reposted_by}
+                    onDeleted={handleDeleted}
+                  />
+                ))}
+              </div>
+              <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
+              {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
+              {!hasMore && items.length > 0 && (
+                <p className="hint load-more-hint">You are all caught up.</p>
+              )}
+            </>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
