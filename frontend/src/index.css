@@ -2977,6 +2977,19 @@ a.profile-edit-btn:hover {
   color: var(--text-secondary);
 }
 
+.first-session-prompt.is-selected {
+  border-color: var(--brand);
+  background: var(--brand-tint);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.first-session-next-hint {
+  margin: 0 0 0.65rem;
+  color: var(--brand);
+  font-weight: 600;
+}
+
 .first-session-count {
   margin: 0.35rem 0 0;
   text-align: right;
@@ -6457,7 +6470,9 @@ button.topic-chip.selected {
 
 .topic-onboarding-actions {
   position: sticky;
-  bottom: 0;
+  /* Sit above the fixed bottom nav so Continue is tappable on mobile */
+  bottom: calc(3.75rem + env(safe-area-inset-bottom, 0px));
+  z-index: 18;
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
@@ -6465,8 +6480,23 @@ button.topic-chip.selected {
   justify-content: flex-end;
   padding: 0.85rem 1.25rem;
   margin-top: 1rem;
-  background: var(--bg, #fff);
+  background: var(--surface, var(--bg, #fff));
   border-top: 1px solid var(--border, #e5e7eb);
+  box-shadow: 0 -6px 16px rgba(15, 20, 25, 0.06);
+}
+
+@media (min-width: 900px) {
+  .topic-onboarding-actions {
+    bottom: 0;
+  }
+}
+
+.topic-onboarding-hint {
+  flex: 1 1 100%;
+  margin: 0;
+  text-align: right;
+  color: var(--brand);
+  font-weight: 600;
 }
 
 .arena-home-strip-foot {
