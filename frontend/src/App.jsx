@@ -172,10 +172,15 @@ export default function App() {
   const onOpsPath =
     location.pathname === opsPath || location.pathname.startsWith(`${opsPath}/`);
   if (onOpsPath) {
+    // Logged out → send to login, then back to the secret path (do not fake 404).
+    if (!token) {
+      const next = encodeURIComponent(opsPath);
+      return <Navigate to={`/login?next=${next}`} replace />;
+    }
     if (!canAccessOpsConsole(user)) {
       return (
         <AuthChrome>
-          <NotFound homeTo={token ? "/feed" : "/"} homeLabel={token ? "Back to Square" : "Back to BarathX"} />
+          <NotFound homeTo="/feed" homeLabel="Back to Square" />
         </AuthChrome>
       );
     }

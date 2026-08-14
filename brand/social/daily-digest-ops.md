@@ -1,11 +1,13 @@
 # Daily peak digest + welcome replies
 
 ## New-user first post
-1. **One official voice** (`@baratx` or `@sharath`) — welcome that nods to their take
-2. Support/bugs → always `@baratx`
+1. **@baratx** — Welcome (human, may nod to their take)
+2. **@sharath** — Welcome (distinct voice)
+3. Feedback posts → “taken your feedback / next release” + follow IG/X/WhatsApp
 
 ## Every later community post
-**One** official reply that reacts to the post topic (not twin bots).
+**Both** `@baratx` and `@sharath` leave one human reply each (different copy).
+Feedback → acknowledge + next release; Sharath points to IG/X `@getbaratx` + WhatsApp via barathx.com.
 Official digest posts are skipped.
 
 Runs on `POST /posts` and a background poller (~45s) for anything missed.

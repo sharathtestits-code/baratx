@@ -3,6 +3,7 @@
 from app.engagement_replies import (
     MAX_REPLY_LENGTH,
     _engage_baratx,
+    _engage_feedback,
     _engage_sharath,
     _looks_like_slop,
     _welcome_baratx,
@@ -18,6 +19,8 @@ def test_detect_topic_reels_genz_support():
     assert detect_topic("audio not coming") == "support"
     assert detect_topic("mic not working on unmute") == "support"
     assert detect_topic("hello") == "short"
+    assert detect_topic("please add dark mode feedback") == "feedback"
+    assert detect_topic("India geopolitics in the Indo-Pacific") == "geopolitics"
 
 
 def test_welcome_and_engage_under_limit_and_human():
@@ -35,6 +38,17 @@ def test_welcome_and_engage_under_limit_and_human():
         assert not _looks_like_slop(text)
         assert "almost deleted" not in text.lower()
         assert "uncomfortable detail" not in text.lower()
+
+
+def test_feedback_ack_and_follow_links():
+    post = "feedback: please add better notifications"
+    a = _engage_feedback("sam", post, voice="baratx")
+    b = _engage_feedback("sam", post, voice="sharath")
+    assert len(a) <= MAX_REPLY_LENGTH and len(b) <= MAX_REPLY_LENGTH
+    assert "feedback" in a.lower() or "next release" in a.lower()
+    assert "getbaratx" in b.lower() or "whatsapp" in b.lower() or "barathx.com" in b.lower()
+    assert not _looks_like_slop(a)
+    assert not _looks_like_slop(b)
 
 
 def test_engage_mentions_reels_context():

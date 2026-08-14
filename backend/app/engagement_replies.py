@@ -3,7 +3,8 @@ Official first replies — @baratx + @sharath.
 
 Rules (anti-slop):
 - Read the post. Answer *that* post — not a recycled “say more / uncomfortable detail” line.
-- Prefer ONE official reply per post (not twin bots). First-post welcome is also one voice.
+- Every community post gets BOTH @baratx and @sharath (two distinct human voices).
+- Feedback → “we’ve taken it / next release” + follow IG/X/WhatsApp for what’s shipping.
 - Bug / product reports → support tone (“where are you seeing that?”), never philosophy.
 - Replies never count toward Founding / Race (official usernames excluded in rewards).
 
@@ -62,6 +63,26 @@ SLOP_PHRASES = (
 _TOPIC_CUES: list[tuple[tuple[str, ...], str]] = [
     (
         (
+            "feedback",
+            "suggestion",
+            "feature request",
+            "please add",
+            "pls add",
+            "wishlist",
+            "should add",
+            "you should add",
+            "next release",
+            "next update",
+            "i suggest",
+            "improve the app",
+            "improve this",
+            "can you add",
+            "would be nice if",
+        ),
+        "feedback",
+    ),
+    (
+        (
             "audio",
             "mic",
             "unmute",
@@ -94,6 +115,21 @@ _TOPIC_CUES: list[tuple[tuple[str, ...], str]] = [
             "wont load",
         ),
         "support",
+    ),
+    (
+        (
+            "geopolitics",
+            "indo-pacific",
+            "foreign affairs",
+            "border dispute",
+            "ukraine",
+            "gaza",
+            "middle east",
+            "nato",
+            "quad alliance",
+            "brics",
+        ),
+        "geopolitics",
     ),
     (("reel", "reels", "instagram", "tiktok", "short form", "shorts"), "reels_speed"),
     (("gen z", "genz", "gen-z", "zoomer"), "genz"),
@@ -158,6 +194,8 @@ def _welcome_baratx(username: str, post_text: str) -> str:
     who = _handle(username)
     bit = _snippet(post_text, 6)
     topic = detect_topic(post_text)
+    if topic == "feedback":
+        return _engage_feedback(username, post_text, voice="baratx")
     if topic == "support":
         return _clip(
             f"Hey {who} — thanks for flagging this. Where are you seeing it (Live room, phone/desktop), "
@@ -175,6 +213,8 @@ def _welcome_baratx(username: str, post_text: str) -> str:
 def _welcome_sharath(username: str, post_text: str) -> str:
     who = _handle(username)
     topic = detect_topic(post_text)
+    if topic == "feedback":
+        return _engage_feedback(username, post_text, voice="sharath")
     if topic == "support":
         return _clip(
             f"Hey {who}, Sharath here — sorry that’s broken for you. Browser + phone or laptop? "
@@ -185,6 +225,23 @@ def _welcome_sharath(username: str, post_text: str) -> str:
         f"{who} welcome. Write like you talk — that’s the whole point here.",
     ]
     return _clip(random.choice(variants))
+
+
+def _engage_feedback(username: str, post_text: str, *, voice: str) -> str:
+    """Product feedback — acknowledge + next release + where to follow shipping notes."""
+    who = _handle(username)
+    if voice == "sharath":
+        pool = [
+            f"{who} Sharath here — logged. Follow what we’re shipping: IG & X @getbaratx · "
+            f"WhatsApp community via barathx.com",
+            f"Got it {who}. Stay close for the next release — @getbaratx on IG/X + WhatsApp on barathx.com",
+        ]
+    else:
+        pool = [
+            f"Hey {who} — we’ve taken your feedback. We’ll fix this in the next release. Thank you.",
+            f"Thanks {who}. Feedback noted — targeting a fix in the next release. Appreciate you posting it.",
+        ]
+    return _clip(random.choice(pool))
 
 
 def _engage_support(username: str, post_text: str, *, voice: str) -> str:
@@ -238,12 +295,18 @@ def _engage_baratx(username: str, post_text: str) -> str:
     who = _handle(username)
     topic = detect_topic(post_text)
     bit = _snippet(post_text, 7)
+    if topic == "feedback":
+        return _engage_feedback(username, post_text, voice="baratx")
     if topic == "support":
         return _engage_support(username, post_text, voice="baratx")
     if topic == "short":
         return _engage_short(username, post_text, voice="baratx")
 
     by_topic = {
+        "geopolitics": [
+            f"{who} geopolitics is loud — what’s the India stake in that story?",
+            f"Okay {who}. Neighbour, trade, or great-power game — which lens are you using?",
+        ],
         "reels_speed": [
             f"{who} reels vs a real argument — which one do you trust more with your own time?",
             f"Ha {who}. Do you still finish thoughts, or has the feed trained that out?",
@@ -316,12 +379,18 @@ def _engage_sharath(username: str, post_text: str) -> str:
     who = _handle(username)
     topic = detect_topic(post_text)
     bit = _snippet(post_text, 7)
+    if topic == "feedback":
+        return _engage_feedback(username, post_text, voice="sharath")
     if topic == "support":
         return _engage_support(username, post_text, voice="sharath")
     if topic == "short":
         return _engage_short(username, post_text, voice="sharath")
 
     by_topic = {
+        "geopolitics": [
+            f"{who} Sharath — skip the cable-TV heat. What’s the real Indian interest here?",
+            f"{who} fair. Who benefits if India stays quiet on that?",
+        ],
         "reels_speed": [
             f"{who} I think boredom got farmed, not just “Gen Z speed”. You feel that?",
             f"Sharath — {who}, defend the reel era for me in one line.",
@@ -494,8 +563,8 @@ def engage_on_new_post(
     create_notification,
 ) -> dict:
     """
-    One official reply per community post (welcome OR engage — not twin scripts).
-    Idempotent for the poller.
+    Both @baratx and @sharath reply on every community post (distinct copy).
+    Idempotent for the poller — fills any missing official voice.
     """
     if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
         return {"ok": True, "skipped": True, "reason": "disabled"}
@@ -508,48 +577,53 @@ def engage_on_new_post(
         return {"ok": True, "skipped": True, "reason": "empty"}
 
     admin, sharath = _official_pair(db)
-    official_ids = [u.id for u in (admin, sharath) if u is not None]
-    if _official_reply_count(db, post.id, official_ids) >= 1:
-        return {"ok": True, "skipped": True, "reason": "already_engaged"}
-
-    topic = detect_topic(text)
-    voice = _pick_voice(admin, sharath, topic)
-    if not voice:
+    voices = [u for u in (admin, sharath) if u is not None]
+    if not voices:
         return {"ok": False, "error": "officials_missing"}
 
-    if is_first_post:
-        body = (
-            _welcome_baratx(author.username, text)
-            if voice.username == ADMIN_USERNAME
-            else _welcome_sharath(author.username, text)
-        )
-        tag = f"{voice.username}_welcome"
-    else:
-        body = (
-            _engage_baratx(author.username, text)
-            if voice.username == ADMIN_USERNAME
-            else _engage_sharath(author.username, text)
-        )
-        tag = f"{voice.username}_engage"
+    topic = detect_topic(text)
+    # Support bugs → @baratx first in the list; still both reply.
+    if topic == "support" and admin and sharath:
+        voices = [admin, sharath]
 
     created: list[str] = []
-    r = _add_reply(
-        db,
-        post=post,
-        official=voice,
-        text=body,
-        recipient_id=author.id,
-        create_notification=create_notification,
-    )
-    if r:
-        created.append(tag)
+    for voice in voices:
+        if _reply_count(db, post.id, voice.id) >= 1:
+            continue
+        if is_first_post:
+            body = (
+                _welcome_baratx(author.username, text)
+                if voice.username == ADMIN_USERNAME
+                else _welcome_sharath(author.username, text)
+            )
+            tag = f"{voice.username}_welcome"
+        else:
+            body = (
+                _engage_baratx(author.username, text)
+                if voice.username == ADMIN_USERNAME
+                else _engage_sharath(author.username, text)
+            )
+            tag = f"{voice.username}_engage"
+        r = _add_reply(
+            db,
+            post=post,
+            official=voice,
+            text=body,
+            recipient_id=author.id,
+            create_notification=create_notification,
+        )
+        if r:
+            created.append(tag)
+
+    if not created:
+        return {"ok": True, "skipped": True, "reason": "already_engaged", "topic": topic}
 
     return {
         "ok": True,
         "created": created,
         "topic": topic,
         "first": is_first_post,
-        "voice": voice.username,
+        "voices": [v.username for v in voices],
     }
 
 

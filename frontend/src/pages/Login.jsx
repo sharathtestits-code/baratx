@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
@@ -10,9 +10,23 @@ export default function Login() {
   const [params] = useSearchParams();
   const initialId = params.get("email") || params.get("username") || "";
   const preferPhone = params.get("method") === "phone";
+  const nextPath = (() => {
+    const raw = (params.get("next") || "").trim();
+    // Only allow same-origin relative paths (ops console, feed, etc.)
+    if (raw.startsWith("/") && !raw.startsWith("//") && !raw.includes("://")) return raw;
+    return "/feed";
+  })();
   const [method, setMethod] = useState(preferPhone ? "phone" : "email");
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  useEffect(() => {
+    try {
+      if (nextPath && nextPath !== "/feed") sessionStorage.setItem("bx_next", nextPath);
+    } catch {
+      /* ignore */
+    }
+  }, [nextPath]);
 
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -41,7 +55,7 @@ export default function Login() {
     try {
       const { access_token } = await api.loginEmail({ email: email.trim(), password });
       login(access_token);
-      navigate("/feed");
+      navigate(nextPath);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -71,7 +85,7 @@ export default function Login() {
     try {
       const { access_token } = await api.loginPhoneVerify({ phone, otp, region });
       login(access_token);
-      navigate("/feed");
+      navigate(nextPath);
     } catch (err) {
       setError(err.message);
     } finally {
