@@ -4,6 +4,7 @@ import { suggestionsApi } from "../api";
 /**
  * Top 15–20 problem/question suggestions for Square or an Arena.
  * Tapping fills compose — never auto-posts.
+ * Layout (stack vs horizontal) is driven by plaza-layout CSS / className.
  */
 export default function SuggestionsStrip({
   token,
@@ -11,6 +12,7 @@ export default function SuggestionsStrip({
   arenaKey = "",
   onPick,
   title = "Suggested takes",
+  className = "",
 }) {
   const [items, setItems] = useState([]);
   const [source, setSource] = useState("");
@@ -44,20 +46,28 @@ export default function SuggestionsStrip({
 
   if (!open) {
     return (
-      <button type="button" className="suggestions-reopen" onClick={() => setOpen(true)}>
+      <button
+        type="button"
+        className={`suggestions-reopen plaza-rail-questions ${className}`.trim()}
+        onClick={() => setOpen(true)}
+      >
         Show suggested takes
       </button>
     );
   }
 
   if (loading) {
-    return <p className="hint suggestions-status">Loading suggestions…</p>;
+    return (
+      <p className={`hint suggestions-status plaza-rail-questions ${className}`.trim()}>
+        Loading suggestions…
+      </p>
+    );
   }
 
   if (!items.length) return null;
 
   return (
-    <section className="suggestions-strip" aria-label={title}>
+    <section className={`suggestions-strip plaza-rail-questions ${className}`.trim()} aria-label={title}>
       <div className="suggestions-head">
         <div>
           <h2 className="suggestions-title">{title}</h2>

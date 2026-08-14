@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { arenasApi, communitiesApi, spacesApi, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
@@ -6,6 +6,8 @@ import { arenaMeta } from "../arenas";
 import PostCard from "../components/PostCard";
 import MentionTextarea from "../components/MentionTextarea";
 import SuggestionsStrip from "../components/SuggestionsStrip";
+import LiveNowStrip from "../components/LiveNowStrip";
+import { focusCompose } from "../focusCompose";
 
 export default function ArenaDetail() {
   const { arenaKey } = useParams();
@@ -26,6 +28,8 @@ export default function ArenaDetail() {
   const [creatingDebate, setCreatingDebate] = useState(false);
   const [busyJoin, setBusyJoin] = useState(false);
   const [topicBusy, setTopicBusy] = useState("");
+  const debateTitleRef = useRef(null);
+  const takeRef = useRef(null);
 
   async function load() {
     setLoading(true);
@@ -83,7 +87,13 @@ export default function ArenaDetail() {
       if (trimmed.startsWith(`${topic.name}:`)) return trimmed;
       return `${topic.name}: ${trimmed}`;
     });
-    document.getElementById("arena-debate-title")?.focus();
+    focusCompose(debateTitleRef);
+  }
+
+  function fillFromSuggestion(prompt) {
+    setText(prompt.slice(0, 500));
+    setDebateTitle(prompt.slice(0, 120));
+    focusCompose(debateTitleRef);
   }
 
   /** Tap a lane: follow it (personalize) and wire it into the debate composer. */
@@ -206,194 +216,203 @@ export default function ArenaDetail() {
 
   return (
     <div className="feed-wrap surface-page arena-detail plaza-page">
-      <div className="feed-header surface-header-row">
-        <div>
-          <Link to="/arenas" className="back-link">
-            ← Arenas
-          </Link>
-          <h1 style={{ color: meta?.accent }}>{arena.name}</h1>
-          <p className="hint">{arena.description}</p>
-          <p className="hint">
-            {arena.member_count} joined · {arena.open_debate_count} live debate
-            {arena.open_debate_count === 1 ? "" : "s"}
-          </p>
-        </div>
-        <button
-          type="button"
-          className={`arena-join-btn${arena.is_member ? " is-joined" : ""}`}
-          disabled={busyJoin}
-          onClick={join}
-        >
-          {busyJoin ? "…" : arena.is_member ? "Joined" : "Join arena"}
-        </button>
-      </div>
-
-      {error && <div className="error">{error}</div>}
-      {msg && <p className="hint ok-hint">{msg}</p>}
-
-      <SuggestionsStrip
-        token={token}
-        surface="arena"
-        arenaKey={arenaKey}
-        title={`Top problems · ${arena.name}`}
-        onPick={(prompt) => {
-          setText(prompt.slice(0, 500));
-          setDebateTitle(prompt.slice(0, 120));
-        }}
-      />
-
-      <section className="arena-section" id="arena-trending-topics">
-        <h2 className="section-title">Trending topics</h2>
-        <p className="hint surface-lead">
-          {topics.length
-            ? `${topics.length} India-trending lanes in ${arena.name}. Tap a topic to follow it and use it in a debate below.`
-            : "Topics loading…"}
-          {followingCount ? ` · ${followingCount} saved here.` : ""}
-        </p>
-        {topics.length > 0 ? (
-          <div className="topic-chip-grid arena-topic-grid" role="list">
-            {topics.map((t) => {
-              const on = !!t.is_following;
-              const active = String(selectedTopicId) === String(t.id);
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  role="listitem"
-                  className={`topic-chip${on ? " selected" : ""}${active ? " is-active-topic" : ""}`}
-                  title={t.blurb || `Follow ${t.name} and use in debate`}
-                  aria-pressed={on || active}
-                  disabled={!!topicBusy}
-                  onClick={() => selectTopic(t)}
-                >
-                  {t.name}
-                  {t.open_debate_count > 0 ? (
-                    <em className="topic-chip-count"> {t.open_debate_count}</em>
-                  ) : null}
-                </button>
-              );
-            })}
+      <div className="plaza-layout">
+        <div className="plaza-main-top">
+          <div className="feed-header surface-header-row">
+            <div>
+              <Link to="/arenas" className="back-link">
+                ← Arenas
+              </Link>
+              <h1 style={{ color: meta?.accent }}>{arena.name}</h1>
+              <p className="hint">{arena.description}</p>
+              <p className="hint">
+                {arena.member_count} joined · {arena.open_debate_count} live debate
+                {arena.open_debate_count === 1 ? "" : "s"}
+              </p>
+            </div>
+            <button
+              type="button"
+              className={`arena-join-btn${arena.is_member ? " is-joined" : ""}`}
+              disabled={busyJoin}
+              onClick={join}
+            >
+              {busyJoin ? "…" : arena.is_member ? "Joined" : "Join arena"}
+            </button>
           </div>
-        ) : (
-          <p className="hint">No topics yet — try again in a moment.</p>
-        )}
-        <div className="arena-topic-actions">
-          <button
-            type="button"
-            className="btn btn-secondary"
-            disabled={!selectedTopicId}
-            onClick={() => {
-              const t = topics.find((x) => x.id === selectedTopicId);
-              if (t) {
-                pickTopicForDebate(t);
-                setMsg(
-                  `Topic set to ${t.name}. Write your debate question and open it.`
-                );
-                document.getElementById("arena-live-debates")?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }
-            }}
-          >
-            Use selected topic in debate
-          </button>
-          {token ? (
-            <p className="hint arena-personalize-copy">
-              <Link
-                className="arena-personalize-link"
-                to={`/onboarding/topics?arena=${encodeURIComponent(arenaKey)}&from=arena`}
+
+          {error && <div className="error">{error}</div>}
+          {msg && <p className="hint ok-hint">{msg}</p>}
+        </div>
+
+        <aside className="plaza-rail-stack" aria-label="Arena discover">
+          <SuggestionsStrip
+            token={token}
+            surface="arena"
+            arenaKey={arenaKey}
+            title={`Top problems · ${arena.name}`}
+            onPick={fillFromSuggestion}
+          />
+          <LiveNowStrip
+            items={debates}
+            title="Live debates"
+            seeAllTo="/spaces"
+            seeAllLabel="Enter Live"
+            limit={6}
+            emptyHint="No live debates — open one below."
+          />
+        </aside>
+
+        <div className="plaza-main-compose">
+          <section className="arena-section" id="arena-trending-topics">
+            <h2 className="section-title">Trending topics</h2>
+            <p className="hint surface-lead">
+              {topics.length
+                ? `${topics.length} India-trending lanes in ${arena.name}. Tap a topic to follow it and use it in a debate below.`
+                : "Topics loading…"}
+              {followingCount ? ` · ${followingCount} saved here.` : ""}
+            </p>
+            {topics.length > 0 ? (
+              <div className="topic-chip-grid arena-topic-grid" role="list">
+                {topics.map((t) => {
+                  const on = !!t.is_following;
+                  const active = String(selectedTopicId) === String(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      role="listitem"
+                      className={`topic-chip${on ? " selected" : ""}${active ? " is-active-topic" : ""}`}
+                      title={t.blurb || `Follow ${t.name} and use in debate`}
+                      aria-pressed={on || active}
+                      disabled={!!topicBusy}
+                      onClick={() => selectTopic(t)}
+                    >
+                      {t.name}
+                      {t.open_debate_count > 0 ? (
+                        <em className="topic-chip-count"> {t.open_debate_count}</em>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="hint">No topics yet — try again in a moment.</p>
+            )}
+            <div className="arena-topic-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                disabled={!selectedTopicId}
+                onClick={() => {
+                  const t = topics.find((x) => x.id === selectedTopicId);
+                  if (t) {
+                    pickTopicForDebate(t);
+                    setMsg(`Topic set to ${t.name}. Write your debate question and open it.`);
+                  }
+                }}
               >
-                Personalize your topics
-              </Link>{" "}
-              for home debates.
-            </p>
-          ) : (
-            <p className="hint">
-              <Link to="/login">Sign in</Link> to personalize topics.
-            </p>
-          )}
-        </div>
-      </section>
+                Use selected topic in debate
+              </button>
+              {token ? (
+                <p className="hint arena-personalize-copy">
+                  <Link
+                    className="arena-personalize-link"
+                    to={`/onboarding/topics?arena=${encodeURIComponent(arenaKey)}&from=arena`}
+                  >
+                    Personalize your topics
+                  </Link>{" "}
+                  for home debates.
+                </p>
+              ) : (
+                <p className="hint">
+                  <Link to="/login">Sign in</Link> to personalize topics.
+                </p>
+              )}
+            </div>
+          </section>
 
-      <section className="arena-section" id="arena-live-debates">
-        <h2 className="section-title">Live debates</h2>
-        <p className="hint surface-lead">
-          100 Founding spots, earned by opening a debate that gets real engagement, not by signing
-          up.
-        </p>
-        <form className="surface-create arena-debate-form" onSubmit={startDebate}>
-          <input
-            id="arena-debate-title"
-            type="text"
-            placeholder={meta?.composeHint || `Start a ${arena.name} debate…`}
-            value={debateTitle}
-            onChange={(e) => setDebateTitle(e.target.value)}
-            maxLength={140}
-            required
-            minLength={2}
-            autoComplete="off"
-          />
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={creatingDebate || !debateTitle.trim()}
-          >
-            {creatingDebate
-              ? "Opening…"
-              : meta?.openDebateLabel || "Open For vs Against"}
-          </button>
-        </form>
-        {debates.length === 0 ? (
-          <p className="hint">No live debates — be the first to open one.</p>
-        ) : (
-          <ul className="debate-list">
-            {debates.map((d) => (
-              <li key={d.id}>
-                <Link to={`/spaces/${d.id}`} className="debate-row">
-                  <span className="debate-title">{d.title}</span>
-                  <span className="debate-sides hint">
-                    {d.for_count} {d.side_for_label} · {d.against_count} {d.side_against_label}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="arena-section">
-        <h2 className="section-title">Arena talk</h2>
-        <form className="compose surface-compose" onSubmit={submitPost}>
-          <MentionTextarea
-            value={text}
-            onChange={setText}
-            placeholder={`What’s your take on ${arena.name}? Type @ to tag`}
-            maxLength={500}
-            rows={3}
-          />
-          <button
-            type="submit"
-            className="post-btn"
-            disabled={posting || !text.trim() || text.trim().length > 500}
-          >
-            {posting ? "Posting…" : "Post"}
-          </button>
-        </form>
-        {posts.length === 0 ? (
-          <p className="hint">No posts in this arena yet.</p>
-        ) : (
-          <div className="post-list">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onDeleted={(id) => setPosts((p) => p.filter((x) => x.id !== id))}
+          <section className="arena-section" id="arena-live-debates">
+            <h2 className="section-title">Live debates</h2>
+            <p className="hint surface-lead">
+              100 Founding spots, earned by opening a debate that gets real engagement, not by signing
+              up.
+            </p>
+            <form className="surface-create arena-debate-form" onSubmit={startDebate}>
+              <input
+                id="arena-debate-title"
+                ref={debateTitleRef}
+                type="text"
+                placeholder={meta?.composeHint || `Start a ${arena.name} debate…`}
+                value={debateTitle}
+                onChange={(e) => setDebateTitle(e.target.value)}
+                maxLength={140}
+                required
+                minLength={2}
+                autoComplete="off"
               />
-            ))}
-          </div>
-        )}
-      </section>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={creatingDebate || !debateTitle.trim()}
+              >
+                {creatingDebate
+                  ? "Opening…"
+                  : meta?.openDebateLabel || "Open For vs Against"}
+              </button>
+            </form>
+            {debates.length === 0 ? (
+              <p className="hint">No live debates — be the first to open one.</p>
+            ) : (
+              <ul className="debate-list">
+                {debates.map((d) => (
+                  <li key={d.id}>
+                    <Link to={`/spaces/${d.id}`} className="debate-row">
+                      <span className="debate-title">{d.title}</span>
+                      <span className="debate-sides hint">
+                        {d.for_count} {d.side_for_label} · {d.against_count} {d.side_against_label}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+
+        <section className="arena-section plaza-main-feed">
+          <h2 className="section-title">Arena talk</h2>
+          <form className="compose surface-compose" onSubmit={submitPost}>
+            <MentionTextarea
+              ref={takeRef}
+              value={text}
+              onChange={setText}
+              placeholder={`What’s your take on ${arena.name}? Type @ to tag`}
+              maxLength={500}
+              rows={3}
+            />
+            <button
+              type="submit"
+              className="post-btn"
+              disabled={posting || !text.trim() || text.trim().length > 500}
+            >
+              {posting ? "Posting…" : "Post"}
+            </button>
+          </form>
+          {posts.length === 0 ? (
+            <p className="hint">No posts in this arena yet.</p>
+          ) : (
+            <div className="post-list">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onDeleted={(id) => setPosts((p) => p.filter((x) => x.id !== id))}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

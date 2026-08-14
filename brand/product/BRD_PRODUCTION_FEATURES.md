@@ -56,7 +56,7 @@ Same **feature set** when QA is deployed from the **`qa`** branch and prod from 
 | ID | Rule | Tester note |
 |----|------|-------------|
 | G1 | Users must be **18+** (signup / Google age confirm) | Reject under-age flows |
-| G2 | English-first UI | No full Hindi/Telugu UI expected |
+| G2 | English-first UI | Preference picker for en/hi/te; full hi/te chrome later — see I18N_HINDI_TELUGU.md |
 | G3 | Post text max **500** chars; reply max **220** | |
 | G4 | Images: JPEG/PNG/GIF/WebP, **≤ 5MB** | |
 | G5 | Official accounts `@baratx`, `@sharath`, `@bharatvoices`, `@indiatech` — likes/replies **do not count** toward Founding / Race | |
@@ -223,7 +223,7 @@ Same **feature set** when QA is deployed from the **`qa`** branch and prod from 
 | Automated UPI payouts | Admin marks paid manually |
 | Full LLM rewrite / “argue my side” | Roadmap; suggestions may optionally LLM-rank if `AI_ASSIST_*` set |
 | Video / Reels product feed | Not built |
-| Hindi / Telugu full UI | Not built |
+| Hindi / Telugu full UI | Preference saved (en/hi/te); chrome translation not built — see I18N_HINDI_TELUGU.md |
 | Native push (FCM/APNs) | Not shipped |
 | RaceStrip / FoundingStrip on Square | Code may exist; not required in current Square shell |
 

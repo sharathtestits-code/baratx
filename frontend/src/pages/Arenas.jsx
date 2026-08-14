@@ -4,6 +4,7 @@ import { arenasApi, communitiesApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { ARENA_TOPICS, arenaMeta } from "../arenas";
 import PlazaPageHeader from "../components/PlazaPageHeader";
+import LiveNowStrip from "../components/LiveNowStrip";
 
 export default function Arenas() {
   const { token } = useAuth();
@@ -63,67 +64,100 @@ export default function Arenas() {
 
   return (
     <div className="feed-wrap surface-page arenas-page plaza-page">
-      <PlazaPageHeader
-        title="Arenas"
-        sub="Pick a side. Jump in. Not a group chat."
-      />
+      <div className="plaza-layout">
+        <div className="plaza-main-top">
+          <PlazaPageHeader
+            title="Arenas"
+            sub="Pick a side. Jump in. Not a group chat."
+          />
 
-      <div className="arena-featured">
-        <p className="arena-featured-kicker">Builders only</p>
-        <h2>Startups — Fund it or Pass</h2>
-        <p className="hint">
-          Argue the pitch and the raise live. 100 Founding spots, earned by opening a debate that
-          gets real engagement, not by signing up.
-        </p>
-        <div className="arena-featured-actions">
-          <Link to="/arenas/startups" className="btn btn-primary">
-            Enter Startups
-          </Link>
-          <Link to="/rewards" className="btn btn-secondary">
-            Founding 100
-          </Link>
-        </div>
-      </div>
-
-      {error && <div className="error">{error}</div>}
-
-      {loading ? (
-        <p className="hint">Loading arenas…</p>
-      ) : (
-        <>
-          <div className="arena-grid">
-            {ARENA_TOPICS.map((meta) => {
-              const arena = byKey[meta.key];
-              return (
-                <div key={meta.key} className="arena-card" style={{ "--arena-accent": meta.accent }}>
-                  <Link to={`/arenas/${meta.key}`} className="arena-card-main">
-                    <div className="arena-card-name">{meta.name}</div>
-                    <p className="arena-card-blurb">{meta.blurb}</p>
-                    <div className="arena-card-meta">
-                      {arena
-                        ? `${arena.member_count} joined · ${arena.open_debate_count} live debate${
-                            arena.open_debate_count === 1 ? "" : "s"
-                          }`
-                        : "Opening soon"}
-                    </div>
-                  </Link>
-                  {arena && (
-                    <button
-                      type="button"
-                      className={`arena-join-btn${arena.is_member ? " is-joined" : ""}`}
-                      disabled={busyKey === meta.key}
-                      onClick={() => toggleJoin(arena)}
-                    >
-                      {busyKey === meta.key ? "…" : arena.is_member ? "Joined" : "Join"}
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+          <div className="arena-featured">
+            <p className="arena-featured-kicker">Builders only</p>
+            <h2>Startups — Fund it or Pass</h2>
+            <p className="hint">
+              Argue the pitch and the raise live. 100 Founding spots, earned by opening a debate that
+              gets real engagement, not by signing up.
+            </p>
+            <div className="arena-featured-actions">
+              <Link to="/arenas/startups" className="btn btn-primary">
+                Enter Startups
+              </Link>
+              <Link to="/rewards" className="btn btn-secondary">
+                Founding 100
+              </Link>
+            </div>
           </div>
+        </div>
 
+        <aside className="plaza-rail-stack" aria-label="Live debates">
+          <section className="suggestions-strip plaza-rail-questions" aria-label="Jump into an arena">
+            <div className="suggestions-head">
+              <div>
+                <h2 className="suggestions-title">Jump into an arena</h2>
+                <p className="suggestions-sub">Pick a lane — open the floor and take a side.</p>
+              </div>
+            </div>
+            <ul className="suggestions-list">
+              {ARENA_TOPICS.slice(0, 8).map((meta) => (
+                <li key={meta.key}>
+                  <Link to={`/arenas/${meta.key}`} className="suggestions-chip suggestions-chip-link">
+                    {meta.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <LiveNowStrip
+            items={debates}
+            title="Live debates"
+            seeAllTo="/spaces"
+            seeAllLabel="Enter Live"
+            limit={8}
+            emptyHint={loading ? "Loading…" : "No live debates yet — open an arena."}
+          />
+        </aside>
+
+        <div className="plaza-main-compose">
+          {error && <div className="error">{error}</div>}
+          {loading ? (
+            <p className="hint">Loading arenas…</p>
+          ) : (
+            <div className="arena-grid">
+              {ARENA_TOPICS.map((meta) => {
+                const arena = byKey[meta.key];
+                return (
+                  <div key={meta.key} className="arena-card" style={{ "--arena-accent": meta.accent }}>
+                    <Link to={`/arenas/${meta.key}`} className="arena-card-main">
+                      <div className="arena-card-name">{meta.name}</div>
+                      <p className="arena-card-blurb">{meta.blurb}</p>
+                      <div className="arena-card-meta">
+                        {arena
+                          ? `${arena.member_count} joined · ${arena.open_debate_count} live debate${
+                              arena.open_debate_count === 1 ? "" : "s"
+                            }`
+                          : "Opening soon"}
+                      </div>
+                    </Link>
+                    {arena && (
+                      <button
+                        type="button"
+                        className={`arena-join-btn${arena.is_member ? " is-joined" : ""}`}
+                        disabled={busyKey === meta.key}
+                        onClick={() => toggleJoin(arena)}
+                      >
+                        {busyKey === meta.key ? "…" : arena.is_member ? "Joined" : "Join"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <section className="plaza-main-feed">
           <h2 className="section-title">Live debates</h2>
-          {debates.length === 0 ? (
+          {loading ? null : debates.length === 0 ? (
             <div className="empty-state">
               <p className="empty-state-title">No live debates yet</p>
               <p className="hint">Open an arena and start the first fight.</p>
@@ -146,8 +180,8 @@ export default function Arenas() {
               })}
             </ul>
           )}
-        </>
-      )}
+        </section>
+      </div>
     </div>
   );
 }
