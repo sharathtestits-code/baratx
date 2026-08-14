@@ -2034,13 +2034,31 @@ def list_posts(
             raise HTTPException(status_code=401, detail="Log in to view your following feed")
         author_filter_ids = [f.followed_id for f in current_user.following] + [current_user.id]
 
-    # Home Square: include arena debate takes (space posts). Keep Communities off Home.
+    # Home Square "For you": Square takes + Arena floor takes + Live/debate space takes.
+    # Keep member-run Communities (non-arena) off Home so Arenas ≠ private groups.
     post_query = (
         db.query(models.Post)
-        .filter(models.Post.community_id.is_(None))
+        .outerjoin(models.Community, models.Community.id == models.Post.community_id)
+        .filter(
+            or_(
+                models.Post.community_id.is_(None),
+                models.Community.is_arena.is_(True),
+            )
+        )
         .order_by(models.Post.created_at.desc())
     )
-    repost_query = db.query(models.Repost).order_by(models.Repost.created_at.desc())
+    repost_query = (
+        db.query(models.Repost)
+        .join(models.Post, models.Post.id == models.Repost.post_id)
+        .outerjoin(models.Community, models.Community.id == models.Post.community_id)
+        .filter(
+            or_(
+                models.Post.community_id.is_(None),
+                models.Community.is_arena.is_(True),
+            )
+        )
+        .order_by(models.Repost.created_at.desc())
+    )
 
     if author_filter_ids is not None:
         post_query = post_query.filter(models.Post.author_id.in_(author_filter_ids))
