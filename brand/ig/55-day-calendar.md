@@ -356,75 +356,77 @@ Sign up: barathx.com
 #BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
 ```
 
-## Day 7 — 2026-08-15
+## Day 7 — 2026-08-15 (Independence Day · soft launch)
 
-### Feature: Pitch Night
+**Theme today:** Happy Independence Day + soft launch (browser). Cadence unchanged: features + carousel + reel.  
+**Also paste:** `brand/social/independence-day-2026/WISHES.md` · daily pack `brand/social/daily/2026-08-15/PACK.md`
+
+### Feature: Independence Day wish
 ```
-You don’t need a VC intro to get judged — you need India.
+Happy Independence Day from BarathX.
 
-Friday Pitch Night: real pitches, Fund it / Pass votes.
+Freedom deserves more than a disappearing status.
+India’s public square is open — leave one honest take.
 
-Create an account so you’re in when Pitch Night opens.
+→ barathx.com
+(browser · phone or desktop · apps coming soon)
 
-barathx.com
-
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
-```
-
-### Feature: Startups Arena
-```
-Founders: private praise lies. Public votes don’t.
-
-Pitch. Get Fund it or Pass. No closed rooms.
-
-Sign up and put your idea in front of India.
-
-barathx.com
-
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BarathX #HappyIndependenceDay #IndependenceDay #India #15August #PublicSquare #SoftLaunch #Debate #JaiHind
 ```
 
-### Feature: Entertainment
+### Feature: Soft launch
 ```
-Everyone has a hot take on what India watches. Few post it where it matters.
+15 August. Soft launching BarathX.
 
-Entertainment Arena is where opinions don’t hide.
+WhatsApp takes disappear by Monday.
+Put one on the record today.
 
-Sign up and drop the take you’d only say to friends.
+India’s public square — sided debate, human replies. No AI slop.
 
-barathx.com
+Leave your first take → barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BarathX #IndependenceDay #India #15August #PublicSquare #SoftLaunch #Debate #IndianStartups
 ```
 
-### Carousel: From zero to first take
-Slides: Create account · Pick 1 topic · Enter an Arena · Drop your take · Reply to one person
+### Feature: On the record
 ```
-Signup to first take in minutes. (swipe)
+Independence Day take that won’t die in the group chat.
+
+Pick a side. Get answered. Human takes only.
+
+→ barathx.com
+
+#BarathX #IndependenceDay #India #PublicSquare #SoftLaunch #Debate #JaiHind
+```
+
+### Carousel: From zero to first take (ID soft launch)
+Slides: Create account · Open Square · Drop your Independence Day take · Pick a side in an Arena · Reply to one person
+```
+Independence Day → first take in minutes. (swipe)
 
 1) Create account
-2) Pick 1 topic
-3) Enter an Arena
-4) Drop your take
+2) Open Square
+3) Drop your Independence Day take
+4) Pick a side in an Arena
 5) Reply to one person
 
 Sign up: barathx.com
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BarathX #IndependenceDay #India #15August #PublicSquare #SoftLaunch #Debate
 ```
 
 ### Reel (with baked audio)
 ```
-Why BaratX?
+Why BarathX — on Independence Day?
 
 Because your best takes deserve a public square — not a group chat graveyard.
 
-Pick a side. Fight clean. Join early.
+Pick a side. Fight clean. Soft launch is live in your browser.
 
 Sign up at barathx.com
 Comment BX for an invite.
 
-#BaratX #India #Startups #PublicSquare #Debate #IndianStartups #TechIndia #BuildInPublic #SocialMedia #IndieHackers
+#BarathX #IndependenceDay #India #PublicSquare #SoftLaunch #Debate #JaiHind
 ```
 
 ## Day 8 — 2026-08-16

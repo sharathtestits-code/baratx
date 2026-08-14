@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import { badgeOf, badgeNameClass, canManageBadges } from "../components/OfficialBadge";
 import EditProfileModal from "../components/EditProfileModal";
+import ProfilePhotoSheet from "../components/ProfilePhotoSheet";
 import { IconCamera } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { postHasAttachedMedia } from "../postMedia";
@@ -31,6 +32,7 @@ export default function Profile() {
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [editMenuOpen, setEditMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [photoSheet, setPhotoSheet] = useState(null);
 
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [coverBusy, setCoverBusy] = useState(false);
@@ -46,6 +48,7 @@ export default function Profile() {
     loadProfile();
     setEditMenuOpen(false);
     setEditModalOpen(false);
+    setPhotoSheet(null);
     setProfileTab("square");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
@@ -181,6 +184,7 @@ export default function Profile() {
       const updated = await api.uploadAvatar(token, file);
       setProfile((p) => ({ ...p, avatar_url: updated.avatar_url }));
       updateUser({ avatar_url: updated.avatar_url });
+      setPhotoSheet(null);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -198,12 +202,43 @@ export default function Profile() {
     try {
       const updated = await api.uploadCover(token, file);
       setProfile((p) => ({ ...p, cover_url: updated.cover_url }));
+      setPhotoSheet(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setCoverBusy(false);
       if (coverInputRef.current) coverInputRef.current.value = "";
     }
+  }
+
+  async function handleRemovePhoto() {
+    if (!token || !photoSheet) return;
+    const removingAvatar = photoSheet === "avatar";
+    if (removingAvatar) setAvatarBusy(true);
+    else setCoverBusy(true);
+    setError("");
+    try {
+      const updated = removingAvatar
+        ? await api.removeAvatar(token)
+        : await api.removeCover(token);
+      if (removingAvatar) {
+        setProfile((p) => ({ ...p, avatar_url: updated.avatar_url ?? null }));
+        updateUser({ avatar_url: updated.avatar_url ?? null });
+      } else {
+        setProfile((p) => ({ ...p, cover_url: updated.cover_url ?? null }));
+      }
+      setPhotoSheet(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setAvatarBusy(false);
+      setCoverBusy(false);
+    }
+  }
+
+  function openPhotoSheet(kind) {
+    setEditMenuOpen(false);
+    setPhotoSheet(kind);
   }
 
   function handleDeleted(postId) {
@@ -241,9 +276,9 @@ export default function Profile() {
           <button
             type="button"
             className="cover-edit-btn"
-            onClick={() => coverInputRef.current?.click()}
+            onClick={() => openPhotoSheet("cover")}
             disabled={coverBusy}
-            title="Change cover photo"
+            title="Edit cover photo"
           >
             <IconCamera />
           </button>
@@ -265,9 +300,9 @@ export default function Profile() {
               <button
                 type="button"
                 className="avatar-edit-btn"
-                onClick={() => avatarInputRef.current?.click()}
+                onClick={() => openPhotoSheet("avatar")}
                 disabled={avatarBusy}
-                title="Change profile photo"
+                title="Edit profile photo"
               >
                 <IconCamera />
               </button>
@@ -308,18 +343,18 @@ export default function Profile() {
                     <button
                       type="button"
                       role="menuitem"
-                      onClick={() => avatarInputRef.current?.click()}
+                      onClick={() => openPhotoSheet("avatar")}
                       disabled={avatarBusy}
                     >
-                      Change photo
+                      Profile photo
                     </button>
                     <button
                       type="button"
                       role="menuitem"
-                      onClick={() => coverInputRef.current?.click()}
+                      onClick={() => openPhotoSheet("cover")}
                       disabled={coverBusy}
                     >
-                      Change cover
+                      Cover photo
                     </button>
                   </div>
                 )}
@@ -628,6 +663,25 @@ export default function Profile() {
           profile={profile}
           onClose={() => setEditModalOpen(false)}
           onSaved={handleProfileSaved}
+        />
+      )}
+
+      {isMe && (
+        <ProfilePhotoSheet
+          open={Boolean(photoSheet)}
+          kind={photoSheet || "avatar"}
+          profile={profile}
+          busy={photoSheet === "avatar" ? avatarBusy : coverBusy}
+          onClose={() => {
+            if (avatarBusy || coverBusy) return;
+            setPhotoSheet(null);
+          }}
+          onKeepCurrent={() => setPhotoSheet(null)}
+          onChangePhoto={() => {
+            if (photoSheet === "avatar") avatarInputRef.current?.click();
+            else coverInputRef.current?.click();
+          }}
+          onRemove={handleRemovePhoto}
         />
       )}
     </div>
