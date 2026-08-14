@@ -3,16 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { api, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { isNativeApp } from "../native";
+import {
+  friendlyNativeGoogleError,
+  nativeGoogleConfigured,
+  nativeGoogleIdToken,
+} from "../nativeGoogleAuth";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
- * Google sign-in that keeps the BarathX button look, but uses GIS renderButton
- * (popup account chooser next to the control) — not One Tap in the top-right.
- *
- * In Capacitor native shells, GIS popup/WebView OAuth is unreliable until
- * platform OAuth clients are configured — prefer phone/email there.
+ * Google sign-in:
+ * - Web: GIS renderButton (popup account chooser)
+ * - Native Capacitor: @capgo/capacitor-social-login → ID token → /auth/google
  */
 export default function GoogleSignInButton({
   label = "Continue with Google",
@@ -33,8 +36,7 @@ export default function GoogleSignInButton({
 
   ageRef.current = { confirmAge18, requireAgeConfirm };
 
-  callbackRef.current = async (response) => {
-    if (!response?.credential) return;
+  async function finishWithIdToken(idToken) {
     const { confirmAge18: ageOk, requireAgeConfirm: needAge } = ageRef.current;
     if (needAge && !ageOk) {
       const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
@@ -46,8 +48,7 @@ export default function GoogleSignInButton({
     setError("");
     try {
       const data = await api.loginGoogle({
-        id_token: response.credential,
-        // Backend only requires this for brand-new Google accounts.
+        id_token: idToken,
         ...(ageOk ? { confirm_age_18: true } : {}),
       });
       login(data.access_token);
@@ -58,7 +59,6 @@ export default function GoogleSignInButton({
         navigate(next);
         return;
       }
-      // Returning users and first-timers go Square — first-session guide lives there.
       if (hasSeenTopicOnboarding()) {
         navigate("/feed");
         return;
@@ -80,7 +80,42 @@ export default function GoogleSignInButton({
     } finally {
       setBusy(false);
     }
+  }
+
+  callbackRef.current = async (response) => {
+    if (!response?.credential) return;
+    await finishWithIdToken(response.credential);
   };
+
+  async function handleNativeGoogle() {
+    const { confirmAge18: ageOk, requireAgeConfirm: needAge } = ageRef.current;
+    if (needAge && !ageOk) {
+      const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    if (!nativeGoogleConfigured()) {
+      const msg =
+        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client — see MOBILE.md). Use phone OTP to join now.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    setBusy(true);
+    setError("");
+    try {
+      const idToken = await nativeGoogleIdToken();
+      // finishWithIdToken manages busy / navigation for the API hop
+      setBusy(false);
+      await finishWithIdToken(idToken);
+    } catch (err) {
+      const msg = friendlyNativeGoogleError(err);
+      setError(msg);
+      onError?.(msg);
+      setBusy(false);
+    }
+  }
 
   useEffect(() => {
     if (!CLIENT_ID || native) return undefined;
@@ -150,22 +185,24 @@ export default function GoogleSignInButton({
   }, [native]);
 
   if (native) {
+    const ageBlocked = requireAgeConfirm && !confirmAge18;
     return (
       <div className="x-google-wrap">
         <button
           type="button"
           className="x-btn x-btn-google"
-          onClick={() => {
-            const msg =
-              "In the BarathX app, use phone OTP or email for now. Google Sign-In needs store OAuth clients (see MOBILE.md).";
-            setError(msg);
-            onError?.(msg);
-          }}
+          disabled={busy || ageBlocked}
+          onClick={handleNativeGoogle}
         >
           <GoogleG className="x-btn-icon" />
-          {label}
+          {busy ? "Signing in…" : label}
         </button>
-        <p className="hint x-google-loading">App tip: phone OTP or email works best.</p>
+        {ageBlocked && (
+          <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
+        )}
+        {!ageBlocked && (
+          <p className="hint x-google-loading">Phone OTP also works if Google isn’t set up on this build yet.</p>
+        )}
         {error && <p className="x-inline-error">{error}</p>}
       </div>
     );

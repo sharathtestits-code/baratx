@@ -5,11 +5,13 @@ import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import Logo, { LogoMark } from "../components/Logo";
+import { isNativeApp } from "../native";
 
 export default function Login() {
   const [params] = useSearchParams();
   const initialId = params.get("email") || params.get("username") || "";
-  const preferPhone = params.get("method") === "phone";
+  const native = isNativeApp();
+  const preferPhone = params.get("method") === "phone" || (native && params.get("method") !== "email");
   const nextPath = (() => {
     const raw = (params.get("next") || "").trim();
     // Only allow same-origin relative paths (ops console, feed, etc.)
