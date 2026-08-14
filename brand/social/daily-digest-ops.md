@@ -1,13 +1,12 @@
 # Daily peak digest + welcome replies
 
 ## New-user first post
-1. **@baratx** — Welcome (human, may nod to their take)
-2. **@sharath** — Welcome
-3. **@baratx** + **@sharath** — Content-aware replies on the same post (not generic chips)
+1. **One official voice** (`@baratx` or `@sharath`) — welcome that nods to their take
+2. Support/bugs → always `@baratx`
 
 ## Every later community post
-**@baratx** + **@sharath** each leave one human reply that reacts to the post topic
-(reels, city, startups, cricket, etc.). Official digest posts are skipped.
+**One** official reply that reacts to the post topic (not twin bots).
+Official digest posts are skipped.
 
 Runs on `POST /posts` and a background poller (~45s) for anything missed.
 Disable: `DISABLE_OFFICIAL_ENGAGE=1`
