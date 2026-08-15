@@ -22,6 +22,8 @@ export default function Settings() {
   const [languageSaving, setLanguageSaving] = useState(false);
   const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
   const [emailSaving, setEmailSaving] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
@@ -134,6 +136,25 @@ export default function Settings() {
     }
   }
 
+  async function deleteAccount() {
+    if (deleteConfirm.trim().toUpperCase() !== "DELETE") {
+      setError("Type DELETE to confirm account deletion");
+      return;
+    }
+    setDeleting(true);
+    setError("");
+    setMsg("");
+    try {
+      await api.deleteMe(token);
+      logout();
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   async function unmute(username) {
     try {
       await socialApi.unmute(token, username);
@@ -230,6 +251,46 @@ export default function Settings() {
           </span>
         </label>
         {emailSaving && <p className="hint">{t("settings.saving")}</p>}
+      </section>
+
+      <section className="settings-section settings-security">
+        <h2>Privacy &amp; security</h2>
+        <p className="hint">
+          Your password is hashed. Email and phone stay private on your profile. Sessions expire;
+          password reset signs out other devices.
+        </p>
+        <ul className="settings-security-points">
+          <li>Passwords stored with bcrypt — never plain text</li>
+          <li>Email / phone visible only to you</li>
+          <li>Confirm email before posting (if you signed up with email)</li>
+          <li>Login &amp; OTP attempts are rate-limited</li>
+        </ul>
+        <Link className="btn btn-secondary" to="/privacy">
+          Read Privacy Policy
+        </Link>
+
+        <div className="settings-danger">
+          <h3>Delete account</h3>
+          <p className="hint">
+            Permanently removes your account and posts. Type <strong>DELETE</strong> to confirm.
+          </p>
+          <input
+            type="text"
+            className="settings-delete-input"
+            placeholder="Type DELETE"
+            value={deleteConfirm}
+            onChange={(e) => setDeleteConfirm(e.target.value)}
+            autoComplete="off"
+          />
+          <button
+            type="button"
+            className="btn btn-danger"
+            disabled={deleting || deleteConfirm.trim().toUpperCase() !== "DELETE"}
+            onClick={deleteAccount}
+          >
+            {deleting ? "Deleting…" : "Delete my account"}
+          </button>
+        </div>
       </section>
 
       <section className="settings-section">

@@ -10,13 +10,19 @@ Not: “here is a feature.”
 Yes: “here is the pain → BarathX fix → create an account.”
 
 ## Visuals
-Each daily slot uses a **different** pack (never the same pictures 3×):
-- morning → `brand/ig/carousel/signup-excite`
-- midday → `brand/ig/carousel/how-it-works`
-- evening → `brand/ig/carousel/launch-pain`
+Each daily slot uses a **different** pack **and** a **rotating template** (never the same look every day):
+- morning → pain / signup-excite energy
+- midday → how-it-works / product proof
+- evening → launch-pain / debate prompt
 
-All packs: **BarathX** spelling + current barathx.com screens.
-Do **not** use the retired `brand/carousel/export` plain pack.
+Generate today’s three creatives (different templates via date hash):
+
+```bash
+python3 brand/ig/render_daily_ig.py --date YYYY-MM-DD --all-slots
+```
+
+Outputs in `brand/social/daily/YYYY-MM-DD/ig-{morning,midday,evening}.jpg` (plus a named template file).
+Do **not** reuse yesterday’s identical frame for all three posts.
 
 ## Caption formula
 1. **Hook pain** (1 line) — something they already feel

@@ -136,6 +136,13 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  deleteMe: (token) =>
+    request("/users/me", {
+      method: "DELETE",
+      headers: authHeaders(token),
+      body: JSON.stringify({ confirm: "DELETE" }),
+    }),
+
   unsubscribeEmail: (token) =>
     request(`/auth/unsubscribe?token=${encodeURIComponent(token)}`, { method: "POST" }),
 

@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 from app.phoneutil import normalize_phone
 from app.text_parse import sanitize_user_text
@@ -40,7 +40,14 @@ class EmailSignupRequest(BaseModel):
     def valid_password(cls, v):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
+        if not re.search(r"[A-Za-z]", v) or not re.search(r"[0-9]", v):
+            raise ValueError("Password must include at least one letter and one number")
         return v
+
+    @field_validator("email")
+    @classmethod
+    def lower_email(cls, v):
+        return str(v).strip().lower()
 
     @field_validator("confirm_age_18")
     @classmethod
@@ -121,7 +128,13 @@ class TokenResponse(BaseModel):
 
 
 class VerifyEmailRequest(BaseModel):
-    token: str
+    token: str = Field(min_length=8, max_length=256)
+
+    @field_validator("token")
+    @classmethod
+    def strip_token(cls, v: str) -> str:
+        return (v or "").strip()
+
 
 
 class ForgotPasswordRequest(BaseModel):
@@ -137,6 +150,8 @@ class ResetPasswordRequest(BaseModel):
     def valid_reset_password(cls, v):
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters")
+        if not re.search(r"[A-Za-z]", v) or not re.search(r"[0-9]", v):
+            raise ValueError("Password must include at least one letter and one number")
         return v
 
 
@@ -144,6 +159,19 @@ class GoogleAuthRequest(BaseModel):
     id_token: str
     # Required only when Google creates a new BarathX account (18+ gate).
     confirm_age_18: Optional[bool] = None
+
+
+class DeleteAccountRequest(BaseModel):
+    """Confirm destructive account deletion (self-serve)."""
+
+    confirm: str
+
+    @field_validator("confirm")
+    @classmethod
+    def must_type_delete(cls, v):
+        if (v or "").strip().upper() != "DELETE":
+            raise ValueError('Type DELETE to confirm permanent account deletion')
+        return "DELETE"
 
 
 class MessageResponse(BaseModel):

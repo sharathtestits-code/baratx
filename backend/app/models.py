@@ -52,6 +52,8 @@ class User(Base):
     has_posted_once = Column(Boolean, default=False, nullable=False)
     # Activity emails (likes/replies/follows). Users can unsubscribe from Settings or email footer.
     email_activity_enabled = Column(Boolean, default=True, nullable=False)
+    # Bumped on password reset / security events to invalidate existing JWTs.
+    token_version = Column(Integer, default=0, nullable=False)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -76,13 +78,13 @@ class User(Base):
 
 
 class OTP(Base):
-    """Stores short-lived OTP codes for phone signup/login (demo: no real SMS sent)."""
+    """Short-lived phone OTP rows. `code` stores a bcrypt hash of the OTP (never plaintext)."""
 
     __tablename__ = "otps"
 
     id = Column(String, primary_key=True, default=gen_uuid)
     phone = Column(String, index=True, nullable=False)
-    code = Column(String, nullable=False)
+    code = Column(String, nullable=False)  # bcrypt hash of the 6-digit OTP
     purpose = Column(String, nullable=False)  # "signup" | "login"
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     expires_at = Column(DateTime, nullable=False)

@@ -10694,3 +10694,108 @@ a.suggestions-chip-link {
     display: block;
   }
 }
+
+/* ---------- Security trust modal + Settings privacy ---------- */
+
+.security-trust-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(8, 10, 14, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  backdrop-filter: blur(4px);
+}
+
+.security-trust-modal {
+  width: min(26rem, 100%);
+  padding: 1.35rem 1.25rem 1.25rem;
+  border-radius: 1.15rem;
+  border: 1px solid var(--border);
+  background: var(--surface-solid, var(--surface));
+  color: var(--text);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+.security-trust-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.security-trust-modal h2 {
+  margin: 0.35rem 0 0.45rem;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.security-trust-list {
+  margin: 0.85rem 0 1.1rem;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.security-trust-list strong {
+  color: var(--text);
+}
+
+.security-trust-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.settings-security-points {
+  margin: 0.65rem 0 1rem;
+  padding-left: 1.1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.settings-danger {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--danger, #f4212e) 35%, var(--border));
+  background: color-mix(in srgb, var(--danger, #f4212e) 8%, transparent);
+}
+
+.settings-danger h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.settings-delete-input {
+  display: block;
+  width: 100%;
+  max-width: 16rem;
+  margin: 0.65rem 0 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn-danger {
+  background: var(--danger, #f4212e);
+  color: #fff;
+  border: none;
+}
+
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

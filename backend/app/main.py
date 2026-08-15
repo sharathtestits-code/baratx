@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, media_store, models, ops_access, rewards, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -48,6 +48,8 @@ def run_migrations():
                 conn.execute(
                     text("ALTER TABLE users ADD COLUMN email_activity_enabled BOOLEAN DEFAULT 1")
                 )
+            if "token_version" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -139,6 +141,8 @@ def run_migrations():
                             "ALTER TABLE users ADD COLUMN email_activity_enabled BOOLEAN DEFAULT TRUE"
                         )
                     )
+                if "token_version" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -250,9 +254,15 @@ with SessionLocal() as _seed_db:
         logging.getLogger("baratx").exception("Prompt refresh on boot failed")
 
 
-app = FastAPI(title="BarathX API", version="0.5.0")
-
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
+app = FastAPI(
+    title="BarathX API",
+    version="0.5.0",
+    docs_url=None if ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if ENVIRONMENT == "production" else "/redoc",
+    openapi_url=None if ENVIRONMENT == "production" else "/openapi.json",
+)
 
 
 def mvp_version_info() -> dict:
@@ -344,16 +354,14 @@ PASSWORD_RESET_TTL_HOURS = 1
 
 
 def _otp_response(code: str, sms_sent: bool = False) -> dict:
-    """Never leak OTP codes in production when SMS was actually sent."""
+    """Never leak OTP codes in production. Dev may include demo OTP when SMS is off."""
     body = {
         "message": "OTP sent" if (ENVIRONMENT == "production" or sms_sent) else "OTP generated (demo mode)",
         "expires_in_minutes": OTP_TTL_MINUTES,
         "sms_sent": sms_sent,
     }
-    if ENVIRONMENT != "production" or not sms_sent:
+    if ENVIRONMENT != "production" and not sms_sent:
         body["dev_otp"] = code
-    else:
-        print("[otp] generated for production request (not returned in response)")
     return body
 
 
@@ -363,10 +371,16 @@ def issue_otp(db: Session, phone: str, purpose: str) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
 
+    if ENVIRONMENT == "production" and not sms.sms_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Phone OTP is not available right now. Sign in with Google or email.",
+        )
+
     code = auth.generate_otp()
     otp = models.OTP(
         phone=phone,
-        code=code,
+        code=auth.hash_otp(code),
         purpose=purpose,
         expires_at=datetime.now(timezone.utc) + timedelta(minutes=OTP_TTL_MINUTES),
     )
@@ -374,15 +388,14 @@ def issue_otp(db: Session, phone: str, purpose: str) -> dict:
     db.commit()
     sms_sent = sms.send_otp_sms(phone, code)
     if not sms_sent:
-        print(f"[otp] {purpose} for {phone}: {code} (SMS not sent)")
-        # MSG91 configured but send failed — don't silently fall back to leaking OTP in prod UI
-        if ENVIRONMENT == "production" and sms.sms_configured():
+        # Never log the OTP or full phone in production.
+        masked = phone[:4] + "…" if phone else "?"
+        print(f"[otp] {purpose} for {masked} (SMS not sent)")
+        if ENVIRONMENT == "production":
             raise HTTPException(
                 status_code=502,
                 detail="Could not send SMS OTP. Check the number and try again, or use Google/email.",
             )
-        if ENVIRONMENT == "production" and not sms.sms_configured():
-            print("[otp] WARNING: MSG91 not configured — returning demo OTP in response")
     return _otp_response(code, sms_sent=sms_sent)
 
 
@@ -417,14 +430,14 @@ def issue_email_verification(db: Session, user: models.User) -> tuple[bool, Opti
             user.email, user.display_name, raw
         )
     except Exception as exc:  # noqa: BLE001 — surface as soft failure; account still created
-        print(f"[email] failed to send verification to {user.email}: {exc}")
+        print(f"[email] failed to send verification: {exc}")
         verify_url = email_service.build_verify_url(raw)
         sent = False
 
     dev_url = None
     if not sent and ENVIRONMENT != "production":
         dev_url = verify_url
-        print(f"[email] DEV verify URL for {user.email}: {verify_url}")
+        print(f"[email] DEV verify URL ready")
     return sent, dev_url
 
 
@@ -435,10 +448,14 @@ async def save_upload_image(image: UploadFile, max_bytes: int) -> str:
     contents = await image.read()
     if len(contents) > max_bytes:
         raise HTTPException(status_code=400, detail=f"Image must be {max_bytes // (1024 * 1024)}MB or smaller")
+    try:
+        sniffed = image_validate.assert_image_bytes(contents, image.content_type)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return media_store.save_bytes(
         contents,
-        content_type=image.content_type or "application/octet-stream",
+        content_type=sniffed,
         filename=image.filename,
     )
 
@@ -451,12 +468,14 @@ def get_current_user(
     creds: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> models.User:
-    user_id = auth.decode_access_token(creds.credentials)
+    user_id, tv = auth.decode_access_token(creds.credentials)
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    if int(getattr(user, "token_version", 0) or 0) != int(tv or 0):
+        raise HTTPException(status_code=401, detail="Session expired — sign in again")
     return user
 
 
@@ -466,10 +485,15 @@ def get_current_user_optional(
 ) -> Optional[models.User]:
     if not creds:
         return None
-    user_id = auth.decode_access_token(creds.credentials)
+    user_id, tv = auth.decode_access_token(creds.credentials)
     if not user_id:
         return None
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        return None
+    if int(getattr(user, "token_version", 0) or 0) != int(tv or 0):
+        return None
+    return user
 
 
 def serialize_user(user: models.User, current_user: Optional[models.User]) -> schemas.UserOut:
@@ -486,8 +510,9 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         id=user.id,
         username=user.username,
         display_name=user.display_name,
-        email=user.email,
-        phone=user.phone,
+        # Never leak email/phone on public profiles — self only.
+        email=user.email if self_view else None,
+        phone=user.phone if self_view else None,
         language=user.language,
         theme=getattr(user, "theme", None) or "midnight",
         bio=user.bio,
@@ -572,6 +597,24 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         space_id=getattr(post, "space_id", None),
     )
 
+
+
+
+def require_verified_to_post(user: models.User) -> None:
+    """Email-password accounts must verify email before posting (phone/Google already verified)."""
+    if user.email and not user.is_email_verified and not user.is_phone_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Confirm your email before posting. Check your inbox or resend from Settings.",
+        )
+
+
+def otp_matches(otp_row: models.OTP, code: str) -> bool:
+    """Accept bcrypt-hashed OTP (preferred) or legacy plaintext rows during rollout."""
+    stored = otp_row.code or ""
+    if stored.startswith("$2"):
+        return auth.verify_otp(code, stored)
+    return secrets.compare_digest(stored, code)
 
 def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) -> schemas.ReplyOut:
     liked_by_me = False
@@ -784,7 +827,16 @@ def ops_config():
 
 # ---------- Admin (password-protected signup insights) ----------
 
-def require_admin(x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret")):
+def require_admin(
+    request: Request,
+    x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret"),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"admin:{rate_limit.client_ip(request)}", limit=60, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     if not ADMIN_SECRET:
         raise HTTPException(
             status_code=503,
@@ -1233,8 +1285,20 @@ def _official_author(db: Session, username: str) -> models.User:
 # ---------- Email signup / login ----------
 
 @app.post("/auth/signup/email", response_model=schemas.TokenResponse)
-def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == payload.email).first():
+def signup_email(
+    payload: schemas.EmailSignupRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"signup:{rate_limit.client_ip(request)}", limit=8, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
+
+    email = str(payload.email).strip().lower()
+    if db.query(models.User).filter(models.User.email == email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     if db.query(models.User).filter(models.User.username == payload.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
@@ -1242,11 +1306,12 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
     user = models.User(
         username=payload.username,
         display_name=payload.display_name,
-        email=payload.email,
+        email=email,
         password_hash=auth.hash_password(payload.password),
         is_email_verified=False,
         badge="none",
         is_official=False,
+        token_version=0,
     )
     db.add(user)
     db.commit()
@@ -1257,7 +1322,7 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
 
     sent, dev_url = issue_email_verification(db, user)
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(
         access_token=token,
         email_verification_sent=sent,
@@ -1267,26 +1332,34 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
 
 @app.post("/auth/verify-email", response_model=schemas.MessageResponse)
 def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_db)):
+    raw = (payload.token or "").strip()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Missing verification token")
+
     row = (
         db.query(models.EmailVerificationToken)
-        .filter(
-            models.EmailVerificationToken.token == payload.token,
-            models.EmailVerificationToken.consumed == False,  # noqa: E712
-        )
+        .filter(models.EmailVerificationToken.token == raw)
         .first()
     )
     if not row:
         raise HTTPException(status_code=400, detail="Invalid or already used verification link")
+
+    user = db.query(models.User).filter(models.User.id == row.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    # Idempotent: refresh / double-click / React remount after first success.
+    if row.consumed or user.is_email_verified:
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            db.commit()
+        return schemas.MessageResponse(message="Email confirmed. Your BarathX account is active.")
 
     expires = row.expires_at
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
     if expires < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Verification link expired — request a new one")
-
-    user = db.query(models.User).filter(models.User.id == row.user_id).first()
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
 
     row.consumed = True
     user.is_email_verified = True
@@ -1343,8 +1416,18 @@ def resend_verification(
 
 
 @app.post("/auth/forgot-password", response_model=schemas.MessageResponse)
-def forgot_password(payload: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(
+    payload: schemas.ForgotPasswordRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
     """Always returns a generic success message to avoid email enumeration."""
+    try:
+        rate_limit.check_rate_limit(
+            f"forgot:{rate_limit.client_ip(request)}", limit=5, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     generic = schemas.MessageResponse(
         message="If that email is registered, we sent a password reset link."
     )
@@ -1377,7 +1460,7 @@ def forgot_password(payload: schemas.ForgotPasswordRequest, db: Session = Depend
             user.email, user.display_name, raw
         )
     except Exception as exc:  # noqa: BLE001
-        print(f"[email] failed to send password reset to {user.email}: {exc}")
+        print(f"[email] failed to send password reset: {exc}")
         sent = False
         reset_url = email_service.build_reset_url(raw)
 
@@ -1419,26 +1502,51 @@ def reset_password(payload: schemas.ResetPasswordRequest, db: Session = Depends(
 
     row.consumed = True
     user.password_hash = auth.hash_password(payload.password)
+    auth.bump_token_version(user)
     db.commit()
     return schemas.MessageResponse(message="Password updated. You can sign in with your new password.")
 
 
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)
-def login_email(payload: schemas.EmailLoginRequest, db: Session = Depends(get_db)):
+def login_email(
+    payload: schemas.EmailLoginRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"login:{rate_limit.client_ip(request)}", limit=20, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     ident = payload.email.strip()
     if "@" in ident:
-        user = db.query(models.User).filter(models.User.email == ident.lower()).first()
+        user = (
+            db.query(models.User)
+            .filter(func.lower(models.User.email) == ident.lower())
+            .first()
+        )
     else:
         user = db.query(models.User).filter(models.User.username == ident).first()
     if not user or not auth.verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect email/username or password")
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
 @app.post("/auth/google", response_model=schemas.TokenResponse)
-def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+def auth_google(
+    payload: schemas.GoogleAuthRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"google:{rate_limit.client_ip(request)}", limit=30, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     if not google_auth.google_configured():
         raise HTTPException(
             status_code=503,
@@ -1447,7 +1555,16 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
     try:
         claims = google_auth.verify_google_id_token(payload.id_token)
     except ValueError as exc:
-        raise HTTPException(status_code=401, detail=str(exc)) from exc
+        # Map common Google token failures to actionable copy (mobile aud mismatch, etc.).
+        msg = str(exc)
+        if "audience mismatch" in msg.lower():
+            msg = (
+                "Google sign-in misconfigured (client ID mismatch). "
+                "Use the web Google button on barathx.com, or update the app’s Google client IDs."
+            )
+        elif "not verified" in msg.lower():
+            msg = "That Google account’s email is not verified. Use another Google account or email signup."
+        raise HTTPException(status_code=401, detail=msg) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -1455,7 +1572,12 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
     display_name = (claims.get("name") or email.split("@")[0])[:50]
     picture = claims.get("picture")
 
-    user = db.query(models.User).filter(models.User.email == email).first()
+    # Case-insensitive match — legacy rows may have mixed-case emails.
+    user = (
+        db.query(models.User)
+        .filter(func.lower(models.User.email) == email)
+        .first()
+    )
     if not user:
         if not payload.confirm_age_18:
             raise HTTPException(
@@ -1478,18 +1600,45 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
             avatar_url=picture,
             badge="none",
             is_official=False,
+            token_version=0,
         )
         db.add(user)
-        db.commit()
-        db.refresh(user)
-        seed.follow_official_accounts(db, user)
-        db.commit()
+        try:
+            db.commit()
+        except Exception:
+            # Race / case-variant duplicate — re-load and continue as login.
+            db.rollback()
+            user = (
+                db.query(models.User)
+                .filter(func.lower(models.User.email) == email)
+                .first()
+            )
+            if not user:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Could not create account with Google. Try email signup or try again.",
+                )
+        else:
+            db.refresh(user)
+            seed.follow_official_accounts(db, user)
+            db.commit()
     else:
+        # Google already proved mailbox ownership (email_verified claim) — safe to
+        # mark verified and sign in (same as prior production behavior).
+        dirty = False
+        if user.email != email:
+            user.email = email
+            dirty = True
         if not user.is_email_verified:
             user.is_email_verified = True
+            dirty = True
+        if picture and not user.avatar_url:
+            user.avatar_url = picture
+            dirty = True
+        if dirty:
             db.commit()
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
@@ -1516,7 +1665,7 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         .order_by(models.OTP.created_at.desc())
         .first()
     )
-    if not otp_row or otp_row.code != payload.otp:
+    if not otp_row or not otp_matches(otp_row, payload.otp):
         raise HTTPException(status_code=400, detail="Invalid OTP")
     if otp_row.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="OTP expired, request a new one")
@@ -1544,15 +1693,24 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
     seed.follow_official_accounts(db, user)
     db.commit()
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
 @app.post("/auth/login/phone/request-otp")
 def login_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depends(get_db)):
+    """Do not reveal whether the phone is registered."""
     user = db.query(models.User).filter(models.User.phone == payload.phone).first()
     if not user:
-        raise HTTPException(status_code=404, detail="No account with this phone number")
+        try:
+            sms.check_otp_rate_limit(payload.phone)
+        except ValueError as exc:
+            raise HTTPException(status_code=429, detail=str(exc)) from exc
+        return {
+            "message": "OTP sent" if ENVIRONMENT == "production" else "OTP generated (demo mode)",
+            "expires_in_minutes": OTP_TTL_MINUTES,
+            "sms_sent": False,
+        }
     return issue_otp(db, payload.phone, "login")
 
 
@@ -1568,19 +1726,19 @@ def login_phone_verify(payload: schemas.PhoneLoginVerify, db: Session = Depends(
         .order_by(models.OTP.created_at.desc())
         .first()
     )
-    if not otp_row or otp_row.code != payload.otp:
+    if not otp_row or not otp_matches(otp_row, payload.otp):
         raise HTTPException(status_code=400, detail="Invalid OTP")
     if otp_row.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="OTP expired, request a new one")
 
     user = db.query(models.User).filter(models.User.phone == payload.phone).first()
     if not user:
-        raise HTTPException(status_code=404, detail="No account with this phone number")
+        raise HTTPException(status_code=400, detail="Invalid phone or OTP")
 
     otp_row.consumed = True
     db.commit()
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
@@ -1589,6 +1747,32 @@ def login_phone_verify(payload: schemas.PhoneLoginVerify, db: Session = Depends(
 @app.get("/users/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return serialize_user(current_user, current_user)
+
+
+@app.delete("/users/me", response_model=schemas.MessageResponse)
+def delete_my_account(
+    payload: schemas.DeleteAccountRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Self-serve permanent account deletion (Privacy Policy)."""
+    if current_user.username in set(seed.OFFICIAL_USERNAMES) or getattr(current_user, "is_official", False):
+        raise HTTPException(status_code=400, detail="Official accounts cannot be self-deleted")
+    uid = current_user.id
+    # Soft-clear PII then remove user row (cascades posts/likes via relationships where configured).
+    current_user.email = None
+    current_user.phone = None
+    current_user.display_name = "Deleted"
+    current_user.bio = ""
+    current_user.avatar_url = None
+    current_user.cover_url = None
+    auth.bump_token_version(current_user)
+    db.commit()
+    user = db.query(models.User).filter(models.User.id == uid).first()
+    if user:
+        db.delete(user)
+        db.commit()
+    return schemas.MessageResponse(message="Your BarathX account has been deleted.")
 
 
 @app.post("/users/me/bootstrap-follows", response_model=schemas.MessageResponse)
@@ -1977,6 +2161,7 @@ async def create_post(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_verified_to_post(current_user)
     text = text_parse.sanitize_user_text(text).strip()
     if not text:
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
@@ -1998,10 +2183,14 @@ async def create_post(
         contents = await image.read()
         if len(contents) > MAX_IMAGE_BYTES:
             raise HTTPException(status_code=400, detail="Image must be 5MB or smaller")
+        try:
+            sniffed = image_validate.assert_image_bytes(contents, image.content_type)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
         image_url = media_store.save_bytes(
             contents,
-            content_type=image.content_type or "application/octet-stream",
+            content_type=sniffed,
             filename=image.filename,
         )
 
@@ -2450,6 +2639,7 @@ def create_reply(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_verified_to_post(current_user)
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")

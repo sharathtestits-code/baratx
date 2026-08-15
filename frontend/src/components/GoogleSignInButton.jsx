@@ -130,10 +130,13 @@ export default function GoogleSignInButton({
       window.google.accounts.id.initialize({
         client_id: CLIENT_ID,
         callback: (res) => callbackRef.current?.(res),
+        // popup is more reliable than redirect on iOS Safari / in-app browsers
         ux_mode: "popup",
         auto_select: false,
         cancel_on_tap_outside: true,
         context: "signin",
+        // Prefer FedCM where available; falls back when unsupported.
+        use_fedcm_for_prompt: true,
       });
 
       try {
