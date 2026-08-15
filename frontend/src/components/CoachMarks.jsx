@@ -11,6 +11,13 @@ import { createPortal } from "react-dom";
 
 const STEPS = [
   {
+    id: "home",
+    target: "[data-coach='nav-home']",
+    title: "Home",
+    body: "Your personal hub — continue arenas, see following activity, and peek at Live. Posting lives on Square.",
+    path: "/home",
+  },
+  {
     id: "compose",
     target: "[data-coach='compose']",
     title: "Drop a take",
@@ -21,7 +28,7 @@ const STEPS = [
     id: "square-nav",
     target: "[data-coach='nav-square']",
     title: "Square",
-    body: "Your home feed. Use Square when you want to post or read takes — including people you don’t follow (For you).",
+    body: "India's public feed. Use Square to post or read takes — including people you don’t follow (For you).",
     path: "/feed",
   },
   {
@@ -39,17 +46,10 @@ const STEPS = [
     path: "/arenas",
   },
   {
-    id: "alerts",
-    target: "[data-coach='nav-alerts']",
-    title: "Alerts",
-    body: "Replies and mentions land here so you can jump back into the thread. We’ll also email you when something needs you.",
-    path: "/notifications",
-  },
-  {
     id: "you",
     target: "[data-coach='nav-you']",
     title: "You",
-    body: "Your profile, settings, and appearance (themes). Change look anytime under Settings → Appearance.",
+    body: "Your profile, settings, and appearance (themes). Alerts are in the top bell and the menu. Change look anytime under Settings → Appearance.",
     path: "/settings",
   },
 ];

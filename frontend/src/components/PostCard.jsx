@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { postsApi, socialApi, mediaUrl } from "../api";
 import { useAuth } from "../context/AuthContext";
@@ -6,20 +6,7 @@ import Avatar from "./Avatar";
 import { badgeNameClass } from "./OfficialBadge";
 import { IconBookmark, IconHeart, IconQuote, IconReply, IconRepost, IconTrash } from "./Icons";
 import { linkifyText } from "./linkifyText";
-
-function timeAgo(dateStr) {
-  const date = new Date(dateStr);
-  const diffMs = Date.now() - date.getTime();
-  const sec = Math.floor(diffMs / 1000);
-  if (sec < 60) return `${Math.max(sec, 1)}s`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h`;
-  const day = Math.floor(hr / 24);
-  if (day < 7) return `${day}d`;
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
+import { formatLocalWhen, timeAgo } from "../time";
 
 export default function PostCard({ post, repostedBy = null, onDeleted = () => {}, detailMode = false }) {
   const { token, user } = useAuth();
@@ -38,10 +25,21 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
 
   const [deleted, setDeleted] = useState(false);
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [replyCount] = useState(post.reply_count);
+  const [nowMs, setNowMs] = useState(() => Date.now());
 
-  const isMine = user && user.username === post.author.username;
+  const isMine =
+    !!user &&
+    (user.id === post.author?.id || user.username === post.author?.username);
   const postPath = `/posts/${post.id}`;
+  const whenLabel = timeAgo(post.created_at, nowMs);
+  const whenTitle = formatLocalWhen(post.created_at);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNowMs(Date.now()), 60000);
+    return () => window.clearInterval(id);
+  }, []);
 
   async function toggleLike() {
     if (!token || likeBusy) return;
@@ -102,14 +100,18 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
 
   async function handleDelete() {
     if (!token || deleteBusy) return;
-    if (!window.confirm("Delete this post? This can't be undone.")) return;
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
     setDeleteBusy(true);
     try {
       await postsApi.remove(token, post.id);
       setDeleted(true);
       onDeleted(post.id);
     } catch (err) {
-      window.alert(err.message);
+      window.alert(err.message || "Could not delete this post. Try again.");
+      setConfirmDelete(false);
     } finally {
       setDeleteBusy(false);
     }
@@ -162,10 +164,12 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
             </Link>
             <span className="post-dot">·</span>
             {detailMode ? (
-              <span className="post-time">{timeAgo(post.created_at)}</span>
+              <span className="post-time" title={whenTitle}>
+                {whenLabel}
+              </span>
             ) : (
-              <Link to={postPath} className="post-time" title="View post">
-                {timeAgo(post.created_at)}
+              <Link to={postPath} className="post-time" title={whenTitle || "View post"}>
+                {whenLabel}
               </Link>
             )}
           </div>
@@ -253,14 +257,16 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
             {isMine ? (
               <button
                 type="button"
-                className="action-btn delete-action"
+                className={`action-btn delete-action${confirmDelete ? " is-confirm" : ""}`}
                 onClick={handleDelete}
                 disabled={deleteBusy}
-                title="Delete post"
+                title={confirmDelete ? "Tap again to confirm delete" : "Delete post"}
+                aria-label={confirmDelete ? "Confirm delete post" : "Delete post"}
               >
                 <span className="action-icon-wrap">
                   <IconTrash />
                 </span>
+                {confirmDelete ? <span className="delete-confirm-label">Delete?</span> : null}
               </button>
             ) : (
               token && (
@@ -270,6 +276,14 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               )
             )}
           </div>
+          {isMine && confirmDelete ? (
+            <p className="hint post-delete-hint">
+              Tap Delete? again to remove this post.{" "}
+              <button type="button" className="text-btn" onClick={() => setConfirmDelete(false)}>
+                Cancel
+              </button>
+            </p>
+          ) : null}
         </div>
       </div>
     </article>

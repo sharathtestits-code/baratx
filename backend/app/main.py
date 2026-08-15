@@ -907,6 +907,43 @@ def admin_delete_post(
     db.query(models.PostHashtag).filter(models.PostHashtag.post_id == post.id).delete(
         synchronize_session=False
     )
+    db.query(models.Like).filter(models.Like.post_id == post.id).delete(synchronize_session=False)
+    db.query(models.Repost).filter(models.Repost.post_id == post.id).delete(
+        synchronize_session=False
+    )
+    db.query(models.Report).filter(models.Report.target_post_id == post.id).delete(
+        synchronize_session=False
+    )
+    db.query(models.Post).filter(models.Post.quoted_post_id == post.id).update(
+        {models.Post.quoted_post_id: None}, synchronize_session=False
+    )
+    if hasattr(models, "FoundingReward"):
+        db.query(models.FoundingReward).filter(
+            models.FoundingReward.qualifying_post_id == post.id
+        ).update(
+            {models.FoundingReward.qualifying_post_id: None},
+            synchronize_session=False,
+        )
+    if hasattr(models, "RaceReward"):
+        db.query(models.RaceReward).filter(models.RaceReward.post_id == post.id).delete(
+            synchronize_session=False
+        )
+    reply_ids = [
+        r[0] for r in db.query(models.Reply.id).filter(models.Reply.post_id == post.id).all()
+    ]
+    if reply_ids:
+        db.query(models.Notification).filter(models.Notification.reply_id.in_(reply_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.ReplyLike).filter(models.ReplyLike.reply_id.in_(reply_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Reply).filter(models.Reply.post_id == post.id).update(
+            {models.Reply.parent_reply_id: None}, synchronize_session=False
+        )
+        db.query(models.Reply).filter(models.Reply.post_id == post.id).delete(
+            synchronize_session=False
+        )
     db.delete(post)
     db.commit()
     return schemas.MessageResponse(message="Post deleted")
@@ -2183,6 +2220,19 @@ def delete_post(
     db.query(models.Post).filter(models.Post.quoted_post_id == post_id).update(
         {models.Post.quoted_post_id: None}, synchronize_session=False
     )
+
+    # Reward FKs — null founding links; drop race rows that point at this post.
+    if hasattr(models, "FoundingReward"):
+        db.query(models.FoundingReward).filter(
+            models.FoundingReward.qualifying_post_id == post_id
+        ).update(
+            {models.FoundingReward.qualifying_post_id: None},
+            synchronize_session=False,
+        )
+    if hasattr(models, "RaceReward"):
+        db.query(models.RaceReward).filter(models.RaceReward.post_id == post_id).delete(
+            synchronize_session=False
+        )
 
     # Debate tallies = people on a side. If this was the author's last sided
     # post in the room, clear their stance so the count matches active takes.
