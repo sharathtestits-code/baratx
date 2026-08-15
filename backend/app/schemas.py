@@ -160,6 +160,7 @@ class UserUpdate(BaseModel):
     bio: Optional[str] = None
     language: Optional[str] = None
     theme: Optional[str] = None
+    email_activity_enabled: Optional[bool] = None
 
     @field_validator("display_name")
     @classmethod
@@ -219,6 +220,7 @@ class UserOut(BaseModel):
     cover_url: Optional[str] = None
     is_email_verified: bool
     is_phone_verified: bool
+    email_activity_enabled: bool = True
     badge: str = "none"  # none | gold | blue
     is_official: bool = False
     is_ops_owner: bool = False

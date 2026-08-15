@@ -20,6 +20,8 @@ export default function Settings() {
   const [themeSaving, setThemeSaving] = useState(false);
   const [language, setLanguage] = useState(() => user?.language || localeLang || getStoredLanguage());
   const [languageSaving, setLanguageSaving] = useState(false);
+  const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
+  const [emailSaving, setEmailSaving] = useState(false);
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
@@ -36,6 +38,12 @@ export default function Settings() {
       setLocaleLanguage(user.language);
     }
   }, [user?.language, setLocaleLanguage]);
+
+  useEffect(() => {
+    if (user && typeof user.email_activity_enabled === "boolean") {
+      setEmailActivity(user.email_activity_enabled);
+    }
+  }, [user?.email_activity_enabled]);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,6 +111,27 @@ export default function Settings() {
     if (nextId === "hi") return "भाषा सेव हो गई। इंटरफ़ेस अपडेट हो गया।";
     if (nextId === "te") return "భాష సేవ్ అయింది. UI అప్‌డేట్ అయింది.";
     return "Language saved. UI updated.";
+  }
+
+  async function saveEmailActivity(next) {
+    setEmailActivity(next);
+    setEmailSaving(true);
+    setMsg("");
+    setError("");
+    try {
+      const updated = await api.updateMe(token, { email_activity_enabled: next });
+      updateUser(updated);
+      setMsg(
+        next
+          ? "Activity emails on — you’ll get one email per notification."
+          : "Unsubscribed from activity emails. In-app Alerts still work."
+      );
+    } catch (err) {
+      setEmailActivity(!next);
+      setError(err.message);
+    } finally {
+      setEmailSaving(false);
+    }
   }
 
   async function unmute(username) {
@@ -179,6 +208,28 @@ export default function Settings() {
           ))}
         </div>
         {languageSaving && <p className="hint">{t("settings.saving")}</p>}
+      </section>
+
+      <section className="settings-section">
+        <h2>Email notifications</h2>
+        <p className="hint">
+          One email per activity (reply, like, follow, mention). Turn off anytime — Alerts in the app
+          still work.
+        </p>
+        <label className="age-gate settings-email-toggle">
+          <input
+            type="checkbox"
+            checked={emailActivity}
+            disabled={emailSaving || !user?.email}
+            onChange={(e) => saveEmailActivity(e.target.checked)}
+          />
+          <span>
+            {user?.email
+              ? "Send me activity emails"
+              : "Add an email on your profile to receive activity emails"}
+          </span>
+        </label>
+        {emailSaving && <p className="hint">{t("settings.saving")}</p>}
       </section>
 
       <section className="settings-section">

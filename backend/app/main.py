@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Request, UploadFile, status
+from fastapi import Depends, FastAPI, File, Form, Header, HTTPException, Query, Request, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -44,6 +44,10 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN is_official BOOLEAN DEFAULT 0"))
             if "has_posted_once" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN has_posted_once BOOLEAN DEFAULT 0"))
+            if "email_activity_enabled" not in existing_cols:
+                conn.execute(
+                    text("ALTER TABLE users ADD COLUMN email_activity_enabled BOOLEAN DEFAULT 1")
+                )
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -129,6 +133,12 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE users ADD COLUMN is_official BOOLEAN DEFAULT FALSE"))
                 if "has_posted_once" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN has_posted_once BOOLEAN DEFAULT FALSE"))
+                if "email_activity_enabled" not in user_cols:
+                    conn.execute(
+                        text(
+                            "ALTER TABLE users ADD COLUMN email_activity_enabled BOOLEAN DEFAULT TRUE"
+                        )
+                    )
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -483,6 +493,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         bio=user.bio,
         is_email_verified=user.is_email_verified,
         is_phone_verified=user.is_phone_verified,
+        email_activity_enabled=bool(getattr(user, "email_activity_enabled", True)),
         badge=badge,
         is_official=is_official,
         # Only expose on self — never leak owner status via profiles/followers.
@@ -653,6 +664,22 @@ def create_notification(
 ):
     if recipient_id == actor_id:
         return
+
+    # Dedupe window: same actor+kind+post already notified recently → keep one email.
+    since = datetime.now(timezone.utc) - timedelta(hours=24)
+    dup_q = (
+        db.query(models.Notification)
+        .filter(models.Notification.recipient_id == recipient_id)
+        .filter(models.Notification.actor_id == actor_id)
+        .filter(models.Notification.kind == kind)
+        .filter(models.Notification.created_at >= since)
+    )
+    if post_id:
+        dup_q = dup_q.filter(models.Notification.post_id == post_id)
+    else:
+        dup_q = dup_q.filter(models.Notification.post_id.is_(None))
+    already = dup_q.first()
+
     db.add(
         models.Notification(
             recipient_id=recipient_id,
@@ -663,11 +690,25 @@ def create_notification(
             message=(message or None),
         )
     )
-    # Retention: email when possible (never fail the social action).
+    # Retention: at most one activity email per notification event.
+    if already:
+        return
     try:
         recipient = db.query(models.User).filter(models.User.id == recipient_id).first()
         actor = db.query(models.User).filter(models.User.id == actor_id).first()
         if not recipient or not actor or not recipient.email:
+            return
+        # Respect unsubscribe / Settings toggle (default on if column missing).
+        if getattr(recipient, "email_activity_enabled", True) is False:
+            return
+        # Never email for official/template bot voices (even if engage were re-enabled).
+        actor_name = (actor.username or "").strip().lower()
+        if bool(getattr(actor, "is_official", False)) or actor_name in (
+            "baratx",
+            "sharath",
+            "bharatvoices",
+            "indiatech",
+        ):
             return
         preview = message
         if not preview and reply_id:
@@ -678,6 +719,8 @@ def create_notification(
             post = db.query(models.Post).filter(models.Post.id == post_id).first()
             if post:
                 preview = post.text
+        unsub_token = auth.create_email_unsub_token(recipient.id)
+        unsub_url = f"{email_service.FRONTEND_URL}/unsubscribe?token={unsub_token}"
         email_service.send_activity_email(
             recipient.email,
             recipient.display_name or recipient.username,
@@ -686,6 +729,7 @@ def create_notification(
             kind,
             preview=preview,
             post_id=post_id,
+            unsubscribe_url=unsub_url,
         )
     except Exception:  # noqa: BLE001
         pass
@@ -1250,6 +1294,26 @@ def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_
     return schemas.MessageResponse(message="Email confirmed. Your BarathX account is active.")
 
 
+@app.get("/auth/unsubscribe", response_model=schemas.MessageResponse)
+@app.post("/auth/unsubscribe", response_model=schemas.MessageResponse)
+def unsubscribe_activity_email(
+    token: str = Query(..., min_length=10),
+    db: Session = Depends(get_db),
+):
+    """One-click unsubscribe from activity emails (likes/replies/follows)."""
+    user_id = auth.decode_email_unsub_token(token)
+    if not user_id:
+        raise HTTPException(status_code=400, detail="Invalid or expired unsubscribe link")
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+    user.email_activity_enabled = False
+    db.commit()
+    return schemas.MessageResponse(
+        message="Unsubscribed. You won’t get BarathX activity emails. You can turn them back on in Settings."
+    )
+
+
 @app.post("/auth/resend-verification", response_model=schemas.MessageResponse)
 def resend_verification(
     current_user: models.User = Depends(get_current_user),
@@ -1558,6 +1622,8 @@ def update_me(
         current_user.language = data["language"]
     if "theme" in data:
         current_user.theme = data["theme"]
+    if "email_activity_enabled" in data:
+        current_user.email_activity_enabled = bool(data["email_activity_enabled"])
     if "username" in data:
         new_username = data["username"]
         reserved = set(seed.OFFICIAL_USERNAMES) | {
@@ -2421,7 +2487,8 @@ def create_reply(
     notified.add(post.author_id)
     if parent_reply_id:
         parent = db.query(models.Reply).filter(models.Reply.id == parent_reply_id).first()
-        if parent:
+        # One email only — skip if parent author already got the post-owner notify.
+        if parent and parent.author_id not in notified:
             create_notification(
                 db,
                 recipient_id=parent.author_id,
@@ -2947,8 +3014,7 @@ except Exception:  # noqa: BLE001
 
     logging.getLogger("baratx").exception("Instagram scheduler failed to start")
 
-# Always-on: @baratx + @sharath first replies on community posts.
-# Disable with DISABLE_OFFICIAL_ENGAGE=1
+# Always-on was twin-bot replies — now OFF unless ENABLE_OFFICIAL_ENGAGE=1
 try:
     from app import engagement_replies
 

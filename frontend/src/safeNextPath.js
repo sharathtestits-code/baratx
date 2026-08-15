@@ -16,6 +16,7 @@ const ALLOWED_PREFIXES = [
   "/bookmarks",
   "/lists",
   "/settings",
+  "/unsubscribe",
   "/u/",
   "/posts/",
   "/hashtag/",
