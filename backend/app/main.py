@@ -813,15 +813,16 @@ def admin_stats(_: bool = Depends(require_admin), db: Session = Depends(get_db))
 def get_suggestions(
     surface: str = "square",
     arena: Optional[str] = None,
+    topic: Optional[str] = None,
     limit: int = 20,
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    """Top 15–20 debate questions/problems for Square or an Arena tab."""
+    """Top 15–20 debate questions/problems for Square, an Arena, or an arena subtopic."""
     from app import suggestions as suggestions_mod
 
     return suggestions_mod.list_suggestions(
-        db, surface=surface, arena_key=arena, limit=limit
+        db, surface=surface, arena_key=arena, topic_key=topic, limit=limit
     )
 
 
