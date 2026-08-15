@@ -1,145 +1,127 @@
-# BarathX Early Circle — WhatsApp Community setup
+# BarathX Square — WhatsApp Community setup
 
-Use this when creating the **WhatsApp Community** (separate from your Channel).  
-Channel = one-way broadcast. Community = early customers talk back (feedback + opinions).
+**Channel** = one-way broadcast (keep using it for drops).  
+**Community** = where people talk back — feedback, bugs, hot takes.
 
-## Limits (plan your early base around these)
+## Limits (early customer base)
 
-| Piece | Cap (WhatsApp Help Center, 2026) | How we use it |
-|-------|----------------------------------|---------------|
-| **Community members** | **Up to 2,000** total (announcements + all sub-groups) | Treat **2,000 = early customer base ceiling** until WhatsApp raises it on your account |
-| **Groups inside community** | Up to **100** groups | Start with 3–4; add later |
-| **Each sub-group** | Typically up to **1,024** | Split by topic before any one chat gets noisy |
-| **Name** | 100 characters | See name below |
-| **Create from** | Personal WhatsApp (not WhatsApp Business app) | Use the same number that owns the brand Channel if possible |
+| Piece | Cap | Use |
+|-------|-----|-----|
+| Community members | **~2,000** total (WhatsApp Help Center) | Soft-launch crew ceiling until full |
+| Groups inside | Up to **100** | Start with 3–4 |
+| Each sub-group | ~**1,024** | Split before one chat gets loud |
+| Create from | Personal WhatsApp (**not** Business app) | Same number as Channel if you can |
 
-> Some third-party articles still quote **5,000**. Trust the number WhatsApp shows you in-app when the community is full. Until then, plan for **2,000**.
+Trust the in-app “community full” limit if WhatsApp shows a different number on your account.
 
 ---
 
-## What to enter when WhatsApp asks
+## What to enter when creating
 
 ### Community name
 ```
-BarathX Early Circle
+BarathX Square
 ```
-Alternate (if you want the cap visible):
+Short alt:
 ```
-BarathX Early Circle · First 2000
+bx square
 ```
 
 ### Community description (paste)
 ```
-India’s public square — soft launch crew.
+India’s public square — soft launch.
 
-You’re here because you joined early. Share honest feedback, bugs, and strong opinions on BarathX. Human takes only. No spam, no politics-as-abuse.
+Drop feedback. Drop takes. Break the app, tell us how.
+Human only. No spam. No AI paste dumps.
 
 App → https://barathx.com
-Channel (broadcast) → follow @getbaratx updates on our WhatsApp Channel
 IG / X → @getbaratx
 
-Rules: respect, no hate, no promo dumps. Admins may remove noise.
+Rule: respect > ratio. Admins remove noise.
 ```
 
-### Community icon
-Upload one of:
-- `barathx-early-circle-icon.png` (primary — BX + “EARLY CIRCLE” ribbon)
-- `barathx-early-circle-icon-512.png` (lighter upload)
-- `barathx-early-community-logo.png` (alt art)
+### Community icon (upload)
+**Primary (Gen Z type):** `barathx-wa-community-icon.png`  
+**Small/avatar:** `barathx-wa-community-icon-512.png`  
+**Ultra-clean BX only:** `barathx-wa-community-icon-bx.png`  
+**Alt art:** `barathx-wa-community-logo-genz.png`
 
-These are **appreciation badges** for early members — not the public marketing Channel icon. Keep the Channel using the main BX logo; use this for the Community so early customers feel distinct.
+Use this on the **Community** only. Keep the main BX logo on the **Channel**.
 
 ---
 
-## Suggested groups inside the Community
+## Groups to add
 
-Create these after the community exists (Announcements is auto-created):
+| Group | For | Who posts |
+|-------|-----|-----------|
+| **Announcements** (auto) | What shipped / what to try | Admins only |
+| **product feedback** | Bugs, UX “huh?”, feature asks | Everyone |
+| **hot takes** | Same energy as the Square | Everyone |
+| **proof** | Screenshots, wins, shoutouts | Everyone |
 
-| Group name | Purpose | Who posts |
-|------------|---------|-----------|
-| **Announcements** (auto) | Soft-launch notes, invites to try features, “what shipped today” | Admins only |
-| **Product feedback** | Bugs, UX friction, “this confused me”, feature asks | Everyone |
-| **Square opinions** | Takes on India topics — same energy as the app | Everyone |
-| **Wins & shoutouts** | Screenshots of good debates, Founding progress, thank-yous | Everyone + admins |
-
-Optional later: `Hindi`, `Telugu`, `Creators`, `Campus`.
-
-### Short descriptions for each group
-**Product feedback**
+### Group descriptions
+**product feedback**
 ```
-Break it, then tell us. Screenshots + steps help most. We’ll read every thread.
+Broke something? Send screenshot + what you tapped. We’ll actually read it.
 ```
 
-**Square opinions**
+**hot takes**
 ```
-Argue it live — respectfully. Pick a side. No AI paste dumps.
+Pick a side. Argue it. No essays, no AI slop.
 ```
 
-**Wins & shoutouts**
+**proof**
 ```
-Early Circle only. Celebrate good takes, clean debates, and people who help the product.
+Show the take. Show the bug. Flex the clean debate.
 ```
 
 ---
 
-## First Announcement (admin post)
+## First Announcement
 
 ```
-Welcome to BarathX Early Circle 🟧
+you’re in BarathX Square 🟧
 
-You’re part of our early customer base (we’ll grow this Community up to WhatsApp’s member cap — currently up to ~2,000).
+this is the soft-launch crew (we grow to WhatsApp’s member cap — ~2k).
 
-What this space is for:
-1) Feedback that makes the product better
-2) Honest opinions — the same energy as barathx.com
-3) First look at soft-launch changes
+do this:
+1) one bug / “this confused me” → product feedback
+2) one real take → hot takes
+3) app → https://barathx.com
 
-Not for: spam, hate, or blasting invite links.
-
-Start here:
-• Drop one thing that confused you in the app → Product feedback
-• Drop one take you’d post on the Square → Square opinions
-• App: https://barathx.com
-
-Thanks for building this with us.
-— BarathX
+no spam. no hate. human takes only.
+— bx
 ```
 
 ---
 
-## Invite message (Channel → Community, or DMs)
+## Invite (Channel / Story / DM)
 
 ```
-BarathX Early Circle is open — WhatsApp Community for early customers.
+BarathX Square is live — WhatsApp Community for soft-launch feedback + takes.
 
-Share feedback, bugs, and real opinions on the app. Human takes only.
-
-Join → [paste Community invite link]
-App → https://barathx.com
+join → [Community invite link]
+app → https://barathx.com
 ```
 
-Pin the invite on your **Channel** once, then remind weekly — don’t spam.
+Post the invite **once** on the Channel, then remind lightly — don’t spam.
 
 ---
 
-## How this sits next to Founding 100
+## Founding 100 (don’t mix ₹ here)
 
-- **WhatsApp Early Circle** = distribution + feedback room (up to Community cap).
-- **Founding 100** = in-app earned spots for real engagement (see `brand/social/FOUNDING-PUBLIC-COPY.md`). Don’t promise ₹ amounts in this Community.
-
-Public line if asked about Founding:
+If someone asks about Founding:
 ```
 100 Founding spots, earned by opening a debate that gets real engagement, not by signing up. → barathx.com
 ```
 
 ---
 
-## Admin checklist
+## Checklist
 
-1. Create Community on personal WhatsApp (not Business app).
-2. Name + description + Early Circle icon.
-3. Add groups: Product feedback · Square opinions · Wins & shoutouts.
-4. Post first Announcement.
-5. Create invite link → share once on Channel + IG/X story.
-6. Approve join requests if you enable that.
-7. When you near the cap, close invites and start a waitlist post on the Channel.
+1. Create Community on personal WhatsApp  
+2. Name `BarathX Square` + description + Gen Z icon  
+3. Add groups: product feedback · hot takes · proof  
+4. Post first Announcement  
+5. Invite link → Channel + IG/X story  
+6. Near the cap → close invites, waitlist on Channel  
