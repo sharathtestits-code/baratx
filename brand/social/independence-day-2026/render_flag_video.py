@@ -185,11 +185,11 @@ def compose_overlay(base: Image.Image, logo: Image.Image, progress: float) -> Im
     draw_text_bold(draw, (bx, by), brand, f_brand, (255, 255, 255, 255), stroke_w=5)
 
     # Wish — bolder serif
-    f_wish = font(FONT_SERIF, 72)
+    f_wish = font(FONT_SERIF, 68)
     wish = "Happy Independence Day"
     ww, wh = text_size(draw, wish, f_wish)
     wx = (W - ww) // 2
-    wy = by + th + 40
+    wy = by + th + 36
     draw_text_bold(
         draw,
         (wx, wy),
@@ -200,29 +200,43 @@ def compose_overlay(base: Image.Image, logo: Image.Image, progress: float) -> Im
         stroke_w=5,
     )
 
-    # Dark plate behind date + tagline for contrast on white band
-    plate_top = wy + wh + 18
-    plate_h = 168
+    # Dark plate behind milestone + date + tagline (contrast on white band)
+    plate_top = wy + wh + 16
+    plate_h = 230
     plate = [
-        int(W * 0.08),
+        int(W * 0.07),
         plate_top,
-        int(W * 0.92),
+        int(W * 0.93),
         plate_top + plate_h,
     ]
-    draw.rounded_rectangle(plate, radius=28, fill=(8, 10, 14, 200))
-    # Thin saffron→green accent on plate edge
-    draw.rounded_rectangle(plate, radius=28, outline=(255, 153, 51, 180), width=2)
+    draw.rounded_rectangle(plate, radius=28, fill=(8, 10, 14, 210))
+    draw.rounded_rectangle(plate, radius=28, outline=(255, 153, 51, 200), width=3)
+
+    # 80th milestone — bold gold
+    f_80 = font(FONT_SANS, 52)
+    milestone = "80th Independence Day"
+    mww, mwh = text_size(draw, milestone, f_80)
+    my = plate_top + 22
+    draw_text_bold(
+        draw,
+        ((W - mww) // 2, my),
+        milestone,
+        f_80,
+        (255, 214, 140, 255),
+        stroke=(0, 0, 0, 255),
+        stroke_w=3,
+    )
 
     # Date — bold gold (not white)
-    f_date = font(FONT_SANS, 48)
+    f_date = font(FONT_SANS, 44)
     date = "15 August 2026"
     dw, dh = text_size(draw, date, f_date)
     dx = (W - dw) // 2
-    dy = plate_top + 28
+    dy = my + mwh + 16
     gap = 22
     rule_y = dy + dh // 2
-    draw.line([(dx - 140, rule_y), (dx - gap, rule_y)], fill=(*SAFFRON, 255), width=4)
-    draw.line([(dx + dw + gap, rule_y), (dx + dw + 140, rule_y)], fill=(*GREEN, 255), width=4)
+    draw.line([(dx - 120, rule_y), (dx - gap, rule_y)], fill=(*SAFFRON, 255), width=4)
+    draw.line([(dx + dw + gap, rule_y), (dx + dw + 120, rule_y)], fill=(*GREEN, 255), width=4)
     draw_text_bold(
         draw,
         (dx, dy),
@@ -234,10 +248,10 @@ def compose_overlay(base: Image.Image, logo: Image.Image, progress: float) -> Im
     )
 
     # Tagline — bold cream on dark plate
-    f_tag = font(FONT_SANS, 46)
+    f_tag = font(FONT_SANS, 44)
     tag = "India’s public square."
     tgw, tgh = text_size(draw, tag, f_tag)
-    ty = dy + dh + 22
+    ty = dy + dh + 16
     draw_text_bold(
         draw,
         ((W - tgw) // 2, ty),
@@ -249,25 +263,26 @@ def compose_overlay(base: Image.Image, logo: Image.Image, progress: float) -> Im
     )
 
     # CTA block — larger bottom copy
-    f_cta = font(FONT_SANS, 52)
+    f_cta = font(FONT_SANS, 50)
     cta = "Leave one honest take"
     cw, ch = text_size(draw, cta, f_cta)
-    cy = int(H * 0.74)
+    cy = int(H * 0.72)
     draw_text_bold(draw, ((W - cw) // 2, cy), cta, f_cta, (255, 255, 255, 255), stroke_w=5)
 
-    f_url = font(FONT_SANS, 58)
-    url = "barathx.com"
+    # Full URL so platforms / share page treat it as a link
+    f_url = font(FONT_SANS, 44)
+    url = "https://barathx.com"
     uw, uh = text_size(draw, url, f_url)
-    uy = cy + ch + 28
-    pad_x, pad_y = 48, 22
+    uy = cy + ch + 26
+    pad_x, pad_y = 40, 20
     pill = [
         (W - uw) // 2 - pad_x,
         uy - pad_y // 2,
         (W + uw) // 2 + pad_x,
-        uy + uh + pad_y // 2,
+        uy + uh + pad_y // 2 + 8,
     ]
     draw.rounded_rectangle(pill, radius=36, fill=(255, 153, 51, 245))
-    draw.rounded_rectangle(pill, radius=36, outline=(255, 255, 255, 200), width=3)
+    draw.rounded_rectangle(pill, radius=36, outline=(255, 255, 255, 220), width=3)
     draw_text_bold(
         draw,
         ((W - uw) // 2, uy),
@@ -277,13 +292,20 @@ def compose_overlay(base: Image.Image, logo: Image.Image, progress: float) -> Im
         stroke=(140, 60, 10, 200),
         stroke_w=2,
     )
+    # Underline — reads as a link on the pill
+    ul_y = uy + uh + 2
+    draw.line(
+        [((W - uw) // 2, ul_y), ((W + uw) // 2, ul_y)],
+        fill=(255, 255, 255, 230),
+        width=3,
+    )
 
     f_soon = font(FONT_SANS, 34)
     soon = "Browser soft launch · Apps coming soon"
     sw, _ = text_size(draw, soon, f_soon)
     draw_text_bold(
         draw,
-        ((W - sw) // 2, uy + uh + 34),
+        ((W - sw) // 2, uy + uh + 36),
         soon,
         f_soon,
         (255, 255, 255, 245),
