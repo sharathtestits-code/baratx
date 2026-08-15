@@ -16,7 +16,7 @@ export default function Login() {
     const raw = (params.get("next") || "").trim();
     // Only allow same-origin relative paths (ops console, feed, etc.)
     if (raw.startsWith("/") && !raw.startsWith("//") && !raw.includes("://")) return raw;
-    return "/feed";
+    return "/home";
   })();
   const [method, setMethod] = useState(preferPhone ? "phone" : "email");
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export default function Login() {
 
   useEffect(() => {
     try {
-      if (nextPath && nextPath !== "/feed") sessionStorage.setItem("bx_next", nextPath);
+      if (nextPath && nextPath !== "/home" && nextPath !== "/feed") sessionStorage.setItem("bx_next", nextPath);
     } catch {
       /* ignore */
     }

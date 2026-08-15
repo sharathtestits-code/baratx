@@ -4,6 +4,7 @@
  */
 
 const ALLOWED_PREFIXES = [
+  "/home",
   "/feed",
   "/spaces",
   "/arenas",
@@ -33,7 +34,7 @@ function isAllowedPath(pathOnly) {
   });
 }
 
-export function safeNextPath(raw, fallback = "/feed") {
+export function safeNextPath(raw, fallback = "/home") {
   const value = (raw || "").trim();
   if (!value) return fallback;
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(value)) return fallback;
