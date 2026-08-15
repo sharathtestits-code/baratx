@@ -30,6 +30,7 @@ export const LOCALES = [
 const STORAGE_KEY = "bx_lang";
 
 const EN = {
+  "nav.home": "Home",
   "nav.square": "Square",
   "nav.live": "Live",
   "nav.arenas": "Arenas",
@@ -44,6 +45,27 @@ const EN = {
   "nav.plaza": "Plaza",
 
   "brand.tagline": "India's public square",
+
+  "home.title": "Home",
+  "home.sub": "Your hub — pick up where you left off.",
+  "home.loading": "Loading…",
+  "home.loadError": "Could not load Home.",
+  "home.welcomeAria": "Welcome",
+  "home.welcome": "Welcome back, {name}",
+  "home.welcomeHint": "Pick up where you left off or explore something new.",
+  "home.goSquare": "Go to Square",
+  "home.continue": "Continue",
+  "home.seeAll": "See all",
+  "home.following": "Following activity",
+  "home.yourArenas": "Your arenas",
+  "home.arenasEmpty": "Join an arena to see it here.",
+  "home.livePeek": "Live peek",
+  "home.liveEmpty": "No rooms live — start one on Live.",
+  "home.continueArena": "Jump back into this arena",
+  "home.continueTopic": "Your topic",
+  "home.continueSquareHint": "Drop a take on India's public square",
+  "home.continueArenasHint": "Pick a side and argue it",
+  "home.continueLiveHint": "Open or join a live room",
 
   "square.kicker": "India's public square",
   "square.title": "Square",
@@ -193,6 +215,7 @@ const EN = {
 
 const HI = {
   ...EN,
+  "nav.home": "होम",
   "nav.square": "स्क्वायर",
   "nav.live": "लाइव",
   "nav.arenas": "एरीना",
@@ -207,6 +230,27 @@ const HI = {
   "nav.plaza": "प्लाज़ा",
 
   "brand.tagline": "भारत का सार्वजनिक चौक",
+
+  "home.title": "होम",
+  "home.sub": "आपका हब — जहाँ छोड़ा था वहीं से शुरू करें।",
+  "home.loading": "लोड हो रहा है…",
+  "home.loadError": "होम लोड नहीं हो सका।",
+  "home.welcomeAria": "स्वागत",
+  "home.welcome": "वापसी पर स्वागत है, {name}",
+  "home.welcomeHint": "जहाँ छोड़ा था वहीं से शुरू करें या कुछ नया देखें।",
+  "home.goSquare": "स्क्वायर पर जाएँ",
+  "home.continue": "जारी रखें",
+  "home.seeAll": "सब देखें",
+  "home.following": "फ़ॉलोइंग गतिविधि",
+  "home.yourArenas": "आपके एरीना",
+  "home.arenasEmpty": "यहाँ दिखाने के लिए कोई एरीना जॉइन करें।",
+  "home.livePeek": "लाइव झलक",
+  "home.liveEmpty": "कोई रूम लाइव नहीं — लाइव पर एक शुरू करें।",
+  "home.continueArena": "इस एरीना में वापस जाएँ",
+  "home.continueTopic": "आपका विषय",
+  "home.continueSquareHint": "भारत के सार्वजनिक चौक पर अपनी राय लिखें",
+  "home.continueArenasHint": "पक्ष चुनें और बहस करें",
+  "home.continueLiveHint": "लाइव रूम खोलें या जॉइन करें",
 
   "square.kicker": "भारत का सार्वजनिक चौक",
   "square.title": "स्क्वायर",
@@ -356,6 +400,7 @@ const HI = {
 
 const TE = {
   ...EN,
+  "nav.home": "హోమ్",
   "nav.square": "స్క్వేర్",
   "nav.live": "లైవ్",
   "nav.arenas": "అరీనాలు",
@@ -370,6 +415,27 @@ const TE = {
   "nav.plaza": "ప్లాజా",
 
   "brand.tagline": "భారత్ పబ్లిక్ స్క్వేర్",
+
+  "home.title": "హోమ్",
+  "home.sub": "మీ హబ్ — ఆపిన చోట నుంచి కొనసాగించండి.",
+  "home.loading": "లోడ్ అవుతోంది…",
+  "home.loadError": "హోమ్ లోడ్ కాలేదు.",
+  "home.welcomeAria": "స్వాగతం",
+  "home.welcome": "మళ్లీ స్వాగతం, {name}",
+  "home.welcomeHint": "ఆపిన చోట నుంచి కొనసాగించండి లేదా కొత్తది చూడండి.",
+  "home.goSquare": "స్క్వేర్‌కి వెళ్లండి",
+  "home.continue": "కొనసాగించండి",
+  "home.seeAll": "అన్నీ చూడండి",
+  "home.following": "ఫాలోయింగ్ కార్యకలాపం",
+  "home.yourArenas": "మీ అరీనాలు",
+  "home.arenasEmpty": "ఇక్కడ చూపించడానికి ఒక అరీనా జాయిన్ అవ్వండి.",
+  "home.livePeek": "లైవ్ సంగ్రహం",
+  "home.liveEmpty": "రూమ్‌లు లైవ్‌లో లేవు — లైవ్‌లో ఒకటి ప్రారంభించండి.",
+  "home.continueArena": "ఈ అరీనాలోకి తిరిగి వెళ్లండి",
+  "home.continueTopic": "మీ అంశం",
+  "home.continueSquareHint": "భారత్ పబ్లిక్ స్క్వేర్‌లో మీ అభిప్రాయం రాయండి",
+  "home.continueArenasHint": "వైపు ఎంచుకుని వాదించండి",
+  "home.continueLiveHint": "లైవ్ రూమ్ తెరవండి లేదా జాయిన్ అవ్వండి",
 
   "square.kicker": "భారత్ పబ్లిక్ స్క్వేర్",
   "square.title": "స్క్వేర్",
