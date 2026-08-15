@@ -21,6 +21,7 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT_DIR = ROOT / "brand" / "social" / "whatsapp"
+SCREENS_DIR = OUT_DIR / "screens"
 LOGO_PATH = ROOT / "brand" / "baratx-logo-avatar.png"
 
 # 720p vertical — smaller file for WhatsApp groups while still sharp on phones
@@ -37,6 +38,93 @@ GREEN = (19, 136, 8)
 FONT_SERIF = "/usr/share/fonts/truetype/noto/NotoSerif-Bold.ttf"
 FONT_SANS = "/usr/share/fonts/truetype/macos/Inter-Bold.ttf"
 FONT_SANS_REG = "/usr/share/fonts/truetype/macos/Inter-Regular.ttf"
+
+# Real website / in-app page stills behind each beat
+SCENE_SCREEN = {
+    "hook": "bx-site-landing.png",
+    "brand": "bx-site-landing.png",
+    "square": "bx-site-square-raw.jpg",
+    "arenas": "bx-site-arenas.jpg",
+    "live": "bx-site-live.jpg",
+    "promise": "bx-site-home.jpg",
+    "cta": "bx-site-signup.png",
+}
+
+_SCREEN_CACHE: dict[str, Image.Image] = {}
+
+
+def cover_resize(img: Image.Image, tw: int, th: int) -> Image.Image:
+    """Scale+crop to fill target (object-fit: cover)."""
+    img = img.convert("RGB")
+    sw, sh = img.size
+    scale = max(tw / sw, th / sh)
+    nw, nh = int(sw * scale + 0.5), int(sh * scale + 0.5)
+    img = img.resize((nw, nh), Image.Resampling.LANCZOS)
+    left = (nw - tw) // 2
+    top = (nh - th) // 2
+    return img.crop((left, top, left + tw, top + th))
+
+
+def load_screen(name: str) -> Image.Image:
+    if name in _SCREEN_CACHE:
+        return _SCREEN_CACHE[name]
+    path = SCREENS_DIR / name
+    if not path.exists():
+        # Fallback solid if missing
+        img = Image.new("RGB", (W, H), DARK)
+    else:
+        # Oversize base for Ken Burns zoom room
+        img = cover_resize(Image.open(path), int(W * 1.18), int(H * 1.18))
+    _SCREEN_CACHE[name] = img
+    return img
+
+
+def ken_burns(base: Image.Image, local: float, t: float) -> Image.Image:
+    """Slow zoom + pan across website screenshot."""
+    bw, bh = base.size
+    zoom = 1.0 + 0.08 * local + 0.02 * math.sin(t * 0.6)
+    cw, ch = int(W * zoom), int(H * zoom)
+    cw = min(cw, bw)
+    ch = min(ch, bh)
+    # Drift
+    max_x = max(bw - cw, 1)
+    max_y = max(bh - ch, 1)
+    x = int(max_x * (0.15 + 0.7 * local))
+    y = int(max_y * (0.2 + 0.35 * math.sin(local * math.pi)))
+    crop = base.crop((x, y, x + cw, y + ch)).resize((W, H), Image.Resampling.LANCZOS)
+    return crop
+
+
+def make_bg(t: float, kind: str, local: float = 0.0) -> Image.Image:
+    """Website page screenshot background with readable dark veil."""
+    screen_name = SCENE_SCREEN.get(kind, "bx-site-landing.png")
+    base = load_screen(screen_name)
+    frame = ken_burns(base, local, t)
+
+    # Soften busy UI slightly so captions pop
+    if kind in ("square", "arenas", "live", "promise", "cta"):
+        frame = frame.filter(ImageFilter.GaussianBlur(radius=1.1))
+    else:
+        frame = frame.filter(ImageFilter.GaussianBlur(radius=1.6))
+
+    frame = ImageEnhance.Brightness(frame).enhance(0.72 if kind == "hook" else 0.82)
+    frame = ImageEnhance.Contrast(frame).enhance(1.08)
+
+    # Gradient veil — keep center UI visible, darken for text
+    rgba = frame.convert("RGBA")
+    veil = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    vd = ImageDraw.Draw(veil)
+    for y in range(H):
+        # Stronger top/bottom for captions; lighter mid so page UI shows
+        top = max(0, int(170 * (1 - y / (H * 0.28))))
+        bot = max(0, int(190 * max(0, (y - H * 0.55) / (H * 0.45))))
+        mid = 55 if kind in ("square", "arenas", "live", "home", "promise") else 85
+        a = min(210, top + bot + mid)
+        vd.line([(0, y), (W, y)], fill=(8, 10, 14, a))
+    # Saffron edge accent
+    vd.rectangle([0, 0, 6, H], fill=(*SAFFRON, 160))
+    out = Image.alpha_composite(rgba, veil).convert("RGB")
+    return out
 
 
 def font(path: str, size: int) -> ImageFont.FreeTypeFont:
@@ -109,39 +197,6 @@ def scene_at(t: float) -> dict:
     return {"kind": kind, "copy": copy, "local": 1.0, "start": beats[-1][0], "end": beats[-1][1]}
 
 
-def make_bg(t: float, kind: str) -> Image.Image:
-    """Dark branded background with soft motion — readable on phones."""
-    img = Image.new("RGB", (W, H), DARK)
-    arr = np.asarray(img).astype(np.float32)
-    yy, xx = np.mgrid[0:H, 0:W]
-    # Animated radial glow
-    cx = W * (0.35 + 0.3 * math.sin(t * 0.7))
-    cy = H * (0.28 + 0.08 * math.cos(t * 0.9))
-    dist = np.sqrt((xx - cx) ** 2 + (yy - cy) ** 2)
-    glow = np.clip(1.0 - dist / (H * 0.85), 0, 1) ** 1.6
-
-    if kind in ("hook", "promise"):
-        tint = np.array([40, 18, 12], dtype=np.float32)
-    elif kind == "arenas":
-        tint = np.array([18, 55, 40], dtype=np.float32)
-    elif kind == "live":
-        tint = np.array([70, 35, 12], dtype=np.float32)
-    elif kind == "cta":
-        tint = np.array([90, 45, 12], dtype=np.float32)
-    else:
-        tint = np.array([55, 28, 12], dtype=np.float32)
-
-    arr += glow[..., None] * tint
-    # Soft saffron top / green bottom wash
-    top = np.clip(1.0 - yy / (H * 0.45), 0, 1)[..., None] * np.array([28, 12, 4])
-    bot = np.clip((yy - H * 0.55) / (H * 0.45), 0, 1)[..., None] * np.array([4, 22, 10])
-    arr += top + bot
-    # Grain
-    noise = np.random.randint(-6, 7, arr.shape).astype(np.float32)
-    out = np.clip(arr + noise, 0, 255).astype(np.uint8)
-    return Image.fromarray(out, "RGB")
-
-
 def pill(draw, text, fnt, y, fill=SAFFRON):
     tw, th = text_size(draw, text, fnt)
     pad_x, pad_y = 28, 14
@@ -176,8 +231,8 @@ def compose(frame_bg: Image.Image, logo: Image.Image, scene: dict, t: float) -> 
     local = scene["local"]
     fade = min(1.0, local * 4.0) if local < 0.85 else max(0.55, 1.0 - (local - 0.85) / 0.15)
 
-    # Top brand chip always visible after hook
-    if kind != "hook":
+    # Top brand chip — skip on product UI pages (logo already in screenshot)
+    if kind not in ("hook", "square", "arenas", "live", "promise"):
         lx = (W - logo.width) // 2
         ly = 48
         layer.paste(logo, (lx, ly), logo)
@@ -212,40 +267,54 @@ def compose(frame_bg: Image.Image, logo: Image.Image, scene: dict, t: float) -> 
         draw_text(draw, ((W - ww) // 2, y + 36), wedge, f_line, fill=(255, 255, 255, 255), stroke_w=4)
 
     elif kind in ("square", "arenas", "live"):
+        # Bottom caption plate — leave most of the website UI visible above
         title, *rest = lines
-        f_title = font(FONT_SANS, 64)
-        tw, th = text_size(draw, title, f_title)
-        y = int(H * 0.36)
-        # Accent bar
+        plate_h = 210
+        plate_top = H - plate_h - 52
         draw.rounded_rectangle(
-            [W // 2 - 48, y - 18, W // 2 + 48, y - 10],
-            radius=4,
-            fill=(*SAFFRON, 255),
+            [24, plate_top, W - 24, H - 44],
+            radius=24,
+            fill=(8, 10, 14, 210),
         )
-        draw_text(draw, ((W - tw) // 2, y), title, f_title, fill=(*SAFFRON, 255), stroke_w=4)
-        y += th + 28
-        f_body = font(FONT_SANS, 40)
+        draw.rounded_rectangle(
+            [24, plate_top, W - 24, H - 44],
+            radius=24,
+            outline=(*SAFFRON, 200),
+            width=2,
+        )
+        f_title = font(FONT_SANS, 48)
+        tw, th = text_size(draw, title, f_title)
+        y = plate_top + 22
+        draw_text(draw, ((W - tw) // 2, y), title, f_title, fill=(*SAFFRON, 255), stroke_w=3)
+        y += th + 10
+        f_body = font(FONT_SANS, 32)
         for line in rest:
             bw, bh = text_size(draw, line, f_body)
-            draw_text(draw, ((W - bw) // 2, y), line, f_body, fill=(*CREAM, 255), stroke_w=4)
-            y += bh + 16
-        # Feature chips
+            draw_text(draw, ((W - bw) // 2, y), line, f_body, fill=(*CREAM, 255), stroke_w=3)
+            y += bh + 8
         chips = {
             "square": ["For you", "Following", "Real replies"],
             "arenas": ["Sports", "Politics", "Startups"],
             "live": ["Debate", "Audio", "15 seats"],
         }[kind]
-        f_chip = font(FONT_SANS, 26)
-        chip_y = y + 40
-        gap = 12
-        widths = [text_size(draw, c, f_chip)[0] + 36 for c in chips]
+        f_chip = font(FONT_SANS, 22)
+        chip_y = y + 8
+        gap = 10
+        widths = [text_size(draw, c, f_chip)[0] + 28 for c in chips]
         total = sum(widths) + gap * (len(chips) - 1)
         x = (W - total) // 2
         for c, cw in zip(chips, widths):
-            draw.rounded_rectangle([x, chip_y, x + cw, chip_y + 44], radius=22, fill=(255, 255, 255, 28))
-            draw.rounded_rectangle([x, chip_y, x + cw, chip_y + 44], radius=22, outline=(*SAFFRON, 180), width=2)
+            draw.rounded_rectangle([x, chip_y, x + cw, chip_y + 36], radius=18, fill=(255, 255, 255, 24))
+            draw.rounded_rectangle([x, chip_y, x + cw, chip_y + 36], radius=18, outline=(*SAFFRON, 180), width=2)
             ctw, cth = text_size(draw, c, f_chip)
-            draw_text(draw, (x + (cw - ctw) // 2, chip_y + (44 - cth) // 2), c, f_chip, fill=(255, 255, 255, 255), stroke_w=2)
+            draw_text(
+                draw,
+                (x + (cw - ctw) // 2, chip_y + (36 - cth) // 2),
+                c,
+                f_chip,
+                fill=(255, 255, 255, 255),
+                stroke_w=2,
+            )
             x += cw + gap
 
     elif kind == "promise":
@@ -335,11 +404,9 @@ def main() -> None:
         for i in range(N_FRAMES):
             t = i / FPS
             scene = scene_at(t)
-            bg = make_bg(t, scene["kind"])
+            bg = make_bg(t, scene["kind"], scene["local"])
             use_logo = logo_big if scene["kind"] == "brand" else logo
-            # Brand scene: paste larger logo manually via compose path — compose uses logo param
             if scene["kind"] == "brand":
-                # Temporarily larger logo in brand beat
                 frame = compose(bg, logo_big, scene, t)
             else:
                 frame = compose(bg, use_logo, scene, t)
