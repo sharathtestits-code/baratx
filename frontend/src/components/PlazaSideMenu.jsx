@@ -237,6 +237,14 @@ export default function PlazaSideMenu() {
               {chevron}
             </button>
 
+            <button type="button" className="plaza-side-manage" onClick={() => goLink("/search")}>
+              <span className="plaza-side-manage-copy">
+                <strong>{t("nav.explore")}</strong>
+                <em>{t("nav.search")}</em>
+              </span>
+              {chevron}
+            </button>
+
             <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
               <span className="plaza-side-manage-copy">
                 <strong>{t("menu.myArenas")}</strong>

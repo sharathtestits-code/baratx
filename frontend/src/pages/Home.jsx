@@ -257,29 +257,6 @@ export default function Home() {
               </ul>
             )}
           </section>
-
-          <section className="home-section home-live-inline" aria-labelledby="home-live-title">
-            <div className="home-section-head">
-              <h2 id="home-live-title">{t("home.livePeek")}</h2>
-              <Link to="/spaces">{t("home.seeAll")}</Link>
-            </div>
-            {liveDebates[0] ? (
-              <Link to={`/spaces/${liveDebates[0].id}`} className="home-live-card">
-                <span className="live-pill">{t("live.liveNow")}</span>
-                <strong>{liveDebates[0].title}</strong>
-                <span className="hint">
-                  {liveDebates[0].host?.username
-                    ? `@${liveDebates[0].host.username}`
-                    : t("nav.live")}
-                  {typeof liveDebates[0].post_count === "number"
-                    ? ` · ${liveDebates[0].post_count}`
-                    : ""}
-                </span>
-              </Link>
-            ) : (
-              <p className="hint">{t("home.liveEmpty")}</p>
-            )}
-          </section>
         </div>
       </div>
     </div>
