@@ -11,6 +11,7 @@ export default function SuggestionsStrip({
   token,
   surface = "square",
   arenaKey = "",
+  topicKey = "",
   onPick,
   title,
   className = "",
@@ -30,6 +31,7 @@ export default function SuggestionsStrip({
         const data = await suggestionsApi.list(token, {
           surface,
           arena: arenaKey || undefined,
+          topic: topicKey || undefined,
           limit: 20,
         });
         if (cancelled) return;
@@ -45,7 +47,7 @@ export default function SuggestionsStrip({
     return () => {
       cancelled = true;
     };
-  }, [token, surface, arenaKey]);
+  }, [token, surface, arenaKey, topicKey]);
 
   if (!open) {
     return (
