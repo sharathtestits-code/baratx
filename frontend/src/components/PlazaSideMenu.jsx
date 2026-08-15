@@ -3,18 +3,20 @@ import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { useAuth } from "../context/AuthContext";
-import { useT } from "../context/LocaleContext";
+import { useLocale, useT } from "../context/LocaleContext";
 import { notificationsApi } from "../api";
 import { ARENA_TOPICS } from "../arenas";
 import { IconLogout } from "./Icons";
 
 /**
  * Change Arena drawer — arenas + Alerts + Settings + Log out (Appearance lives in Settings).
+ * Brand title is always Latin BarathX (aligned with every other page).
  */
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
   const { token, user, logout } = useAuth();
   const t = useT();
+  const { locale } = useLocale();
   const location = useLocation();
   const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
@@ -119,6 +121,19 @@ export default function PlazaSideMenu() {
     ? location.pathname.split("/")[2]
     : "";
 
+  const chevron = (
+    <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M6 4l4 4-4 4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+
   return createPortal(
     <>
       <div
@@ -130,7 +145,7 @@ export default function PlazaSideMenu() {
         id="plaza-side-menu"
         className={`plaza-side-menu${open ? " is-open" : ""}`}
         aria-hidden={!open}
-        aria-label="Menu"
+        aria-label={t("menu.aria")}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="plaza-side-head">
@@ -143,7 +158,7 @@ export default function PlazaSideMenu() {
             onClick={() => setPickerOpen((v) => !v)}
           >
             <span className="plaza-side-arena-name">
-              Bharat
+              BarathX
               <svg
                 className={`plaza-side-chevron${pickerOpen ? " is-open" : ""}`}
                 viewBox="0 0 16 16"
@@ -159,9 +174,19 @@ export default function PlazaSideMenu() {
                 />
               </svg>
             </span>
-            <span className="plaza-side-change">Change Arena</span>
+            {locale.id !== "en" ? (
+              <span className="plaza-side-brand-native" lang={locale.id}>
+                {locale.brandNative}
+              </span>
+            ) : null}
+            <span className="plaza-side-change">{t("menu.changeArena")}</span>
           </button>
-          <button type="button" className="plaza-side-close" onClick={close} aria-label="Close menu">
+          <button
+            type="button"
+            className="plaza-side-close"
+            onClick={close}
+            aria-label={t("nav.closeMenu")}
+          >
             ×
           </button>
         </div>
@@ -169,7 +194,7 @@ export default function PlazaSideMenu() {
         <nav
           id={listId}
           className={`plaza-side-arenas${pickerOpen ? " is-open" : ""}`}
-          aria-label="Arenas"
+          aria-label={t("nav.arenas")}
           hidden={!pickerOpen}
         >
           <ul className="plaza-side-arena-list">
@@ -192,9 +217,7 @@ export default function PlazaSideMenu() {
           </ul>
         </nav>
 
-        {!pickerOpen && (
-          <p className="plaza-side-picker-hint">Tap Change Arena to pick Sports, Politics, and more.</p>
-        )}
+        {!pickerOpen && <p className="plaza-side-picker-hint">{t("menu.pickerHint")}</p>}
 
         {/* Site links only when arena picker is closed — avoids overlapping layers. */}
         {!pickerOpen && (
@@ -202,110 +225,56 @@ export default function PlazaSideMenu() {
             <button type="button" className="plaza-side-manage" onClick={() => goLink("/notifications")}>
               <span className="plaza-side-manage-copy">
                 <strong>
-                  Alerts
+                  {t("menu.alerts")}
                   {unread > 0 ? (
                     <span className="plaza-side-unread" aria-label={`${unread} unread`}>
                       {unread > 9 ? "9+" : unread}
                     </span>
                   ) : null}
                 </strong>
-                <em>Replies, follows, and new posts</em>
+                <em>{t("menu.alertsSub")}</em>
               </span>
-              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M6 4l4 4-4 4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {chevron}
             </button>
 
             <button type="button" className="plaza-side-manage" onClick={goMyArenas}>
               <span className="plaza-side-manage-copy">
-                <strong>My Arenas</strong>
-                <em>Pick a side. Jump in.</em>
+                <strong>{t("menu.myArenas")}</strong>
+                <em>{t("menu.myArenasSub")}</em>
               </span>
-              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M6 4l4 4-4 4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {chevron}
             </button>
 
             <button type="button" className="plaza-side-manage" onClick={() => goLink("/communities")}>
               <span className="plaza-side-manage-copy">
-                <strong>Communities</strong>
-                <em>Member-run groups — not Arenas</em>
+                <strong>{t("menu.communities")}</strong>
+                <em>{t("menu.communitiesSub")}</em>
               </span>
-              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M6 4l4 4-4 4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {chevron}
             </button>
 
             <button type="button" className="plaza-side-manage" onClick={() => goLink("/rewards")}>
               <span className="plaza-side-manage-copy">
-                <strong>Founding 100</strong>
-                <em>Earned by a real debate — not signup</em>
+                <strong>{t("menu.founding")}</strong>
+                <em>{t("menu.foundingSub")}</em>
               </span>
-              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M6 4l4 4-4 4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {chevron}
             </button>
 
             <button type="button" className="plaza-side-manage plaza-side-settings" onClick={goSettings}>
               <span className="plaza-side-manage-copy">
-                <strong>Settings</strong>
-                <em>Appearance, privacy, mutes, log out</em>
+                <strong>{t("menu.settings")}</strong>
+                <em>{t("menu.settingsSub")}</em>
               </span>
-              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M6 4l4 4-4 4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {chevron}
             </button>
 
             <button type="button" className="plaza-side-manage" onClick={() => goLink("/guidelines")}>
               <span className="plaza-side-manage-copy">
-                <strong>Guidelines</strong>
-                <em>House rules + how badges work</em>
+                <strong>{t("menu.guidelines")}</strong>
+                <em>{t("menu.guidelinesSub")}</em>
               </span>
-              <svg className="plaza-side-manage-chevron" viewBox="0 0 16 16" aria-hidden="true">
-                <path
-                  d="M6 4l4 4-4 4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {chevron}
             </button>
 
             {user ? (
@@ -317,7 +286,7 @@ export default function PlazaSideMenu() {
                 <span className="plaza-side-manage-copy">
                   <strong>
                     <IconLogout className="plaza-side-logout-icon" aria-hidden="true" />
-                    Log out
+                    {t("menu.logout")}
                   </strong>
                   <em>@{user.username}</em>
                 </span>
