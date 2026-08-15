@@ -15,14 +15,16 @@ Research for WhatsApp groups / Status / Channel (2026):
 | `barathx-whatsapp-teaser-poster.jpg` | Thumbnail / preview still |
 | `render_whatsapp_teaser.py` | Re-render |
 
-## Beats
-1. Hook — WhatsApp takes disappear by Monday  
-2. Brand — BarathX · India’s public square · Pick a side. Argue it live.  
-3. Square — Drop a take · real reply  
-4. Arenas — Pick a side · Agree vs Disagree  
-5. Live — Argue it live · up to 15 voices  
-6. Promise — Human takes only. No AI slop.  
-7. CTA — https://barathx.com · soft launch · Founding 100 (no ₹)
+## Beats (website page in background)
+1. Hook — landing page behind “WhatsApp takes disappear…”  
+2. Brand — landing · India’s public square  
+3. Square — real Square UI still  
+4. Arenas — real Arenas UI still  
+5. Live — real Live/Spaces UI still  
+6. Promise — Home hub still · Human takes only  
+7. CTA — signup page · https://barathx.com  
+
+Screens live in `screens/` (`bx-site-*.png|jpg`).
 
 ## Paste message (send with the video)
 
