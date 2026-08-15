@@ -1521,7 +1521,11 @@ def login_email(
         raise HTTPException(status_code=429, detail=str(exc)) from exc
     ident = payload.email.strip()
     if "@" in ident:
-        user = db.query(models.User).filter(models.User.email == ident.lower()).first()
+        user = (
+            db.query(models.User)
+            .filter(func.lower(models.User.email) == ident.lower())
+            .first()
+        )
     else:
         user = db.query(models.User).filter(models.User.username == ident).first()
     if not user or not auth.verify_password(payload.password, user.password_hash):
@@ -1551,7 +1555,16 @@ def auth_google(
     try:
         claims = google_auth.verify_google_id_token(payload.id_token)
     except ValueError as exc:
-        raise HTTPException(status_code=401, detail=str(exc)) from exc
+        # Map common Google token failures to actionable copy (mobile aud mismatch, etc.).
+        msg = str(exc)
+        if "audience mismatch" in msg.lower():
+            msg = (
+                "Google sign-in misconfigured (client ID mismatch). "
+                "Use the web Google button on barathx.com, or update the app’s Google client IDs."
+            )
+        elif "not verified" in msg.lower():
+            msg = "That Google account’s email is not verified. Use another Google account or email signup."
+        raise HTTPException(status_code=401, detail=msg) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -1559,7 +1572,12 @@ def auth_google(
     display_name = (claims.get("name") or email.split("@")[0])[:50]
     picture = claims.get("picture")
 
-    user = db.query(models.User).filter(models.User.email == email).first()
+    # Case-insensitive match — legacy rows may have mixed-case emails.
+    user = (
+        db.query(models.User)
+        .filter(func.lower(models.User.email) == email)
+        .first()
+    )
     if not user:
         if not payload.confirm_age_18:
             raise HTTPException(
@@ -1585,18 +1603,40 @@ def auth_google(
             token_version=0,
         )
         db.add(user)
-        db.commit()
-        db.refresh(user)
-        seed.follow_official_accounts(db, user)
-        db.commit()
-    else:
-        # Do not silently verify an unverified password account via Google alone —
-        # require the mailbox owner to confirm email first (or use phone/Google-new).
-        if not user.is_email_verified and not user.is_phone_verified:
-            raise HTTPException(
-                status_code=403,
-                detail="This email already has a BarathX account. Confirm that email (or reset password) before linking Google.",
+        try:
+            db.commit()
+        except Exception:
+            # Race / case-variant duplicate — re-load and continue as login.
+            db.rollback()
+            user = (
+                db.query(models.User)
+                .filter(func.lower(models.User.email) == email)
+                .first()
             )
+            if not user:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Could not create account with Google. Try email signup or try again.",
+                )
+        else:
+            db.refresh(user)
+            seed.follow_official_accounts(db, user)
+            db.commit()
+    else:
+        # Google already proved mailbox ownership (email_verified claim) — safe to
+        # mark verified and sign in (same as prior production behavior).
+        dirty = False
+        if user.email != email:
+            user.email = email
+            dirty = True
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            dirty = True
+        if picture and not user.avatar_url:
+            user.avatar_url = picture
+            dirty = True
+        if dirty:
+            db.commit()
 
     token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
