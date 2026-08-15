@@ -215,6 +215,7 @@ export default function ArenaDetail() {
   }
 
   const followingCount = topics.filter((t) => t.is_following).length;
+  const selectedTopic = topics.find((x) => String(x.id) === String(selectedTopicId));
 
   return (
     <div className="feed-wrap surface-page arena-detail plaza-page">
@@ -251,7 +252,12 @@ export default function ArenaDetail() {
             token={token}
             surface="arena"
             arenaKey={arenaKey}
-            title={`Top problems · ${arena.name}`}
+            topicKey={selectedTopic?.key || ""}
+            title={
+              selectedTopic
+                ? `Top problems · ${selectedTopic.name}`
+                : `Top problems · ${arena.name}`
+            }
             onPick={fillFromSuggestion}
           />
           <LiveNowStrip

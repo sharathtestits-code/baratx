@@ -524,9 +524,10 @@ export const searchApi = {
 };
 
 export const suggestionsApi = {
-  list: (token, { surface = "square", arena, limit = 20 } = {}) => {
+  list: (token, { surface = "square", arena, topic, limit = 20 } = {}) => {
     const params = new URLSearchParams({ surface, limit: String(limit) });
     if (arena) params.set("arena", arena);
+    if (topic) params.set("topic", topic);
     return request(`/suggestions?${params}`, {
       headers: token ? authHeaders(token) : {},
     });
