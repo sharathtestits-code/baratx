@@ -8480,6 +8480,15 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   letter-spacing: 0.01em;
 }
 
+.plaza-side-brand-native {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary, var(--muted));
+  letter-spacing: -0.01em;
+  margin-top: -0.15rem;
+}
+
 .plaza-side-close {
   width: 2rem;
   height: 2rem;
