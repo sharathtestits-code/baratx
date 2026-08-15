@@ -5,9 +5,11 @@ import { useAuth } from "../context/AuthContext";
 import { ARENA_TOPICS, arenaMeta } from "../arenas";
 import PlazaPageHeader from "../components/PlazaPageHeader";
 import LiveNowStrip from "../components/LiveNowStrip";
+import { useT } from "../context/LocaleContext";
 
 export default function Arenas() {
   const { token } = useAuth();
+  const t = useT();
   const [arenas, setArenas] = useState([]);
   const [debates, setDebates] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,34 +69,31 @@ export default function Arenas() {
       <div className="plaza-layout">
         <div className="plaza-main-top">
           <PlazaPageHeader
-            title="Arenas"
-            sub="Pick a side. Jump in. Not a group chat."
+            title={t("arenas.title")}
+            sub={t("arenas.sub")}
           />
 
           <div className="arena-featured">
-            <p className="arena-featured-kicker">Builders only</p>
-            <h2>Startups — Fund it or Pass</h2>
-            <p className="hint">
-              Argue the pitch and the raise live. 100 Founding spots, earned by opening a debate that
-              gets real engagement, not by signing up.
-            </p>
+            <p className="arena-featured-kicker">{t("arenas.featuredKicker")}</p>
+            <h2>{t("arenas.featuredTitle")}</h2>
+            <p className="hint">{t("arenas.featuredHint")}</p>
             <div className="arena-featured-actions">
               <Link to="/arenas/startups" className="btn btn-primary">
-                Enter Startups
+                {t("arenas.enterStartups")}
               </Link>
               <Link to="/rewards" className="btn btn-secondary">
-                Founding 100
+                {t("arenas.founding100")}
               </Link>
             </div>
           </div>
         </div>
 
-        <aside className="plaza-rail-stack" aria-label="Live debates">
-          <section className="suggestions-strip plaza-rail-questions" aria-label="Jump into an arena">
+        <aside className="plaza-rail-stack" aria-label={t("arenas.liveDebates")}>
+          <section className="suggestions-strip plaza-rail-questions" aria-label={t("arenas.jumpTitle")}>
             <div className="suggestions-head">
               <div>
-                <h2 className="suggestions-title">Jump into an arena</h2>
-                <p className="suggestions-sub">Pick a lane — open the floor and take a side.</p>
+                <h2 className="suggestions-title">{t("arenas.jumpTitle")}</h2>
+                <p className="suggestions-sub">{t("arenas.jumpSub")}</p>
               </div>
             </div>
             <ul className="suggestions-list">
@@ -109,18 +108,18 @@ export default function Arenas() {
           </section>
           <LiveNowStrip
             items={debates}
-            title="Live debates"
+            title={t("arenas.liveDebates")}
             seeAllTo="/spaces"
-            seeAllLabel="Enter Live"
+            seeAllLabel={t("arenas.enterLive")}
             limit={8}
-            emptyHint={loading ? "Loading…" : "No live debates yet — open an arena."}
+            emptyHint={loading ? t("settings.loading") : t("arenas.noLiveHint")}
           />
         </aside>
 
         <div className="plaza-main-compose">
           {error && <div className="error">{error}</div>}
           {loading ? (
-            <p className="hint">Loading arenas…</p>
+            <p className="hint">{t("arenas.loading")}</p>
           ) : (
             <div className="arena-grid">
               {ARENA_TOPICS.map((meta) => {
@@ -132,10 +131,14 @@ export default function Arenas() {
                       <p className="arena-card-blurb">{meta.blurb}</p>
                       <div className="arena-card-meta">
                         {arena
-                          ? `${arena.member_count} joined · ${arena.open_debate_count} live debate${
-                              arena.open_debate_count === 1 ? "" : "s"
-                            }`
-                          : "Opening soon"}
+                          ? t(
+                              arena.open_debate_count === 1 ? "arenas.meta" : "arenas.metaPlural",
+                              {
+                                members: arena.member_count,
+                                debates: arena.open_debate_count,
+                              }
+                            )
+                          : t("arenas.openingSoon")}
                       </div>
                     </Link>
                     {arena && (
@@ -145,7 +148,7 @@ export default function Arenas() {
                         disabled={busyKey === meta.key}
                         onClick={() => toggleJoin(arena)}
                       >
-                        {busyKey === meta.key ? "…" : arena.is_member ? "Joined" : "Join"}
+                        {busyKey === meta.key ? "…" : arena.is_member ? t("arenas.joined") : t("arenas.join")}
                       </button>
                     )}
                   </div>
@@ -156,11 +159,11 @@ export default function Arenas() {
         </div>
 
         <section className="plaza-main-feed">
-          <h2 className="section-title">Live debates</h2>
+          <h2 className="section-title">{t("arenas.liveDebates")}</h2>
           {loading ? null : debates.length === 0 ? (
             <div className="empty-state">
-              <p className="empty-state-title">No live debates yet</p>
-              <p className="hint">Open an arena and start the first fight.</p>
+              <p className="empty-state-title">{t("arenas.emptyTitle")}</p>
+              <p className="hint">{t("arenas.emptyHint")}</p>
             </div>
           ) : (
             <ul className="debate-list">

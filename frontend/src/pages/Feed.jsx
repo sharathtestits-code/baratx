@@ -22,6 +22,7 @@ import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 import { sanitizeUserText } from "../sanitizeUserText";
 import { focusCompose } from "../focusCompose";
+import { useT } from "../context/LocaleContext";
 
 const MAX_LEN = 500;
 const PAGE_SIZE = 20;
@@ -41,6 +42,7 @@ function feedItemKey(item) {
 
 export default function Feed() {
   const { token, user, loading } = useAuth();
+  const t = useT();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const quotePostId = searchParams.get("quote");
@@ -448,9 +450,9 @@ export default function Feed() {
         <div className="plaza-main-top">
           <header className="square-home-head">
             <div className="square-home-head-main">
-              <p className="square-home-kicker">India&apos;s public square</p>
-              <h1 className="square-home-title">Square</h1>
-              <p className="square-home-sub">One question. Your take. No Reels required.</p>
+              <p className="square-home-kicker">{t("square.kicker")}</p>
+              <h1 className="square-home-title">{t("square.title")}</h1>
+              <p className="square-home-sub">{t("square.sub")}</p>
             </div>
             <FoundingChip refreshKey={foundingRefresh} />
           </header>
@@ -462,7 +464,7 @@ export default function Feed() {
           <SuggestionsStrip
             token={token}
             surface="square"
-            title="Top questions in the Square"
+            title={t("square.topQuestions")}
             onPick={(prompt) => fillCompose(prompt)}
           />
           <LiveNowStrip items={liveDebates} limit={6} emptyHint="" />
@@ -472,15 +474,15 @@ export default function Feed() {
           <div className="plaza-studio-head">
             <Avatar name={user?.display_name} username={user?.username} url={user?.avatar_url} size={44} />
             <div>
-              <p className="plaza-studio-label">Drop a take</p>
-              <p className="hint">Short post. Real replies.</p>
+              <p className="plaza-studio-label">{t("square.dropTake")}</p>
+              <p className="hint">{t("square.dropHint")}</p>
             </div>
           </div>
           <div className="compose-body">
             <MentionTextarea
               ref={composeRef}
               placeholder={
-                quotePreview ? "Add a comment and tag people with @…" : "What's your take?"
+                quotePreview ? t("square.placeholderQuote") : t("square.placeholder")
               }
               value={text}
               onChange={(v) => {
@@ -519,7 +521,7 @@ export default function Feed() {
             {postError && <div className="error">{postError}</div>}
             <div className="compose-studio-tiles" aria-label="Create studio">
               <button type="button" className="compose-tile" onClick={() => fileInputRef.current?.click()}>
-                Photo
+                {t("square.photo")}
               </button>
               <button
                 type="button"
@@ -528,13 +530,13 @@ export default function Feed() {
                 onClick={() => setShowStarters((v) => !v)}
                 title="Starter prompts — not AI drafts"
               >
-                Hot take starters
+                {t("square.starters")}
               </button>
               <Link to="/spaces" className="compose-tile">
-                Start a live
+                {t("square.startLive")}
               </Link>
               <Link to="/communities" className="compose-tile">
-                Community
+                {t("square.community")}
               </Link>
             </div>
             {showStarters && (
@@ -560,7 +562,10 @@ export default function Feed() {
                   setCivicHighlight(false);
                 }}
               />
-              <span>This is a real civic / city problem{civicProblem ? " (≥50 chars for First 100)" : ""}</span>
+              <span>
+                {t("square.civic")}
+                {civicProblem ? t("square.civicHint") : ""}
+              </span>
             </label>
             {foundingNotice && <p className="hint ok-hint compose-founding-notice">{foundingNotice}</p>}
             <div className="compose-footer">
@@ -580,7 +585,7 @@ export default function Feed() {
                 className="post-btn"
                 disabled={posting || !text.trim() || text.trim().length > MAX_LEN}
               >
-                {posting ? "Posting..." : "Post"}
+                {posting ? t("square.posting") : t("square.post")}
               </button>
             </div>
           </div>
@@ -588,34 +593,29 @@ export default function Feed() {
 
         <section className="plaza-takes plaza-main-feed">
           <div className="plaza-takes-head">
-            <h2>Takes from the square</h2>
+            <h2>{t("square.takesTitle")}</h2>
             <div className="plaza-takes-tabs">
               <button
                 type="button"
                 className={tab === "global" ? "is-active" : ""}
                 onClick={() => setTab("global")}
               >
-                For you
+                {t("square.forYou")}
               </button>
               <button
                 type="button"
                 className={tab === "following" ? "is-active" : ""}
                 onClick={() => setTab("following")}
               >
-                Following
+                {t("square.following")}
               </button>
             </div>
           </div>
           {tab === "global" && (
-            <p className="hint plaza-takes-hint">
-              Everyone&apos;s takes on the Square and in Arenas — you don&apos;t need to follow them
-              first. Switch to Following to see only people you follow.
-            </p>
+            <p className="hint plaza-takes-hint">{t("square.forYouHint")}</p>
           )}
           {tab === "following" && (
-            <p className="hint plaza-takes-hint">
-              Only people you follow (and you). For the common public feed, use For you.
-            </p>
+            <p className="hint plaza-takes-hint">{t("square.followingHint")}</p>
           )}
 
           {feedError && <div className="error">{feedError}</div>}
@@ -634,20 +634,18 @@ export default function Feed() {
             </div>
           ) : items.length === 0 ? (
             <EmptyState
-              title={tab === "following" ? "Nothing here yet" : "No takes yet"}
+              title={tab === "following" ? t("square.emptyFollowing") : t("square.emptyTakes")}
               hint={
-                tab === "following"
-                  ? "Follow people in Explore, then come back."
-                  : "Drop the first take in the square."
+                tab === "following" ? t("square.emptyFollowingHint") : t("square.emptyTakesHint")
               }
-              primaryLabel={tab === "following" ? "Explore people" : "Write a take"}
+              primaryLabel={tab === "following" ? t("square.explorePeople") : t("square.writeTake")}
               primaryTo={tab === "following" ? "/search" : undefined}
               onPrimary={
                 tab === "following"
                   ? undefined
                   : () => focusCompose(composeRef)
               }
-              secondaryLabel="Start a debate"
+              secondaryLabel={t("square.startDebate")}
               secondaryTo="/spaces"
             />
           ) : (
@@ -663,9 +661,9 @@ export default function Feed() {
                 ))}
               </div>
               <div ref={setSentinel} className="scroll-sentinel" aria-hidden="true" />
-              {loadingMore && <p className="hint load-more-hint">Loading more...</p>}
+              {loadingMore && <p className="hint load-more-hint">{t("square.loadingMore")}</p>}
               {!hasMore && items.length > 0 && (
-                <p className="hint load-more-hint">You are all caught up.</p>
+                <p className="hint load-more-hint">{t("square.caughtUp")}</p>
               )}
             </>
           )}

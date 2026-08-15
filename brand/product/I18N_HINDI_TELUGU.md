@@ -28,7 +28,7 @@ BarathX is **English-first** at soft launch. The product already stores a per-us
 | Phase | Scope |
 | --- | --- |
 | **P0 (this ship)** | Preference picker + `lang` attribute + docs. English UI stays. |
-| **P1** | Translate plaza chrome (Square / Arenas / Live / Settings / nav) for `hi` + `te`. |
+| **P1** | Translate plaza chrome (Square / Arenas / Live / Settings / nav) for `hi` + `te`. **Done — selecting language updates UI live.** |
 | **P2** | Language-aware suggestions + Today’s Square + empty-state copy. |
 | **P3** | Landing / FAQ / legal + moderation assist. |
 

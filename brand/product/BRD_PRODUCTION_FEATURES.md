@@ -223,7 +223,7 @@ Same **feature set** when QA is deployed from the **`qa`** branch and prod from 
 | Automated UPI payouts | Admin marks paid manually |
 | Full LLM rewrite / “argue my side” | Roadmap; suggestions may optionally LLM-rank if `AI_ASSIST_*` set |
 | Video / Reels product feed | Not built |
-| Hindi / Telugu full UI | Preference saved (en/hi/te); chrome translation not built — see I18N_HINDI_TELUGU.md |
+| Hindi / Telugu full UI | P1 plaza chrome live (Square / Arenas / Live / Settings / nav); content rails still English |
 | Native push (FCM/APNs) | Not shipped |
 | RaceStrip / FoundingStrip on Square | Code may exist; not required in current Square shell |
 

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { LocaleProvider } from "./context/LocaleContext.jsx";
 import { initThemeFromStorage } from "./theme.js";
 import { applyDocumentLanguage, getStoredLanguage } from "./i18n.js";
 import { initNativeShell } from "./native.js";
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <LocaleProvider>
+          <App />
+        </LocaleProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

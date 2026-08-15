@@ -1,10 +1,6 @@
 /**
- * Lightweight locale preference for BarathX.
- * Full UI strings for Hindi / Telugu are phased — see brand/product/I18N_HINDI_TELUGU.md.
- * Backend already accepts language: en | hi | te on the user profile.
- *
- * Brand rule: BX logo mark + Latin "BarathX" wordmark stay in every locale.
- * Native lines are optional subtitles only — never replace the logo.
+ * BarathX locale + UI chrome strings (en / hi / te).
+ * Brand rule: BX logo + Latin "BarathX" wordmark never change; native lines are subtitles only.
  */
 
 export const LOCALES = [
@@ -33,6 +29,406 @@ export const LOCALES = [
 
 const STORAGE_KEY = "bx_lang";
 
+const EN = {
+  "nav.square": "Square",
+  "nav.live": "Live",
+  "nav.arenas": "Arenas",
+  "nav.alerts": "Alerts",
+  "nav.you": "You",
+  "nav.explore": "Explore",
+  "nav.search": "Search",
+  "nav.profile": "Profile",
+  "nav.openMenu": "Open menu",
+  "nav.closeMenu": "Close menu",
+  "nav.main": "Main",
+  "nav.plaza": "Plaza",
+
+  "brand.tagline": "India's public square",
+
+  "square.kicker": "India's public square",
+  "square.title": "Square",
+  "square.sub": "One question. Your take. No Reels required.",
+  "square.dropTake": "Drop a take",
+  "square.dropHint": "Short post. Real replies.",
+  "square.placeholder": "What's your take?",
+  "square.placeholderQuote": "Add a comment and tag people with @…",
+  "square.post": "Post",
+  "square.posting": "Posting...",
+  "square.photo": "Photo",
+  "square.starters": "Hot take starters",
+  "square.startLive": "Start a live",
+  "square.community": "Community",
+  "square.civic": "This is a real civic / city problem",
+  "square.civicHint": " (≥50 chars for First 100)",
+  "square.topQuestions": "Top questions in the Square",
+  "square.takesTitle": "Takes from the square",
+  "square.forYou": "For you",
+  "square.following": "Following",
+  "square.forYouHint":
+    "Everyone's takes on the Square and in Arenas — you don't need to follow them first. Switch to Following to see only people you follow.",
+  "square.followingHint": "Only people you follow (and you). For the common public feed, use For you.",
+  "square.emptyFollowing": "Nothing here yet",
+  "square.emptyFollowingHint": "Follow people in Explore, then come back.",
+  "square.emptyTakes": "No takes yet",
+  "square.emptyTakesHint": "Drop the first take in the square.",
+  "square.explorePeople": "Explore people",
+  "square.writeTake": "Write a take",
+  "square.startDebate": "Start a debate",
+  "square.loadingMore": "Loading more...",
+  "square.caughtUp": "You are all caught up.",
+  "square.liveNow": "Live now",
+  "square.enterLive": "Enter Live",
+
+  "todays.label": "Today’s Square",
+  "todays.sub": "Post your take. Someone will talk back.",
+  "todays.cta": "Answer today’s question",
+  "todays.later": "Later",
+  "todays.chip": "For You Now",
+
+  "suggestions.pick": "Pick one to start — or write your own. {count} ready",
+  "suggestions.ranked": " · ranked",
+  "suggestions.hide": "Hide",
+  "suggestions.show": "Show suggested takes",
+  "suggestions.loading": "Loading suggestions…",
+
+  "live.title": "Live",
+  "live.sub": "Start a live. Jump in. Mute, video, reactions — max 15.",
+  "live.startOne": "Start one",
+  "live.liveNow": "Live now",
+  "live.noRooms": "No rooms live — start one",
+  "live.startRoom": "Start a room India can join",
+  "live.hostTakes": "Hosted by @{user} · {count} takes in the room",
+  "live.openTalk": "Open a 15-person talk. Argue live — mute, video, reactions.",
+  "live.jumpIn": "Jump in",
+  "live.startLive": "Start a live",
+  "live.hostOwn": "Host your own",
+  "live.browseArenas": "Browse arenas",
+  "live.composeLabel": "Start a live",
+  "live.composePlaceholder": "What are we arguing?",
+  "live.goLive": "Go live",
+  "live.opening": "Opening…",
+  "live.roomsLive": "Rooms live",
+  "live.loading": "Loading…",
+  "live.suggestedTitle": "Suggested debates",
+  "live.suggestedHint": "Tap a topic to prefill — then go live.",
+  "live.topStarters": "Top debate starters",
+  "live.topStartersSub": "Tap one to fill Start a live — then go live.",
+  "live.seeAll": "See all",
+  "live.emptyRooms": "No rooms yet — start the first.",
+
+  "arenas.title": "Arenas",
+  "arenas.sub": "Pick a side. Jump in. Not a group chat.",
+  "arenas.featuredKicker": "Builders only",
+  "arenas.featuredTitle": "Startups — Fund it or Pass",
+  "arenas.featuredHint":
+    "Argue the pitch and the raise live. 100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.",
+  "arenas.enterStartups": "Enter Startups",
+  "arenas.founding100": "Founding 100",
+  "arenas.jumpTitle": "Jump into an arena",
+  "arenas.jumpSub": "Pick a lane — open the floor and take a side.",
+  "arenas.liveDebates": "Live debates",
+  "arenas.enterLive": "Enter Live",
+  "arenas.loading": "Loading arenas…",
+  "arenas.openingSoon": "Opening soon",
+  "arenas.join": "Join",
+  "arenas.joined": "Joined",
+  "arenas.emptyTitle": "No live debates yet",
+  "arenas.emptyHint": "Open an arena and start the first fight.",
+  "arenas.noLiveHint": "No live debates yet — open an arena.",
+  "arenas.meta": "{members} joined · {debates} live debate",
+  "arenas.metaPlural": "{members} joined · {debates} live debates",
+
+  "settings.title": "Settings and privacy",
+  "settings.appearance": "Appearance",
+  "settings.appearanceHint":
+    "Default is Tri-Color Midnight (dark). Switch to Saffron, Monsoon, or Ink anytime.",
+  "settings.saving": "Saving…",
+  "settings.appearanceSaved": "Appearance saved.",
+  "settings.language": "Language",
+  "settings.languageHint":
+    "Choose English, Hindi, or Telugu. The BarathX logo stays the same in every language.",
+  "settings.languageSaved": "Language saved. UI updated.",
+  "settings.profile": "Profile",
+  "settings.profileHint": "Update your display name, username, bio, and photos.",
+  "settings.editProfile": "Edit profile",
+  "settings.muted": "Muted accounts",
+  "settings.blocked": "Blocked accounts",
+  "settings.loading": "Loading…",
+  "settings.noMutes": "You haven’t muted anyone.",
+  "settings.noBlocks": "You haven’t blocked anyone.",
+  "settings.unmute": "Unmute",
+  "settings.unblock": "Unblock",
+  "settings.logout": "Log out",
+};
+
+const HI = {
+  ...EN,
+  "nav.square": "स्क्वायर",
+  "nav.live": "लाइव",
+  "nav.arenas": "एरीना",
+  "nav.alerts": "अलर्ट",
+  "nav.you": "आप",
+  "nav.explore": "खोजें",
+  "nav.search": "खोजें",
+  "nav.profile": "प्रोफ़ाइल",
+  "nav.openMenu": "मेनू खोलें",
+  "nav.closeMenu": "मेनू बंद करें",
+  "nav.main": "मुख्य",
+  "nav.plaza": "प्लाज़ा",
+
+  "brand.tagline": "भारत का सार्वजनिक चौक",
+
+  "square.kicker": "भारत का सार्वजनिक चौक",
+  "square.title": "स्क्वायर",
+  "square.sub": "एक सवाल। आपकी राय। रील्स की ज़रूरत नहीं।",
+  "square.dropTake": "अपनी राय लिखें",
+  "square.dropHint": "छोटा पोस्ट। असली जवाब।",
+  "square.placeholder": "आपकी क्या राय है?",
+  "square.placeholderQuote": "टिप्पणी लिखें और @ से टैग करें…",
+  "square.post": "पोस्ट",
+  "square.posting": "पोस्ट हो रहा है...",
+  "square.photo": "फ़ोटो",
+  "square.starters": "हॉट टेक शुरू करें",
+  "square.startLive": "लाइव शुरू करें",
+  "square.community": "कम्युनिटी",
+  "square.civic": "यह एक असली नागरिक / शहर की समस्या है",
+  "square.civicHint": " (First 100 के लिए ≥50 अक्षर)",
+  "square.topQuestions": "स्क्वायर के शीर्ष प्रश्न",
+  "square.takesTitle": "स्क्वायर से राय",
+  "square.forYou": "आपके लिए",
+  "square.following": "फ़ॉलोइंग",
+  "square.forYouHint":
+    "स्क्वायर और एरीना की सभी राय — पहले फ़ॉलो करने की ज़रूरत नहीं। सिर्फ़ जिनको आप फ़ॉलो करते हैं, उनके लिए फ़ॉलोइंग चुनें।",
+  "square.followingHint": "सिर्फ़ वे लोग जिन्हें आप फ़ॉलो करते हैं (और आप)। सार्वजनिक फ़ीड के लिए आपके लिए चुनें।",
+  "square.emptyFollowing": "अभी यहाँ कुछ नहीं",
+  "square.emptyFollowingHint": "खोजें में लोगों को फ़ॉलो करें, फिर वापस आएँ।",
+  "square.emptyTakes": "अभी कोई राय नहीं",
+  "square.emptyTakesHint": "स्क्वायर पर पहली राय लिखें।",
+  "square.explorePeople": "लोग खोजें",
+  "square.writeTake": "राय लिखें",
+  "square.startDebate": "बहस शुरू करें",
+  "square.loadingMore": "और लोड हो रहा है...",
+  "square.caughtUp": "आप पूरी तरह अपडेट हैं।",
+  "square.liveNow": "अभी लाइव",
+  "square.enterLive": "लाइव में जाएँ",
+
+  "todays.label": "आज का स्क्वायर",
+  "todays.sub": "अपनी राय पोस्ट करें। कोई जवाब देगा।",
+  "todays.cta": "आज का सवाल जवाब दें",
+  "todays.later": "बाद में",
+  "todays.chip": "अभी आपके लिए",
+
+  "suggestions.pick": "शुरू करने के लिए एक चुनें — या खुद लिखें। {count} तैयार",
+  "suggestions.ranked": " · रैंक किए",
+  "suggestions.hide": "छिपाएँ",
+  "suggestions.show": "सुझाई राय दिखाएँ",
+  "suggestions.loading": "सुझाव लोड हो रहे हैं…",
+
+  "live.title": "लाइव",
+  "live.sub": "लाइव शुरू करें। जुड़ें। म्यूट, वीडियो, प्रतिक्रिया — अधिकतम 15।",
+  "live.startOne": "एक शुरू करें",
+  "live.liveNow": "अभी लाइव",
+  "live.noRooms": "कोई रूम लाइव नहीं — एक शुरू करें",
+  "live.startRoom": "एक रूम शुरू करें जिसमें भारत जुड़ सके",
+  "live.hostTakes": "@{user} द्वारा होस्ट · रूम में {count} राय",
+  "live.openTalk": "15 लोगों की बातचीत खोलें। लाइव बहस — म्यूट, वीडियो, प्रतिक्रिया।",
+  "live.jumpIn": "अंदर जाएँ",
+  "live.startLive": "लाइव शुरू करें",
+  "live.hostOwn": "अपना होस्ट करें",
+  "live.browseArenas": "एरीना देखें",
+  "live.composeLabel": "लाइव शुरू करें",
+  "live.composePlaceholder": "हम किस पर बहस कर रहे हैं?",
+  "live.goLive": "लाइव जाएँ",
+  "live.opening": "खुल रहा है…",
+  "live.roomsLive": "लाइव रूम",
+  "live.loading": "लोड हो रहा है…",
+  "live.suggestedTitle": "सुझाई बहसें",
+  "live.suggestedHint": "टॉपिक टैप करें — फिर लाइव जाएँ।",
+  "live.topStarters": "शीर्ष बहस शुरूआत",
+  "live.topStartersSub": "एक टैप करें — फिर लाइव जाएँ।",
+  "live.seeAll": "सभी देखें",
+  "live.emptyRooms": "अभी कोई रूम नहीं — पहला शुरू करें।",
+
+  "arenas.title": "एरीना",
+  "arenas.sub": "पक्ष चुनें। कूदें। यह ग्रुप चैट नहीं है।",
+  "arenas.featuredKicker": "सिर्फ़ बिल्डर्स",
+  "arenas.featuredTitle": "स्टार्टअप्स — फंड करें या पास",
+  "arenas.featuredHint":
+    "पिच और राउंड पर लाइव बहस करें। 100 फाउंडिंग स्पॉट — असली जुड़ाव वाली बहस से मिलते हैं, साइन अप से नहीं।",
+  "arenas.enterStartups": "स्टार्टअप्स में जाएँ",
+  "arenas.founding100": "फाउंडिंग 100",
+  "arenas.jumpTitle": "एरीना में कूदें",
+  "arenas.jumpSub": "एक लेन चुनें — फ़्लोर खोलें और पक्ष लें।",
+  "arenas.liveDebates": "लाइव बहसें",
+  "arenas.enterLive": "लाइव में जाएँ",
+  "arenas.loading": "एरीना लोड हो रहे हैं…",
+  "arenas.openingSoon": "जल्द खुल रहा है",
+  "arenas.join": "जुड़ें",
+  "arenas.joined": "जुड़े",
+  "arenas.emptyTitle": "अभी कोई लाइव बहस नहीं",
+  "arenas.emptyHint": "एरीना खोलें और पहली लड़ाई शुरू करें।",
+  "arenas.noLiveHint": "अभी कोई लाइव बहस नहीं — एरीना खोलें।",
+  "arenas.meta": "{members} जुड़े · {debates} लाइव बहस",
+  "arenas.metaPlural": "{members} जुड़े · {debates} लाइव बहसें",
+
+  "settings.title": "सेटिंग्स और गोपनीयता",
+  "settings.appearance": "दिखावट",
+  "settings.appearanceHint":
+    "डिफ़ॉल्ट ट्राइ-कलर मिडनाइट (डार्क) है। कभी भी सैफ़्रन, मानसून या इंक चुनें।",
+  "settings.saving": "सेव हो रहा है…",
+  "settings.appearanceSaved": "दिखावट सेव हो गई।",
+  "settings.language": "भाषा",
+  "settings.languageHint":
+    "अंग्रेज़ी, हिन्दी या तेलुगु चुनें। हर भाषा में BarathX लोगो वही रहता है।",
+  "settings.languageSaved": "भाषा सेव हो गई। इंटरफ़ेस अपडेट हो गया।",
+  "settings.profile": "प्रोफ़ाइल",
+  "settings.profileHint": "डिस्प्ले नाम, यूज़रनेम, बायो और फ़ोटो अपडेट करें।",
+  "settings.editProfile": "प्रोफ़ाइल संपादित करें",
+  "settings.muted": "म्यूट किए खाते",
+  "settings.blocked": "ब्लॉक किए खाते",
+  "settings.loading": "लोड हो रहा है…",
+  "settings.noMutes": "आपने किसी को म्यूट नहीं किया।",
+  "settings.noBlocks": "आपने किसी को ब्लॉक नहीं किया।",
+  "settings.unmute": "अनम्यूट",
+  "settings.unblock": "अनब्लॉक",
+  "settings.logout": "लॉग आउट",
+};
+
+const TE = {
+  ...EN,
+  "nav.square": "స్క్వేర్",
+  "nav.live": "లైవ్",
+  "nav.arenas": "అరీనాలు",
+  "nav.alerts": "అలర్ట్‌లు",
+  "nav.you": "మీరు",
+  "nav.explore": "అన్వేషించండి",
+  "nav.search": "వెతకండి",
+  "nav.profile": "ప్రొఫైల్",
+  "nav.openMenu": "మెనూ తెరవండి",
+  "nav.closeMenu": "మెనూ మూసివేయండి",
+  "nav.main": "ప్రధాన",
+  "nav.plaza": "ప్లాజా",
+
+  "brand.tagline": "భారత్ పబ్లిక్ స్క్వేర్",
+
+  "square.kicker": "భారత్ పబ్లిక్ స్క్వేర్",
+  "square.title": "స్క్వేర్",
+  "square.sub": "ఒక ప్రశ్న. మీ అభిప్రాయం. రీల్స్ అవసరం లేదు.",
+  "square.dropTake": "మీ అభిప్రాయం రాయండి",
+  "square.dropHint": "చిన్న పోస్ట్. నిజమైన రిప్లైలు.",
+  "square.placeholder": "మీ అభిప్రాయం ఏమిటి?",
+  "square.placeholderQuote": "కామెంట్ రాసి @తో ట్యాగ్ చేయండి…",
+  "square.post": "పోస్ట్",
+  "square.posting": "పోస్ట్ అవుతోంది...",
+  "square.photo": "ఫోటో",
+  "square.starters": "హాట్ టేక్ స్టార్టర్స్",
+  "square.startLive": "లైవ్ ప్రారంభించండి",
+  "square.community": "కమ్యూనిటీ",
+  "square.civic": "ఇది నిజమైన పౌర / నగర సమస్య",
+  "square.civicHint": " (First 100 కోసం ≥50 అక్షరాలు)",
+  "square.topQuestions": "స్క్వేర్‌లో టాప్ ప్రశ్నలు",
+  "square.takesTitle": "స్క్వేర్ నుండి అభిప్రాయాలు",
+  "square.forYou": "మీ కోసం",
+  "square.following": "ఫాలోయింగ్",
+  "square.forYouHint":
+    "స్క్వేర్ మరియు అరీనాల్లో అందరి అభిప్రాయాలు — ముందుగా ఫాలో చేయాల్సిన అవసరం లేదు. మీరు ఫాలో చేసేవారిని మాత్రమే చూడాలంటే ఫాలోయింగ్ ఎంచుకోండి.",
+  "square.followingHint": "మీరు ఫాలో చేసే వారు (మరియు మీరు) మాత్రమే. పబ్లిక్ ఫీడ్ కోసం మీ కోసం వాడండి.",
+  "square.emptyFollowing": "ఇక్కడ ఇంకా ఏమీ లేదు",
+  "square.emptyFollowingHint": "అన్వేషణలో వ్యక్తులను ఫాలో చేసి తిరిగి రండి.",
+  "square.emptyTakes": "ఇంకా అభిప్రాయాలు లేవు",
+  "square.emptyTakesHint": "స్క్వేర్‌లో మొదటి అభిప్రాయం రాయండి.",
+  "square.explorePeople": "వ్యక్తులను వెతకండి",
+  "square.writeTake": "అభిప్రాయం రాయండి",
+  "square.startDebate": "చర్చ ప్రారంభించండి",
+  "square.loadingMore": "మరిన్ని లోడ్ అవుతున్నాయి...",
+  "square.caughtUp": "మీరు పూర్తిగా అప్ టు డేట్.",
+  "square.liveNow": "ఇప్పుడు లైవ్",
+  "square.enterLive": "లైవ్‌లోకి వెళ్లండి",
+
+  "todays.label": "నేటి స్క్వేర్",
+  "todays.sub": "మీ అభిప్రాయం పోస్ట్ చేయండి. ఎవరైనా స్పందిస్తారు.",
+  "todays.cta": "నేటి ప్రశ్నకు సమాధానం ఇవ్వండి",
+  "todays.later": "తర్వాత",
+  "todays.chip": "ఇప్పుడు మీ కోసం",
+
+  "suggestions.pick": "ప్రారంభించడానికి ఒకటి ఎంచుకోండి — లేదా మీరే రాయండి. {count} సిద్ధం",
+  "suggestions.ranked": " · ర్యాంక్",
+  "suggestions.hide": "దాచు",
+  "suggestions.show": "సూచనలు చూపించు",
+  "suggestions.loading": "సూచనలు లోడ్ అవుతున్నాయి…",
+
+  "live.title": "లైవ్",
+  "live.sub": "లైవ్ ప్రారంభించండి. చేరండి. మ్యూట్, వీడియో, రియాక్షన్స్ — గరిష్టం 15.",
+  "live.startOne": "ఒకటి ప్రారంభించండి",
+  "live.liveNow": "ఇప్పుడు లైవ్",
+  "live.noRooms": "లైవ్ రూములు లేవు — ఒకటి ప్రారంభించండి",
+  "live.startRoom": "భారత్ చేరగల రూమ్ ప్రారంభించండి",
+  "live.hostTakes": "@{user} హోస్ట్ · రూమ్‌లో {count} అభిప్రాయాలు",
+  "live.openTalk": "15 మంది చర్చ తెరవండి. లైవ్‌లో వాదించండి — మ్యూట్, వీడియో, రియాక్షన్స్.",
+  "live.jumpIn": "లోపలికి వెళ్లండి",
+  "live.startLive": "లైవ్ ప్రారంభించండి",
+  "live.hostOwn": "మీ స్వంతం హోస్ట్ చేయండి",
+  "live.browseArenas": "అరీనాలు చూడండి",
+  "live.composeLabel": "లైవ్ ప్రారంభించండి",
+  "live.composePlaceholder": "మనం దేనిపై వాదిస్తున్నాం?",
+  "live.goLive": "లైవ్‌కు వెళ్లండి",
+  "live.opening": "తెరుస్తోంది…",
+  "live.roomsLive": "లైవ్ రూములు",
+  "live.loading": "లోడ్ అవుతోంది…",
+  "live.suggestedTitle": "సూచించిన చర్చలు",
+  "live.suggestedHint": "టాపిక్ ట్యాప్ చేసి — లైవ్‌కు వెళ్లండి.",
+  "live.topStarters": "టాప్ చర్చ స్టార్టర్స్",
+  "live.topStartersSub": "ఒకటి ట్యాప్ చేసి — లైవ్‌కు వెళ్లండి.",
+  "live.seeAll": "అన్నీ చూడండి",
+  "live.emptyRooms": "ఇంకా రూములు లేవు — మొదటిది ప్రారంభించండి.",
+
+  "arenas.title": "అరీనాలు",
+  "arenas.sub": "వైపు ఎంచుకోండి. లోపలికి వెళ్లండి. ఇది గ్రూప్ చాట్ కాదు.",
+  "arenas.featuredKicker": "బిల్డర్స్ మాత్రమే",
+  "arenas.featuredTitle": "స్టార్టప్స్ — ఫండ్ ఇవ్వండి లేదా పాస్",
+  "arenas.featuredHint":
+    "పిచ్ మరియు రైజ్‌పై లైవ్‌లో వాదించండి. 100 ఫౌండింగ్ స్పాట్లు — నిజమైన ఎంగేజ్‌మెంట్ ఉన్న చర్చతో సంపాదించాలి, సైన్ అప్‌తో కాదు.",
+  "arenas.enterStartups": "స్టార్టప్స్‌లోకి",
+  "arenas.founding100": "ఫౌండింగ్ 100",
+  "arenas.jumpTitle": "అరీనాలోకి వెళ్లండి",
+  "arenas.jumpSub": "ఒక లేన్ ఎంచుకోండి — ఫ్లోర్ తెరిచి వైపు తీసుకోండి.",
+  "arenas.liveDebates": "లైవ్ చర్చలు",
+  "arenas.enterLive": "లైవ్‌లోకి",
+  "arenas.loading": "అరీనాలు లోడ్ అవుతున్నాయి…",
+  "arenas.openingSoon": "త్వరలో తెరవబడుతుంది",
+  "arenas.join": "చేరండి",
+  "arenas.joined": "చేరారు",
+  "arenas.emptyTitle": "ఇంకా లైవ్ చర్చలు లేవు",
+  "arenas.emptyHint": "అరీనా తెరిచి మొదటి పోరు ప్రారంభించండి.",
+  "arenas.noLiveHint": "ఇంకా లైవ్ చర్చలు లేవు — అరీనా తెరవండి.",
+  "arenas.meta": "{members} చేరారు · {debates} లైవ్ చర్చ",
+  "arenas.metaPlural": "{members} చేరారు · {debates} లైవ్ చర్చలు",
+
+  "settings.title": "సెట్టింగ్స్ మరియు గోప్యత",
+  "settings.appearance": "రూపం",
+  "settings.appearanceHint":
+    "డిఫాల్ట్ ట్రై-కలర్ మిడ్‌నైట్ (డార్క్). సాఫ్రన్, మాన్సూన్ లేదా ఇంక్‌కు మారండి.",
+  "settings.saving": "సేవ్ అవుతోంది…",
+  "settings.appearanceSaved": "రూపం సేవ్ అయింది.",
+  "settings.language": "భాష",
+  "settings.languageHint":
+    "ఇంగ్లీష్, హిందీ లేదా తెలుగు ఎంచుకోండి. ప్రతి భాషలో BarathX లోగో అలాగే ఉంటుంది.",
+  "settings.languageSaved": "భాష సేవ్ అయింది. UI అప్‌డేట్ అయింది.",
+  "settings.profile": "ప్రొఫైల్",
+  "settings.profileHint": "డిస్‌ప్లే పేరు, యూజర్‌నేమ్, బయో మరియు ఫోటోలు అప్‌డేట్ చేయండి.",
+  "settings.editProfile": "ప్రొఫైల్ సవరించండి",
+  "settings.muted": "మ్యూట్ చేసిన ఖాతాలు",
+  "settings.blocked": "బ్లాక్ చేసిన ఖాతాలు",
+  "settings.loading": "లోడ్ అవుతోంది…",
+  "settings.noMutes": "మీరు ఎవరినీ మ్యూట్ చేయలేదు.",
+  "settings.noBlocks": "మీరు ఎవరినీ బ్లాక్ చేయలేదు.",
+  "settings.unmute": "అన్‌మ్యూట్",
+  "settings.unblock": "అన్‌బ్లాక్",
+  "settings.logout": "లాగ్ అవుట్",
+};
+
+export const MESSAGES = { en: EN, hi: HI, te: TE };
+
 export function getStoredLanguage(fallback = "en") {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
@@ -43,8 +439,12 @@ export function getStoredLanguage(fallback = "en") {
   return fallback;
 }
 
+export function normalizeLanguage(lang) {
+  return lang === "hi" || lang === "te" ? lang : "en";
+}
+
 export function applyDocumentLanguage(lang) {
-  const id = lang === "hi" || lang === "te" ? lang : "en";
+  const id = normalizeLanguage(lang);
   if (typeof document !== "undefined") {
     document.documentElement.lang = id;
   }
@@ -58,4 +458,15 @@ export function applyDocumentLanguage(lang) {
 
 export function localeMeta(id) {
   return LOCALES.find((l) => l.id === id) || LOCALES[0];
+}
+
+/** Translate a key for a language. Vars: {name} → value. */
+export function translate(lang, key, vars = {}) {
+  const id = normalizeLanguage(lang);
+  const table = MESSAGES[id] || EN;
+  let out = table[key] ?? EN[key] ?? key;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.replaceAll(`{${k}}`, String(v ?? ""));
+  }
+  return out;
 }
