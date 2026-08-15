@@ -132,99 +132,165 @@ def text_size(draw: ImageDraw.ImageDraw, text: str, fnt: ImageFont.ImageFont) ->
     return box[2] - box[0], box[3] - box[1]
 
 
+def draw_text_bold(
+    draw: ImageDraw.ImageDraw,
+    xy: tuple[int, int],
+    text: str,
+    fnt: ImageFont.ImageFont,
+    fill: tuple[int, int, int, int],
+    stroke: tuple[int, int, int, int] = (8, 10, 14, 220),
+    stroke_w: int = 4,
+) -> None:
+    """High-contrast text with hard outline so copy reads on saffron/white/green."""
+    x, y = xy
+    if stroke_w > 0:
+        draw.text((x, y), text, font=fnt, fill=fill, stroke_width=stroke_w, stroke_fill=stroke)
+    else:
+        draw.text((x, y), text, font=fnt, fill=fill)
+
+
 def compose_overlay(base: Image.Image, logo: Image.Image, progress: float) -> Image.Image:
     """Brand + Independence Day copy over darkened waving flag."""
     frame = base.convert("RGBA")
 
-    # Dark vignette so text reads
+    # Stronger vignette — especially over the white band so mid copy doesn't wash out
     veil = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     vdraw = ImageDraw.Draw(veil)
-    # Top/bottom gradient bars
     for y in range(H):
-        top = max(0, int(160 * (1 - y / (H * 0.28))))
-        bot = max(0, int(180 * max(0, (y - H * 0.62) / (H * 0.38))))
-        a = min(200, top + bot + 55)
+        top = max(0, int(170 * (1 - y / (H * 0.26))))
+        mid = 0
+        # Extra darken across middle third (white flag stripe)
+        if H * 0.30 <= y <= H * 0.68:
+            mid = int(95 + 35 * math.sin(math.pi * (y - H * 0.30) / (H * 0.38)))
+        bot = max(0, int(200 * max(0, (y - H * 0.58) / (H * 0.42))))
+        a = min(215, top + mid + bot + 40)
         vdraw.line([(0, y), (W, y)], fill=(8, 10, 14, a))
     frame = Image.alpha_composite(frame, veil)
 
-    # Fade-in for title block
     alpha = int(255 * min(1.0, max(0.0, (progress - 0.04) / 0.18)))
     title_layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(title_layer)
 
     # Logo
     lx = (W - logo.width) // 2
-    ly = int(H * 0.18)
+    ly = int(H * 0.14)
     title_layer.paste(logo, (lx, ly), logo)
 
-    # Wordmark
-    f_brand = font(FONT_SANS, 92)
+    # Wordmark — bigger + outlined
+    f_brand = font(FONT_SANS, 100)
     brand = "BarathX"
     tw, th = text_size(draw, brand, f_brand)
     bx = (W - tw) // 2
-    by = ly + logo.height + 28
-    # Soft shadow
-    draw.text((bx + 3, by + 3), brand, font=f_brand, fill=(0, 0, 0, 160))
-    draw.text((bx, by), brand, font=f_brand, fill=(255, 255, 255, 255))
+    by = ly + logo.height + 22
+    draw_text_bold(draw, (bx, by), brand, f_brand, (255, 255, 255, 255), stroke_w=5)
 
-    # Wish
-    f_wish = font(FONT_SERIF, 64)
+    # Wish — bolder serif
+    f_wish = font(FONT_SERIF, 72)
     wish = "Happy Independence Day"
     ww, wh = text_size(draw, wish, f_wish)
     wx = (W - ww) // 2
-    wy = by + th + 48
-    draw.text((wx + 2, wy + 2), wish, font=f_wish, fill=(0, 0, 0, 140))
-    draw.text((wx, wy), wish, font=f_wish, fill=(255, 214, 140, 255))
+    wy = by + th + 40
+    draw_text_bold(
+        draw,
+        (wx, wy),
+        wish,
+        f_wish,
+        (255, 220, 120, 255),
+        stroke=(20, 12, 4, 230),
+        stroke_w=5,
+    )
 
-    # Date line with saffron / green rules
-    f_date = font(FONT_SANS_REG, 36)
+    # Dark plate behind date + tagline for contrast on white band
+    plate_top = wy + wh + 18
+    plate_h = 168
+    plate = [
+        int(W * 0.08),
+        plate_top,
+        int(W * 0.92),
+        plate_top + plate_h,
+    ]
+    draw.rounded_rectangle(plate, radius=28, fill=(8, 10, 14, 200))
+    # Thin saffron→green accent on plate edge
+    draw.rounded_rectangle(plate, radius=28, outline=(255, 153, 51, 180), width=2)
+
+    # Date — bold gold (not white)
+    f_date = font(FONT_SANS, 48)
     date = "15 August 2026"
     dw, dh = text_size(draw, date, f_date)
     dx = (W - dw) // 2
-    dy = wy + wh + 28
+    dy = plate_top + 28
+    gap = 22
     rule_y = dy + dh // 2
-    gap = 28
-    draw.line([(dx - 160, rule_y), (dx - gap, rule_y)], fill=(*SAFFRON, 255), width=3)
-    draw.line([(dx + dw + gap, rule_y), (dx + dw + 160, rule_y)], fill=(*GREEN, 255), width=3)
-    draw.text((dx, dy), date, font=f_date, fill=(255, 255, 255, 230))
+    draw.line([(dx - 140, rule_y), (dx - gap, rule_y)], fill=(*SAFFRON, 255), width=4)
+    draw.line([(dx + dw + gap, rule_y), (dx + dw + 140, rule_y)], fill=(*GREEN, 255), width=4)
+    draw_text_bold(
+        draw,
+        (dx, dy),
+        date,
+        f_date,
+        (255, 214, 140, 255),
+        stroke=(0, 0, 0, 255),
+        stroke_w=3,
+    )
 
-    # Tagline
-    f_tag = font(FONT_SANS_REG, 40)
+    # Tagline — bold cream on dark plate
+    f_tag = font(FONT_SANS, 46)
     tag = "India’s public square."
-    tgw, _ = text_size(draw, tag, f_tag)
-    ty = dy + dh + 36
-    draw.text(((W - tgw) // 2, ty), tag, font=f_tag, fill=(255, 255, 255, 220))
+    tgw, tgh = text_size(draw, tag, f_tag)
+    ty = dy + dh + 22
+    draw_text_bold(
+        draw,
+        ((W - tgw) // 2, ty),
+        tag,
+        f_tag,
+        (255, 248, 235, 255),
+        stroke=(0, 0, 0, 255),
+        stroke_w=3,
+    )
 
-    # CTA block near bottom
-    f_cta = font(FONT_SANS, 42)
+    # CTA block — larger bottom copy
+    f_cta = font(FONT_SANS, 52)
     cta = "Leave one honest take"
     cw, ch = text_size(draw, cta, f_cta)
-    cy = int(H * 0.78)
-    draw.text(((W - cw) // 2 + 2, cy + 2), cta, font=f_cta, fill=(0, 0, 0, 140))
-    draw.text(((W - cw) // 2, cy), cta, font=f_cta, fill=(255, 255, 255, 255))
+    cy = int(H * 0.74)
+    draw_text_bold(draw, ((W - cw) // 2, cy), cta, f_cta, (255, 255, 255, 255), stroke_w=5)
 
-    f_url = font(FONT_SANS, 48)
+    f_url = font(FONT_SANS, 58)
     url = "barathx.com"
     uw, uh = text_size(draw, url, f_url)
-    uy = cy + ch + 22
-    # Pill behind URL
-    pad_x, pad_y = 36, 16
+    uy = cy + ch + 28
+    pad_x, pad_y = 48, 22
     pill = [
         (W - uw) // 2 - pad_x,
         uy - pad_y // 2,
         (W + uw) // 2 + pad_x,
         uy + uh + pad_y // 2,
     ]
-    draw.rounded_rectangle(pill, radius=28, fill=(255, 153, 51, 230))
-    draw.text(((W - uw) // 2, uy), url, font=f_url, fill=(255, 255, 255, 255))
+    draw.rounded_rectangle(pill, radius=36, fill=(255, 153, 51, 245))
+    draw.rounded_rectangle(pill, radius=36, outline=(255, 255, 255, 200), width=3)
+    draw_text_bold(
+        draw,
+        ((W - uw) // 2, uy),
+        url,
+        f_url,
+        (255, 255, 255, 255),
+        stroke=(140, 60, 10, 200),
+        stroke_w=2,
+    )
 
-    f_soon = font(FONT_SANS_REG, 28)
+    f_soon = font(FONT_SANS, 34)
     soon = "Browser soft launch · Apps coming soon"
     sw, _ = text_size(draw, soon, f_soon)
-    draw.text(((W - sw) // 2, uy + uh + 28), soon, font=f_soon, fill=(255, 255, 255, 190))
+    draw_text_bold(
+        draw,
+        ((W - sw) // 2, uy + uh + 34),
+        soon,
+        f_soon,
+        (255, 255, 255, 245),
+        stroke_w=4,
+    )
 
     if alpha < 255:
-        # Apply overall alpha to title layer
         r, g, b, a = title_layer.split()
         a = a.point(lambda p: int(p * alpha / 255))
         title_layer = Image.merge("RGBA", (r, g, b, a))
