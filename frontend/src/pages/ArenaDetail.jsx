@@ -8,11 +8,13 @@ import MentionTextarea from "../components/MentionTextarea";
 import SuggestionsStrip from "../components/SuggestionsStrip";
 import LiveNowStrip from "../components/LiveNowStrip";
 import { focusCompose } from "../focusCompose";
+import { useT } from "../context/LocaleContext";
 
 export default function ArenaDetail() {
   const { arenaKey } = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
+  const t = useT();
   const meta = arenaMeta(arenaKey);
   const [arena, setArena] = useState(null);
   const [debates, setDebates] = useState([]);
@@ -223,7 +225,7 @@ export default function ArenaDetail() {
               <Link to="/arenas" className="back-link">
                 ← Arenas
               </Link>
-              <h1 style={{ color: meta?.accent }}>{arena.name}</h1>
+              <h1 style={{ color: meta?.accent }}>{t(`arena.${arenaKey}`) || arena.name}</h1>
               <p className="hint">{arena.description}</p>
               <p className="hint">
                 {arena.member_count} joined · {arena.open_debate_count} live debate
