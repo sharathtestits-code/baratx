@@ -1332,26 +1332,34 @@ def signup_email(
 
 @app.post("/auth/verify-email", response_model=schemas.MessageResponse)
 def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_db)):
+    raw = (payload.token or "").strip()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Missing verification token")
+
     row = (
         db.query(models.EmailVerificationToken)
-        .filter(
-            models.EmailVerificationToken.token == payload.token,
-            models.EmailVerificationToken.consumed == False,  # noqa: E712
-        )
+        .filter(models.EmailVerificationToken.token == raw)
         .first()
     )
     if not row:
         raise HTTPException(status_code=400, detail="Invalid or already used verification link")
+
+    user = db.query(models.User).filter(models.User.id == row.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    # Idempotent: refresh / double-click / React remount after first success.
+    if row.consumed or user.is_email_verified:
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            db.commit()
+        return schemas.MessageResponse(message="Email confirmed. Your BarathX account is active.")
 
     expires = row.expires_at
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
     if expires < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="Verification link expired — request a new one")
-
-    user = db.query(models.User).filter(models.User.id == row.user_id).first()
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
 
     row.consumed = True
     user.is_email_verified = True

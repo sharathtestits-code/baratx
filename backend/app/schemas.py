@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 
 from app.phoneutil import normalize_phone
 from app.text_parse import sanitize_user_text
@@ -128,7 +128,13 @@ class TokenResponse(BaseModel):
 
 
 class VerifyEmailRequest(BaseModel):
-    token: str
+    token: str = Field(min_length=8, max_length=256)
+
+    @field_validator("token")
+    @classmethod
+    def strip_token(cls, v: str) -> str:
+        return (v or "").strip()
+
 
 
 class ForgotPasswordRequest(BaseModel):
