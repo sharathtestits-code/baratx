@@ -1296,7 +1296,10 @@ def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_
 
 @app.get("/auth/unsubscribe", response_model=schemas.MessageResponse)
 @app.post("/auth/unsubscribe", response_model=schemas.MessageResponse)
-def unsubscribe_activity_email(token: str, db: Session = Depends(get_db)):
+def unsubscribe_activity_email(
+    token: str = Query(..., min_length=10),
+    db: Session = Depends(get_db),
+):
     """One-click unsubscribe from activity emails (likes/replies/follows)."""
     user_id = auth.decode_email_unsub_token(token)
     if not user_id:
