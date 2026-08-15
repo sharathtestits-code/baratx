@@ -40,6 +40,7 @@ import PlazaSideMenu from "./components/PlazaSideMenu";
 import EmailVerifyBanner from "./components/EmailVerifyBanner";
 import Logo from "./components/Logo";
 import ThemeOnboarding from "./components/ThemeOnboarding";
+import SecurityTrustModal from "./components/SecurityTrustModal";
 import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
@@ -85,6 +86,7 @@ function PlazaShell() {
         <main className="app-main app-main-plaza">
           <EmailVerifyBanner />
           <ThemeOnboarding />
+          <SecurityTrustModal />
           <AppRoutes />
         </main>
         <ComposeFab />

@@ -45,3 +45,8 @@ keystore.properties
 !.env.example
 !**/.env.example
 !frontend/.env.production
+
+backend/.venv/
+**/.venv/
+**/__pycache__/
+
