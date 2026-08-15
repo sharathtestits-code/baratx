@@ -136,6 +136,9 @@ export const api = {
       body: JSON.stringify(body),
     }),
 
+  unsubscribeEmail: (token) =>
+    request(`/auth/unsubscribe?token=${encodeURIComponent(token)}`, { method: "POST" }),
+
   getProfile: (username, token) =>
     request(`/users/${encodeURIComponent(username)}`, { headers: authHeaders(token) }),
 
