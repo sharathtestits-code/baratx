@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
+import Unsubscribe from "./pages/Unsubscribe";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Guidelines from "./pages/Guidelines";
@@ -212,6 +213,13 @@ export default function App() {
     return (
       <AuthChrome>
         <VerifyEmail />
+      </AuthChrome>
+    );
+  }
+  if (location.pathname === "/unsubscribe") {
+    return (
+      <AuthChrome>
+        <Unsubscribe />
       </AuthChrome>
     );
   }

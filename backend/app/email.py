@@ -271,6 +271,7 @@ def send_activity_email(
     kind: str,
     preview: Optional[str] = None,
     post_id: Optional[str] = None,
+    unsubscribe_url: Optional[str] = None,
 ) -> bool:
     """Best-effort retention email when someone interacts with you."""
     if not to_email:
@@ -294,6 +295,7 @@ def send_activity_email(
     else:
         cta = f"{FRONTEND_URL}/notifications"
 
+    unsub = unsubscribe_url or f"{FRONTEND_URL}/settings"
     preview_line = f'\n"{preview[:140]}"\n' if preview else "\n"
     text_body = (
         f"Hi {recipient_name},\n\n"
@@ -301,6 +303,7 @@ def send_activity_email(
         f"{preview_line}\n"
         f"{cta_label}: {cta}\n\n"
         f"Sign in at {FRONTEND_URL}/login if you need to.\n\n"
+        f"Don’t want activity emails? Unsubscribe: {unsub}\n\n"
         f"— BarathX\n"
     )
     preview_html = (
@@ -323,6 +326,10 @@ def send_activity_email(
   </p>
   <p style="color:#8b98a5;font-size:13px;">
     Sign in at <a href="{FRONTEND_URL}/login" style="color:#000080;">{FRONTEND_URL}/login</a> to catch up.
+  </p>
+  <p style="color:#8b98a5;font-size:12px;margin-top:32px;">
+    Don’t want activity emails?
+    <a href="{unsub}" style="color:#536471;">Unsubscribe</a>
   </p>
   <p>— BarathX</p>
 </body>

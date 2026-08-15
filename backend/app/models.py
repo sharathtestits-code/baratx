@@ -50,6 +50,8 @@ class User(Base):
     is_official = Column(Boolean, default=False, nullable=False, index=True)
     # Lifetime flag: official first-post welcome fires once even if all posts are deleted.
     has_posted_once = Column(Boolean, default=False, nullable=False)
+    # Activity emails (likes/replies/follows). Users can unsubscribe from Settings or email footer.
+    email_activity_enabled = Column(Boolean, default=True, nullable=False)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
