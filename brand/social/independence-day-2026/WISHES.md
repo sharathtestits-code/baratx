@@ -29,7 +29,9 @@ Also: `brand/ig/independence-2026/` (city prompt, honest take, cover).
 
 **Files:** `barathx-independence-day-flag-reel.mp4` (1080×1920) · `barathx-independence-day-flag-square.mp4` (1080×1080)
 
-**On-screen:** BarathX · Happy Independence Day · **80th Independence Day** · 15 August 2026 · India’s public square · Leave one honest take · https://barathx.com
+**Layout:** Instagram Reel safe-zone template — logo + all copy stay inside the middle band (below username/audio chrome, above caption/buttons). Square is composed separately (not a center-crop that clips the logo).
+
+**On-screen:** BarathX · Happy Independence Day · **80th Independence Day** · 15 August 2026 · India’s public square · Leave one honest take · https://barathx.com · Browser soft launch · Apps coming soon
 
 **Clickable link:** open `flag-reel.html` in a browser (video + tappable https://barathx.com). On IG/WA, add the link in caption / sticker / bio — MP4 pixels are not tappable.
 
