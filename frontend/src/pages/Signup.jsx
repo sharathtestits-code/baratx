@@ -194,7 +194,6 @@ export default function Signup() {
 
       {!otpSent && (
         <>
-          {ageGate}
           <GoogleSignInButton
             label="Sign up with Google"
             onError={setError}
@@ -277,6 +276,7 @@ export default function Signup() {
               required
             />
           </label>
+          {ageGate}
           <button type="submit" disabled={busy || !confirmAge18}>
             {busy ? "Creating account..." : "Sign up"}
           </button>
@@ -310,6 +310,7 @@ export default function Signup() {
             onRegionChange={setRegion}
             onPhoneChange={setPhone}
           />
+          {ageGate}
           <button type="submit" disabled={busy || !confirmAge18}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>
@@ -324,7 +325,6 @@ export default function Signup() {
               </>
             )}
           </p>
-          {ageGate}
           <label>
             Username
             <input
@@ -348,6 +348,7 @@ export default function Signup() {
               required
             />
           </label>
+          {ageGate}
           <button type="submit" disabled={busy || !confirmAge18}>
             {busy ? "Verifying..." : "Verify & create account"}
           </button>

@@ -198,7 +198,7 @@ export default function GoogleSignInButton({
           {busy ? "Signing in…" : label}
         </button>
         {ageBlocked && (
-          <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
+          <p className="hint x-google-loading">Confirm you are 18+ below to continue with Google.</p>
         )}
         {!ageBlocked && (
           <p className="hint x-google-loading">Phone OTP also works if Google isn’t set up on this build yet.</p>
@@ -250,7 +250,7 @@ export default function GoogleSignInButton({
         />
       </div>
       {ageBlocked && (
-        <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
+        <p className="hint x-google-loading">Confirm you are 18+ below to continue with Google.</p>
       )}
       {!gisReady && !error && !ageBlocked && <p className="hint x-google-loading">Loading Google…</p>}
       {error && <p className="x-inline-error">{error}</p>}
