@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { suggestionsApi } from "../api";
+import { useT } from "../context/LocaleContext";
 
 /**
  * Top 15–20 problem/question suggestions for Square or an Arena.
@@ -11,9 +12,11 @@ export default function SuggestionsStrip({
   surface = "square",
   arenaKey = "",
   onPick,
-  title = "Suggested takes",
+  title,
   className = "",
 }) {
+  const t = useT();
+  const resolvedTitle = title || t("square.topQuestions");
   const [items, setItems] = useState([]);
   const [source, setSource] = useState("");
   const [open, setOpen] = useState(true);
@@ -51,7 +54,7 @@ export default function SuggestionsStrip({
         className={`suggestions-reopen plaza-rail-questions ${className}`.trim()}
         onClick={() => setOpen(true)}
       >
-        Show suggested takes
+        {t("suggestions.show")}
       </button>
     );
   }
@@ -59,7 +62,7 @@ export default function SuggestionsStrip({
   if (loading) {
     return (
       <p className={`hint suggestions-status plaza-rail-questions ${className}`.trim()}>
-        Loading suggestions…
+        {t("suggestions.loading")}
       </p>
     );
   }
@@ -67,17 +70,17 @@ export default function SuggestionsStrip({
   if (!items.length) return null;
 
   return (
-    <section className={`suggestions-strip plaza-rail-questions ${className}`.trim()} aria-label={title}>
+    <section className={`suggestions-strip plaza-rail-questions ${className}`.trim()} aria-label={resolvedTitle}>
       <div className="suggestions-head">
         <div>
-          <h2 className="suggestions-title">{title}</h2>
+          <h2 className="suggestions-title">{resolvedTitle}</h2>
           <p className="suggestions-sub">
-            Pick one to start — or write your own. {items.length} ready
-            {source.startsWith("llm") ? " · ranked" : ""}.
+            {t("suggestions.pick", { count: items.length })}
+            {source.startsWith("llm") ? t("suggestions.ranked") : ""}.
           </p>
         </div>
         <button type="button" className="suggestions-hide" onClick={() => setOpen(false)}>
-          Hide
+          {t("suggestions.hide")}
         </button>
       </div>
       <ul className="suggestions-list">
