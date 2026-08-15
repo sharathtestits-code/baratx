@@ -180,7 +180,7 @@ export default function Rewards() {
             ) : (
               <p>
                 You have no Home post in this race yet.{" "}
-                <Link to="/feed">Post on Home</Link> to enter.
+                <Link to="/feed">Post on Square</Link> to enter.
               </p>
             )}
             {race.leader && (

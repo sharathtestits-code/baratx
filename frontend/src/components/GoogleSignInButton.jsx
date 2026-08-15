@@ -60,7 +60,7 @@ export default function GoogleSignInButton({
         return;
       }
       if (hasSeenTopicOnboarding()) {
-        navigate("/feed");
+        navigate("/home");
         return;
       }
       try {

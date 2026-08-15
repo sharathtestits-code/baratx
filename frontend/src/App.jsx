@@ -9,6 +9,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Guidelines from "./pages/Guidelines";
+import Home from "./pages/Home";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
@@ -65,8 +66,8 @@ function AdminChrome({ children }) {
           <Logo variant="full" className="admin-topbar-logo" />
           <span className="admin-topbar-badge">Ops</span>
         </Link>
-        <Link to="/feed" className="admin-topbar-back">
-          Back to Square
+        <Link to="/home" className="admin-topbar-back">
+          Back to Home
         </Link>
       </header>
       <main className="admin-main">{children}</main>
@@ -96,9 +97,10 @@ function PlazaShell() {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/feed" replace />} />
-      <Route path="/signup" element={<Navigate to="/feed" replace />} />
-      <Route path="/login" element={<Navigate to="/feed" replace />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
+      <Route path="/signup" element={<Navigate to="/home" replace />} />
+      <Route path="/login" element={<Navigate to="/home" replace />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/feed" element={<Feed />} />
       <Route path="/search" element={<Search />} />
       <Route path="/notifications" element={<Notifications />} />
@@ -123,7 +125,7 @@ function AppRoutes() {
       <Route path="/guidelines" element={<Guidelines />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="*" element={<NotFound homeTo="/feed" homeLabel="Back to Square" />} />
+      <Route path="*" element={<NotFound homeTo="/home" homeLabel="Back to Home" />} />
     </Routes>
   );
 }
@@ -189,7 +191,7 @@ export default function App() {
     if (!canAccessOpsConsole(user)) {
       return (
         <AuthChrome>
-          <NotFound homeTo="/feed" homeLabel="Back to Square" />
+          <NotFound homeTo="/home" homeLabel="Back to Home" />
         </AuthChrome>
       );
     }
@@ -202,7 +204,7 @@ export default function App() {
   if (location.pathname === "/admin" || location.pathname.startsWith("/admin/")) {
     return (
       <AuthChrome>
-        <NotFound homeTo={token ? "/feed" : "/"} homeLabel={token ? "Back to Square" : "Back to BarathX"} />
+        <NotFound homeTo={token ? "/home" : "/"} homeLabel={token ? "Back to Home" : "Back to BarathX"} />
       </AuthChrome>
     );
   }

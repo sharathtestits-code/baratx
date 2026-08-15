@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notificationsApi } from "../api";
-import { IconArena, IconBell, IconBookmark, IconHome, IconLive, IconLogout, IconMessage, IconSearch, IconUser, IconMore } from "./Icons";
+import { IconArena, IconBell, IconBookmark, IconHome, IconLive, IconLogout, IconMessage, IconSearch, IconSquare, IconUser, IconMore } from "./Icons";
 import Avatar from "./Avatar";
 import Logo from "./Logo";
 
@@ -71,12 +71,16 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
-        <Link to="/feed" className="sidebar-brand" aria-label="BarathX Home">
+        <Link to="/home" className="sidebar-brand" aria-label="BarathX Home">
           <Logo variant="full" className="sidebar-logo-full" title="BarathX" />
         </Link>
         <nav className="sidebar-nav" aria-label="Primary">
-          <NavLink to="/feed" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
+          <NavLink to="/home" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
             <IconHome className="sidebar-icon" />
+            <span>Home</span>
+          </NavLink>
+          <NavLink to="/feed" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
+            <IconSquare className="sidebar-icon" />
             <span>Square</span>
           </NavLink>
           <NavLink to="/spaces" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
