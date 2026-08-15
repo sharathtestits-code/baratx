@@ -46,7 +46,8 @@ iOS & Android apps coming soon.
 
 ## Instagram @getbaratx
 
-**Image:** `indep-2026-08-15-main.jpg` / wish square / `ig-honest-take.jpg`
+**Image:** `indep-2026-08-15-main.jpg` / wish square / `ig-honest-take.jpg`  
+**Reel / Stories video:** `../independence-day-2026/barathx-independence-day-flag-reel.mp4` (waving Tiranga)
 
 **Caption:**
 ```

@@ -15,8 +15,35 @@ Tone: wish first, soft launch second. Browser soft launch live; apps coming soon
 | `barathx-independence-day-wish-wide.png` | X / LinkedIn landscape |
 | `indep-2026-08-15-main.jpg` | Soft-launch + India Gate (IG / WA) |
 | `indep-2026-08-15-x.jpg` | Soft-launch crop for X |
+| `barathx-independence-day-flag-reel.mp4` | IG Reels / Stories / WhatsApp status (9:16, waving Tiranga) |
+| `barathx-independence-day-flag-square.mp4` | IG feed / LinkedIn square video |
+| `barathx-independence-day-flag-poster.jpg` | Still / thumbnail from the flag video |
+| `render_flag_video.py` | Re-render script for the flag video |
 
 Also: `brand/ig/independence-2026/` (city prompt, honest take, cover).
+
+---
+
+## Video — waving flag (Reels / Stories)
+
+**Files:** `barathx-independence-day-flag-reel.mp4` (1080×1920) · `barathx-independence-day-flag-square.mp4` (1080×1080)
+
+**On-screen:** BarathX · Happy Independence Day · 15 August 2026 · India’s public square · Leave one honest take · barathx.com
+
+**Caption (IG Reel / Stories):**
+```
+Happy Independence Day from BarathX.
+
+Freedom deserves more than a disappearing status.
+India’s public square is open — leave one honest take.
+
+→ barathx.com
+(browser · phone or desktop · apps coming soon)
+
+#BarathX #HappyIndependenceDay #IndependenceDay #India #15August #PublicSquare #SoftLaunch #JaiHind
+```
+
+Re-render: `python3 brand/social/independence-day-2026/render_flag_video.py`
 
 ---
 
