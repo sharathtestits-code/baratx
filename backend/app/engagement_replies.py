@@ -8,7 +8,7 @@ Rules (anti-slop):
 - Bug / product reports → support tone (“where are you seeing that?”), never philosophy.
 - Replies never count toward Founding / Race (official usernames excluded in rewards).
 
-Disable: DISABLE_OFFICIAL_ENGAGE=1
+Disable: default OFF. Opt in with ENABLE_OFFICIAL_ENGAGE=1 (or set DISABLE_OFFICIAL_ENGAGE=1 to force off).
 Purge old slop: POST /admin/engage/purge-slop (ops) or PURGE_ENGAGE_SLOP_ON_BOOT=1
 """
 
@@ -36,6 +36,18 @@ MAX_REPLY_LENGTH = 220
 POLL_SECONDS = 45
 LOOKBACK_HOURS = 48
 BATCH_LIMIT = 25
+
+
+def engage_disabled() -> bool:
+    """
+    Official template auto-replies are OFF by default (felt like bot spam).
+    Opt in with ENABLE_OFFICIAL_ENGAGE=1. DISABLE_OFFICIAL_ENGAGE=1 also forces off.
+    """
+    if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
+        return True
+    if os.environ.get("ENABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
+        return False
+    return True
 
 # Phrases from the old template bot — used to purge + never regenerate.
 SLOP_PHRASES = (
@@ -566,7 +578,7 @@ def engage_on_new_post(
     Both @baratx and @sharath reply on every community post (distinct copy).
     Idempotent for the poller — fills any missing official voice.
     """
-    if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
+    if engage_disabled():
         return {"ok": True, "skipped": True, "reason": "disabled"}
 
     if _author_is_official(author):
@@ -675,7 +687,7 @@ def purge_engage_slop_replies(db: Session, *, only_slop_phrases: bool = False) -
 
 def backfill_missing_replies(db: Session, *, create_notification, limit: int = BATCH_LIMIT) -> dict:
     """Monitor recent community posts missing official replies and fill them."""
-    if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
+    if engage_disabled():
         return {"ok": True, "skipped": True, "reason": "disabled"}
 
     admin, sharath = _official_pair(db)
@@ -742,8 +754,11 @@ def start_engagement_scheduler(*, create_notification) -> None:
     global _scheduler_started, _boot_purge_done
     if _scheduler_started:
         return
-    if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
-        logger.info("Official engage scheduler disabled via DISABLE_OFFICIAL_ENGAGE")
+    if engage_disabled():
+        logger.info(
+            "Official engage scheduler OFF by default "
+            "(set ENABLE_OFFICIAL_ENGAGE=1 to opt in)"
+        )
         return
 
     def loop() -> None:
