@@ -3,19 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { notificationsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import { formatLocalWhen } from "../time";
 
 function formatWhen(iso) {
-  try {
-    const d = new Date(iso);
-    return d.toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  } catch {
-    return "";
-  }
+  return formatLocalWhen(iso);
 }
 
 function notificationCopy(n) {
