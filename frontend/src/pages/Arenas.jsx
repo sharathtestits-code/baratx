@@ -100,7 +100,7 @@ export default function Arenas() {
               {ARENA_TOPICS.slice(0, 8).map((meta) => (
                 <li key={meta.key}>
                   <Link to={`/arenas/${meta.key}`} className="suggestions-chip suggestions-chip-link">
-                    {meta.name}
+                    {t(`arena.${meta.key}`)}
                   </Link>
                 </li>
               ))}
@@ -127,8 +127,8 @@ export default function Arenas() {
                 return (
                   <div key={meta.key} className="arena-card" style={{ "--arena-accent": meta.accent }}>
                     <Link to={`/arenas/${meta.key}`} className="arena-card-main">
-                      <div className="arena-card-name">{meta.name}</div>
-                      <p className="arena-card-blurb">{meta.blurb}</p>
+                      <div className="arena-card-name">{t(`arena.${meta.key}`)}</div>
+                      <p className="arena-card-blurb">{t(`arena.${meta.key}.blurb`)}</p>
                       <div className="arena-card-meta">
                         {arena
                           ? t(
@@ -172,7 +172,11 @@ export default function Arenas() {
                 return (
                   <li key={d.id}>
                     <Link to={`/spaces/${d.id}`} className="debate-row">
-                      <span className="debate-arena-tag">{d.arena_name || meta?.name || "Arena"}</span>
+                      <span className="debate-arena-tag">
+                        {d.arena_key
+                          ? t(`arena.${d.arena_key}`)
+                          : d.arena_name || meta?.name || t("nav.arenas")}
+                      </span>
                       <span className="debate-title">{d.title}</span>
                       <span className="debate-sides hint">
                         {d.for_count} {d.side_for_label} · {d.against_count} {d.side_against_label}

@@ -159,6 +159,19 @@ const EN = {
   "settings.unmute": "Unmute",
   "settings.unblock": "Unblock",
   "settings.logout": "Log out",
+
+  "arena.startups": "Startups",
+  "arena.sports": "Sports",
+  "arena.politics": "Politics",
+  "arena.entertainment": "Entertainment",
+  "arena.news": "News",
+  "arena.spirituality": "Spirituality",
+  "arena.startups.blurb": "Funding, founders, and the India builder economy — Fund it or Pass.",
+  "arena.sports.blurb": "Cricket, football, and every match India argues about.",
+  "arena.politics.blurb": "Policy, parties, and the fights that shape the country.",
+  "arena.entertainment.blurb": "Film, music, and celebrity culture — pick a side.",
+  "arena.news.blurb": "Breaking stories and the takes India can’t ignore.",
+  "arena.spirituality.blurb": "Faith, yoga, festivals, and the searches shaping modern India.",
 };
 
 const HI = {
@@ -292,6 +305,19 @@ const HI = {
   "settings.unmute": "अनम्यूट",
   "settings.unblock": "अनब्लॉक",
   "settings.logout": "लॉग आउट",
+
+  "arena.startups": "स्टार्टअप्स",
+  "arena.sports": "खेल",
+  "arena.politics": "राजनीति",
+  "arena.entertainment": "मनोरंजन",
+  "arena.news": "समाचार",
+  "arena.spirituality": "अध्यात्म",
+  "arena.startups.blurb": "फ़ंडिंग, फाउंडर्स और भारत की बिल्डर इकोनॉमी — फंड करें या पास।",
+  "arena.sports.blurb": "क्रिकेट, फ़ुटबॉल और हर मैच जिस पर भारत बहस करता है।",
+  "arena.politics.blurb": "नीति, दल और वो लड़ाइयाँ जो देश को आकार देती हैं।",
+  "arena.entertainment.blurb": "फ़िल्म, संगीत और सेलिब्रिटी संस्कृति — पक्ष चुनें।",
+  "arena.news.blurb": "ब्रेकिंग खबरें और वो राय जिन्हें भारत नज़रअंदाज़ नहीं कर सकता।",
+  "arena.spirituality.blurb": "आस्था, योग, त्योहार और आधुनिक भारत को आकार देने वाली खोज।",
 };
 
 const TE = {
@@ -425,6 +451,19 @@ const TE = {
   "settings.unmute": "అన్‌మ్యూట్",
   "settings.unblock": "అన్‌బ్లాక్",
   "settings.logout": "లాగ్ అవుట్",
+
+  "arena.startups": "స్టార్టప్స్",
+  "arena.sports": "క్రీడలు",
+  "arena.politics": "రాజకీయాలు",
+  "arena.entertainment": "వినోదం",
+  "arena.news": "వార్తలు",
+  "arena.spirituality": "ఆధ్యాత్మికత",
+  "arena.startups.blurb": "ఫండింగ్, ఫౌండర్లు మరియు భారత్ బిల్డర్ ఎకానమీ — ఫండ్ ఇవ్వండి లేదా పాస్.",
+  "arena.sports.blurb": "క్రికెట్, ఫుట్‌బాల్ మరియు భారత్ చర్చించే ప్రతి మ్యాచ్.",
+  "arena.politics.blurb": "విధానం, పార్టీలు మరియు దేశాన్ని ఆకృతి చేసే పోరాటాలు.",
+  "arena.entertainment.blurb": "సినిమా, సంగీతం మరియు సెలబ్రిటీ సంస్కృతి — వైపు ఎంచుకోండి.",
+  "arena.news.blurb": "బ్రేకింగ్ కథనాలు మరియు భారత్ విస్మరించలేని అభిప్రాయాలు.",
+  "arena.spirituality.blurb": "విశ్వాసం, యోగా, పండుగలు మరియు ఆధునిక భారత్‌ను ఆకృతి చేసే అన్వేషణలు.",
 };
 
 export const MESSAGES = { en: EN, hi: HI, te: TE };
@@ -469,4 +508,20 @@ export function translate(lang, key, vars = {}) {
     out = out.replaceAll(`{${k}}`, String(v ?? ""));
   }
   return out;
+}
+
+/** Localized arena / topic orbit name (Startups, Sports, …). */
+export function arenaTopicName(lang, key, fallback = "") {
+  if (!key) return fallback;
+  const translated = translate(lang, `arena.${key}`);
+  if (translated && translated !== `arena.${key}`) return translated;
+  return fallback || key;
+}
+
+/** Localized arena blurb. */
+export function arenaTopicBlurb(lang, key, fallback = "") {
+  if (!key) return fallback;
+  const translated = translate(lang, `arena.${key}.blurb`);
+  if (translated && translated !== `arena.${key}.blurb`) return translated;
+  return fallback || "";
 }

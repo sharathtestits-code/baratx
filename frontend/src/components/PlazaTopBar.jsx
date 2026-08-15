@@ -80,7 +80,7 @@ export default function PlazaTopBar() {
             className="plaza-orbit"
             style={{ "--arena-accent": a.accent }}
           >
-            {a.name}
+            {t(`arena.${a.key}`)}
           </Link>
         ))}
         <Link to="/spaces" className="plaza-orbit plaza-orbit-live">

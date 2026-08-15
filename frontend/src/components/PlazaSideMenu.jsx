@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { useAuth } from "../context/AuthContext";
+import { useT } from "../context/LocaleContext";
 import { notificationsApi } from "../api";
 import { ARENA_TOPICS } from "../arenas";
 import { IconLogout } from "./Icons";
@@ -13,6 +14,7 @@ import { IconLogout } from "./Icons";
 export default function PlazaSideMenu() {
   const { open, close } = usePlazaMenu();
   const { token, user, logout } = useAuth();
+  const t = useT();
   const location = useLocation();
   const navigate = useNavigate();
   const pathRef = useRef(location.pathname);
@@ -182,7 +184,7 @@ export default function PlazaSideMenu() {
                     onClick={() => goArena(a.key)}
                   >
                     <span className="plaza-side-arena-bar" aria-hidden="true" />
-                    <strong>{a.name}</strong>
+                    <strong>{t(`arena.${a.key}`)}</strong>
                   </button>
                 </li>
               );
