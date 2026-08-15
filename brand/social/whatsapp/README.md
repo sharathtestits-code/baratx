@@ -1,32 +1,36 @@
-# BarathX — WhatsApp group marketing teaser
+# BarathX — WhatsApp / Instagram marketing teaser
 
 ## Why this cut
-Research for WhatsApp groups / Status / Channel (2026):
-- **9:16 vertical**, **~24 seconds**, **MP4 H.264**, target **under 16MB**
-- **Burned-in captions** — most people watch muted in groups
+- **9:16 Instagram Reel template** (1080×1920) with safe zones so logo + captions aren’t covered by IG UI
+- Same story still works in **WhatsApp** groups / Status / Channel
+- **~24 seconds**, **MP4 H.264**, burned-in captions (muted viewing)
 - **One CTA** at the end: https://barathx.com
-- Hook first (WhatsApp pain), then product, then link
+
+## Safe zones (Reel)
+- Top ~320px reserved (username / audio)
+- Bottom ~440px reserved (captions / buttons)
+- Logo, plates, and CTA stay in the middle band
 
 ## Files
 | File | Use |
 |------|-----|
-| `barathx-whatsapp-teaser.mp4` | **Primary** — send in WhatsApp groups / Channel / Status |
-| `barathx-whatsapp-teaser-square.mp4` | Optional 1:1 if a group compresses vertical oddly |
-| `barathx-whatsapp-teaser-poster.jpg` | Thumbnail / preview still |
+| `barathx-whatsapp-teaser.mp4` | **Primary** — IG Reels / Stories / WhatsApp Status |
+| `barathx-whatsapp-teaser-square.mp4` | Feed / LinkedIn square (composed, not center-cropped) |
+| `barathx-whatsapp-teaser-poster.jpg` | Thumbnail |
 | `render_whatsapp_teaser.py` | Re-render |
 
 ## Beats (website page in background)
-1. Hook — landing page behind “WhatsApp takes disappear…”  
-2. Brand — landing · India’s public square  
-3. Square — real Square UI still  
-4. Arenas — real Arenas UI still  
-5. Live — real Live/Spaces UI still  
-6. Promise — Home hub still · Human takes only  
-7. CTA — signup page · https://barathx.com  
+1. Hook — landing · WhatsApp takes disappear…  
+2. Brand — India’s public square  
+3. Square — real Square UI  
+4. Arenas — real Arenas UI  
+5. Live — real Live UI  
+6. Promise — Human takes only  
+7. CTA — https://barathx.com  
 
 Screens live in `screens/` (`bx-site-*.png|jpg`).
 
-## Paste message (send with the video)
+## Paste message
 
 ```
 WhatsApp takes disappear by Monday.
@@ -37,17 +41,6 @@ Human takes only. No AI slop.
 
 Soft launch live in your browser (phone or desktop).
 Apps coming soon.
-
-→ https://barathx.com
-```
-
-### Shorter alt
-```
-Tired of debates dying in the group chat?
-
-BarathX — India’s public square.
-Square · Arenas · Live
-Human takes only.
 
 → https://barathx.com
 ```
