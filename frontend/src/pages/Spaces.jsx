@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import PlazaPageHeader from "../components/PlazaPageHeader";
 import LiveNowStrip from "../components/LiveNowStrip";
 import { focusCompose } from "../focusCompose";
+import { useT } from "../context/LocaleContext";
 
 const SUGGESTED_DEBATES = [
   "Should WFH stay the default in India tech?",
@@ -15,6 +16,7 @@ const SUGGESTED_DEBATES = [
 
 export default function Spaces() {
   const { token } = useAuth();
+  const t = useT();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -69,23 +71,26 @@ export default function Spaces() {
       <div className="plaza-layout">
         <div className="plaza-main-top">
           <PlazaPageHeader
-            title="Live"
-            sub="Start a live. Jump in. Mute, video, reactions — max 15."
+            title={t("live.title")}
+            sub={t("live.sub")}
           />
           <section className={`live-amphitheatre${empty ? " is-empty-hero" : ""}`}>
             <div className="live-amphitheatre-glow" aria-hidden="true" />
-            <span className="live-pill">{empty ? "Start one" : "Live now"}</span>
+            <span className="live-pill">{empty ? t("live.startOne") : t("live.liveNow")}</span>
             <h2 className="live-amphitheatre-title">
               {featured
                 ? featured.title
                 : empty
-                  ? "No rooms live — start one"
-                  : "Start a room India can join"}
+                  ? t("live.noRooms")
+                  : t("live.startRoom")}
             </h2>
             <p className="live-amphitheatre-sub">
               {featured
-                ? `Hosted by @${featured.host?.username} · ${featured.post_count} takes in the room`
-                : "Open a 15-person talk. Argue live — mute, video, reactions."}
+                ? t("live.hostTakes", {
+                    user: featured.host?.username,
+                    count: featured.post_count,
+                  })
+                : t("live.openTalk")}
             </p>
             {empty && (
               <button
@@ -108,7 +113,7 @@ export default function Spaces() {
             <div className="live-amphitheatre-actions">
               {featured ? (
                 <Link to={`/spaces/${featured.id}`} className="btn btn-primary">
-                  Jump in
+                  {t("live.jumpIn")}
                 </Link>
               ) : (
                 <button
@@ -116,28 +121,28 @@ export default function Spaces() {
                   className="btn btn-primary"
                   onClick={() => startSuggested(title.trim() || SUGGESTED_DEBATES[0])}
                 >
-                  Start a live
+                  {t("live.startLive")}
                 </button>
               )}
               {featured ? (
                 <a href="#go-live" className="btn btn-secondary">
-                  Host your own
+                  {t("live.hostOwn")}
                 </a>
               ) : (
                 <Link to="/arenas" className="btn btn-secondary">
-                  Browse arenas
+                  {t("live.browseArenas")}
                 </Link>
               )}
             </div>
           </section>
         </div>
 
-        <aside className="plaza-rail-stack" aria-label="Suggested debates">
-          <section className="suggestions-strip plaza-rail-questions" aria-label="Top debate starters">
+        <aside className="plaza-rail-stack" aria-label={t("live.topStarters")}>
+          <section className="suggestions-strip plaza-rail-questions" aria-label={t("live.topStarters")}>
             <div className="suggestions-head">
               <div>
-                <h2 className="suggestions-title">Top debate starters</h2>
-                <p className="suggestions-sub">Tap one to fill Start a live — then go live.</p>
+                <h2 className="suggestions-title">{t("live.topStarters")}</h2>
+                <p className="suggestions-sub">{t("live.topStartersSub")}</p>
               </div>
             </div>
             <ul className="suggestions-list">
@@ -152,26 +157,26 @@ export default function Spaces() {
           </section>
           <LiveNowStrip
             items={items}
-            title="Rooms live"
-            seeAllLabel="See all"
+            title={t("live.roomsLive")}
+            seeAllLabel={t("live.seeAll")}
             limit={6}
-            emptyHint={loading ? "Loading rooms…" : "No rooms yet — start the first."}
+            emptyHint={loading ? t("live.loading") : t("live.emptyRooms")}
           />
         </aside>
 
         <form id="go-live" className="plaza-studio live-create plaza-main-compose" onSubmit={createSpace}>
-          <p className="plaza-studio-label">Start a live</p>
+          <p className="plaza-studio-label">{t("live.composeLabel")}</p>
           <input
             ref={titleRef}
             type="text"
-            placeholder="What are we arguing?"
+            placeholder={t("live.composePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={100}
             required
           />
           <button type="submit" className="btn btn-primary" disabled={creating || !title.trim()}>
-            {creating ? "Opening…" : "Go live"}
+            {creating ? t("live.opening") : t("live.goLive")}
           </button>
         </form>
 
@@ -179,14 +184,14 @@ export default function Spaces() {
 
         <section className="plaza-takes plaza-main-feed">
           <div className="plaza-takes-head">
-            <h2>Rooms live</h2>
+            <h2>{t("live.roomsLive")}</h2>
           </div>
           {loading ? (
-            <p className="hint">Loading…</p>
+            <p className="hint">{t("live.loading")}</p>
           ) : items.length === 0 ? (
             <div className="live-empty-suggest">
-              <p className="live-empty-suggest-title">Suggested debates</p>
-              <p className="hint">Tap a topic to prefill — then go live.</p>
+              <p className="live-empty-suggest-title">{t("live.suggestedTitle")}</p>
+              <p className="hint">{t("live.suggestedHint")}</p>
               <div className="live-empty-chips">
                 {SUGGESTED_DEBATES.map((topic) => (
                   <button

@@ -2,21 +2,23 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, socialApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import { useLocale } from "../context/LocaleContext";
 import Avatar from "../components/Avatar";
 import Logo from "../components/Logo";
 import ThemePicker from "../components/ThemePicker";
 import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
-import { LOCALES, applyDocumentLanguage, getStoredLanguage, localeMeta } from "../i18n";
+import { LOCALES, getStoredLanguage, localeMeta } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
   const { user, token, logout, updateUser } = useAuth();
+  const { language: localeLang, setLanguage: setLocaleLanguage, t } = useLocale();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
   const [theme, setTheme] = useState(() => user?.theme || getStoredTheme());
   const [themeSaving, setThemeSaving] = useState(false);
-  const [language, setLanguage] = useState(() => user?.language || getStoredLanguage());
+  const [language, setLanguage] = useState(() => user?.language || localeLang || getStoredLanguage());
   const [languageSaving, setLanguageSaving] = useState(false);
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
@@ -31,9 +33,9 @@ export default function Settings() {
   useEffect(() => {
     if (user?.language) {
       setLanguage(user.language);
-      applyDocumentLanguage(user.language);
+      setLocaleLanguage(user.language);
     }
-  }, [user?.language]);
+  }, [user?.language, setLocaleLanguage]);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,7 +72,7 @@ export default function Settings() {
       const updated = await api.updateMe(token, { theme: nextId });
       updateUser(updated);
       markThemeChosen();
-      setMsg("Appearance saved.");
+      setMsg(t("settings.appearanceSaved"));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -81,23 +83,26 @@ export default function Settings() {
   async function saveLanguage(nextId) {
     if (!nextId || nextId === language) return;
     setLanguage(nextId);
-    applyDocumentLanguage(nextId);
+    setLocaleLanguage(nextId);
     setLanguageSaving(true);
     setMsg("");
     setError("");
     try {
       const updated = await api.updateMe(token, { language: nextId });
       updateUser(updated);
-      setMsg(
-        nextId === "en"
-          ? "Language saved. English UI is active."
-          : "Language preference saved. Full Hindi/Telugu UI chrome is coming next — English remains until then."
-      );
+      setMsg(translateSaved(nextId));
     } catch (err) {
       setError(err.message);
     } finally {
       setLanguageSaving(false);
     }
+  }
+
+  function translateSaved(nextId) {
+    // Use the newly selected language for the confirmation itself.
+    if (nextId === "hi") return "भाषा सेव हो गई। इंटरफ़ेस अपडेट हो गया।";
+    if (nextId === "te") return "భాష సేవ్ అయింది. UI అప్‌డేట్ అయింది.";
+    return "Language saved. UI updated.";
   }
 
   async function unmute(username) {
@@ -126,35 +131,29 @@ export default function Settings() {
   return (
     <div className="feed-wrap surface-page plaza-page">
       <div className="feed-header">
-        <h1>Settings and privacy</h1>
+        <h1>{t("settings.title")}</h1>
       </div>
 
       {error && <div className="error">{error}</div>}
       {msg && <p className="hint ok-hint">{msg}</p>}
 
       <section className="settings-section">
-        <h2>Appearance</h2>
-        <p className="hint">
-          Default is Tri-Color Midnight (dark). Switch to Saffron, Monsoon, or Ink anytime.
-        </p>
+        <h2>{t("settings.appearance")}</h2>
+        <p className="hint">{t("settings.appearanceHint")}</p>
         <ThemePicker value={theme} onChange={saveTheme} compact />
-        {themeSaving && <p className="hint">Saving…</p>}
+        {themeSaving && <p className="hint">{t("settings.saving")}</p>}
       </section>
 
       <section className="settings-section settings-language">
         <div className="settings-lang-brand" aria-label="BarathX">
           <Logo variant="full" className="settings-lang-logo" />
           <p className="settings-lang-brand-native" lang={selectedLocale.id}>
-            {selectedLocale.brandNative}
-            {selectedLocale.id !== "en" ? ` · ${selectedLocale.tagline}` : ` · ${selectedLocale.tagline}`}
+            {selectedLocale.brandNative} · {selectedLocale.tagline}
           </p>
         </div>
-        <h2>Language</h2>
-        <p className="hint">
-          English is the default. Hindi and Telugu preferences are saved to your account now; full
-          translated UI ships in a later update. The BarathX logo stays the same in every language.
-        </p>
-        <div className="settings-lang-grid" role="radiogroup" aria-label="Language">
+        <h2>{t("settings.language")}</h2>
+        <p className="hint">{t("settings.languageHint")}</p>
+        <div className="settings-lang-grid" role="radiogroup" aria-label={t("settings.language")}>
           {LOCALES.map((loc) => (
             <button
               key={loc.id}
@@ -179,23 +178,23 @@ export default function Settings() {
             </button>
           ))}
         </div>
-        {languageSaving && <p className="hint">Saving…</p>}
+        {languageSaving && <p className="hint">{t("settings.saving")}</p>}
       </section>
 
       <section className="settings-section">
-        <h2>Profile</h2>
-        <p className="hint">Update your display name, username, bio, and photos.</p>
+        <h2>{t("settings.profile")}</h2>
+        <p className="hint">{t("settings.profileHint")}</p>
         <Link className="btn btn-secondary" to={`/u/${user?.username}`}>
-          Edit profile
+          {t("settings.editProfile")}
         </Link>
       </section>
 
       <section className="settings-section">
-        <h2>Muted accounts</h2>
+        <h2>{t("settings.muted")}</h2>
         {listsLoading ? (
-          <p className="hint">Loading…</p>
+          <p className="hint">{t("settings.loading")}</p>
         ) : mutes.length === 0 ? (
-          <p className="hint">You haven’t muted anyone.</p>
+          <p className="hint">{t("settings.noMutes")}</p>
         ) : (
           <ul className="settings-user-list">
             {mutes.map((u) => (
@@ -208,7 +207,7 @@ export default function Settings() {
                   </span>
                 </Link>
                 <button type="button" className="btn btn-ghost" onClick={() => unmute(u.username)}>
-                  Unmute
+                  {t("settings.unmute")}
                 </button>
               </li>
             ))}
@@ -217,11 +216,11 @@ export default function Settings() {
       </section>
 
       <section className="settings-section">
-        <h2>Blocked accounts</h2>
+        <h2>{t("settings.blocked")}</h2>
         {listsLoading ? (
-          <p className="hint">Loading…</p>
+          <p className="hint">{t("settings.loading")}</p>
         ) : blocks.length === 0 ? (
-          <p className="hint">You haven’t blocked anyone.</p>
+          <p className="hint">{t("settings.noBlocks")}</p>
         ) : (
           <ul className="settings-user-list">
             {blocks.map((u) => (
@@ -234,7 +233,7 @@ export default function Settings() {
                   </span>
                 </Link>
                 <button type="button" className="btn btn-ghost" onClick={() => unblock(u.username)}>
-                  Unblock
+                  {t("settings.unblock")}
                 </button>
               </li>
             ))}
@@ -273,7 +272,7 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Account</h2>
         <button type="button" className="btn btn-secondary" onClick={handleLogout}>
-          Log out
+          {t("settings.logout")}
         </button>
       </section>
 

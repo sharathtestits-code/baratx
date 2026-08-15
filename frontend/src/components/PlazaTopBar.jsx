@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { usePlazaMenu } from "../context/PlazaMenuContext";
+import { useT } from "../context/LocaleContext";
 import Logo from "./Logo";
 import Avatar from "./Avatar";
 import { ARENA_TOPICS } from "../arenas";
@@ -13,6 +14,7 @@ export default function PlazaTopBar() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { open, toggle } = usePlazaMenu();
+  const t = useT();
 
   return (
     <header className="plaza-top">
@@ -25,7 +27,7 @@ export default function PlazaTopBar() {
             e.stopPropagation();
             toggle();
           }}
-          aria-label={open ? "Close menu" : "Open menu"}
+          aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
           aria-expanded={open}
           aria-controls="plaza-side-menu"
         >
@@ -34,22 +36,22 @@ export default function PlazaTopBar() {
           <span />
         </button>
 
-        <Link to="/feed" className="plaza-brand" aria-label="BarathX Square">
+        <Link to="/feed" className="plaza-brand" aria-label="BarathX">
           <Logo variant="full" className="plaza-brand-logo" title="BarathX" />
         </Link>
 
-        <nav className="plaza-primary" aria-label="Plaza">
+        <nav className="plaza-primary" aria-label={t("nav.plaza")}>
           <NavLink to="/feed" className={({ isActive }) => `plaza-link${isActive ? " is-active" : ""}`} end>
-            Square
+            {t("nav.square")}
           </NavLink>
           <NavLink to="/spaces" className={({ isActive }) => `plaza-link${isActive ? " is-active" : ""}`}>
-            Live
+            {t("nav.live")}
           </NavLink>
           <NavLink to="/arenas" className={({ isActive }) => `plaza-link${isActive ? " is-active" : ""}`}>
-            Arenas
+            {t("nav.arenas")}
           </NavLink>
           <NavLink to="/search" className={({ isActive }) => `plaza-link${isActive ? " is-active" : ""}`}>
-            Explore
+            {t("nav.explore")}
           </NavLink>
         </nav>
 
@@ -57,13 +59,13 @@ export default function PlazaTopBar() {
           <button
             type="button"
             className="plaza-search-btn"
-            aria-label="Search"
+            aria-label={t("nav.search")}
             onClick={() => navigate("/search")}
           >
             <IconSearch className="plaza-search-icon" />
           </button>
           {user && (
-            <Link to={`/u/${user.username}`} className="plaza-avatar-link" aria-label="Profile">
+            <Link to={`/u/${user.username}`} className="plaza-avatar-link" aria-label={t("nav.profile")}>
               <Avatar name={user.display_name} username={user.username} url={user.avatar_url} size={34} />
             </Link>
           )}
@@ -82,7 +84,7 @@ export default function PlazaTopBar() {
           </Link>
         ))}
         <Link to="/spaces" className="plaza-orbit plaza-orbit-live">
-          Live now
+          {t("square.liveNow")}
         </Link>
       </nav>
     </header>
