@@ -1792,12 +1792,38 @@ a.post-username:hover {
   margin-left: auto;
 }
 
+.delete-action.is-confirm {
+  color: var(--danger, #b91c1c);
+  font-weight: 700;
+}
+
 .delete-action:hover:not(:disabled) {
   color: var(--danger);
 }
 
 .delete-action:hover:not(:disabled) .action-icon-wrap {
   background: #fce8ea;
+}
+
+.delete-confirm-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.post-delete-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+}
+
+.post-delete-hint .text-btn {
+  border: none;
+  background: transparent;
+  color: var(--brand);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
 }
 
 /* ---------- Replies ---------- */
