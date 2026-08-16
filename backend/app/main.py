@@ -634,6 +634,10 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
     tags = text_parse.extract_hashtags(post.text)
     safe_text = text_parse.sanitize_user_text(post.text or "")
     likely_ai = bool(getattr(post, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
+    mentions_me = False
+    if current_user and getattr(current_user, "username", None):
+        me = current_user.username.lower()
+        mentions_me = me in {m.lower() for m in text_parse.extract_mentions(safe_text)}
 
     return schemas.PostOut(
         id=post.id,
@@ -652,6 +656,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         debate_side=getattr(post, "debate_side", None),
         space_id=getattr(post, "space_id", None),
         likely_ai=likely_ai,
+        mentions_me=mentions_me,
     )
 
 
@@ -2614,21 +2619,40 @@ def list_posts(
         )
 
     if feed == "global":
-        # Square "For you": real member takes first (including blue/gold badges),
-        # then seeded official digest accounts, follow not required.
+        # Pull recent @tags into For you so tagged posts aren’t missed.
+        if current_user and not before:
+            seen_ids = {i.post.id for i in items}
+            for mention_item in list_mention_feed(
+                db, current_user=current_user, limit=min(10, limit), before=None
+            ):
+                if mention_item.post.id in seen_ids:
+                    # Ensure mentions_me is set even if the post was already in the window.
+                    mention_item.post.mentions_me = True
+                    for existing in items:
+                        if existing.post.id == mention_item.post.id:
+                            existing.post.mentions_me = True
+                            break
+                    continue
+                mention_item.post.mentions_me = True
+                items.append(mention_item)
+                seen_ids.add(mention_item.post.id)
+
+        # Square "For you": tagged posts first, then member takes, then official digests.
         # Within each band, human takes beat likely-AI drafts.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
             uname = (getattr(author, "username", None) or "").lower() if author else ""
             is_seed_official = uname in official_names
             is_ai = bool(getattr(i.post, "likely_ai", False))
+            tagged = bool(getattr(i.post, "mentions_me", False))
             ts = i.item_time.timestamp() if i.item_time else 0.0
-            return (1 if is_seed_official else 0, 1 if is_ai else 0, -ts)
+            return (0 if tagged else 1, 1 if is_seed_official else 0, 1 if is_ai else 0, -ts)
 
         items.sort(key=_sort_key)
     else:
         items.sort(
             key=lambda i: (
+                0 if getattr(i.post, "mentions_me", False) else 1,
                 1 if getattr(i.post, "likely_ai", False) else 0,
                 -(i.item_time.timestamp() if i.item_time else 0.0),
             )

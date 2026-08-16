@@ -326,6 +326,8 @@ class PostOut(BaseModel):
     debate_side: Optional[str] = None
     space_id: Optional[str] = None
     likely_ai: bool = False
+    # True when the viewer’s @username is tagged in this post text.
+    mentions_me: bool = False
     # Set only on create when civic/floor award is evaluated.
     founding_awarded: Optional[bool] = None
     founding_status: Optional[str] = None

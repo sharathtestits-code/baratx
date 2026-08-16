@@ -140,7 +140,12 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
   if (deleted) return null;
 
   return (
-    <article className={`post${detailMode ? " post-detail-card" : ""}`}>
+    <article className={`post${detailMode ? " post-detail-card" : ""}${post.mentions_me ? " post-tagged-me" : ""}`}>
+      {post.mentions_me && (
+        <div className="mention-tag">
+          Tagged you
+        </div>
+      )}
       {repostedBy && (
         <div className="repost-tag">
           <IconRepost className="repost-tag-icon" />
