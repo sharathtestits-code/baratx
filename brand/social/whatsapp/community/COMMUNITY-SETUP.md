@@ -40,11 +40,18 @@ IG / X → @getbaratx
 Rule: respect > ratio. Admins remove noise.
 ```
 
-### Community icon (upload)
-**Primary (Gen Z type):** `barathx-wa-community-icon.png`  
-**Small/avatar:** `barathx-wa-community-icon-512.png`  
-**Ultra-clean BX only:** `barathx-wa-community-icon-bx.png`  
-**Alt art:** `barathx-wa-community-logo-genz.png`
+### Community icon / DP (upload)
+Same pattern as the welcome photo: dark field · giant **BX** · saffron bar · **SQUARE**.
+
+| File | Use |
+|------|-----|
+| `barathx-wa-dp.png` | **Primary DP** — Community profile photo (1024) |
+| `barathx-wa-dp-512.png` | Lighter upload |
+| `barathx-wa-dp-256.png` | Tiny / fallback |
+| `barathx-wa-dp-circle-preview.png` | How it looks in WhatsApp’s circle crop |
+| `barathx-wa-dp-genz.png` | Alt DP art (same pattern) |
+| `barathx-wa-community-icon.png` | Extra icon variant |
+| `barathx-wa-community-icon-bx.png` | Ultra-clean BX-only |
 
 Use this on the **Community** only. Keep the main BX logo on the **Channel**.
 
