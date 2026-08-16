@@ -129,6 +129,10 @@ export const api = {
   loginPhoneVerify: (body) =>
     request("/auth/login/phone/verify", { method: "POST", body: JSON.stringify(body) }),
 
+  /** Invalidate every JWT for this account (stolen session recovery). */
+  revokeSessions: (token) =>
+    request("/auth/revoke-sessions", { method: "POST", headers: authHeaders(token) }),
+
   me: (token) => request("/users/me", { headers: authHeaders(token), timeoutMs: 12000 }),
 
   updateMe: (token, body) =>

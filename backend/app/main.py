@@ -335,6 +335,14 @@ async def anti_scrape_middleware(request: Request, call_next):
     path = request.url.path or ""
     if anti_scrape.is_bulk_scrape_path(path):
         response.headers.setdefault("X-Robots-Tag", "noindex, nofollow, noai, noimageai")
+    # Baseline hardening on every API response.
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=()",
+    )
     return response
 
 
@@ -1550,6 +1558,19 @@ def reset_password(payload: schemas.ResetPasswordRequest, db: Session = Depends(
     auth.bump_token_version(user)
     db.commit()
     return schemas.MessageResponse(message="Password updated. You can sign in with your new password.")
+
+
+@app.post("/auth/revoke-sessions", response_model=schemas.MessageResponse)
+def revoke_sessions(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Invalidate every JWT for this account (stolen-token / shared-device recovery)."""
+    auth.bump_token_version(current_user)
+    db.commit()
+    return schemas.MessageResponse(
+        message="All sessions signed out. Sign in again on devices you still use."
+    )
 
 
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)

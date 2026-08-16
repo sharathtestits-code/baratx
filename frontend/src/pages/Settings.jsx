@@ -11,7 +11,7 @@ import { LOCALES, getStoredLanguage, localeMeta } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout, revokeAllSessions, updateUser } = useAuth();
   const { language: localeLang, setLanguage: setLocaleLanguage, t } = useLocale();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -173,9 +173,25 @@ export default function Settings() {
     }
   }
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     navigate("/");
+  }
+
+  async function handleRevokeAll() {
+    if (
+      !window.confirm(
+        "Sign out every device and browser that has your BarathX account? You’ll need to log in again here too."
+      )
+    ) {
+      return;
+    }
+    try {
+      await revokeAllSessions();
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Could not sign out all sessions.");
+    }
   }
 
   return (
@@ -257,17 +273,23 @@ export default function Settings() {
         <h2>Privacy &amp; security</h2>
         <p className="hint">
           Your password is hashed. Email and phone stay private on your profile. Sessions expire;
-          password reset signs out other devices.
+          password reset and “sign out everywhere” kill stolen tokens on other devices.
         </p>
         <ul className="settings-security-points">
           <li>Passwords stored with bcrypt, never plain text</li>
           <li>Email / phone visible only to you</li>
           <li>Confirm email before posting (if you signed up with email)</li>
           <li>Login &amp; OTP attempts are rate-limited</li>
+          <li>Log out revokes your session token so a copied key stops working</li>
         </ul>
-        <Link className="btn btn-secondary" to="/privacy">
-          Read Privacy Policy
-        </Link>
+        <div className="settings-security-actions">
+          <Link className="btn btn-secondary" to="/privacy">
+            Read Privacy Policy
+          </Link>
+          <button type="button" className="btn btn-secondary" onClick={handleRevokeAll}>
+            Sign out everywhere
+          </button>
+        </div>
 
         <div className="settings-danger">
           <h3>Delete account</h3>

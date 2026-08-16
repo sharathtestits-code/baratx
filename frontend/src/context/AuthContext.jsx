@@ -77,7 +77,33 @@ export function AuthProvider({ children }) {
     setToken(newToken);
   }
 
-  function logout() {
+  async function logout() {
+    const current = localStorage.getItem("iv_token");
+    localStorage.removeItem("iv_token");
+    setToken(null);
+    setUser(null);
+    setBootError("");
+    setLoading(false);
+    // Best-effort: don't block UI if the network is down.
+    if (current) {
+      try {
+        await api.revokeSessions(current);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  async function revokeAllSessions() {
+    if (!token) {
+      logout();
+      return;
+    }
+    try {
+      await api.revokeSessions(token);
+    } catch {
+      /* still clear local session */
+    }
     localStorage.removeItem("iv_token");
     setToken(null);
     setUser(null);
@@ -115,7 +141,17 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, loading, bootError, login, logout, updateUser, retryBoot }}
+      value={{
+        token,
+        user,
+        loading,
+        bootError,
+        login,
+        logout,
+        revokeAllSessions,
+        updateUser,
+        retryBoot,
+      }}
     >
       {children}
     </AuthContext.Provider>

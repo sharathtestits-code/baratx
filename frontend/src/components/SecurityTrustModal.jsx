@@ -60,6 +60,10 @@ export default function SecurityTrustModal() {
             attempts.
           </li>
           <li>
+            <strong>Session kill switch</strong>. Log out or “Sign out everywhere” in Settings
+            invalidates stolen tokens on other devices.
+          </li>
+          <li>
             <strong>You control mail</strong>, unsubscribe anytime; delete your account in Settings.
           </li>
         </ul>
