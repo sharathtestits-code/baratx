@@ -1,26 +1,33 @@
-# BarathX — daily WhatsApp + X Cursor Automation
+# BarathX — daily WhatsApp + X + LinkedIn (2×/day)
 
-Paste into a new [Cursor Automation](https://cursor.com/automations). Agents cannot create automations via API — create once in the dashboard.
+Paste into [Cursor Automation](https://cursor.com/automations). Agents cannot create automations via API — create once in the dashboard.
 
-**Companion:** [README.md](./README.md) · [../ig/CONTENT-RULES.md](../../ig/CONTENT-RULES.md) · [../FOUNDING-PUBLIC-COPY.md](../FOUNDING-PUBLIC-COPY.md)
+**Companion:** [README.md](./README.md) · [../../ig/CONTENT-RULES.md](../../ig/CONTENT-RULES.md) · [../FOUNDING-PUBLIC-COPY.md](../FOUNDING-PUBLIC-COPY.md)
 
 ---
 
-## Suggested schedule
+## Schedule (IST)
 
-| Cadence | Goal |
-|---------|------|
-| **Daily 09:00 IST** | 1 WhatsApp community post + 1 X post (copy + images) |
+| Time | Slot | Channels |
+|------|------|----------|
+| **09:00** | Morning | WhatsApp + X + LinkedIn |
+| **20:00** | Evening | WhatsApp + X + LinkedIn |
 
-Trigger: **Scheduled** · Repo: `sharathtestits-code/baratx` · Branch: `main`  
-Cron: `0 9 * * *` with timezone **Asia/Kolkata** (or UTC `30 3 * * *`)
+Create **two** automations (or one cron with slot detection from clock hour).
+
+Suggested crons (Asia/Kolkata):
+- Morning: `0 9 * * *`
+- Evening: `0 20 * * *`
+
+Repo: `sharathtestits-code/baratx` · Branch: `main`  
+**You post manually** after the “post is ready” email — never auto-blast.
 
 ---
 
 ## Automation prompt (copy/paste)
 
 ```
-You prepare BarathX’s daily social pack (WhatsApp community + X). Draft only — do not post anywhere.
+You prepare BarathX’s daily social pack (WhatsApp + X + LinkedIn). Draft only — do not post anywhere.
 
 Read first:
 - brand/social/daily/README.md
@@ -31,36 +38,41 @@ Read first:
 
 Rules:
 - Brand spelling: BarathX only (never BaratX / BharathX)
-- Cadence: 1 WhatsApp community post + 1 X post for today (use IST date)
-- Structure: pain → BarathX fix → signup CTA; include https://barathx.com
+- Cadence: TWO posts today (morning + evening IST) × WhatsApp + X + LinkedIn
+- Structure each post: pain/trend → BarathX fix/highlight → signup CTA + https://barathx.com
+- Cover product highlights across the day: Square · Arenas · Live · human-first / AI demotion · soft launch · Founding public line (no ₹)
 - Never mention Founding ₹ / ₹150 / UPI / cash. If Founding is mentioned, use exactly: “100 Founding spots, earned by opening a debate that gets real engagement, not by signing up.”
-- Short, paste-ready copy; match tone of brand/social/daily/2026-08-14/PACK.md
-- Prefer timely hooks (festivals, soft launch, India debate culture) without inventing fake traction
+- Prefer timely India hooks (culture, campus, soft launch, AI-in-feeds) without partisan campaigning or fake traction
+- Short, paste-ready copy
 
 Create brand/social/daily/YYYY-MM-DD/ (today’s IST date) with:
-1) PACK.md — WhatsApp community + X sections; each with Image filename + Post body in a fenced code block
-2) Image assets for WA + X, referenced from PACK.md
+1) PACK.md — Post 1 Morning + Post 2 Evening; each channel has Image filename + Post body in a fenced code block
+2) APPROVAL.md — list images awaiting Sharath approval
+3) Images via: python3 brand/social/daily/render_daily_crosspost.py --date YYYY-MM-DD
+4) After writing pack, run: python3 brand/social/daily/notify_pack_ready.py --date YYYY-MM-DD --slot all
+   (emails “Your BarathX post is ready”; if email env missing, NOTIFY-PREVIEW-*.md is enough)
 
-Commit and open a PR titled “Daily social pack YYYY-MM-DD” if allowed; otherwise write files and stop.
+Commit and open a PR titled “Daily social pack YYYY-MM-DD” if allowed.
 
-In the run summary for Sharath: paste both posts in full + say where the images are.
+In the run summary: paste both slots’ WA + X + LinkedIn copy + image paths + say “awaiting approve” if MOCKUP ribbon is on.
 ```
 
 ---
 
 ## Manual create steps (Sharath)
 
-1. Open https://cursor.com/automations → **New automation** (or https://cursor.com/automations/new)
-2. Name: `BarathX daily WhatsApp + X pack`
-3. Trigger: **Scheduled** → every day **09:00** · timezone **Asia/Kolkata** (cron `0 9 * * *`)
-4. Repository: **`sharathtestits-code/baratx`** · branch **`main`** (required — cron defaults to no repo)
-5. Tools: allow **Pull requests** / repo write so packs land as PRs
-6. Paste the prompt above → **Save** → **Activate**
-7. Run once manually → confirm `brand/social/daily/YYYY-MM-DD/PACK.md` looks right
-8. Each morning: open the agent run → copy WA + X into WhatsApp / X yourself (never auto-blast)
+1. Open https://cursor.com/automations → **New automation**
+2. Name: `BarathX daily AM pack` (repeat for PM)
+3. Trigger: **Scheduled** → **09:00** (and second automation **20:00**) · timezone **Asia/Kolkata**
+4. Repository: **`sharathtestits-code/baratx`** · branch **`main`**
+5. Paste the prompt → **Save** → **Activate**
+6. When email says **Your BarathX post is ready** → open pack → paste to WhatsApp / X / LinkedIn yourself
 
 ---
 
-## Plan note
+## Approval loop
 
-Automations need Cursor **Pro+** (or Teams) with Cloud Agents. Each run bills as a Cloud Agent.
+1. Agent ships mockups with **MOCKUP · APPROVE** ribbon  
+2. You reply `approve all` (or AM/PM / tweaks)  
+3. Agent re-renders with `--approve` and re-sends ready email  
+4. You post  

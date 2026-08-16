@@ -405,3 +405,89 @@ def send_ops_alert_email(
     except Exception:
         logger.exception("Ops alert email failed for %s", to_email)
         return False
+
+
+SOCIAL_PACK_EMAIL = (
+    os.environ.get("SOCIAL_PACK_EMAIL")
+    or os.environ.get("BUG_ALERT_EMAIL")
+    or os.environ.get("OPS_ALERT_EMAIL")
+    or "hello@barathx.com"
+).strip()
+
+
+def send_daily_pack_ready_email(
+    *,
+    date: str,
+    slot: str,
+    channels: str,
+    pack_path: str,
+    wa_body: str = "",
+    x_body: str = "",
+    li_body: str = "",
+    image_hint: str = "",
+) -> bool:
+    """Email Sharath when a daily social pack is ready to paste manually."""
+    to_email = SOCIAL_PACK_EMAIL
+    if not to_email:
+        return False
+
+    slot_label = (slot or "daily").strip().title()
+    subject = f"Your BarathX post is ready — {date} {slot_label}"
+    text_body = (
+        f"Your BarathX post is ready.\n\n"
+        f"Date: {date} (IST)\n"
+        f"Slot: {slot_label}\n"
+        f"Channels: {channels}\n"
+        f"Pack: {pack_path}\n"
+    )
+    if image_hint:
+        text_body += f"Images: {image_hint}\n"
+    text_body += "\n— Paste yourself (WhatsApp / X / LinkedIn). Do not auto-blast.\n"
+    if wa_body:
+        text_body += f"\n--- WhatsApp ---\n{wa_body.strip()}\n"
+    if x_body:
+        text_body += f"\n--- X ---\n{x_body.strip()}\n"
+    if li_body:
+        text_body += f"\n--- LinkedIn ---\n{li_body.strip()}\n"
+    text_body += "\n- BarathX daily pack\n"
+
+    def _esc(s: str) -> str:
+        return (
+            (s or "")
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+        )
+
+    blocks = []
+    for label, body in (("WhatsApp", wa_body), ("X", x_body), ("LinkedIn", li_body)):
+        if not body:
+            continue
+        blocks.append(
+            f"<h3 style='margin:24px 0 8px;color:#FF671F;'>{_esc(label)}</h3>"
+            f"<pre style='white-space:pre-wrap;background:#111;color:#f5f5f5;"
+            f"padding:14px;border-radius:10px;font-size:14px;'>{_esc(body.strip())}</pre>"
+        )
+    blocks_html = "\n".join(blocks)
+    html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
+  <p style="font-size:20px;font-weight:700;">Your BarathX post is ready</p>
+  <p>Date: <strong>{_esc(date)}</strong> (IST) · Slot: <strong>{_esc(slot_label)}</strong></p>
+  <p>Channels: {_esc(channels)}</p>
+  <p style="color:#536471;font-size:14px;">Pack: {_esc(pack_path)}</p>
+  {"<p style='color:#536471;font-size:14px;'>Images: " + _esc(image_hint) + "</p>" if image_hint else ""}
+  <p style="margin:20px 0;padding:12px 16px;background:#fff4ec;border-left:4px solid #FF671F;">
+    Paste yourself on WhatsApp / X / LinkedIn. Do not auto-blast.
+  </p>
+  {blocks_html}
+  <p style="color:#8b98a5;font-size:13px;margin-top:28px;">- BarathX daily pack</p>
+</body>
+</html>
+"""
+    try:
+        return send_email(to_email, subject, text_body, html_body)
+    except Exception:
+        logger.exception("Daily pack ready email failed for %s", to_email)
+        return False
