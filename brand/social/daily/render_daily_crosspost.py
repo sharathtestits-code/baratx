@@ -250,14 +250,15 @@ def morning_linkedin(*, for_approval: bool) -> Image.Image:
 
 
 def evening_whatsapp(*, for_approval: bool) -> Image.Image:
-    """Family/community WA style — product proof strip."""
+    """Family/community WA style — current product: Square · Arenas · Live."""
     base, d = canvas()
     stamp(base, d, pill="PM · WHATSAPP")
     d.text((36, 120), "TONIGHT ON BARATHX", font=fnt(22), fill=SAFFRON)
     d.text((36, 165), "Drop. Pick.", font=fnt(54), fill=WHITE)
     d.text((36, 235), "Argue live.", font=fnt(54), fill=SAFFRON)
 
-    phones = [("home", "Home"), ("arenas", "Side"), ("live", "Live")]
+    # Current mobile UI only (no legacy desktop compose / old screens).
+    phones = [("square", "Drop"), ("arenas", "Pick"), ("live", "Argue")]
     layer = base.convert("RGBA")
     xs = [40, 380, 720]
     for (name, label), x in zip(phones, xs):

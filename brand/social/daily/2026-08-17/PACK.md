@@ -73,7 +73,7 @@ https://barathx.com
 | Channel | File |
 |---------|------|
 | X (shared highlight) | `evening-shared.jpg` |
-| WhatsApp | `evening-whatsapp.jpg` |
+| WhatsApp | `evening-whatsapp.jpg` (Square · Arenas · Live — current UI) |
 | LinkedIn | reuse `evening-shared.jpg` |
 
 ### WhatsApp community / channel
