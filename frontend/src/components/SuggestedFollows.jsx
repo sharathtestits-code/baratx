@@ -9,31 +9,31 @@ export const SUGGESTED_PEOPLE = [
   {
     display_name: "BarathX",
     username: "baratx",
-    blurb: "Official blue — product updates & India conversation prompts",
+    blurb: "Official blue, product updates & India conversation prompts",
     badge: "blue",
   },
   {
     display_name: "Sharath",
     username: "sharath",
-    blurb: "Founder — building India’s public square",
+    blurb: "Founder, building India’s public square",
     badge: "blue",
   },
   {
     display_name: "Bharat Voices",
     username: "bharatvoices",
-    blurb: "Gold BarathX — culture, ideas, everyday India",
+    blurb: "Gold BarathX, culture, ideas, everyday India",
     badge: "gold",
   },
   {
     display_name: "India Tech Daily",
     username: "indiatech",
-    blurb: "Gold BarathX — startups, policy & builders",
+    blurb: "Gold BarathX, startups, policy & builders",
     badge: "gold",
   },
 ];
 
 /**
- * Who-to-follow list with Follow buttons — shown on mobile feed/search
+ * Who-to-follow list with Follow buttons, shown on mobile feed/search
  * (right rail is desktop-only).
  */
 export default function SuggestedFollows({ title = "Who to follow", note, dismissible = false }) {

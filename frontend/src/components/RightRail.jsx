@@ -51,7 +51,7 @@ export default function RightRail() {
         <div className="rail-card rail-card-suggested">
           <SuggestedFollows
             title="Official BarathX"
-            note="Seed accounts run by BarathX — not organic third parties."
+            note="Seed accounts run by BarathX, not organic third parties."
           />
         </div>
 

@@ -321,7 +321,7 @@ export default function Signup() {
             OTP sent to <strong>{phone}</strong>.{" "}
             {devOtp && (
               <>
-                (Demo mode — your code is <b>{devOtp}</b>)
+                (Demo mode, your code is <b>{devOtp}</b>)
               </>
             )}
           </p>

@@ -11,7 +11,7 @@ function daysLeft(endsAt) {
 }
 
 /**
- * Biweekly Square Race strip — your likes vs leader; full board on /rewards.
+ * Biweekly Square Race strip, your likes vs leader; full board on /rewards.
  */
 export default function RaceStrip() {
   const { token } = useAuth();
@@ -44,7 +44,7 @@ export default function RaceStrip() {
         <p className="race-strip-meta">{left == null ? "" : left === 0 ? "Ends today" : `${left}d left`}</p>
       </div>
       <p className="race-strip-body">
-        Highest-liked Home post wins ₹{race.prize_min}–₹{race.prize_max}. You don’t score yourself —
+        Highest-liked Home post wins ₹{race.prize_min}–₹{race.prize_max}. You don’t score yourself -
         likes do.
       </p>
       {leader ? (
@@ -58,7 +58,7 @@ export default function RaceStrip() {
         </p>
       ) : (
         <p className="race-strip-leader">
-          No leader yet — need ≥{race.min_likes_to_win} likes.
+          No leader yet, need ≥{race.min_likes_to_win} likes.
           {mine ? ` You have ${mine.like_count}.` : ""}
         </p>
       )}

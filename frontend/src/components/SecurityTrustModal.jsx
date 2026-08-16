@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 const SEEN_KEY = "bx_security_trust_seen_v1";
 
 /**
- * One-time trust modal — what BarathX does to keep accounts & data safer.
+ * One-time trust modal, what BarathX does to keep accounts & data safer.
  */
 export default function SecurityTrustModal() {
   const { user } = useAuth();
@@ -45,22 +45,22 @@ export default function SecurityTrustModal() {
         <p className="security-trust-kicker">Your data · Our promise</p>
         <h2 id="security-trust-title">BarathX keeps your account locked down</h2>
         <p className="hint">
-          Soft launch or not — we treat sign-in and personal data as product, not an afterthought.
+          Soft launch or not, we treat sign-in and personal data as product, not an afterthought.
         </p>
         <ul className="security-trust-list">
           <li>
-            <strong>Passwords hashed</strong> — we never store your password in plain text.
+            <strong>Passwords hashed</strong>, we never store your password in plain text.
           </li>
           <li>
-            <strong>Email &amp; phone stay private</strong> — other people can’t see them on your
+            <strong>Email &amp; phone stay private</strong>, other people can’t see them on your
             profile.
           </li>
           <li>
-            <strong>Secure sign-in</strong> — Google checks, OTP limits, and rate limits on login
+            <strong>Secure sign-in</strong>. Google checks, OTP limits, and rate limits on login
             attempts.
           </li>
           <li>
-            <strong>You control mail</strong> — unsubscribe anytime; delete your account in Settings.
+            <strong>You control mail</strong>, unsubscribe anytime; delete your account in Settings.
           </li>
         </ul>
         <div className="security-trust-actions">

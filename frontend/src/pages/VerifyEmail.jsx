@@ -20,7 +20,7 @@ export default function VerifyEmail() {
     updateUserRef.current = updateUser;
   }, [authToken, updateUser]);
 
-  // Verify once per token — do not re-run when AuthContext re-renders
+  // Verify once per token, do not re-run when AuthContext re-renders
   // (unstable updateUser / session hydrate), or the first success consumes
   // the one-time token and the retry shows "already used".
   useEffect(() => {

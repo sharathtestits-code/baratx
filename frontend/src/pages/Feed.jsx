@@ -413,7 +413,7 @@ export default function Feed() {
   const remaining = MAX_LEN - text.length;
   const charCountClass = remaining < 20 ? "char-count char-count-low" : "char-count";
 
-  // First session: guided take — welcome popup can sit on top.
+  // First session: guided take, welcome popup can sit on top.
   if (showFirstSession) {
     return (
       <div className="plaza-page plaza-square plaza-square-first">
@@ -528,7 +528,7 @@ export default function Feed() {
                 className={`compose-tile compose-tile-starters${showStarters ? " is-open" : ""}`}
                 aria-expanded={showStarters}
                 onClick={() => setShowStarters((v) => !v)}
-                title="Starter prompts — not AI drafts"
+                title="Starter prompts, not AI drafts"
               >
                 {t("square.starters")}
               </button>

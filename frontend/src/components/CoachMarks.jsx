@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 /**
  * X / Facebook-style coach marks: spotlight the real UI + short tip card.
- * Primary action is Next / Got it — no “Skip tour” (that pattern trains people to ignore).
+ * Primary action is Next / Got it, no “Skip tour” (that pattern trains people to ignore).
  * Tiny × dismisses the tip set (same as closing a Facebook tip).
  *
  * localStorage: bx_nav_tour_done=1
@@ -14,35 +14,35 @@ const STEPS = [
     id: "home",
     target: "[data-coach='nav-home']",
     title: "Home",
-    body: "Your personal hub — continue arenas, see following activity, and peek at Live. Posting lives on Square.",
+    body: "Your personal hub, continue arenas, see following activity, and peek at Live. Posting lives on Square.",
     path: "/home",
   },
   {
     id: "compose",
     target: "[data-coach='compose']",
     title: "Drop a take",
-    body: "Start here — this is where you post on The Square. Early members (first 100–1,000) get a welcome reply from admin and the founder, plus a surprise gift revealed later (T&Cs apply).",
+    body: "Start here, this is where you post on The Square. Early members (first 100–1,000) get a welcome reply from admin and the founder, plus a surprise gift revealed later (T&Cs apply).",
     path: "/feed",
   },
   {
     id: "square-nav",
     target: "[data-coach='nav-square']",
     title: "Square",
-    body: "India's public feed. Use Square to post or read takes — including people you don’t follow (For you).",
+    body: "India's public feed. Use Square to post or read takes, including people you don’t follow (For you).",
     path: "/feed",
   },
   {
     id: "live",
     target: "[data-coach='nav-live']",
     title: "Live",
-    body: "Open or join a room when the fight needs to happen now — sided debate, up to 15 voices, optional Live Talk audio.",
+    body: "Open or join a room when the fight needs to happen now, sided debate, up to 15 voices, optional Live Talk audio.",
     path: "/spaces",
   },
   {
     id: "arenas",
     target: "[data-coach='nav-arenas']",
     title: "Arenas",
-    body: "Pick a side on Sports, Politics, Entertainment, News, Spirituality, or Startups. Use Arenas when you want Agree/Disagree — not a group chat.",
+    body: "Pick a side on Sports, Politics, Entertainment, News, Spirituality, or Startups. Use Arenas when you want Agree/Disagree, not a group chat.",
     path: "/arenas",
   },
   {

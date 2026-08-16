@@ -7,7 +7,7 @@ export default function Terms() {
       <p className="legal-updated">Last updated: August 6, 2026</p>
       <p>
         By using BarathX (BX) at <strong>barathx.com</strong>, you agree to these terms. BarathX is an
-        early product — features may change as we improve the square.
+        early product, features may change as we improve the square.
       </p>
 
       <h2>The basics</h2>
@@ -40,7 +40,7 @@ export default function Terms() {
       <p>
         During soft launch, some of the first 100–1,000 people who join and post may receive a
         welcome reply from BarathX admin and the founder, and may be eligible for a surprise gift
-        whose details are revealed later. This is a limited promotional offer — not a purchase,
+        whose details are revealed later. This is a limited promotional offer, not a purchase,
         lottery, or guarantee. Eligibility, timing, and fulfilment are at BarathX&apos;s discretion
         and may change or end without notice. Void where prohibited.{" "}
         <strong>T&amp;Cs apply</strong>.

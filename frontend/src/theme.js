@@ -1,4 +1,4 @@
-/** BarathX appearance themes — applied via data-theme on <html>. */
+/** BarathX appearance themes, applied via data-theme on <html>. */
 
 export const THEME_STORAGE_KEY = "bx_theme";
 export const THEME_CHOSEN_KEY = "bx_theme_chosen";
@@ -7,7 +7,7 @@ export const THEMES = [
   {
     id: "midnight",
     name: "Tri-Color Midnight",
-    blurb: "Dark premium look — saffron, green & navy accents. Default.",
+    blurb: "Dark premium look, saffron, green & navy accents. Default.",
     swatch: ["#0D0D12", "#FF9933", "#138808", "#FFFFFF"],
   },
   {
@@ -72,7 +72,7 @@ export function applyTheme(themeId) {
   } catch {
     // ignore quota / private mode
   }
-  // Native shell (Capacitor) — keep status bar in sync with theme
+  // Native shell (Capacitor), keep status bar in sync with theme
   try {
     import("./native.js").then((native) => {
       native.syncNativeChrome?.(id);

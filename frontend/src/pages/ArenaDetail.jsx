@@ -123,7 +123,7 @@ export default function ArenaDetail() {
         const updated = await arenasApi.join(token, arenaKey);
         setArena(updated);
       }
-      setMsg(`${topic.name} selected — edit the question below, then Open debate.`);
+      setMsg(`${topic.name} selected, edit the question below, then Open debate.`);
       window.requestAnimationFrame(() => {
         document.getElementById("arena-live-debates")?.scrollIntoView({
           behavior: "smooth",
@@ -132,7 +132,7 @@ export default function ArenaDetail() {
       });
     } catch (err) {
       // Topic is still selected for the debate form even if follow/save failed
-      setError(err.message || "Could not save topic — you can still open the debate below");
+      setError(err.message || "Could not save topic, you can still open the debate below");
       document.getElementById("arena-live-debates")?.scrollIntoView({
         behavior: "smooth",
         block: "start",
@@ -188,7 +188,7 @@ export default function ArenaDetail() {
       });
       setDebates((prev) => [created, ...prev]);
       setDebateTitle("");
-      setMsg("Debate opened — taking you in…");
+      setMsg("Debate opened, taking you in…");
       navigate(`/spaces/${created.id}`);
     } catch (err) {
       setError(err.message || "Could not open debate");
@@ -266,7 +266,7 @@ export default function ArenaDetail() {
             seeAllTo="/spaces"
             seeAllLabel="Enter Live"
             limit={6}
-            emptyHint="No live debates — open one below."
+            emptyHint="No live debates, open one below."
           />
         </aside>
 
@@ -304,7 +304,7 @@ export default function ArenaDetail() {
                 })}
               </div>
             ) : (
-              <p className="hint">No topics yet — try again in a moment.</p>
+              <p className="hint">No topics yet, try again in a moment.</p>
             )}
             <div className="arena-topic-actions">
               <button
@@ -369,7 +369,7 @@ export default function ArenaDetail() {
               </button>
             </form>
             {debates.length === 0 ? (
-              <p className="hint">No live debates — be the first to open one.</p>
+              <p className="hint">No live debates, be the first to open one.</p>
             ) : (
               <ul className="debate-list">
                 {debates.map((d) => (

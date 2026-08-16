@@ -59,7 +59,7 @@ export default function SpaceRoom() {
     setStanceBusy(true);
     setError("");
     setStanceHint(false);
-    // Optimistic — unlock typing / Post immediately
+    // Optimistic, unlock typing / Post immediately
     setSpace((prev) => (prev ? { ...prev, my_side: side } : prev));
     try {
       const updated = await spacesApi.setStance(token, spaceId, side);
@@ -268,10 +268,10 @@ export default function SpaceRoom() {
               </span>
             </button>
           </div>
-          <p className="hint debate-tally-hint">Counts are people on each side — not post totals.</p>
+          <p className="hint debate-tally-hint">Counts are people on each side, not post totals.</p>
           {space.my_side ? (
             <p className="hint ok-hint">
-              You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong> —
+              You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong> -
               type your argument below.
             </p>
           ) : (
@@ -321,8 +321,8 @@ export default function SpaceRoom() {
                       ? `Argue for ${
                           space.my_side === "for" ? space.side_for_label : space.side_against_label
                         }… type @ to tag`
-                      : "Type your take — pick For or Against above to post"
-                    : "Say something in this Space — type @ to tag"
+                      : "Type your take, pick For or Against above to post"
+                    : "Say something in this Space, type @ to tag"
                 }
                 maxLength={500}
                 rows={3}

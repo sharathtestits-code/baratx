@@ -24,7 +24,7 @@ const MIN_PICKS = 1;
 const MAX_PICKS = 20;
 
 /**
- * Interest picker — post-signup onboarding and arena “Personalize your topics”.
+ * Interest picker, post-signup onboarding and arena “Personalize your topics”.
  */
 export default function OnboardingTopics() {
   const { token } = useAuth();
@@ -39,7 +39,7 @@ export default function OnboardingTopics() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // First-time onboarding only — arena personalize should not burn the welcome flag.
+    // First-time onboarding only, arena personalize should not burn the welcome flag.
     if (!fromArena) markTopicOnboardingSeen();
   }, [fromArena]);
 
@@ -135,8 +135,8 @@ export default function OnboardingTopics() {
       if (!fromArena) sessionStorage.setItem("bx_welcome", "1");
       leave(fromArena ? undefined : "/feed?welcome=1");
     } catch (err) {
-      // Don't trap the user — save failed but they can still enter the square
-      setError(err.message || "Could not save topics — continuing anyway");
+      // Don't trap the user, save failed but they can still enter the square
+      setError(err.message || "Could not save topics, continuing anyway");
       markTopicOnboardingSeen();
       if (!fromArena) sessionStorage.setItem("bx_welcome", "1");
       window.setTimeout(() => leave(fromArena ? undefined : "/feed?welcome=1"), 600);
@@ -215,7 +215,7 @@ export default function OnboardingTopics() {
         {!canContinue ? (
           <p className="hint topic-onboarding-hint">Tap a topic above, then Continue.</p>
         ) : (
-          <p className="hint topic-onboarding-hint">Ready — tap Continue.</p>
+          <p className="hint topic-onboarding-hint">Ready, tap Continue.</p>
         )}
       </div>
     </div>
