@@ -48,6 +48,25 @@ Rule: respect > ratio. Admins remove noise.
 
 Use this on the **Community** only. Keep the main BX logo on the **Channel**.
 
+### Welcome photo (first Announcement / Channel drop)
+Trending IG/X pattern used: **dark field + giant type + saffron accent bar** (Wrapped / Black-Label style).
+
+| File | Use |
+|------|-----|
+| `barathx-wa-welcome.png` | **Primary** — WhatsApp Community welcome / Announcement image |
+| `barathx-wa-welcome-1080.png` | Same, locked 1080×1080 |
+| `barathx-wa-welcome-story.png` | 1080×1350 for IG/X story or Status |
+| `barathx-wa-welcome-genz-trend.png` | Alt art (same pattern) |
+
+Caption with the welcome photo:
+```
+you're in.
+BarathX Square — soft launch crew.
+
+drop feedback. drop takes. break the app.
+→ https://barathx.com
+```
+
 ---
 
 ## Groups to add
