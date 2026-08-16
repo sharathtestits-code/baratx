@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[3]
 SCREENS = ROOT / "brand" / "social" / "whatsapp" / "screens"
+LIVE = SCREENS / "live-2026-08-16"  # current product UI captures
 CAROUSEL = ROOT / "brand" / "carousel" / "screens"
 LOGO = ROOT / "brand" / "baratx-logo-avatar.png"
 DAILY = Path(__file__).resolve().parent
@@ -107,7 +108,27 @@ def phone(path: Path, h: int = 560) -> Image.Image:
 
 
 def screen(name: str) -> Path:
+    # Prefer fresh live captures of current BarathX UI (Home / Square / Arenas / Live).
     m = {
+        "square": LIVE / "square-mobile.png",
+        "square2": LIVE / "square-foryou-mobile.png",
+        "arenas": LIVE / "arenas-mobile.png",
+        "live": LIVE / "live-mobile.png",
+        "home": LIVE / "home-mobile.png",
+        "signup": LIVE / "signup-mobile.png",
+        "landing": LIVE / "landing-mobile.png",
+        "feed": LIVE / "square-mobile.png",
+        "compose": LIVE / "square-mobile.png",
+        "search": LIVE / "search-mobile.png",
+        "profile": LIVE / "profile-mobile.png",
+        "landing_desk": LIVE / "landing-desktop.png",
+        "home_desk": LIVE / "home-desktop.png",
+        "square_desk": LIVE / "square-desktop.png",
+        "live_desk": LIVE / "live-desktop.png",
+        "arenas_desk": LIVE / "arenas-desktop.png",
+    }
+    # Fallbacks to older brand screens / carousel if a live file is missing.
+    fallback = {
         "square": SCREENS / "bx-site-square-b.jpg",
         "square2": SCREENS / "bx-site-square-c.jpg",
         "arenas": SCREENS / "bx-site-arenas.jpg",
@@ -117,9 +138,19 @@ def screen(name: str) -> Path:
         "landing": SCREENS / "bx-site-landing.png",
         "feed": CAROUSEL / "m03-feed.png",
         "compose": CAROUSEL / "07-compose.png",
+        "search": CAROUSEL / "m05-search.png",
+        "profile": CAROUSEL / "m06-profile.png",
     }
-    p = m[name]
-    return p if p.exists() else next(x for x in m.values() if x.exists())
+    p = m.get(name)
+    if p and p.exists():
+        return p
+    fb = fallback.get(name)
+    if fb and fb.exists():
+        return fb
+    for alt in list(m.values()) + list(fallback.values()):
+        if alt.exists():
+            return alt
+    raise FileNotFoundError(name)
 
 
 def morning_genz(*, for_approval: bool) -> Image.Image:
@@ -226,7 +257,7 @@ def evening_whatsapp(*, for_approval: bool) -> Image.Image:
     d.text((36, 165), "Drop. Pick.", font=fnt(54), fill=WHITE)
     d.text((36, 235), "Argue live.", font=fnt(54), fill=SAFFRON)
 
-    phones = [("compose", "Write"), ("arenas", "Side"), ("live", "Live")]
+    phones = [("home", "Home"), ("arenas", "Side"), ("live", "Live")]
     layer = base.convert("RGBA")
     xs = [40, 380, 720]
     for (name, label), x in zip(phones, xs):
