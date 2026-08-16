@@ -1877,6 +1877,26 @@ a.post-username:hover {
   overflow-wrap: anywhere;
 }
 
+.ai-draft-tag {
+  margin-left: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.reply-likely-ai .reply-body {
+  opacity: 0.72;
+}
+
+.ai-replies-divider {
+  margin: 0.75rem 0 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+
 .reply-form {
   display: flex;
   flex-direction: row;

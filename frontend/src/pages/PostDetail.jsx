@@ -188,9 +188,18 @@ export default function PostDetail() {
           <p className="hint profile-posts-hint">No replies yet. Be the first.</p>
         ) : (
           <div className="detail-reply-list">
-            {replies.map((r) => (
-              <ReplyItem key={r.id} reply={r} onReplyTo={handleReplyTo} />
-            ))}
+            {replies.map((r, idx) => {
+              const prevAi = idx > 0 && replies[idx - 1].likely_ai;
+              const showAiDivider = r.likely_ai && !prevAi && replies.some((x) => !x.likely_ai);
+              return (
+                <div key={r.id}>
+                  {showAiDivider ? (
+                    <p className="hint ai-replies-divider">Possible AI drafts (sorted below human replies)</p>
+                  ) : null}
+                  <ReplyItem reply={r} onReplyTo={handleReplyTo} />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

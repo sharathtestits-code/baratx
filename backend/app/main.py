@@ -15,6 +15,7 @@ from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
 from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
+from app import ai_filter, anti_scrape
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -60,6 +61,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
             if "debate_side" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+            if "likely_ai" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN likely_ai BOOLEAN DEFAULT 0"))
 
             # communities arena flags
             try:
@@ -94,6 +97,8 @@ def run_migrations():
             reply_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(replies)"))}
             if "parent_reply_id" not in reply_cols:
                 conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+            if "likely_ai" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN likely_ai BOOLEAN DEFAULT 0"))
 
             notif_tables = {
                 row[0]
@@ -153,6 +158,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
             if post_cols and "debate_side" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+            if post_cols and "likely_ai" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN likely_ai BOOLEAN DEFAULT FALSE"))
 
             community_cols = cols("communities")
             if community_cols:
@@ -179,6 +186,8 @@ def run_migrations():
             reply_cols = cols("replies")
             if reply_cols and "parent_reply_id" not in reply_cols:
                 conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+            if reply_cols and "likely_ai" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN likely_ai BOOLEAN DEFAULT FALSE"))
 
             notif_cols = cols("notifications")
             if notif_cols and "kind" not in notif_cols:
@@ -314,9 +323,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def anti_scrape_middleware(request: Request, call_next):
+    """Block scraper UAs + throttle anonymous bulk reads on content APIs."""
+    blocked = anti_scrape.enforce_anti_scrape(request)
+    if blocked is not None:
+        return blocked
+    response = await call_next(request)
+    # Discourage AI trainers / indexers from caching API JSON.
+    path = request.url.path or ""
+    if anti_scrape.is_bulk_scrape_path(path):
+        response.headers.setdefault("X-Robots-Tag", "noindex, nofollow, noai, noimageai")
+    return response
+
+
 BASE_DIR = media_store.BASE_DIR
 MEDIA_DIR = media_store.MEDIA_DIR
 os.makedirs(MEDIA_DIR, exist_ok=True)
+
+
+@app.get("/robots.txt")
+def robots_txt():
+    """API-host robots — refuse scrapers and AI training crawls."""
+    return Response(content=anti_scrape.robots_txt_body(), media_type="text/plain; charset=utf-8")
 
 
 @app.get("/media/{name}")
@@ -578,6 +608,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
 
     tags = text_parse.extract_hashtags(post.text)
     safe_text = text_parse.sanitize_user_text(post.text or "")
+    likely_ai = bool(getattr(post, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
 
     return schemas.PostOut(
         id=post.id,
@@ -595,6 +626,7 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         hashtags=tags,
         debate_side=getattr(post, "debate_side", None),
         space_id=getattr(post, "space_id", None),
+        likely_ai=likely_ai,
     )
 
 
@@ -609,6 +641,15 @@ def require_verified_to_post(user: models.User) -> None:
         )
 
 
+def enforce_human_take(user: models.User, text: str) -> bool:
+    """Reject hard AI slop; return likely_ai flag for softer hits. Official voices skip reject."""
+    score = ai_filter.score_ai_text(text)
+    is_official = bool(getattr(user, "is_official", False))
+    if score.reject and not is_official:
+        raise HTTPException(status_code=400, detail=ai_filter.AI_REJECT_DETAIL)
+    return bool(score.likely_ai) and not is_official
+
+
 def otp_matches(otp_row: models.OTP, code: str) -> bool:
     """Accept bcrypt-hashed OTP (preferred) or legacy plaintext rows during rollout."""
     stored = otp_row.code or ""
@@ -620,15 +661,18 @@ def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) ->
     liked_by_me = False
     if current_user:
         liked_by_me = any(like.user_id == current_user.id for like in reply.likes)
+    safe_text = text_parse.sanitize_user_text(reply.text or "")
+    likely_ai = bool(getattr(reply, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
     return schemas.ReplyOut(
         id=reply.id,
         post_id=reply.post_id,
-        text=text_parse.sanitize_user_text(reply.text or ""),
+        text=safe_text,
         created_at=reply.created_at,
         author=author_out(reply.author),
         like_count=len(reply.likes),
         liked_by_me=liked_by_me,
         parent_reply_id=getattr(reply, "parent_reply_id", None),
+        likely_ai=likely_ai,
     )
 
 
@@ -1175,6 +1219,7 @@ def admin_create_reply(
         author_id=author.id,
         text=text,
         parent_reply_id=None,
+        likely_ai=False,
     )
     db.add(reply)
     db.flush()
@@ -2167,6 +2212,7 @@ async def create_post(
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
     if len(text) > MAX_POST_LENGTH:
         raise HTTPException(status_code=400, detail=f"Post must be {MAX_POST_LENGTH} characters or fewer")
+    likely_ai = enforce_human_take(current_user, text)
 
     quoted_post_id = None
     if quote_post_id:
@@ -2199,6 +2245,7 @@ async def create_post(
         text=text,
         image_url=image_url,
         quoted_post_id=quoted_post_id,
+        likely_ai=likely_ai,
     )
     # Lifetime welcome: fire once per account even if every post is later deleted.
     is_first_post = not bool(getattr(current_user, "has_posted_once", False))
@@ -2395,16 +2442,23 @@ def list_posts(
     if feed == "global":
         # Square "For you": real member takes first (including blue/gold badges),
         # then seeded official digest accounts, follow not required.
+        # Within each band, human takes beat likely-AI drafts.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
             uname = (getattr(author, "username", None) or "").lower() if author else ""
             is_seed_official = uname in official_names
+            is_ai = bool(getattr(i.post, "likely_ai", False))
             ts = i.item_time.timestamp() if i.item_time else 0.0
-            return (1 if is_seed_official else 0, -ts)
+            return (1 if is_seed_official else 0, 1 if is_ai else 0, -ts)
 
         items.sort(key=_sort_key)
     else:
-        items.sort(key=lambda i: i.item_time, reverse=True)
+        items.sort(
+            key=lambda i: (
+                1 if getattr(i.post, "likely_ai", False) else 0,
+                -(i.item_time.timestamp() if i.item_time else 0.0),
+            )
+        )
     return items[:limit]
 
 
@@ -2649,6 +2703,7 @@ def create_reply(
         raise HTTPException(status_code=400, detail="Reply text cannot be empty")
     if len(text) > MAX_REPLY_LENGTH:
         raise HTTPException(status_code=400, detail=f"Reply must be {MAX_REPLY_LENGTH} characters or fewer")
+    likely_ai = enforce_human_take(current_user, text)
 
     parent_reply_id = payload.parent_reply_id
     if parent_reply_id:
@@ -2661,6 +2716,7 @@ def create_reply(
         author_id=current_user.id,
         text=text,
         parent_reply_id=parent_reply_id,
+        likely_ai=likely_ai,
     )
     db.add(reply)
     db.flush()
@@ -2718,7 +2774,15 @@ def list_replies(
         .order_by(models.Reply.created_at.asc())
         .all()
     )
-    return [serialize_reply(r, current_user) for r in replies]
+    # Human replies first; flagged AI drafts sink to the bottom (still visible).
+    serialized = [serialize_reply(r, current_user) for r in replies]
+    serialized.sort(
+        key=lambda r: (
+            1 if r.likely_ai else 0,
+            r.created_at.timestamp() if r.created_at else 0.0,
+        )
+    )
+    return serialized
 
 
 # ---------- Reply likes ----------

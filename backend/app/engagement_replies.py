@@ -551,6 +551,7 @@ def _add_reply(
         author_id=official.id,
         text=_clip(text),
         parent_reply_id=None,
+        likely_ai=False,
     )
     db.add(reply)
     db.flush()

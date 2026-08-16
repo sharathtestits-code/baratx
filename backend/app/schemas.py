@@ -308,6 +308,7 @@ class PostOut(BaseModel):
     hashtags: list[str] = []
     debate_side: Optional[str] = None
     space_id: Optional[str] = None
+    likely_ai: bool = False
     # Set only on create when civic/floor award is evaluated.
     founding_awarded: Optional[bool] = None
     founding_status: Optional[str] = None
@@ -341,6 +342,7 @@ class ReplyOut(BaseModel):
     like_count: int = 0
     liked_by_me: bool = False
     parent_reply_id: Optional[str] = None
+    likely_ai: bool = False
 
     class Config:
         from_attributes = True

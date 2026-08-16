@@ -27,6 +27,10 @@ export default function Guidelines() {
         <ul>
           <li>Threats, doxxing, sexual content involving minors, or illegal activity.</li>
           <li>Spam, scams, or bot farms posting the same take everywhere.</li>
+          <li>
+            Paste AI drafts as your take. Human takes only, obvious AI copy is blocked or sorted
+            under real replies.
+          </li>
           <li>Hate that targets people for who they are (not ideas you disagree with).</li>
         </ul>
 

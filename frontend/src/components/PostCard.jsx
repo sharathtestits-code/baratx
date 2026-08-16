@@ -162,6 +162,7 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
             <Link to={`/u/${post.author.username}`} className={badgeNameClass(post.author, "post-username")}>
               @{post.author.username}
             </Link>
+            {post.likely_ai ? <span className="ai-draft-tag">Possible AI draft</span> : null}
             <span className="post-dot">·</span>
             {detailMode ? (
               <span className="post-time" title={whenTitle}>

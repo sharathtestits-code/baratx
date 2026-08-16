@@ -128,6 +128,8 @@ class Post(Base):
     community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
     debate_side = Column(String, nullable=True)  # for | against (arena debates only)
+    # Heuristic AI-slop flag — demoted in feeds so human takes stay on top.
+    likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     author = relationship("User", back_populates="posts")
@@ -160,6 +162,8 @@ class Reply(Base):
     author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     parent_reply_id = Column(String, ForeignKey("replies.id"), nullable=True, index=True)
     text = Column(Text, nullable=False)
+    # Heuristic AI-slop flag — human replies sort above these.
+    likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     post = relationship("Post", back_populates="replies")
