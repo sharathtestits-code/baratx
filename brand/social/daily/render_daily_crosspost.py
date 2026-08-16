@@ -121,6 +121,7 @@ def screen(name: str) -> Path:
         "compose": LIVE / "square-mobile.png",
         "search": LIVE / "search-mobile.png",
         "profile": LIVE / "profile-mobile.png",
+        "rewards": LIVE / "rewards-mobile.png",
         "landing_desk": LIVE / "landing-desktop.png",
         "home_desk": LIVE / "home-desktop.png",
         "square_desk": LIVE / "square-desktop.png",
@@ -140,6 +141,7 @@ def screen(name: str) -> Path:
         "compose": CAROUSEL / "07-compose.png",
         "search": CAROUSEL / "m05-search.png",
         "profile": CAROUSEL / "m06-profile.png",
+        "rewards": SCREENS / "bx-site-arenas.jpg",
     }
     p = m.get(name)
     if p and p.exists():
