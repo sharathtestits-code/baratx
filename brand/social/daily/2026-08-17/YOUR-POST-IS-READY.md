@@ -1,22 +1,12 @@
-# Daily pack — 2026-08-17 (IST) · APPROVED
+# Your BarathX post is ready — 2026-08-17
 
-**Cadence:** 2 posts/day · WhatsApp + X + LinkedIn  
-**Status:** APPROVED — finals ready to paste  
-**UI:** current product (Home / Square / Arenas / Live)  
-**Reel:** `barathx-mobile-ui-reel.mp4` (~12s · 9:16)
+Paste yourself (WhatsApp / X / LinkedIn). Do not auto-blast.
 
----
+## Morning (09:00 IST)
 
-## Post 1 — Morning (≈ 09:00 IST)
+**Images:** `morning-shared.jpg` (WA+X) · `morning-linkedin.jpg` (LinkedIn)
 
-**Images**
-| Channel | File |
-|---------|------|
-| WhatsApp + X | `morning-shared.jpg` |
-| LinkedIn | `morning-linkedin.jpg` |
-| Optional reel (any channel) | `barathx-mobile-ui-reel.mp4` |
-
-### WhatsApp community / channel
+### WhatsApp
 ```
 Gen Z has takes.
 Reels bury them. Chats delete them.
@@ -66,16 +56,12 @@ https://barathx.com
 
 ---
 
-## Post 2 — Evening (≈ 20:00 IST)
+## Evening (20:00 IST)
 
-**Images / video**
-| Channel | File |
-|---------|------|
-| X + LinkedIn | `evening-shared.jpg` |
-| WhatsApp | `evening-whatsapp.jpg` |
-| Reel (WA status / X / LI / IG Reels) | `barathx-mobile-ui-reel.mp4` |
+**Images:** `evening-shared.jpg` (X+LI) · `evening-whatsapp.jpg` (WA)  
+**Reel:** `barathx-mobile-ui-reel.mp4` (~12s)
 
-### WhatsApp community / channel
+### WhatsApp
 ```
 Tonight on BarathX —
 
@@ -123,7 +109,7 @@ Leave one honest take tonight.
 #BarathX #India #AI #PublicSquare
 ```
 
-### Reel caption (short — any channel)
+### Reel caption
 ```
 Drop. Pick. Argue live.
 
@@ -132,13 +118,3 @@ Human takes only. No AI slop.
 
 → https://barathx.com
 ```
-
----
-
-## Files checklist
-- [x] `morning-shared.jpg`
-- [x] `morning-linkedin.jpg`
-- [x] `evening-shared.jpg`
-- [x] `evening-whatsapp.jpg`
-- [x] `barathx-mobile-ui-reel.mp4`
-- [x] `barathx-mobile-ui-reel-poster.jpg`
