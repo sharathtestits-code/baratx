@@ -7,7 +7,7 @@ import Avatar from "../components/Avatar";
 import ReplyItem from "../components/ReplyItem";
 import MentionTextarea from "../components/MentionTextarea";
 
-const MAX_REPLY_LEN = 220;
+const MAX_REPLY_LEN = 500;
 
 export default function PostDetail() {
   const { postId } = useParams();

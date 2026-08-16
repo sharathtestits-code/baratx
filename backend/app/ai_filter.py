@@ -86,7 +86,7 @@ class AiScore:
     reasons: tuple[str, ...]
 
 
-# Thresholds tuned for short Square takes (post ≤500, reply ≤220).
+# Thresholds tuned for short Square takes (post/reply ≤500).
 FLAG_SCORE = 4
 REJECT_SCORE = 8
 

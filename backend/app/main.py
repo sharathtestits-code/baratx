@@ -396,7 +396,7 @@ if not media_store.use_db_store() and not media_store.s3_enabled():
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 MAX_POST_LENGTH = 500
-MAX_REPLY_LENGTH = 220
+MAX_REPLY_LENGTH = 500
 MAX_AVATAR_BYTES = 3 * 1024 * 1024  # 3MB
 MAX_COVER_BYTES = 5 * 1024 * 1024  # 5MB
 

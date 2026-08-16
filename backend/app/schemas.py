@@ -347,8 +347,8 @@ class ReplyCreate(BaseModel):
         v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Reply cannot be empty")
-        if len(v) > 220:
-            raise ValueError("Reply must be 220 characters or fewer")
+        if len(v) > 500:
+            raise ValueError("Reply must be 500 characters or fewer")
         return v
 
 
@@ -552,8 +552,8 @@ class AdminReplyCreate(BaseModel):
         v = sanitize_user_text(v or "").strip()
         if not v:
             raise ValueError("Reply cannot be empty")
-        if len(v) > 220:
-            raise ValueError("Reply must be 220 characters or fewer")
+        if len(v) > 500:
+            raise ValueError("Reply must be 500 characters or fewer")
         return v
 
     @field_validator("username")
