@@ -764,6 +764,105 @@ def hidden_author_ids(db: Session, current_user: Optional[models.User]) -> set[s
     return blocked | blocked_by | muted
 
 
+def list_mention_feed(
+    db: Session,
+    *,
+    current_user: models.User,
+    limit: int,
+    before: Optional[str],
+) -> list[schemas.FeedItemOut]:
+    """Posts (and reply parents) where someone @tagged the current user."""
+    username = (current_user.username or "").strip().lower()
+    if not username:
+        return []
+
+    cursor = None
+    if before:
+        try:
+            cursor = datetime.fromisoformat(before)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid 'before' timestamp")
+
+    # Match @username with a non-username char (or end) after the handle.
+    pattern = f"%@{username}%"
+    hidden = hidden_author_ids(db, current_user)
+    post_ids: dict[str, datetime] = {}
+
+    post_q = db.query(models.Post).filter(models.Post.text.ilike(pattern))
+    if cursor is not None:
+        post_q = post_q.filter(models.Post.created_at < cursor)
+    for p in post_q.order_by(models.Post.created_at.desc()).limit(limit * 4).all():
+        if p.author_id in hidden or p.author_id == current_user.id:
+            continue
+        # Avoid false positives like @rahul catching @rahul99
+        mentioned = {m.lower() for m in text_parse.extract_mentions(p.text or "")}
+        if username not in mentioned:
+            continue
+        post_ids[p.id] = p.created_at
+
+    reply_q = db.query(models.Reply).filter(models.Reply.text.ilike(pattern))
+    if cursor is not None:
+        reply_q = reply_q.filter(models.Reply.created_at < cursor)
+    for r in reply_q.order_by(models.Reply.created_at.desc()).limit(limit * 4).all():
+        if r.author_id in hidden or r.author_id == current_user.id:
+            continue
+        mentioned = {m.lower() for m in text_parse.extract_mentions(r.text or "")}
+        if username not in mentioned:
+            continue
+        # Surface the parent post so Home can open the thread.
+        ts = r.created_at
+        prev = post_ids.get(r.post_id)
+        if prev is None or (ts and prev and ts > prev):
+            post_ids[r.post_id] = ts
+
+    # Also pick up mention notifications (covers edge cases / older rows).
+    notif_q = (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.recipient_id == current_user.id,
+            models.Notification.kind == "mention",
+            models.Notification.post_id.isnot(None),
+        )
+        .order_by(models.Notification.created_at.desc())
+        .limit(limit * 3)
+    )
+    if cursor is not None:
+        notif_q = notif_q.filter(models.Notification.created_at < cursor)
+    for n in notif_q.all():
+        if not n.post_id:
+            continue
+        ts = n.created_at
+        prev = post_ids.get(n.post_id)
+        if prev is None or (ts and prev and ts > prev):
+            post_ids[n.post_id] = ts
+
+    if not post_ids:
+        return []
+
+    ordered_ids = sorted(post_ids.keys(), key=lambda pid: post_ids[pid] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)[
+        :limit
+    ]
+    posts = (
+        db.query(models.Post)
+        .filter(models.Post.id.in_(ordered_ids))
+        .all()
+    )
+    by_id = {p.id: p for p in posts}
+    items: list[schemas.FeedItemOut] = []
+    for pid in ordered_ids:
+        post = by_id.get(pid)
+        if not post or post.author_id in hidden:
+            continue
+        items.append(
+            schemas.FeedItemOut(
+                post=serialize_post(post, current_user),
+                reposted_by=None,
+                item_time=post_ids.get(pid) or post.created_at,
+            )
+        )
+    return items
+
+
 def create_notification(
     db: Session,
     *,
@@ -2426,11 +2525,22 @@ async def create_post(
 def list_posts(
     limit: int = 20,
     before: Optional[str] = None,  # ISO timestamp cursor for pagination
-    feed: str = "global",  # "global" | "following"
+    feed: str = "global",  # "global" | "following" | "mentions"
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
     limit = max(1, min(limit, 50))
+
+    # Mentions / @tags: always show on Home even if you don't follow the author.
+    if feed == "mentions":
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Log in to see posts that tagged you")
+        return list_mention_feed(
+            db,
+            current_user=current_user,
+            limit=limit,
+            before=before,
+        )
 
     author_filter_ids = None
     if feed == "following":

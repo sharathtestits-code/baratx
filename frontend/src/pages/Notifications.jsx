@@ -86,7 +86,7 @@ export default function Notifications() {
       <div className="feed-header">
         <h1>Alerts</h1>
         <p className="hint" style={{ margin: "0.25rem 0 0" }}>
-          Replies, follows, and new Square posts land here.
+          Replies, follows, @tags, and new Square posts land here. Tags also show on Home.
         </p>
       </div>
 
