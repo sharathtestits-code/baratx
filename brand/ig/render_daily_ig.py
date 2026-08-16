@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Daily Instagram creatives — rotating templates so posts don’t look identical.
+Daily Instagram single-frame aliases (optional).
+
+Canonical auto-posts are 6-slide product carousels:
+  python3 brand/ig/render_product_carousels.py
+
+This script still builds rotating single frames for packs / WA mirrors.
+Prefer product carousels for @getbaratx schedule.
 
 Usage:
-  python3 brand/ig/render_daily_ig.py --date 2026-08-16
   python3 brand/ig/render_daily_ig.py --date 2026-08-16 --all-slots
-
-Slots (CONTENT-RULES):
-  morning  → bold hook / pain (signup-excite energy)
-  midday   → how-it-works / product proof
-  evening  → launch-pain / debate prompt
 """
 
 from __future__ import annotations

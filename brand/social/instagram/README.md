@@ -36,8 +36,23 @@ python3 brand/social/instagram/post_carousel.py --pack morning
 python3 brand/social/instagram/post_carousel.py --pack evening
 ```
 
-Slides are fetched by Meta from GitHub raw:
-`https://raw.githubusercontent.com/sharathtestits-code/baratx/main/brand/carousel/export/slide-0N.png`
+Slides are fetched by Meta from GitHub raw on **main**:
+`https://raw.githubusercontent.com/sharathtestits-code/baratx/main/brand/ig/carousel/<pack>/slide-0N.jpg`
 
-## Assets
-Regenerate: `cd brand/carousel && python3 render_slides.py`
+## Assets (product UI carousels)
+Canonical packs live under `brand/ig/carousel/{signup-excite,how-it-works,launch-pain}/`.
+
+Regenerate (approved dark + saffron + real screens):
+
+```bash
+python3 brand/ig/render_product_carousels.py
+```
+
+Scheduler pulls from **main** GitHub raw URLs — merge regenerated slides before expecting auto-posts to change.
+
+Manual publish (needs `ADMIN_SECRET` + IG env on API):
+
+```bash
+curl -X POST 'https://baratx-production.up.railway.app/admin/instagram-carousel?pack=morning' \
+  -H "X-Admin-Secret: $ADMIN_SECRET"
+```

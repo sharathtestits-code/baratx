@@ -9,20 +9,28 @@ Make a stranger understand **why they should sign up** at barathx.com.
 Not: “here is a feature.”
 Yes: “here is the pain → BarathX fix → create an account.”
 
-## Visuals
-Each daily slot uses a **different** pack **and** a **rotating template** (never the same look every day):
-- morning → pain / signup-excite energy
-- midday → how-it-works / product proof
-- evening → launch-pain / debate prompt
+## Visuals (product-first — no blank type slides)
+Auto IG carousels must show **real BarathX UI** (Square / Arenas / Live / signup / Home) in phone frames, crisp dark + saffron type — never empty gradient text cards.
 
-Generate today’s three creatives (different templates via date hash):
+| IST slot | Pack folder | Energy |
+|----------|-------------|--------|
+| Morning 09:00 | `brand/ig/carousel/signup-excite/` | pain → signup |
+| Midday 13:30 | `brand/ig/carousel/how-it-works/` | product proof |
+| Evening 20:00 | `brand/ig/carousel/launch-pain/` | debate CTA |
+
+Regenerate all packs (6 slides each, 1080×1080 JPG):
+
+```bash
+python3 brand/ig/render_product_carousels.py
+```
+
+Optional single-frame daily aliases:
 
 ```bash
 python3 brand/ig/render_daily_ig.py --date YYYY-MM-DD --all-slots
 ```
 
-Outputs in `brand/social/daily/YYYY-MM-DD/ig-{morning,midday,evening}.jpg` (plus a named template file).
-Do **not** reuse yesterday’s identical frame for all three posts.
+Do **not** reuse one pack for all three slots. Do **not** ship slides without product screens.
 
 ## Caption formula
 1. **Hook pain** (1 line) — something they already feel
