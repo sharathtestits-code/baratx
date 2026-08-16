@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
@@ -10,6 +11,8 @@ import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../s
  */
 export default function Landing() {
   const softLaunch = isSoftLaunchWindow();
+  const [confirmAge18, setConfirmAge18] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   return (
     <div className="bx-home">
       <header className="bx-home-nav">
@@ -57,14 +60,41 @@ export default function Landing() {
             </Link>
           </div>
           <div className="bx-home-hero-google">
-            <GoogleSignInButton label="Continue with Google" confirmAge18 />
+            <label className="age-gate bx-home-consent">
+              <input
+                type="checkbox"
+                checked={confirmAge18}
+                onChange={(e) => setConfirmAge18(e.target.checked)}
+              />
+              <span>
+                I am <strong>18+</strong>
+              </span>
+            </label>
+            <label className="age-gate bx-home-consent">
+              <input
+                type="checkbox"
+                checked={acceptPrivacy}
+                onChange={(e) => setAcceptPrivacy(e.target.checked)}
+              />
+              <span>
+                I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
+                <Link to="/terms">Terms</Link>
+              </span>
+            </label>
+            <GoogleSignInButton
+              label="Continue with Google"
+              confirmAge18={confirmAge18}
+              acceptPrivacy={acceptPrivacy}
+              requireAgeConfirm
+              requirePrivacyConfirm
+            />
           </div>
           <p className="bx-home-founding-chip">
             <Link to="/signup?next=/rewards">100 Founding spots</Link>, earned by opening a debate
             that gets real engagement, not by signing up.
           </p>
           <p className="bx-home-hero-legal">
-            18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
+            Personal data is processed under India&apos;s DPDP Act. Details in{" "}
             <Link to="/privacy">Privacy</Link>.
           </p>
         </div>

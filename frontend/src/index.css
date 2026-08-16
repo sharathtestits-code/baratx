@@ -10784,6 +10784,13 @@ a.suggestions-chip-link {
   gap: 0.35rem;
 }
 
+.settings-security-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.35rem;
+}
+
 .settings-danger {
   margin-top: 1.25rem;
   padding: 1rem;

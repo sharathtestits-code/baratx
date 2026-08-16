@@ -29,6 +29,7 @@ class EmailSignupRequest(BaseModel):
     username: str
     display_name: str
     confirm_age_18: bool = False
+    accept_privacy: bool = False
 
     @field_validator("username")
     @classmethod
@@ -54,6 +55,13 @@ class EmailSignupRequest(BaseModel):
     def must_confirm_age(cls, v):
         if not v:
             raise ValueError("You must be 18 or older to join BarathX")
+        return True
+
+    @field_validator("accept_privacy")
+    @classmethod
+    def must_accept_privacy(cls, v):
+        if not v:
+            raise ValueError("Accept the Privacy Policy to create an account")
         return True
 
 
@@ -89,6 +97,7 @@ class PhoneSignupVerify(BaseModel):
     display_name: str
     region: Optional[str] = None
     confirm_age_18: bool = False
+    accept_privacy: bool = False
 
     @field_validator("username")
     @classmethod
@@ -100,6 +109,13 @@ class PhoneSignupVerify(BaseModel):
     def must_confirm_age(cls, v):
         if not v:
             raise ValueError("You must be 18 or older to join BarathX")
+        return True
+
+    @field_validator("accept_privacy")
+    @classmethod
+    def must_accept_privacy(cls, v):
+        if not v:
+            raise ValueError("Accept the Privacy Policy to create an account")
         return True
 
     @model_validator(mode="after")
@@ -157,8 +173,9 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
-    # Required only when Google creates a new BarathX account (18+ gate).
+    # Required only when Google creates a new BarathX account (18+ gate + DPDP consent).
     confirm_age_18: Optional[bool] = None
+    accept_privacy: Optional[bool] = None
 
 
 class DeleteAccountRequest(BaseModel):

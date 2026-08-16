@@ -15,7 +15,7 @@ from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
 from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
-from app import ai_filter, anti_scrape
+from app import ai_filter, anti_scrape, data_protection
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -51,6 +51,10 @@ def run_migrations():
                 )
             if "token_version" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
+            if "privacy_accepted_at" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at DATETIME"))
+            if "privacy_notice_version" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -148,6 +152,10 @@ def run_migrations():
                     )
                 if "token_version" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
+                if "privacy_accepted_at" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at TIMESTAMP"))
+                if "privacy_notice_version" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -214,6 +222,15 @@ def run_migrations():
 
 
 run_migrations()
+
+# DPDP retention: purge expired OTPs / auth tokens on boot (purpose completed).
+with SessionLocal() as _dpdp_db:
+    try:
+        data_protection.purge_ephemeral_personal_data(_dpdp_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("DPDP ephemeral purge on boot failed")
 
 # Cold-start density: official BarathX accounts + starter posts + communities.
 with SessionLocal() as _seed_db:
@@ -1365,6 +1382,8 @@ def signup_email(
         badge="none",
         is_official=False,
         token_version=0,
+        privacy_accepted_at=datetime.now(timezone.utc),
+        privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
     )
     db.add(user)
     db.commit()
@@ -1650,6 +1669,11 @@ def auth_google(
                 status_code=400,
                 detail="You must be 18 or older to join BarathX. Confirm your age to continue.",
             )
+        if not payload.accept_privacy:
+            raise HTTPException(
+                status_code=400,
+                detail="New accounts must accept the Privacy Policy. Open Sign up, tick Privacy (DPDP), then continue with Google.",
+            )
         base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
         username = base
         n = 0
@@ -1667,6 +1691,8 @@ def auth_google(
             badge="none",
             is_official=False,
             token_version=0,
+            privacy_accepted_at=datetime.now(timezone.utc),
+            privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
         )
         db.add(user)
         try:
@@ -1751,6 +1777,8 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         is_phone_verified=True,
         badge="none",
         is_official=False,
+        privacy_accepted_at=datetime.now(timezone.utc),
+        privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
     )
     db.add(user)
     db.commit()
@@ -1821,10 +1849,16 @@ def delete_my_account(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Self-serve permanent account deletion (Privacy Policy)."""
+    """DPDP right to erasure — permanent account + personal data deletion."""
     if current_user.username in set(seed.OFFICIAL_USERNAMES) or getattr(current_user, "is_official", False):
         raise HTTPException(status_code=400, detail="Official accounts cannot be self-deleted")
     uid = current_user.id
+    phone = current_user.phone
+    delete_media_file(current_user.avatar_url)
+    delete_media_file(current_user.cover_url)
+    data_protection.erase_user_auth_artefacts(db, uid)
+    if phone:
+        db.query(models.OTP).filter(models.OTP.phone == phone).delete(synchronize_session=False)
     # Soft-clear PII then remove user row (cascades posts/likes via relationships where configured).
     current_user.email = None
     current_user.phone = None
@@ -1838,7 +1872,16 @@ def delete_my_account(
     if user:
         db.delete(user)
         db.commit()
-    return schemas.MessageResponse(message="Your BarathX account has been deleted.")
+    return schemas.MessageResponse(message="Your BarathX account and personal data have been deleted.")
+
+
+@app.get("/users/me/data-export")
+def export_my_data(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """DPDP right to access — download a copy of your personal data."""
+    return data_protection.build_personal_data_export(db, current_user)
 
 
 @app.post("/users/me/bootstrap-follows", response_model=schemas.MessageResponse)

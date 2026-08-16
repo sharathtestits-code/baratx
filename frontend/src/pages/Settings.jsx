@@ -21,7 +21,7 @@ export default function Settings() {
   const [language, setLanguage] = useState(() => user?.language || localeLang || getStoredLanguage());
   const [languageSaving, setLanguageSaving] = useState(false);
   const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
-  const [emailSaving, setEmailSaving] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [mutes, setMutes] = useState([]);
@@ -173,6 +173,26 @@ export default function Settings() {
     }
   }
 
+  async function handleExportData() {
+    setExportBusy(true);
+    setError("");
+    try {
+      const data = await api.exportMyData(token);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `barathx-data-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setMsg("Download started. That’s a copy of personal data we hold (DPDP right to access).");
+    } catch (err) {
+      setError(err.message || "Could not export your data.");
+    } finally {
+      setExportBusy(false);
+    }
+  }
+
   async function handleLogout() {
     await logout();
     navigate("/");
@@ -281,8 +301,14 @@ export default function Settings() {
           <li>Confirm email before posting (if you signed up with email)</li>
           <li>Login &amp; OTP attempts are rate-limited</li>
           <li>Log out revokes your session token so a copied key stops working</li>
+          <li>
+            India DPDP: access, correct, erase, and withdraw consent (see Privacy Policy)
+          </li>
         </ul>
         <div className="settings-security-actions">
+          <button type="button" className="btn btn-secondary" onClick={handleExportData} disabled={exportBusy}>
+            {exportBusy ? "Preparing…" : "Download my data"}
+          </button>
           <Link className="btn btn-secondary" to="/privacy">
             Read Privacy Policy
           </Link>

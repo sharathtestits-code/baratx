@@ -266,7 +266,11 @@ export default function Login() {
               <div className="x-auth-or bx-login-or" role="separator">
                 <span>or continue with</span>
               </div>
-              <GoogleSignInButton label="Continue with Google" onError={setError} confirmAge18 />
+              <GoogleSignInButton label="Continue with Google" onError={setError} />
+              <p className="hint bx-login-google-hint">
+                New here? <Link to="/signup">Sign up</Link> and accept the Privacy Policy (India DPDP)
+                first.
+              </p>
             </>
           )}
 

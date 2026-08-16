@@ -135,6 +135,10 @@ export const api = {
 
   me: (token) => request("/users/me", { headers: authHeaders(token), timeoutMs: 12000 }),
 
+  /** DPDP right to access — JSON export of personal data we hold. */
+  exportMyData: (token) =>
+    request("/users/me/data-export", { headers: authHeaders(token), timeoutMs: 30000 }),
+
   updateMe: (token, body) =>
     request("/users/me", {
       method: "PATCH",

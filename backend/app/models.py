@@ -54,6 +54,9 @@ class User(Base):
     email_activity_enabled = Column(Boolean, default=True, nullable=False)
     # Bumped on password reset / security events to invalidate existing JWTs.
     token_version = Column(Integer, default=0, nullable=False)
+    # DPDP: affirmative consent to privacy notice (Data Principal).
+    privacy_accepted_at = Column(DateTime, nullable=True)
+    privacy_notice_version = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
