@@ -1694,6 +1694,22 @@ a.post-username:hover {
   margin-left: 2.7rem;
 }
 
+.mention-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--brand);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  margin-left: 2.7rem;
+}
+
+.post-tagged-me {
+  border-left: 3px solid color-mix(in srgb, var(--brand) 70%, transparent);
+  padding-left: 0.35rem;
+}
+
 .repost-tag a {
   color: var(--text-secondary);
   text-decoration: none;
