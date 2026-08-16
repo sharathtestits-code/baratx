@@ -577,3 +577,17 @@ class RaceReward(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     post = relationship("Post", foreign_keys=[post_id])
+
+
+class ProductIssue(Base):
+    """Early-member (first 1000) product bugs / concerns board."""
+
+    __tablename__ = "product_issues"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, default="bug", index=True)  # bug | concern | idea
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    author = relationship("User", foreign_keys=[author_id])

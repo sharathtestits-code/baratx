@@ -402,6 +402,35 @@ export default function Settings() {
       </section>
 
       <section className="settings-section">
+        <h2>Help &amp; WhatsApp</h2>
+        <p className="hint">
+          First 1000 members can log bugs on Early issues (ops gets an email). Join WhatsApp to
+          talk concerns live.
+        </p>
+        <div className="settings-security-actions">
+          <Link className="btn btn-secondary" to="/early-issues">
+            Early issues
+          </Link>
+          <a
+            className="btn btn-secondary"
+            href="https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU?mode=gi_t"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Community
+          </a>
+          <a
+            className="btn btn-secondary"
+            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Channel
+          </a>
+        </div>
+      </section>
+
+      <section className="settings-section">
         <h2>Badges</h2>
         <ul className="settings-badge-legend">
           <li>

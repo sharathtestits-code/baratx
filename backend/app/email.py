@@ -340,3 +340,68 @@ def send_activity_email(
     except Exception:
         logger.exception("Activity email failed for %s", to_email)
         return False
+
+
+OPS_ALERT_EMAIL = (os.environ.get("BUG_ALERT_EMAIL") or os.environ.get("OPS_ALERT_EMAIL") or "hello@barathx.com").strip()
+
+
+def send_ops_alert_email(
+    *,
+    subject: str,
+    summary: str,
+    details: str = "",
+    reporter: str = "",
+    kind: str = "alert",
+) -> bool:
+    """Notify ops when someone logs a bug, concern, or moderation report."""
+    to_email = OPS_ALERT_EMAIL
+    if not to_email:
+        return False
+
+    def _esc(s: str) -> str:
+        return (
+            (s or "")
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+        )
+
+    safe_summary = _esc(summary)
+    safe_details = _esc(details)
+    safe_reporter = _esc(reporter or "unknown")
+    safe_kind = _esc(kind)
+    lines = [
+        f"Kind: {kind}",
+        f"Reporter: {reporter or 'unknown'}",
+        "",
+        summary.strip(),
+        "",
+    ]
+    if details:
+        lines.extend(["Details:", details.strip(), ""])
+    lines.append(f"Open app: {FRONTEND_URL}/early-issues")
+    text_body = "\n".join(lines)
+    details_html = (
+        f"<pre style='white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:8px;'>{safe_details}</pre>"
+        if details
+        else ""
+    )
+    html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
+  <p><strong>BarathX ops alert</strong> · {safe_kind}</p>
+  <p>Reporter: {safe_reporter}</p>
+  <p>{safe_summary}</p>
+  {details_html}
+  <p><a href="{FRONTEND_URL}/early-issues">Open Early issues</a></p>
+  <p>- BarathX</p>
+</body>
+</html>
+"""
+    try:
+        return send_email(to_email, subject, text_body, html_body)
+    except Exception:
+        logger.exception("Ops alert email failed for %s", to_email)
+        return False

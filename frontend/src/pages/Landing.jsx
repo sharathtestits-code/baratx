@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../softLaunch";
+import { WHATSAPP_CHANNEL, WHATSAPP_COMMUNITY, X_PROFILE } from "../socialLinks";
 
 /**
  * Debate-first brand landing (audit Week 1).
@@ -294,18 +295,25 @@ export default function Landing() {
           </Link>
           <a
             className="btn btn-secondary bx-home-cta-secondary"
-            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            href={WHATSAPP_COMMUNITY}
             target="_blank"
             rel="noreferrer"
           >
-            WhatsApp community
+            WhatsApp Community
           </a>
         </div>
         <p className="bx-home-closing-follow">
-          Follow on X →{" "}
-          <a href="https://x.com/getbaratx" target="_blank" rel="noreferrer">
+          Channel →{" "}
+          <a href={WHATSAPP_CHANNEL} target="_blank" rel="noreferrer">
+            WhatsApp Channel
+          </a>
+          {" · "}
+          X →{" "}
+          <a href={X_PROFILE} target="_blank" rel="noreferrer">
             @getbaratx
           </a>
+          {" · "}
+          <Link to="/early-issues">Early issues</Link>
         </p>
       </section>
 
@@ -313,6 +321,7 @@ export default function Landing() {
         <span>© {new Date().getFullYear()} BarathX</span>
         <span className="bx-home-foot-links">
           <Link to="/guidelines">Guidelines</Link>
+          <Link to="/early-issues">Early issues</Link>
           <Link to="/terms">Terms</Link>
           <Link to="/privacy">Privacy</Link>
           <a href="https://barathx.com">barathx.com</a>

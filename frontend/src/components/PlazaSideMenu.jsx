@@ -222,6 +222,14 @@ export default function PlazaSideMenu() {
         {/* Site links only when arena picker is closed — avoids overlapping layers. */}
         {!pickerOpen && (
           <div className="plaza-side-nav-links">
+            <button type="button" className="plaza-side-manage" onClick={() => goLink("/early-issues")}>
+              <span className="plaza-side-manage-copy">
+                <strong>Early issues</strong>
+                <em>Bugs &amp; concerns · first 1000</em>
+              </span>
+              {chevron}
+            </button>
+
             <button type="button" className="plaza-side-manage" onClick={() => goLink("/notifications")}>
               <span className="plaza-side-manage-copy">
                 <strong>

@@ -8804,6 +8804,111 @@ body.plaza-menu-is-open .plaza-menu-toggle {
   text-decoration: underline;
 }
 
+.bx-soft-launch-links {
+  display: inline-flex;
+  gap: 0.65rem;
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.bx-soft-launch-links a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.early-wa-card {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface, transparent));
+}
+
+.early-wa-card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.early-wa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.early-issue-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0 0 1.25rem;
+}
+
+.early-kind {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.early-kind select {
+  max-width: 12rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--border);
+  background: var(--surface, #fff);
+  color: var(--text);
+  font: inherit;
+}
+
+.early-issue-form textarea {
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface, #fff);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+.early-issue-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.early-issue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.early-issue-card {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  background: var(--surface, transparent);
+}
+
+.early-issue-card p {
+  margin: 0.45rem 0 0;
+  white-space: pre-wrap;
+}
+
+.early-issue-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
 .square-home-kicker {
   margin: 0;
   font-size: 0.78rem;

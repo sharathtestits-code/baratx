@@ -1036,3 +1036,46 @@ class RaceCloseRequest(BaseModel):
 
 class RaceMarkPaid(BaseModel):
     note: Optional[str] = ""
+
+
+class ProductIssueCreate(BaseModel):
+    text: str
+    kind: str = "bug"  # bug | concern | idea
+
+    @field_validator("kind")
+    @classmethod
+    def valid_kind(cls, v):
+        k = (v or "bug").strip().lower()
+        if k not in ("bug", "concern", "idea"):
+            raise ValueError("Kind must be bug, concern, or idea")
+        return k
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = sanitize_user_text(v or "").strip()
+        if len(v) < 10:
+            raise ValueError("Describe the issue in at least 10 characters")
+        if len(v) > 500:
+            raise ValueError("Issue must be 500 characters or fewer")
+        return v
+
+
+class ProductIssueOut(BaseModel):
+    id: str
+    text: str
+    kind: str
+    created_at: datetime
+    author: AuthorOut
+
+    class Config:
+        from_attributes = True
+
+
+class EarlyIssuesMetaOut(BaseModel):
+    early_cap: int = 1000
+    is_early_member: bool = False
+    early_rank: Optional[int] = None
+    whatsapp_community: str = ""
+    whatsapp_channel: str = ""
+    message: str = ""

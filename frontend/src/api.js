@@ -346,6 +346,19 @@ export const socialApi = {
     request(`/hashtags/${encodeURIComponent(tag)}`, { headers: authHeaders(token) }),
 };
 
+export const earlyIssuesApi = {
+  meta: (token) =>
+    request("/early-issues/meta", { headers: token ? authHeaders(token) : undefined }),
+  list: (token) =>
+    request("/early-issues", { headers: token ? authHeaders(token) : undefined }),
+  create: (token, body) =>
+    request("/early-issues", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
+};
+
 export const listsApi = {
   list: (token) => request("/lists", { headers: authHeaders(token) }),
   get: (token, id) => request(`/lists/${id}`, { headers: authHeaders(token) }),
