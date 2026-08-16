@@ -1,5 +1,8 @@
 # APPROVE these mockups — 2026-08-17
 
+**UI source:** fresh captures from current local BarathX build  
+(`brand/social/whatsapp/screens/live-2026-08-16/` — Home / Square / Arenas / Live / Landing)
+
 Reply with one of:
 - `approve all`
 - `approve AM` / `approve PM`
