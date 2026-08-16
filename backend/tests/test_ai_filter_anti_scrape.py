@@ -40,6 +40,10 @@ def test_scraper_ua_blocked():
     assert anti_scrape.is_scraper_ua("Scrapy/2.11.0 (+https://scrapy.org)")
     assert anti_scrape.is_scraper_ua("")
     assert anti_scrape.is_scraper_ua("GPTBot/1.0")
+    assert anti_scrape.is_scraper_ua(
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 HeadlessChrome/120.0.0.0 Safari/537.36"
+    )
+    assert anti_scrape.is_scraper_ua("Mozilla/5.0 ... Chrome/120.0.0.0 (Playwright)")
 
 
 def test_browser_ua_allowed():
@@ -55,3 +59,61 @@ def test_bulk_paths():
     assert anti_scrape.is_bulk_scrape_path("/posts/abc/replies")
     assert not anti_scrape.is_bulk_scrape_path("/health")
     assert not anti_scrape.is_bulk_scrape_path("/auth/google")
+
+
+def test_scroll_page_requires_client_header():
+    class FakeQuery(dict):
+        def get(self, k, default=None):
+            return dict.get(self, k, default)
+
+    class FakeRequest:
+        def __init__(self, path, ua, client=None, before=None, auth=None, origin=None):
+            self.url = type("U", (), {"path": path})()
+            self.method = "GET"
+            self.query_params = FakeQuery({"before": before} if before else {})
+            self.headers = {
+                "user-agent": ua,
+            }
+            if client:
+                self.headers["x-barathx-client"] = client
+            if auth:
+                self.headers["authorization"] = auth
+            if origin:
+                self.headers["origin"] = origin
+            self.client = type("C", (), {"host": "1.2.3.4"})()
+
+    browser = (
+        "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 "
+        "Chrome/120.0.0.0 Mobile Safari/537.36"
+    )
+    # Scroll page without official client → blocked (web scroller).
+    blocked = anti_scrape.enforce_anti_scrape(
+        FakeRequest("/posts", browser, before="2026-01-01T00:00:00+00:00", origin="https://evil.test")
+    )
+    assert blocked is not None
+    assert blocked.status_code == 403
+
+    # Official web client + scroll → allowed (rate limit may still apply later).
+    ok = anti_scrape.enforce_anti_scrape(
+        FakeRequest(
+            "/posts",
+            browser,
+            client="web",
+            before="2026-01-01T00:00:00+00:00",
+            origin="https://barathx.com",
+        )
+    )
+    assert ok is None
+
+    # Headless always blocked even with client header spoof.
+    headless = anti_scrape.enforce_anti_scrape(
+        FakeRequest(
+            "/posts",
+            "Mozilla/5.0 HeadlessChrome/120.0.0.0",
+            client="web",
+            before="2026-01-01T00:00:00+00:00",
+            origin="https://barathx.com",
+        )
+    )
+    assert headless is not None
+    assert headless.status_code == 403

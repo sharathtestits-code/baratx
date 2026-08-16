@@ -1,4 +1,4 @@
-# BarathX — human square. No scraping. No AI training crawls.
+# BarathX — human square. No scraping. No AI training crawls. No scroll harvest.
 User-agent: *
 Disallow: /admin
 Disallow: /admin/
@@ -8,6 +8,15 @@ Disallow: /settings
 Disallow: /messages
 Disallow: /notifications
 Disallow: /bookmarks
+Disallow: /home
+Disallow: /feed
+Disallow: /posts
+Disallow: /u/
+Disallow: /search
+Disallow: /hashtags
+Disallow: /communities
+Disallow: /spaces
+Disallow: /arenas
 
 User-agent: GPTBot
 Disallow: /

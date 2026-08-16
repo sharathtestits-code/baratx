@@ -35,7 +35,7 @@ async function request(path, options = {}) {
   }
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  const headers = { ...(extraHeaders || {}) };
+  const headers = { "X-BarathX-Client": "web", ...(extraHeaders || {}) };
   // Prefer JSON from the same-origin API so document navigations can own HTML
   // routes like /notifications without colliding with fetch() (DEF-008).
   if (!headers.Accept && !headers.accept) {
@@ -86,7 +86,9 @@ async function request(path, options = {}) {
 }
 
 function authHeaders(token) {
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = { "X-BarathX-Client": "web" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
 export const api = {
