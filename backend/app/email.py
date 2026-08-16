@@ -1,13 +1,13 @@
 """Outbound email helpers for account verification.
 
-Cloudflare Email Routing only receives mail at hello@barathx.com — it cannot
+Cloudflare Email Routing only receives mail at hello@barathx.com, it cannot
 send. Prefer Resend; keep Gmail SMTP as backup/debug:
 
   1) Resend (primary):
      RESEND_API_KEY=re_...
      EMAIL_FROM=BarathX <hello@barathx.com>   # domain must be verified in Resend
 
-  2) Gmail SMTP (backup / debug — App Password):
+  2) Gmail SMTP (backup / debug. App Password):
      SMTP_HOST=smtp.gmail.com
      SMTP_PORT=587
      SMTP_USER=you@gmail.com
@@ -176,7 +176,7 @@ def send_email(to_email: str, subject: str, text_body: str, html_body: str) -> b
         return True
 
     logger.warning(
-        "Email not configured — verification link for %s: see logs / dev_verify_url",
+        "Email not configured, verification link for %s: see logs / dev_verify_url",
         to_email,
     )
     logger.info("DEV email to=%s subject=%s\n%s", to_email, subject, text_body)
@@ -191,7 +191,7 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
         f"Welcome to BarathX. Confirm your email by opening this link:\n\n"
         f"{verify_url}\n\n"
         f"This link expires in 24 hours. If you did not sign up, ignore this email.\n\n"
-        f"— BarathX\n"
+        f"- BarathX\n"
     )
     html_body = f"""\
 <!DOCTYPE html>
@@ -209,7 +209,7 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
     <a href="{verify_url}" style="color:#000080;">{verify_url}</a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">This link expires in 24 hours.</p>
-  <p>— BarathX</p>
+  <p>- BarathX</p>
 </body>
 </html>
 """
@@ -225,7 +225,7 @@ def send_password_reset_email(to_email: str, display_name: str, token: str) -> t
         f"We received a request to reset your BarathX password. Open this link:\n\n"
         f"{reset_url}\n\n"
         f"This link expires in 1 hour. If you did not request a reset, ignore this email.\n\n"
-        f"— BarathX\n"
+        f"- BarathX\n"
     )
     html_body = f"""\
 <!DOCTYPE html>
@@ -243,7 +243,7 @@ def send_password_reset_email(to_email: str, display_name: str, token: str) -> t
     <a href="{reset_url}" style="color:#000080;">{reset_url}</a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">This link expires in 1 hour.</p>
-  <p>— BarathX</p>
+  <p>- BarathX</p>
 </body>
 </html>
 """
@@ -304,7 +304,7 @@ def send_activity_email(
         f"{cta_label}: {cta}\n\n"
         f"Sign in at {FRONTEND_URL}/login if you need to.\n\n"
         f"Don’t want activity emails? Unsubscribe: {unsub}\n\n"
-        f"— BarathX\n"
+        f"- BarathX\n"
     )
     preview_html = (
         f'<p style="color:#536471;border-left:3px solid #efe8e0;padding-left:12px;">{preview[:140]}</p>'
@@ -331,7 +331,7 @@ def send_activity_email(
     Don’t want activity emails?
     <a href="{unsub}" style="color:#536471;">Unsubscribe</a>
   </p>
-  <p>— BarathX</p>
+  <p>- BarathX</p>
 </body>
 </html>
 """

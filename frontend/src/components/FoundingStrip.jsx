@@ -4,7 +4,7 @@ import { rewardsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 /**
- * Quiet Founding 100 strip on Home — links to /rewards for full progress.
+ * Quiet Founding 100 strip on Home, links to /rewards for full progress.
  */
 export default function FoundingStrip({ onPostProblem }) {
   const { token } = useAuth();
@@ -31,7 +31,7 @@ export default function FoundingStrip({ onPostProblem }) {
       <section className="founding-strip founding-strip-done" aria-label="Founding membership">
         <p>
           You&apos;re in. Thank-you sent
-          {status.amount_inr != null ? ` — ₹${status.amount_inr}, no strings` : ""}.{" "}
+          {status.amount_inr != null ? `, ₹${status.amount_inr}, no strings` : ""}.{" "}
           <Link to="/rewards">See rewards</Link>
         </p>
       </section>
@@ -43,7 +43,7 @@ export default function FoundingStrip({ onPostProblem }) {
       <section className="founding-strip founding-strip-done" aria-label="Founding membership">
         <p>
           You&apos;re in. Small thank-you on the way
-          {status.amount_inr != null ? ` — ₹${status.amount_inr}, no strings` : ""}.{" "}
+          {status.amount_inr != null ? `, ₹${status.amount_inr}, no strings` : ""}.{" "}
           <Link to="/rewards">Details</Link>
         </p>
       </section>
@@ -58,7 +58,7 @@ export default function FoundingStrip({ onPostProblem }) {
         : `${q.like_count || 0}/${q.need_likes || 25} likes · ${q.reply_count || 0}/${q.need_replies || 5} replies`;
     return (
       <section className="founding-strip" aria-label="Founding reward">
-        <p className="founding-strip-label">Founding {status.cap} — waiting on India</p>
+        <p className="founding-strip-label">Founding {status.cap}, waiting on India</p>
         <p className="founding-strip-body">
           Floor cleared. Rating progress: {need}.{" "}
           <Link to="/rewards">Full progress</Link>

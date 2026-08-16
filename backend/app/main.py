@@ -25,7 +25,7 @@ Base.metadata.create_all(bind=engine)
 
 def run_migrations():
     """
-    Base.metadata.create_all() only creates tables that don't exist yet — it
+    Base.metadata.create_all() only creates tables that don't exist yet, it
     never alters existing tables. Add missing columns safely on startup.
     """
     url = str(engine.url)
@@ -210,7 +210,7 @@ run_migrations()
 with SessionLocal() as _seed_db:
     try:
         seed.seed_official_accounts(_seed_db)
-    except Exception:  # noqa: BLE001 — never block API boot on seed
+    except Exception:  # noqa: BLE001, never block API boot on seed
         import logging
 
         logging.getLogger("baratx").exception("Official account seed failed")
@@ -429,7 +429,7 @@ def issue_email_verification(db: Session, user: models.User) -> tuple[bool, Opti
         sent, verify_url = email_service.send_verification_email(
             user.email, user.display_name, raw
         )
-    except Exception as exc:  # noqa: BLE001 — surface as soft failure; account still created
+    except Exception as exc:  # noqa: BLE001, surface as soft failure; account still created
         print(f"[email] failed to send verification: {exc}")
         verify_url = email_service.build_verify_url(raw)
         sent = False
@@ -475,7 +475,7 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     if int(getattr(user, "token_version", 0) or 0) != int(tv or 0):
-        raise HTTPException(status_code=401, detail="Session expired — sign in again")
+        raise HTTPException(status_code=401, detail="Session expired, sign in again")
     return user
 
 
@@ -510,7 +510,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         id=user.id,
         username=user.username,
         display_name=user.display_name,
-        # Never leak email/phone on public profiles — self only.
+        # Never leak email/phone on public profiles, self only.
         email=user.email if self_view else None,
         phone=user.phone if self_view else None,
         language=user.language,
@@ -521,7 +521,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         email_activity_enabled=bool(getattr(user, "email_activity_enabled", True)),
         badge=badge,
         is_official=is_official,
-        # Only expose on self — never leak owner status via profiles/followers.
+        # Only expose on self, never leak owner status via profiles/followers.
         is_ops_owner=owner_self,
         ops_console_path=ops_access.ops_console_path() if owner_self else None,
         created_at=user.created_at,
@@ -818,7 +818,7 @@ def health():
 
 @app.get("/ops/config", response_model=schemas.OpsConfigOut)
 def ops_config():
-    """Path only — needed so the SPA can route the secret URL.
+    """Path only, needed so the SPA can route the secret URL.
 
     Opening the console UI still requires an OPS owner login + ADMIN_SECRET unlock.
     """
@@ -969,7 +969,7 @@ def admin_delete_user(
     db: Session = Depends(get_db),
 ):
     """Remove a misleading / abusive account. Protected blue founders cannot be deleted.
-    Admins can act immediately — no queue wait. Auto-mod also deletes after repeated reports.
+    Admins can act immediately, no queue wait. Auto-mod also deletes after repeated reports.
     """
     from app.moderation import purge_user
 
@@ -1137,7 +1137,7 @@ def admin_recent_posts(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Recent posts from community members — for welcoming new joiners with replies."""
+    """Recent posts from community members, for welcoming new joiners with replies."""
     limit = max(1, min(limit, 100))
     days = max(1, min(days, 30))
     official = set(seed.OFFICIAL_USERNAMES)
@@ -1278,7 +1278,7 @@ def _official_author(db: Session, username: str) -> models.User:
         )
     author = db.query(models.User).filter(models.User.username == username).first()
     if not author:
-        raise HTTPException(status_code=404, detail=f"@{username} not found — seed may not have run")
+        raise HTTPException(status_code=404, detail=f"@{username} not found, seed may not have run")
     return author
 
 
@@ -1359,7 +1359,7 @@ def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
     if expires < datetime.now(timezone.utc):
-        raise HTTPException(status_code=400, detail="Verification link expired — request a new one")
+        raise HTTPException(status_code=400, detail="Verification link expired, request a new one")
 
     row.consumed = True
     user.is_email_verified = True
@@ -1409,7 +1409,7 @@ def resend_verification(
             detail="Email delivery is not configured yet. Try again later.",
         )
     return schemas.MessageResponse(
-        message="Email provider not configured — use the development verify link.",
+        message="Email provider not configured, use the development verify link.",
         email_verification_sent=False,
         dev_verify_url=dev_url,
     )
@@ -1472,7 +1472,7 @@ def forgot_password(
             detail="Email delivery is not configured yet. Try again later.",
         )
     return schemas.MessageResponse(
-        message="Email provider not configured — use the development reset link.",
+        message="Email provider not configured, use the development reset link.",
         dev_reset_url=reset_url,
     )
 
@@ -1572,7 +1572,7 @@ def auth_google(
     display_name = (claims.get("name") or email.split("@")[0])[:50]
     picture = claims.get("picture")
 
-    # Case-insensitive match — legacy rows may have mixed-case emails.
+    # Case-insensitive match, legacy rows may have mixed-case emails.
     user = (
         db.query(models.User)
         .filter(func.lower(models.User.email) == email)
@@ -1606,7 +1606,7 @@ def auth_google(
         try:
             db.commit()
         except Exception:
-            # Race / case-variant duplicate — re-load and continue as login.
+            # Race / case-variant duplicate, re-load and continue as login.
             db.rollback()
             user = (
                 db.query(models.User)
@@ -1623,7 +1623,7 @@ def auth_google(
             seed.follow_official_accounts(db, user)
             db.commit()
     else:
-        # Google already proved mailbox ownership (email_verified claim) — safe to
+        # Google already proved mailbox ownership (email_verified claim), safe to
         # mark verified and sign in (same as prior production behavior).
         dirty = False
         if user.email != email:
@@ -1886,7 +1886,7 @@ def set_user_badge(
                 detail="Only gold accounts can be promoted to blue. Grant gold first.",
             )
     elif new_badge == "gold":
-        # From none (grant) or from blue (demote for security) — both allowed.
+        # From none (grant) or from blue (demote for security), both allowed.
         if current not in ("none", "blue"):
             raise HTTPException(status_code=400, detail="Cannot set gold from this status")
     elif new_badge == "none":
@@ -1898,7 +1898,7 @@ def set_user_badge(
 
     seed._apply_badge(target, new_badge)
 
-    # Optional in-app notification — never block the badge change if notify fails.
+    # Optional in-app notification, never block the badge change if notify fails.
     if payload.notify:
         try:
             if current == "blue" and new_badge == "gold":
@@ -2228,7 +2228,7 @@ async def create_post(
         logging.getLogger("baratx").exception("Official engage on create_post failed")
 
     # Alert @baratx + @sharath when a community member posts (so Alerts isn't empty for ops).
-    # Only skip seeded platform accounts — blue/gold badge members still notify.
+    # Only skip seeded platform accounts, blue/gold badge members still notify.
     if current_user.username not in set(seed.OFFICIAL_USERNAMES):
         officials = (
             db.query(models.User)
@@ -2280,7 +2280,7 @@ async def create_post(
         if awarded:
             founding_awarded = True
             founding_status = awarded.status
-            founding_message = "Floor cleared — you're on Founding 100. India rates next."
+            founding_message = "Floor cleared, you're on Founding 100. India rates next."
         else:
             existing = rewards.my_reward(db, current_user.id)
             if existing:
@@ -2289,11 +2289,11 @@ async def create_post(
             elif getattr(current_user, "is_official", False) or (
                 (getattr(current_user, "badge", None) or "").lower() == "blue"
             ):
-                founding_message = "Official/blue accounts aren't eligible for Founding 100 — post still published."
+                founding_message = "Official/blue accounts aren't eligible for Founding 100, post still published."
             elif rewards.slots_remaining(db) <= 0:
-                founding_message = "Founding 100 is full — post still published."
+                founding_message = "Founding 100 is full, post still published."
             else:
-                founding_message = "Could not claim Founding 100 floor — post still published."
+                founding_message = "Could not claim Founding 100 floor, post still published."
 
     db.commit()
     db.refresh(post)
@@ -2365,7 +2365,7 @@ def list_posts(
         post_query = post_query.filter(models.Post.created_at < cursor)
         repost_query = repost_query.filter(models.Repost.created_at < cursor)
 
-    # pull a generous window from each side, then merge + trim — good enough at demo scale
+    # pull a generous window from each side, then merge + trim, good enough at demo scale
     # For You (global): over-fetch so community takes aren't buried under digest flood.
     window = limit * (8 if feed == "global" else 3)
     posts = post_query.limit(window).all()
@@ -2394,7 +2394,7 @@ def list_posts(
 
     if feed == "global":
         # Square "For you": real member takes first (including blue/gold badges),
-        # then seeded official digest accounts — follow not required.
+        # then seeded official digest accounts, follow not required.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
             uname = (getattr(author, "username", None) or "").lower() if author else ""
@@ -2440,7 +2440,7 @@ def delete_post(
         for r in db.query(models.Reply.id).filter(models.Reply.post_id == post_id).all()
     ]
 
-    # Explicit cleanup — Postgres enforces FKs that SQLite often skips.
+    # Explicit cleanup. Postgres enforces FKs that SQLite often skips.
     db.query(models.Notification).filter(models.Notification.post_id == post_id).delete(
         synchronize_session=False
     )
@@ -2476,7 +2476,7 @@ def delete_post(
         {models.Post.quoted_post_id: None}, synchronize_session=False
     )
 
-    # Reward FKs — null founding links; drop race rows that point at this post.
+    # Reward FKs, null founding links; drop race rows that point at this post.
     if hasattr(models, "FoundingReward"):
         db.query(models.FoundingReward).filter(
             models.FoundingReward.qualifying_post_id == post_id
@@ -2677,7 +2677,7 @@ def create_reply(
     notified.add(post.author_id)
     if parent_reply_id:
         parent = db.query(models.Reply).filter(models.Reply.id == parent_reply_id).first()
-        # One email only — skip if parent author already got the post-owner notify.
+        # One email only, skip if parent author already got the post-owner notify.
         if parent and parent.author_id not in notified:
             create_notification(
                 db,
@@ -2917,7 +2917,7 @@ def admin_daily_digest(
     db: Session = Depends(get_db),
 ):
     """Run a peak digest slot (morning/midday/evening): @baratx glimpse + @sharath take,
-    cross-replies, and mutual likes — credible news sources only.
+    cross-replies, and mutual likes, credible news sources only.
     """
     from app import daily_digest
 
@@ -2949,7 +2949,7 @@ def founding_status(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    """Quiet Founding 100 status — slots left + whether this user already earned."""
+    """Quiet Founding 100 status, slots left + whether this user already earned."""
     return rewards.status_payload(db, current_user)
 
 
@@ -2958,7 +2958,7 @@ def race_status(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    """Biweekly Square Race — highest likes win ₹150–₹500."""
+    """Biweekly Square Race, highest likes win ₹150–₹500."""
     data = rewards.race_status_for_user(db, current_user)
     return schemas.RaceStatusOut(**data)
 
@@ -3204,7 +3204,7 @@ except Exception:  # noqa: BLE001
 
     logging.getLogger("baratx").exception("Instagram scheduler failed to start")
 
-# Always-on was twin-bot replies — now OFF unless ENABLE_OFFICIAL_ENGAGE=1
+# Always-on was twin-bot replies, now OFF unless ENABLE_OFFICIAL_ENGAGE=1
 try:
     from app import engagement_replies
 
@@ -3215,7 +3215,7 @@ except Exception:  # noqa: BLE001
     logging.getLogger("baratx").exception("Official engage scheduler failed to start")
 
 
-# Optional SPA (built into Docker as /app/frontend_dist) — same-origin Square UI on Railway.
+# Optional SPA (built into Docker as /app/frontend_dist), same-origin Square UI on Railway.
 _FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend_dist"
 
 

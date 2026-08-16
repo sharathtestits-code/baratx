@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 /**
- * Plain-language house rules — audit Week 1 (moderation was missing from product).
+ * Plain-language house rules, audit Week 1 (moderation was missing from product).
  */
 export default function Guidelines() {
   return (
@@ -18,7 +18,7 @@ export default function Guidelines() {
 
         <h2>Do</h2>
         <ul>
-          <li>Pick a side and make a clear case — text or live.</li>
+          <li>Pick a side and make a clear case, text or live.</li>
           <li>Reply to takes you disagree with; that&apos;s the product.</li>
           <li>Report spam, impersonation, and harassment from the ··· menu on any post.</li>
         </ul>
@@ -39,10 +39,10 @@ export default function Guidelines() {
         <h2>Badges</h2>
         <ul>
           <li>
-            <strong>Blue official</strong> — BarathX staff / platform accounts.
+            <strong>Blue official</strong>. BarathX staff / platform accounts.
           </li>
           <li>
-            <strong>Gold BarathX</strong> — BarathX brand voices (seeded topic accounts), not personal
+            <strong>Gold BarathX</strong>. BarathX brand voices (seeded topic accounts), not personal
             verification.
           </li>
         </ul>
@@ -50,7 +50,7 @@ export default function Guidelines() {
         <h2>Early members</h2>
         <p>
           Among the first 100–1,000 people who join and post, BarathX admin and the founder may leave
-          a welcome reply. A surprise gift may apply — details revealed later. Limited offer;{" "}
+          a welcome reply. A surprise gift may apply, details revealed later. Limited offer;{" "}
           <strong>T&amp;Cs apply</strong> (
           <Link to="/terms">Terms</Link>). Founding 100 is separate: 100 spots earned by opening a
           debate that gets real engagement, not by signing up. Details on{" "}

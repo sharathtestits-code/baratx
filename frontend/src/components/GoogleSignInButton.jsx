@@ -97,7 +97,7 @@ export default function GoogleSignInButton({
     }
     if (!nativeGoogleConfigured()) {
       const msg =
-        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client — see MOBILE.md). Use phone OTP to join now.";
+        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client, see MOBILE.md). Use phone OTP to join now.";
       setError(msg);
       onError?.(msg);
       return;

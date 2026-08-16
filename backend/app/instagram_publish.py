@@ -6,7 +6,7 @@ from public GitHub raw URLs on **main** (never a stale feature-branch pack).
 Hard rules:
 - Brand spelling is **BarathX** (never BaratX / BharathX on creatives or captions)
 - Each IST slot MUST use a different visual pack (signup-excite / how-it-works / launch-pain)
-- Old brand/carousel/export pack is retired — do not point DEFAULT_IMAGE_BASE there
+- Old brand/carousel/export pack is retired, do not point DEFAULT_IMAGE_BASE there
 - Do not reuse one pack for all three daily captions
 
 Trending IG music cannot be attached via Graph API for feed carousels.
@@ -37,7 +37,7 @@ _RAW = (
     "main/brand/ig/carousel"
 )
 
-# Rotate visual packs by slot — DIFFERENT pictures for DIFFERENT captions.
+# Rotate visual packs by slot. DIFFERENT pictures for DIFFERENT captions.
 # Never ship the same creative 3×/day.
 _RAW = (
     "https://raw.githubusercontent.com/sharathtestits-code/baratx/"
@@ -52,7 +52,7 @@ DEFAULT_IMAGE_BASE = PACK_IMAGE_BASE["morning"]
 SLIDE_COUNT = 6
 SLIDE_EXT = "jpg"
 
-# India peak windows — up to 3 posts/day.
+# India peak windows, up to 3 posts/day.
 PEAK_SLOTS = (
     (9, 0, "morning"),
     (13, 30, "midday"),
@@ -74,9 +74,9 @@ FOOTER_IG = (
 CAPTIONS = {
     "morning": [
         (
-            "this is BarathX — India’s public square.\n\n"
+            "this is BarathX. India’s public square.\n\n"
             "Square · Arenas · Live.\n"
-            "pick a side. argue it live. human takes only — no AI slop.\n\n"
+            "pick a side. argue it live. human takes only, no AI slop.\n\n"
             "we’re early. first voices get seen.\n"
             "create an account, leave one honest take.\n"
             "comment BX if you want the invite personally.\n\n"
@@ -95,7 +95,7 @@ CAPTIONS = {
     ],
     "midday": [
         (
-            "how BarathX actually works —\n\n"
+            "how BarathX actually works -\n\n"
             "1. drop a take in the Square\n"
             "2. pick a side (no fence)\n"
             "3. jump an Arena or go Live\n\n"
@@ -106,7 +106,7 @@ CAPTIONS = {
             "#BarathX #India #GenZ #PickASide #PublicSquare"
         ),
         (
-            "midday check —\n\n"
+            "midday check -\n\n"
             "if your hottest take died in a group chat today, that’s the product "
             "gap. i’m fixing it.\n\n"
             "BarathX: drop it, pick a side, fight it out.\n"
@@ -118,7 +118,7 @@ CAPTIONS = {
     ],
     "evening": [
         (
-            "end of day —\n\n"
+            "end of day -\n\n"
             "whatsapp buries your best takes.\n"
             "reels want your thumb, not your opinion.\n\n"
             "BarathX is the square where india actually argues.\n"
@@ -128,7 +128,7 @@ CAPTIONS = {
             "#BarathX #India #GenZ #PublicSquare #BuildInPublic #DesiApp"
         ),
         (
-            "one ask tonight — leave one honest take on BarathX.\n\n"
+            "one ask tonight, leave one honest take on BarathX.\n\n"
             "no reels firehose inside. no ai slop.\n"
             "just sides, arenas, and people who showed up for the same fight.\n\n"
             "create your account. i’m building this for us.\n"
@@ -316,7 +316,7 @@ def _publish_slot_if_needed(pack: str, slot: datetime, *, reason: str) -> dict |
         return None
     recent = _recent_media_times(token, ig_user_id)
     if _already_posted_near(slot, recent):
-        logger.info("Skip %s (%s) — already have media near %s", pack, reason, slot.isoformat())
+        logger.info("Skip %s (%s), already have media near %s", pack, reason, slot.isoformat())
         return None
     logger.info("Publishing %s (%s) for slot %s", pack, reason, slot.isoformat())
     return publish_carousel(pack=pack)
@@ -356,7 +356,7 @@ def start_instagram_scheduler() -> None:
             logger.info("Instagram scheduler disabled")
             return
         if not _env("INSTAGRAM_ACCESS_TOKEN") or not _env("INSTAGRAM_BUSINESS_ACCOUNT_ID"):
-            logger.info("Instagram scheduler idle — credentials not configured")
+            logger.info("Instagram scheduler idle, credentials not configured")
             return
         _scheduler_started = True
 

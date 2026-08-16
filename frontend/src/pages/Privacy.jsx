@@ -7,7 +7,7 @@ export default function Privacy() {
       <p className="legal-updated">Last updated: August 6, 2026</p>
       <p>
         BarathX (BX) is India’s text-first public square at <strong>barathx.com</strong>. This page
-        explains what we collect and how we use it — in plain language.
+        explains what we collect and how we use it, in plain language.
       </p>
 
       <h2>What we collect</h2>
@@ -29,7 +29,7 @@ export default function Privacy() {
       <ul>
         <li>We don’t sell your personal data</li>
         <li>We don’t run ads based on selling your profile to brokers</li>
-        <li>Passwords are stored hashed — we can’t read your password</li>
+        <li>Passwords are stored hashed, we can’t read your password</li>
       </ul>
 
       <h2>Security</h2>

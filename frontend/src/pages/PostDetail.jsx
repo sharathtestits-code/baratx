@@ -155,7 +155,7 @@ export default function PostDetail() {
                 placeholder={
                   parentReply
                     ? `Reply to @${parentReply.author.username}`
-                    : "Post your reply — type @ to tag someone"
+                    : "Post your reply, type @ to tag someone"
                 }
                 value={replyText}
                 onChange={setReplyText}

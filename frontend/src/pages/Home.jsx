@@ -13,7 +13,7 @@ import SoftLaunchBanner from "../components/SoftLaunchBanner";
 import EmptyState from "../components/EmptyState";
 
 /**
- * Personal hub — Welcome, Continue, Following activity, Your arenas, Live peek.
+ * Personal hub. Welcome, Continue, Following activity, Your arenas, Live peek.
  * Public takes / compose live on Square (`/feed`).
  */
 export default function Home() {

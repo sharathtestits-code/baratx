@@ -125,7 +125,7 @@ export default function Settings() {
       updateUser(updated);
       setMsg(
         next
-          ? "Activity emails on — you’ll get one email per notification."
+          ? "Activity emails on, you’ll get one email per notification."
           : "Unsubscribed from activity emails. In-app Alerts still work."
       );
     } catch (err) {
@@ -234,7 +234,7 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Email notifications</h2>
         <p className="hint">
-          One email per activity (reply, like, follow, mention). Turn off anytime — Alerts in the app
+          One email per activity (reply, like, follow, mention). Turn off anytime. Alerts in the app
           still work.
         </p>
         <label className="age-gate settings-email-toggle">
@@ -260,7 +260,7 @@ export default function Settings() {
           password reset signs out other devices.
         </p>
         <ul className="settings-security-points">
-          <li>Passwords stored with bcrypt — never plain text</li>
+          <li>Passwords stored with bcrypt, never plain text</li>
           <li>Email / phone visible only to you</li>
           <li>Confirm email before posting (if you signed up with email)</li>
           <li>Login &amp; OTP attempts are rate-limited</li>
@@ -357,11 +357,11 @@ export default function Settings() {
         <h2>Badges</h2>
         <ul className="settings-badge-legend">
           <li>
-            <strong className="badge-name badge-blue">Blue official</strong> — BarathX staff / platform
+            <strong className="badge-name badge-blue">Blue official</strong>. BarathX staff / platform
             accounts.
           </li>
           <li>
-            <strong className="badge-name badge-gold">Gold BarathX</strong> — BarathX brand voices (topic
+            <strong className="badge-name badge-gold">Gold BarathX</strong>. BarathX brand voices (topic
             accounts), not personal verification.
           </li>
         </ul>

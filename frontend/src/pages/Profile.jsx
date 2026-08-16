@@ -609,7 +609,7 @@ export default function Profile() {
                     : "Nothing echoed yet."
                   : profileTab === "media"
                     ? isMe
-                      ? "Attach a photo when you post — only image posts show here."
+                      ? "Attach a photo when you post, only image posts show here."
                       : "No photos yet."
                     : profileTab === "arenas"
                       ? isMe

@@ -56,7 +56,7 @@ export default function Communities() {
         <h1>Communities</h1>
       </div>
       <p className="hint surface-lead">
-        Member-run groups — city, craft, or interest. For national sided debate use{" "}
+        Member-run groups, city, craft, or interest. For national sided debate use{" "}
         <Link to="/arenas">Arenas</Link> instead (Sports, Politics, Startups…).
       </p>
 
