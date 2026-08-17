@@ -1167,8 +1167,12 @@ def admin_delete_user(
     if user.username in seed.PROTECTED_BLUE_USERNAMES:
         raise HTTPException(status_code=400, detail="Cannot delete protected blue official accounts")
     username = user.username
-    purge_user(db, user)
-    db.commit()
+    try:
+        purge_user(db, user)
+        db.commit()
+    except Exception as exc:  # noqa: BLE001 — surface FK/cleanup failures to ops
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Could not delete @{username}: {exc}") from exc
     return schemas.MessageResponse(message=f"Deleted @{username}")
 
 

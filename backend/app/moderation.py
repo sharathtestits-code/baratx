@@ -458,4 +458,7 @@ def purge_user(db: Session, user: models.User) -> None:
         )
     else:
         db.query(models.Space).filter(models.Space.host_id == uid).delete(synchronize_session=False)
-    db.delete(user)
+
+    # Avoid ORM relationship cascades fighting bulk query deletes (Postgres IntegrityError / 500).
+    db.expunge(user)
+    db.query(models.User).filter(models.User.id == uid).delete(synchronize_session=False)
