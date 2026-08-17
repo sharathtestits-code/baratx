@@ -1969,28 +1969,18 @@ def delete_my_account(
     db: Session = Depends(get_db),
 ):
     """DPDP right to erasure — permanent account + personal data deletion."""
+    from app.moderation import purge_user
+
     if current_user.username in set(seed.OFFICIAL_USERNAMES) or getattr(current_user, "is_official", False):
         raise HTTPException(status_code=400, detail="Official accounts cannot be self-deleted")
-    uid = current_user.id
     phone = current_user.phone
     delete_media_file(current_user.avatar_url)
     delete_media_file(current_user.cover_url)
-    data_protection.erase_user_auth_artefacts(db, uid)
     if phone:
         db.query(models.OTP).filter(models.OTP.phone == phone).delete(synchronize_session=False)
-    # Soft-clear PII then remove user row (cascades posts/likes via relationships where configured).
-    current_user.email = None
-    current_user.phone = None
-    current_user.display_name = "Deleted"
-    current_user.bio = ""
-    current_user.avatar_url = None
-    current_user.cover_url = None
-    auth.bump_token_version(current_user)
+    # Full FK-safe purge (posts, rewards, tokens, graph) — avoids zombie "Deleted" rows.
+    purge_user(db, current_user)
     db.commit()
-    user = db.query(models.User).filter(models.User.id == uid).first()
-    if user:
-        db.delete(user)
-        db.commit()
     return schemas.MessageResponse(message="Your BarathX account and personal data have been deleted.")
 
 

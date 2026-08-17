@@ -276,8 +276,118 @@ def apply_report_auto_mod(
 
 
 def purge_user(db: Session, user: models.User) -> None:
-    """Remove a user and dependent rows that lack cascade-from-user."""
+    """Remove a user and dependent rows that lack cascade-from-user.
+
+    Postgres enforces FKs that SQLite often skips — clear every users.id
+    reference before deleting the row (posts, rewards, tokens, etc.).
+    """
     uid = user.id
+
+    # Auth artefacts
+    db.query(models.EmailVerificationToken).filter(
+        models.EmailVerificationToken.user_id == uid
+    ).delete(synchronize_session=False)
+    db.query(models.PasswordResetToken).filter(
+        models.PasswordResetToken.user_id == uid
+    ).delete(synchronize_session=False)
+
+    # Rewards / product board (may reference posts/spaces too)
+    if hasattr(models, "FoundingReward"):
+        db.query(models.FoundingReward).filter(models.FoundingReward.user_id == uid).delete(
+            synchronize_session=False
+        )
+    if hasattr(models, "RaceReward"):
+        db.query(models.RaceReward).filter(models.RaceReward.user_id == uid).delete(
+            synchronize_session=False
+        )
+    if hasattr(models, "ProductIssue"):
+        db.query(models.ProductIssue).filter(models.ProductIssue.author_id == uid).delete(
+            synchronize_session=False
+        )
+
+    # Posts authored by this user (and everything hanging off those posts)
+    post_ids = [
+        p[0] for p in db.query(models.Post.id).filter(models.Post.author_id == uid).all()
+    ]
+    if post_ids:
+        reply_ids = [
+            r[0]
+            for r in db.query(models.Reply.id).filter(models.Reply.post_id.in_(post_ids)).all()
+        ]
+        if reply_ids:
+            db.query(models.Notification).filter(
+                models.Notification.reply_id.in_(reply_ids)
+            ).delete(synchronize_session=False)
+            db.query(models.ReplyLike).filter(models.ReplyLike.reply_id.in_(reply_ids)).delete(
+                synchronize_session=False
+            )
+            db.query(models.Reply).filter(models.Reply.post_id.in_(post_ids)).update(
+                {models.Reply.parent_reply_id: None}, synchronize_session=False
+            )
+            db.query(models.Reply).filter(models.Reply.post_id.in_(post_ids)).delete(
+                synchronize_session=False
+            )
+        db.query(models.Notification).filter(models.Notification.post_id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Like).filter(models.Like.post_id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Repost).filter(models.Repost.post_id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Bookmark).filter(models.Bookmark.post_id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.PostHashtag).filter(models.PostHashtag.post_id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Report).filter(models.Report.target_post_id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Post).filter(models.Post.quoted_post_id.in_(post_ids)).update(
+            {models.Post.quoted_post_id: None}, synchronize_session=False
+        )
+        if hasattr(models, "FoundingReward"):
+            db.query(models.FoundingReward).filter(
+                models.FoundingReward.qualifying_post_id.in_(post_ids)
+            ).update(
+                {models.FoundingReward.qualifying_post_id: None},
+                synchronize_session=False,
+            )
+        if hasattr(models, "RaceReward"):
+            db.query(models.RaceReward).filter(models.RaceReward.post_id.in_(post_ids)).delete(
+                synchronize_session=False
+            )
+        db.query(models.Post).filter(models.Post.id.in_(post_ids)).delete(
+            synchronize_session=False
+        )
+
+    # Replies authored on other people's posts
+    own_reply_ids = [
+        r[0] for r in db.query(models.Reply.id).filter(models.Reply.author_id == uid).all()
+    ]
+    if own_reply_ids:
+        db.query(models.Notification).filter(
+            models.Notification.reply_id.in_(own_reply_ids)
+        ).delete(synchronize_session=False)
+        db.query(models.ReplyLike).filter(models.ReplyLike.reply_id.in_(own_reply_ids)).delete(
+            synchronize_session=False
+        )
+        db.query(models.Reply).filter(models.Reply.parent_reply_id.in_(own_reply_ids)).update(
+            {models.Reply.parent_reply_id: None}, synchronize_session=False
+        )
+        db.query(models.Reply).filter(models.Reply.id.in_(own_reply_ids)).delete(
+            synchronize_session=False
+        )
+
+    # Engagement rows owned by this user
+    db.query(models.Like).filter(models.Like.user_id == uid).delete(synchronize_session=False)
+    db.query(models.ReplyLike).filter(models.ReplyLike.user_id == uid).delete(
+        synchronize_session=False
+    )
+    db.query(models.Repost).filter(models.Repost.user_id == uid).delete(synchronize_session=False)
+
     db.query(models.Follow).filter(
         (models.Follow.follower_id == uid) | (models.Follow.followed_id == uid)
     ).delete(synchronize_session=False)
@@ -317,6 +427,11 @@ def purge_user(db: Session, user: models.User) -> None:
     db.query(models.LiveTalkReaction).filter(models.LiveTalkReaction.user_id == uid).delete(
         synchronize_session=False
     )
+    if hasattr(models, "LiveTalkSignal"):
+        db.query(models.LiveTalkSignal).filter(
+            (models.LiveTalkSignal.from_user_id == uid)
+            | (models.LiveTalkSignal.to_user_id == uid)
+        ).delete(synchronize_session=False)
     db.query(models.ModerationStrike).filter(models.ModerationStrike.user_id == uid).delete(
         synchronize_session=False
     )
@@ -324,14 +439,23 @@ def purge_user(db: Session, user: models.User) -> None:
         synchronize_session=False
     )
     host = db.query(models.User).filter(models.User.username == "baratx").first()
+    owned_space_ids = [
+        s[0] for s in db.query(models.Space.id).filter(models.Space.host_id == uid).all()
+    ]
+    if owned_space_ids and hasattr(models, "FoundingReward"):
+        db.query(models.FoundingReward).filter(
+            models.FoundingReward.qualifying_space_id.in_(owned_space_ids)
+        ).update(
+            {models.FoundingReward.qualifying_space_id: None},
+            synchronize_session=False,
+        )
     if host and host.id != uid:
         db.query(models.Space).filter(models.Space.host_id == uid).update(
             {models.Space.host_id: host.id}, synchronize_session=False
         )
-    else:
-        db.query(models.Space).filter(models.Space.host_id == uid).delete(synchronize_session=False)
-    if host and host.id != uid:
         db.query(models.Community).filter(models.Community.created_by == uid).update(
             {models.Community.created_by: host.id}, synchronize_session=False
         )
+    else:
+        db.query(models.Space).filter(models.Space.host_id == uid).delete(synchronize_session=False)
     db.delete(user)
