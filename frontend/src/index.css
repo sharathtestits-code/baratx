@@ -20,6 +20,165 @@ html {
   display: none;
 }
 
+/* Native app entry — not the browser marketing Landing */
+.bx-native-launch {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding:
+    max(1.25rem, env(safe-area-inset-top, 0px))
+    1.25rem
+    max(1.25rem, env(safe-area-inset-bottom, 0px));
+  background: #0d0d12;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  color-scheme: dark;
+}
+
+.bx-native-launch-glow {
+  position: absolute;
+  inset: -20% -10% auto;
+  height: 55%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 103, 31, 0.28), transparent 70%);
+  pointer-events: none;
+}
+
+.bx-native-launch-top {
+  position: relative;
+  z-index: 1;
+  padding-top: 0.5rem;
+}
+
+.bx-native-launch-logo {
+  font-size: 1.65rem;
+}
+
+.bx-native-launch-tag {
+  margin: 0.35rem 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+}
+
+.bx-native-launch-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  max-width: 26rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.bx-native-launch-kicker {
+  margin: 0;
+  color: #ff671f;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.bx-native-launch-title {
+  margin: 0;
+  font-size: clamp(2rem, 8vw, 2.6rem);
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.bx-native-launch-title span {
+  color: #ff671f;
+  display: block;
+}
+
+.bx-native-launch-copy {
+  margin: 0 0 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+.bx-native-launch-primary,
+.bx-native-launch-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.bx-native-launch-primary {
+  background: #ff671f;
+  color: #0d0d12;
+}
+
+.bx-native-launch-secondary {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+}
+
+.bx-native-launch-consent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.bx-native-launch-switch {
+  margin: 0.35rem 0 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+}
+
+.bx-native-launch-switch a {
+  color: #ff671f;
+  font-weight: 600;
+}
+
+.bx-native-launch-foot {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8rem;
+  padding-top: 1rem;
+}
+
+/* Native login: full-bleed app card, hide desktop brand rail */
+.native-app .bx-login-page {
+  grid-template-columns: 1fr;
+}
+
+.native-app .bx-login-brand {
+  display: none;
+}
+
+.native-app .bx-login-main {
+  padding: max(1rem, env(safe-area-inset-top, 0px)) 1rem max(1.25rem, env(safe-area-inset-bottom, 0px));
+  align-items: stretch;
+}
+
+.native-app .bx-login-card {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  border-radius: 1.25rem;
+  box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.native-app .bx-login-trust {
+  margin-top: 1rem;
+}
+
 
 :root,
 [data-theme="saffron"] {
