@@ -1,5 +1,11 @@
+import { isNativeApp } from "./native";
+
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const DEFAULT_TIMEOUT_MS = 15000;
+
+function clientHeaderValue() {
+  return isNativeApp() ? "native" : "web";
+}
 
 export class ApiError extends Error {
   constructor(message, { status = 0, code = "" } = {}) {
@@ -35,7 +41,7 @@ async function request(path, options = {}) {
   }
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  const headers = { "X-BarathX-Client": "web", ...(extraHeaders || {}) };
+  const headers = { "X-BarathX-Client": clientHeaderValue(), ...(extraHeaders || {}) };
   // Prefer JSON from the same-origin API so document navigations can own HTML
   // routes like /notifications without colliding with fetch() (DEF-008).
   if (!headers.Accept && !headers.accept) {
@@ -86,7 +92,7 @@ async function request(path, options = {}) {
 }
 
 function authHeaders(token) {
-  const headers = { "X-BarathX-Client": "web" };
+  const headers = { "X-BarathX-Client": clientHeaderValue() };
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 }

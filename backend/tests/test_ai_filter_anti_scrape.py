@@ -117,3 +117,14 @@ def test_scroll_page_requires_client_header():
     )
     assert headless is not None
     assert headless.status_code == 403
+
+    # Native OkHttp + official client header is allowed (Capacitor Android).
+    native_ok = anti_scrape.enforce_anti_scrape(
+        FakeRequest(
+            "/search",
+            "okhttp/4.12.0",
+            client="native",
+            origin="https://localhost",
+        )
+    )
+    assert native_ok is None

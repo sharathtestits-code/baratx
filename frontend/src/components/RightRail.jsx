@@ -5,10 +5,10 @@ import SuggestedFollows from "./SuggestedFollows";
 
 const TRENDING_ORBITS = [
   { label: "BarathX", query: "BarathX", meta: "On BarathX", members: "Official", energy: 92 },
-  { label: "#StartupIndia", query: "StartupIndia", meta: "Builders", members: "Orbit", energy: 78 },
-  { label: "#IPL", query: "IPL", meta: "Sports", members: "Hot", energy: 88 },
-  { label: "Monsoon", query: "Monsoon", meta: "Local drops", members: "India today", energy: 64 },
-  { label: "Politics", query: "Politics", meta: "Arena", members: "Debate", energy: 71 },
+  { label: "#Startups", query: "startups", meta: "Builders", members: "Orbit", energy: 78 },
+  { label: "#Sports", query: "sports", meta: "Sports", members: "Hot", energy: 88 },
+  { label: "#News", query: "news", meta: "India today", members: "Live", energy: 64 },
+  { label: "Politics", query: "politics", meta: "Arena", members: "Debate", energy: 71 },
 ];
 
 export default function RightRail() {

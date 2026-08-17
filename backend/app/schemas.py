@@ -385,9 +385,25 @@ class UserSearchOut(BaseModel):
         from_attributes = True
 
 
+class TopicSearchOut(BaseModel):
+    id: str
+    key: str
+    name: str
+    arena_key: str
+    blurb: str = ""
+
+
+class ArenaSearchOut(BaseModel):
+    key: str
+    name: str
+    slug: str
+
+
 class SearchResults(BaseModel):
     users: list[UserSearchOut]
     posts: list[PostOut]
+    topics: list[TopicSearchOut] = []
+    arenas: list[ArenaSearchOut] = []
 
 
 class NotificationOut(BaseModel):

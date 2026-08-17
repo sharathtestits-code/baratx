@@ -129,6 +129,17 @@ def rate_limited_response() -> JSONResponse:
     )
 
 
+def is_native_http_ua(ua: str) -> bool:
+    """Capacitor / Android HTTP stacks (not headless browser scrapers)."""
+    low = (ua or "").lower()
+    if "headless" in low or "playwright" in low or "puppeteer" in low or "selenium" in low:
+        return False
+    return bool(
+        re.search(r"okhttp|capacitor|dalvik|;\s*wv\)|barathx/", low)
+        or re.search(r"^java/", low)
+    )
+
+
 def enforce_anti_scrape(request: Request) -> Optional[Response]:
     """Return a 403/429 Response if this request looks like automated scraping."""
     path = request.url.path or "/"
@@ -140,11 +151,13 @@ def enforce_anti_scrape(request: Request) -> Optional[Response]:
         return None
 
     ua = client_user_agent(request)
-    # Always block known scraper / headless UAs — Origin spoofing must not bypass.
-    if is_scraper_ua(ua) and not _ALLOWED_UA.search(ua):
-        return scrape_blocked_response()
-
     official = has_official_client(request)
+    # Always block known scraper / headless UAs — Origin spoofing must not bypass.
+    # Official native shells may send OkHttp/Java UAs; allow those with the client header.
+    if is_scraper_ua(ua) and not _ALLOWED_UA.search(ua):
+        if not (official and is_native_http_ua(ua)):
+            return scrape_blocked_response()
+
     scrolling = is_scroll_page(request)
 
     # Infinite-scroll harvest without the real web/native client header.

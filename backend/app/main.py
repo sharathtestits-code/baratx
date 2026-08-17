@@ -15,7 +15,7 @@ from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
 from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
-from app import ai_filter, anti_scrape, data_protection
+from app import ai_filter, anti_scrape, data_protection, search_query
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -3039,22 +3039,149 @@ def search(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    q = q.strip()
-    if not q:
-        return schemas.SearchResults(users=[], posts=[])
+    """Explore search: people, posts, hashtags, and topic/arena homes."""
+    variants = search_query.search_variants(q)
+    if not variants:
+        return schemas.SearchResults(users=[], posts=[], topics=[], arenas=[])
 
-    like_pattern = f"%{q}%"
+    # Escape LIKE wildcards; SQLite + Postgres both accept ESCAPE '\\'.
+    likes = [search_query.like_pattern(v) for v in variants]
+    user_filters = []
+    post_text_filters = []
+    hashtag_filters = []
+    topic_filters = []
+    community_filters = []
+    space_title_filters = []
+    for like in likes:
+        user_filters.extend(
+            [
+                models.User.username.ilike(like, escape="\\"),
+                models.User.display_name.ilike(like, escape="\\"),
+                models.User.bio.ilike(like, escape="\\"),
+            ]
+        )
+        post_text_filters.append(models.Post.text.ilike(like, escape="\\"))
+        hashtag_filters.append(models.Hashtag.tag.ilike(like, escape="\\"))
+        topic_filters.extend(
+            [
+                models.Topic.name.ilike(like, escape="\\"),
+                models.Topic.key.ilike(like, escape="\\"),
+            ]
+        )
+        community_filters.extend(
+            [
+                models.Community.name.ilike(like, escape="\\"),
+                models.Community.slug.ilike(like, escape="\\"),
+                models.Community.arena_key.ilike(like, escape="\\"),
+            ]
+        )
+        space_title_filters.append(models.Space.title.ilike(like, escape="\\"))
 
     users = (
         db.query(models.User)
-        .filter(or_(models.User.username.ilike(like_pattern), models.User.display_name.ilike(like_pattern)))
+        .filter(or_(*user_filters))
         .limit(20)
         .all()
     )
 
+    topic_rows = (
+        db.query(models.Topic)
+        .filter(or_(*topic_filters))
+        .limit(12)
+        .all()
+    )
+    # Dedupe by (arena_key, key) keeping first
+    seen_topics: set[tuple[str, str]] = set()
+    topics_out: list[schemas.TopicSearchOut] = []
+    topic_ids: list[str] = []
+    for t in topic_rows:
+        pair = (t.arena_key, t.key)
+        if pair in seen_topics:
+            continue
+        seen_topics.add(pair)
+        topic_ids.append(t.id)
+        topics_out.append(
+            schemas.TopicSearchOut(
+                id=t.id,
+                key=t.key,
+                name=t.name,
+                arena_key=t.arena_key,
+                blurb=t.blurb or "",
+            )
+        )
+
+    community_rows = (
+        db.query(models.Community)
+        .filter(or_(*community_filters))
+        .limit(12)
+        .all()
+    )
+    arenas_out: list[schemas.ArenaSearchOut] = []
+    community_ids: list[str] = []
+    seen_arenas: set[str] = set()
+    for c in community_rows:
+        community_ids.append(c.id)
+        key = (c.arena_key or c.slug or "").strip()
+        if not key or key in seen_arenas:
+            continue
+        if not c.is_arena and not c.arena_key:
+            continue
+        seen_arenas.add(key)
+        arenas_out.append(
+            schemas.ArenaSearchOut(
+                key=key,
+                name=c.name,
+                slug=c.slug,
+            )
+        )
+
+    # Posts matching body text OR linked hashtags OR topic/arena spaces OR debate titles.
+    matching_hashtag_ids = [
+        row.id
+        for row in db.query(models.Hashtag.id).filter(or_(*hashtag_filters)).limit(40).all()
+    ]
+    hashtag_post_ids = []
+    if matching_hashtag_ids:
+        hashtag_post_ids = [
+            row.post_id
+            for row in (
+                db.query(models.PostHashtag.post_id)
+                .filter(models.PostHashtag.hashtag_id.in_(matching_hashtag_ids))
+                .limit(80)
+                .all()
+            )
+        ]
+
+    topic_space_ids = []
+    if topic_ids:
+        topic_space_ids = [
+            row.id
+            for row in (
+                db.query(models.Space.id)
+                .filter(models.Space.topic_id.in_(topic_ids))
+                .limit(80)
+                .all()
+            )
+        ]
+
+    titled_space_ids = [
+        row.id
+        for row in db.query(models.Space.id).filter(or_(*space_title_filters)).limit(40).all()
+    ]
+
+    post_filters = list(post_text_filters)
+    if hashtag_post_ids:
+        post_filters.append(models.Post.id.in_(hashtag_post_ids))
+    if topic_space_ids:
+        post_filters.append(models.Post.space_id.in_(topic_space_ids))
+    if titled_space_ids:
+        post_filters.append(models.Post.space_id.in_(titled_space_ids))
+    if community_ids:
+        post_filters.append(models.Post.community_id.in_(community_ids))
+
     posts = (
         db.query(models.Post)
-        .filter(models.Post.text.ilike(like_pattern))
+        .filter(or_(*post_filters))
         .order_by(models.Post.created_at.desc())
         .limit(30)
         .all()
@@ -3077,6 +3204,8 @@ def search(
             for u in users
         ],
         posts=[serialize_post(p, current_user) for p in posts],
+        topics=topics_out,
+        arenas=arenas_out,
     )
 
 
