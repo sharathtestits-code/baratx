@@ -43,116 +43,152 @@ Keep this track running. It does **not** count toward Google’s 12-tester / 14-
 
 ---
 
-## Unlock closed testing (the real blocker)
+## Unlock closed testing (the 11 dashboard tasks)
 
-Dashboard says **Finish setting up your app → Provide app information and create your store listing**. Until those tasks are green, **Closed testing stays locked**.
+Dashboard → **Finish setting up your app → Provide app information and create your store listing**. Click each empty circle **top to bottom**. Until every task is done, **Closed testing stays locked**.
 
-Click **View tasks** on the dashboard. Work the list top to bottom. Typical items:
+Work **Let us know about the content of your app** first (9 items), then **Manage how your app is organized and presented** (2 items).
 
-### 1) Main store listing
+### 1. Set privacy policy
 
-**Grow users → Store presence → Main store listing**
+- Privacy policy URL: `https://barathx.com/privacy`
+- Save.
 
-Paste the copy below. Upload assets from `brand/mobile/play-listing/`.
+### 2. Sign in details
+
+All or some of the app is behind login. Play reviewers **must** get in.
+
+Before this form: on https://barathx.com create a dedicated **email + password** account (18+). Do **not** put 2FA / phone OTP on it. Use that email and password below.
+
+- Are some parts of the app restricted? **Yes**
+- Add instructions:
+
+```
+All core screens require sign-in (18+).
+
+1. Open BarathX.
+2. Tap Sign in.
+3. Enter the email and password in this form.
+4. Confirm you are 18+ if asked.
+5. You land on Square. From the menu open an Arena, pick a side, post a take. Replies and Profile (You) are in the same signed-in app.
+
+No one-time code, membership, or extra download is required for this account.
+```
+
+- Username / email: the reviewer account you created  
+- Password: that account’s password  
+- Other information required? **No**
+- Save.
+
+Do not leave this blank. Social apps get rejected if reviewers cannot log in.
+
+### 3. Ads
+
+- Does your app contain ads? **No, my app does not contain ads**
+- Save.
+
+### 4. Content rating
+
+Start questionnaire → email `hello@barathx.com` → category **Social Networking** (or Communication if that is the only social option).
+
+| If asked | Answer |
+|----------|--------|
+| Users can interact / communicate | **Yes** (posts, replies, live rooms) |
+| User-generated content | **Yes** |
+| Unrestricted internet access | **No** (in-app Square / Arenas, not a general browser) |
+| Users share physical location | **No** |
+| In-app purchases / gambling | **No** |
+| Ads | **No** |
+| Violence / sexual content as a core feature | **No** |
+| Users may post mild language | **Yes** if asked (UGC debate) |
+| Age gate | **Yes — 18+** |
+
+Submit. When IARC emails the rating, **apply it to the app**. A Teen / 12+ rating is normal for social UGC even though the product is 18+.
+
+### 5. Target audience
+
+- Age groups: tick **18 and over only**. Do **not** tick 13–15 or 16–17.
+- Could the store listing appeal to children? **No**
+- Not a Families app.
+- Save.
+
+### 6. Data safety
+
+Overview:
+
+| Question | Answer |
+|----------|--------|
+| Collects required user data types? | **Yes** |
+| Encrypted in transit? | **Yes** |
+| Users can request deletion? | **Yes** — hello@barathx.com |
+| Independent security review? | **No** |
+| Committed to Play Families policy? | **No** (18+ only) |
+| Advertising ID? | **No** |
+
+Data types — **Collected**, **not shared** with third parties (showing posts to other BarathX users is not “shared”). Not ephemeral. Purposes: **App functionality** + **Account management**; also **Fraud prevention, security, and compliance** for email/phone/session.
+
+| Type | Required or optional |
+|------|----------------------|
+| Personal info → Name (display name) | Required |
+| Personal info → Email address | Users can choose (phone or Google instead) |
+| Personal info → Phone number | Users can choose |
+| Personal info → User IDs (username) | Required |
+| Photos and videos → Photos | Users can choose |
+| App activity → Other user-generated content (posts, replies) | Users can choose |
+| App info → Crash logs (if Play / OS collects) | Required if you keep them; skip if you do not |
+| Device or other IDs (login session) | Required |
+
+Do **not** declare: location, financial info, health, contacts, ads data, or “sold / shared for advertising”.
+
+### 7. Government apps
+
+- Is this a government app? **No**
+- Save.
+
+### 8. Financial features
+
+- **My app doesn't provide any financial features**
+- Founding 100 thank-you is not banking, payments, crypto, or an in-app purchase.
+- Save.
+
+### 9. Health
+
+- **My app does not have any health features**
+- Save.
+
+### 10. Select an app category and provide contact details
+
+This is Store settings, not the listing graphics.
+
+- App or game: **App**
+- Category: **Social**
+- Email: `hello@barathx.com`
+- Website: `https://barathx.com`
+- Phone: optional
+- Default language: English (India) if offered, else English (United States)
+- Save.
+
+### 11. Set up your store listing
+
+Main store listing. Paste [§ Store listing copy](#store-listing-copy). Upload `brand/mobile/play-listing/`.
 
 | Field | Value |
 |-------|--------|
 | App name | BarathX |
 | Short description | India's public square — pick a side, argue it live. |
-| Full description | See [§ Store listing copy](#store-listing-copy) |
+| Full description | See copy below |
 | App icon | `play-listing/icon-512.png` (512×512) |
 | Feature graphic | `play-listing/feature-1024x500.png` (1024×500) |
-| Phone screenshots | At least **2** (need 2–8). Capture on a real phone — see [§ Screenshots](#screenshots) |
-| Privacy policy | `https://barathx.com/privacy` |
+| Phone screenshots | At least **2** (aim for 5). Capture on a real phone — [§ Screenshots](#screenshots) |
+| Privacy policy | already set in task 1 |
 
-**Category:** Social  
-**Tags:** debate, social, india, campus, news, sports  
-**Email:** hello@barathx.com  
-**Website:** https://barathx.com  
-**WhatsApp (optional contact):** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
+Tags if asked: debate, social, india, campus, news, sports.
 
-### 2) Store settings
+This task stays incomplete until **icon + feature graphic + ≥2 phone screenshots** are uploaded.
 
-**Grow users → Store presence → Store settings**
+### After the 11 are green
 
-- App name: BarathX
-- Default language: English (United States) or English (India) — pick one and stay consistent
-- Contact email: hello@barathx.com
-- Phone / website: optional; website https://barathx.com
-
-### 3) Target audience and content
-
-**Policy → Target audience and content**
-
-- Target age: **18 and over only**. Do **not** tick 13–15 or 16–17. The product is 18+.
-- Appeal to children: **No**
-- News app: **No** (primary use is debate/social, not a news publisher)
-- COVID contact tracing: **No**
-
-### 4) Content ratings
-
-**Policy → App content → Content ratings** → IARC questionnaire.
-
-Answer honestly for a social / UGC debate app:
-
-- Category: **Social Networking** (or Communication, if that is the closest option)
-- Users can communicate: **Yes** (posts, replies, live rooms)
-- User-generated content: **Yes**
-- Users can share location: **No** (unless you later add it)
-- Shares user's physical location: **No**
-- In-app purchases: **No**
-- Ads: **No**
-- Violence / sexual content as a core feature: **No**
-- Mild language possible in UGC: **Yes** if asked
-- Age gate in app: **Yes — 18+**
-
-Submit and wait for the rating email. Assign the rating to the app when it arrives.
-
-### 5) News apps
-
-**No** — BarathX is not a news publication.
-
-### 6) Data safety
-
-**Policy → App content → Data safety**
-
-| Question | Answer |
-|----------|--------|
-| Collects user data? | **Yes** |
-| Encrypted in transit? | **Yes** (HTTPS) |
-| Users can request deletion? | **Yes** — hello@barathx.com |
-| Independent security review? | **No** |
-| Sold / shared for ads? | **No** |
-
-Data types to declare (collected for **App functionality** + **Account management**, not sold):
-
-- **Personal info:** Name, Email, Phone number (account)
-- **User content:** Posts, replies, photos the user uploads
-- **App activity / identifiers:** App interactions, crash logs if Play collects them, device/session needed to stay signed in
-
-Optional vs required: account fields are **required** to create an account. Photos are **optional**.
-
-### 7) Ads
-
-**Does your app contain ads?** → **No**
-
-### 8) App access (reviewer login)
-
-**Policy → App content → App access**
-
-- All or some functionality is **restricted** (login required).
-- Add **instructions + a test account** Play reviewers can use:
-  - Email/password **or** a phone number that receives OTP
-  - Steps: open app → Sign in → land on Square → open an Arena → post a take
-- Do **not** leave this blank. Reviewers reject social apps they cannot log into.
-
-### 9) Government / Financial / Health
-
-All **No** (Founding 100 thank-you is not an in-app purchase or financial product).
-
-### 10) Countries / countries available for testing
-
-When you create the **closed** release, include **India** plus every country a tester’s Google account is in. If a tester is abroad and India-only is selected, install fails.
+Closed testing unlocks on the same dashboard. When you create that closed release, include **India** plus every country a tester’s Google account is in. If a tester is abroad and India-only is selected, install fails.
 
 ---
 

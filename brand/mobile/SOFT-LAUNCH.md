@@ -42,7 +42,7 @@ Do **not** wait for public Production store listing to start Campus Voice testin
 - [x] Confirm https://barathx.com/privacy and `/terms` load after deploy
 - [x] Create [Google Play Console](https://play.google.com/console) app: **BarathX** / package `com.baratx.app`
 - [x] Internal testing release created (Active)
-- [ ] Finish **View tasks** (store listing, 18+ audience, content rating, data safety, reviewer login) — copy + assets in [PLAY-CONSOLE.md](./PLAY-CONSOLE.md) and `play-listing/`
+- [ ] Finish the **11 dashboard tasks** (privacy → store listing) — exact answers in [PLAY-CONSOLE.md](./PLAY-CONSOLE.md); assets in `play-listing/`
 - [ ] Privacy policy URL in Play Console: `https://barathx.com/privacy`
 
 ### 2) Wire real phone OTP (critical for India Gen Z)
