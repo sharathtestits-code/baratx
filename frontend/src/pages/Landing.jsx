@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../softLaunch";
+import { WHATSAPP_CHANNEL, WHATSAPP_COMMUNITY, X_PROFILE } from "../socialLinks";
 
 /**
  * Debate-first brand landing (audit Week 1).
@@ -10,6 +12,8 @@ import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../s
  */
 export default function Landing() {
   const softLaunch = isSoftLaunchWindow();
+  const [confirmAge18, setConfirmAge18] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   return (
     <div className="bx-home">
       <header className="bx-home-nav">
@@ -44,8 +48,8 @@ export default function Landing() {
           ) : null}
           <p className="bx-home-hero-line">Pick a side. Argue it live.</p>
           <p className="bx-home-hero-sub">
-            The place people who actually have an opinion go — not another feed to like and leave.
-            Soft launch live in your browser — phone or desktop. {APP_COMING_SOON_LINE}.
+            The place people who actually have an opinion go, not another feed to like and leave.
+            Soft launch live in your browser (phone or desktop). {APP_COMING_SOON_LINE}.
           </p>
           <p className="bx-home-hero-anti-ai">Human takes only. No AI slop.</p>
           <div className="bx-home-hero-ctas">
@@ -57,14 +61,41 @@ export default function Landing() {
             </Link>
           </div>
           <div className="bx-home-hero-google">
-            <GoogleSignInButton label="Continue with Google" confirmAge18 />
+            <label className="age-gate bx-home-consent">
+              <input
+                type="checkbox"
+                checked={confirmAge18}
+                onChange={(e) => setConfirmAge18(e.target.checked)}
+              />
+              <span>
+                I am <strong>18+</strong>
+              </span>
+            </label>
+            <label className="age-gate bx-home-consent">
+              <input
+                type="checkbox"
+                checked={acceptPrivacy}
+                onChange={(e) => setAcceptPrivacy(e.target.checked)}
+              />
+              <span>
+                I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
+                <Link to="/terms">Terms</Link>
+              </span>
+            </label>
+            <GoogleSignInButton
+              label="Continue with Google"
+              confirmAge18={confirmAge18}
+              acceptPrivacy={acceptPrivacy}
+              requireAgeConfirm
+              requirePrivacyConfirm
+            />
           </div>
           <p className="bx-home-founding-chip">
             <Link to="/signup?next=/rewards">100 Founding spots</Link>, earned by opening a debate
             that gets real engagement, not by signing up.
           </p>
           <p className="bx-home-hero-legal">
-            18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
+            Personal data is processed under India&apos;s DPDP Act. Details in{" "}
             <Link to="/privacy">Privacy</Link>.
           </p>
         </div>
@@ -75,9 +106,9 @@ export default function Landing() {
         <h2 id="bx-home-why">Not another feed to scroll</h2>
         <p className="bx-home-copy">
           Old way: argue in an Instagram thread that vanishes in an hour, or a WhatsApp group where
-          fifteen people talk past each other. BarathX: a live, sided debate — Agree vs Disagree —
+          fifteen people talk past each other. BarathX: a live, sided debate (Agree vs Disagree)
           where a real person answers you on the record. We&apos;re officially soft launching on
-          Independence Day (15 August) in the browser — phone and desktop — early on purpose so those
+          Independence Day (15 August) in the browser (phone and desktop), early on purpose so those
           rooms stay real, not performed for growth numbers. Native apps for Apple and Android are
           coming soon.
         </p>
@@ -85,7 +116,7 @@ export default function Landing() {
 
       <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-apps">
         <p className="bx-home-kicker">Apps</p>
-        <h2 id="bx-home-apps">App coming soon — Apple &amp; Android</h2>
+        <h2 id="bx-home-apps">App coming soon: Apple &amp; Android</h2>
         <p className="bx-home-copy">
           Soft launch is live in the browser today. Join on your phone browser or desktop while we
           finish the App Store and Google Play builds.
@@ -124,24 +155,24 @@ export default function Landing() {
         <h2 id="bx-home-how">Three steps. Real conversation.</h2>
         <ol className="bx-home-steps">
           <li>
-            <strong>Answer today&apos;s question.</strong> One prompt, every day — post your take in
+            <strong>Answer today&apos;s question.</strong> One prompt, every day. Post your take in
             your own words.
           </li>
           <li>
-            <strong>Pick a side, join the room.</strong> Live debates with a running tally — up to 15
+            <strong>Pick a side, join the room.</strong> Live debates with a running tally, up to 15
             voices.
           </li>
           <li>
-            <strong>Get real replies.</strong> People in your arena see you — not a buried timeline.
+            <strong>Get real replies.</strong> People in your arena see you, not a buried timeline.
           </li>
         </ol>
       </section>
 
       <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-startups">
         <p className="bx-home-kicker">Start here</p>
-        <h2 id="bx-home-startups">Startups Arena — Fund it or Pass</h2>
+        <h2 id="bx-home-startups">Startups Arena: Fund it or Pass</h2>
         <p className="bx-home-copy">
-          Where India&apos;s builders argue about the pitch, the raise, and the exit — live, not in a
+          Where India&apos;s builders argue about the pitch, the raise, and the exit, live, not in a
           comment thread three days later. That&apos;s where we&apos;re densest first.
         </p>
         <Link to="/signup?next=/arenas/startups" className="btn btn-primary bx-home-inline-cta">
@@ -156,14 +187,14 @@ export default function Landing() {
           <div>
             <h3>Arenas</h3>
             <p>
-              Pick a side and jump in — Sports, Politics, Entertainment, News, Spirituality,
+              Pick a side and jump in: Sports, Politics, Entertainment, News, Spirituality,
               Startups. Agree/Disagree (or Fund it/Pass) live.
             </p>
           </div>
           <div>
             <h3>Communities</h3>
             <p>
-              Smaller groups (city, craft, interest). Not the same six Arenas — use them when you
+              Smaller groups (city, craft, interest). Not the same six Arenas. Use them when you
               want a circle, not a national floor.
             </p>
           </div>
@@ -174,7 +205,7 @@ export default function Landing() {
         <p className="bx-home-kicker">Live</p>
         <h2 id="bx-home-live">The wedge X and Threads don&apos;t have</h2>
         <p className="bx-home-copy">
-          Open a room, pick your side, mute/video/react — a capped 15-person call with a running
+          Open a room, pick your side, mute/video/react. A capped 15-person call with a running
           tally. Built for conversation that happens now.
         </p>
       </section>
@@ -184,7 +215,7 @@ export default function Landing() {
         <h2 id="bx-home-founding">100 Founding spots. Earned, not claimed.</h2>
         <p className="bx-home-copy">
           100 Founding spots, earned by opening a debate that gets real engagement, not by signing
-          up. Getting in means something — we&apos;re early on purpose. Free forever for everyone
+          up. Getting in means something. We&apos;re early on purpose. Free forever for everyone
           else.
         </p>
         <Link to="/signup?next=/rewards" className="btn btn-secondary bx-home-inline-cta">
@@ -212,14 +243,14 @@ export default function Landing() {
           <div>
             <dt>What are Arenas?</dt>
             <dd>
-              Topic debate floors. Communities are separate member-run groups — not duplicate Arenas.
+              Topic debate floors. Communities are separate member-run groups, not duplicate Arenas.
             </dd>
           </div>
           <div>
             <dt>What&apos;s Founding 100?</dt>
             <dd>
               100 Founding spots, earned by opening a debate that gets real engagement, not by
-              signing up. Membership — not a signup bonus.
+              signing up. Membership, not a signup bonus.
             </dd>
           </div>
           <div>
@@ -229,14 +260,14 @@ export default function Landing() {
           <div>
             <dt>When is the soft launch?</dt>
             <dd>
-              Official soft launch on Independence Day — 15 August — in your browser on phone and
+              Official soft launch on Independence Day (15 August) in your browser on phone and
               desktop. iOS and Android apps are coming soon. Same BarathX, early on purpose.
             </dd>
           </div>
           <div>
             <dt>Is there a mobile app?</dt>
             <dd>
-              Not yet. Soft launch is web-first — open barathx.com in Safari, Chrome, or any browser.
+              Not yet. Soft launch is web-first. Open barathx.com in Safari, Chrome, or any browser.
               Native apps for Apple App Store and Google Play are coming soon.
             </dd>
           </div>
@@ -257,25 +288,32 @@ export default function Landing() {
       <section className="bx-home-closing" aria-labelledby="bx-home-close">
         <LogoMark className="bx-home-closing-mark" title="" />
         <h2 id="bx-home-close">Post your take. Someone will talk back.</h2>
-        <p className="bx-home-copy">BarathX — India&apos;s public square. Built by Indians. For India.</p>
+        <p className="bx-home-copy">BarathX. India&apos;s public square. Built by Indians. For India.</p>
         <div className="bx-home-hero-ctas">
           <Link to="/signup" className="btn btn-primary bx-home-cta-primary">
             Answer today&apos;s question
           </Link>
           <a
             className="btn btn-secondary bx-home-cta-secondary"
-            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            href={WHATSAPP_COMMUNITY}
             target="_blank"
             rel="noreferrer"
           >
-            WhatsApp community
+            WhatsApp Community
           </a>
         </div>
         <p className="bx-home-closing-follow">
-          Follow on X →{" "}
-          <a href="https://x.com/getbaratx" target="_blank" rel="noreferrer">
+          Channel →{" "}
+          <a href={WHATSAPP_CHANNEL} target="_blank" rel="noreferrer">
+            WhatsApp Channel
+          </a>
+          {" · "}
+          X →{" "}
+          <a href={X_PROFILE} target="_blank" rel="noreferrer">
             @getbaratx
           </a>
+          {" · "}
+          <Link to="/early-issues">Early issues</Link>
         </p>
       </section>
 
@@ -283,6 +321,7 @@ export default function Landing() {
         <span>© {new Date().getFullYear()} BarathX</span>
         <span className="bx-home-foot-links">
           <Link to="/guidelines">Guidelines</Link>
+          <Link to="/early-issues">Early issues</Link>
           <Link to="/terms">Terms</Link>
           <Link to="/privacy">Privacy</Link>
           <a href="https://barathx.com">barathx.com</a>

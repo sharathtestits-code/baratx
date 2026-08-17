@@ -1,4 +1,4 @@
-"""Daily peak digest — credible arena glimpses + @baratx / @sharath engagement.
+"""Daily peak digest, credible arena glimpses + @baratx / @sharath engagement.
 
 Posts only at 3 IST peak windows (morning / midday / evening):
   1) @baratx posts a news glimpse (credible sources only)
@@ -36,7 +36,7 @@ ADMIN_USERNAME = "baratx"
 SHARATH_USERNAME = "sharath"
 DIGEST_AUTHORS = (ADMIN_USERNAME, SHARATH_USERNAME)
 
-# Three peak windows — do not spray the feed all day.
+# Three peak windows, do not spray the feed all day.
 PEAK_SLOTS = (
     (9, 0, "morning"),
     (13, 30, "midday"),
@@ -49,7 +49,7 @@ SLOT_MARKERS = {
 }
 POST_MARKER = "#BarathXDaily"
 
-# Per peak slot: one dense arena first (Startups-weighted) — avoid six thin empty rooms.
+# Per peak slot: one dense arena first (Startups-weighted), avoid six thin empty rooms.
 ARENAS_PER_SLOT = 1
 # Soft floors for headline selection (tests + collector).
 MIN_POSTS_IF_QUALITY = 2
@@ -67,7 +67,7 @@ ARENA_WEIGHT = {
     "spirituality": 0.6,
 }
 
-# Prefer press / wire / named desk queries — then filter by credible publisher.
+# Prefer press / wire / named desk queries, then filter by credible publisher.
 ARENA_TRENDING_QUERIES = {
     "sports": "India sports news today PTI OR ANI OR The Hindu",
     "politics": "India politics Parliament press conference PIB OR PTI",
@@ -341,7 +341,7 @@ def render_brand_card(*, headline: str, arena: str, source: str = "") -> bytes:
 
 
 def compose_admin_glimpse(*, title: str, arena: str, source: str, slot: str) -> str:
-    """Admin morning/peak glimpse — stick to the headline + named source only."""
+    """Admin morning/peak glimpse, stick to the headline + named source only."""
     tag = f"#{(arena or 'news').replace(' ', '')}"
     slot_marker = SLOT_MARKERS.get(slot, "")
     clean = (title or "").strip()
@@ -361,7 +361,7 @@ def compose_admin_glimpse(*, title: str, arena: str, source: str, slot: str) -> 
 
 
 def compose_sharath_take(*, title: str, arena: str, source: str, slot: str) -> str:
-    """Sharath response post — opinion framing only; no invented facts."""
+    """Sharath response post, opinion framing only; no invented facts."""
     slot_marker = SLOT_MARKERS.get(slot, "#BXMorning")
     tag = f"#{arena.capitalize()}" if arena else "#India"
     parts = [
@@ -370,7 +370,7 @@ def compose_sharath_take(*, title: str, arena: str, source: str, slot: str) -> s
         title.strip(),
         "",
         f"(via {source})" if source else "",
-        "Reply with evidence — not just heat.",
+        "Reply with evidence, not just heat.",
         f"{tag} {POST_MARKER} {slot_marker}",
     ]
     text = "\n".join(p for p in parts if p is not None).strip()
@@ -381,7 +381,7 @@ def compose_sharath_take(*, title: str, arena: str, source: str, slot: str) -> s
 
 def compose_sharath_reply_to_admin() -> str:
     return (
-        "Adding my view: this belongs on the square — debate the claim, cite the source, "
+        "Adding my view: this belongs on the square, debate the claim, cite the source, "
         "don’t just pile on. What’s your city reading into it?"
     )
 
@@ -649,7 +649,7 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
         if os.environ.get("DISABLE_DAILY_DIGEST", "").strip().lower() in ("1", "true", "yes"):
             logger.info("Daily digest scheduler disabled via DISABLE_DAILY_DIGEST")
             return
-        # Default OFF — automated official posts/replies felt botty. Opt in with ENABLE_DAILY_DIGEST=1
+        # Default OFF, automated official posts/replies felt botty. Opt in with ENABLE_DAILY_DIGEST=1
         if os.environ.get("ENABLE_DAILY_DIGEST", "").strip().lower() not in ("1", "true", "yes"):
             logger.info("Daily digest scheduler OFF by default (set ENABLE_DAILY_DIGEST=1 to opt in)")
             return

@@ -140,7 +140,12 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
   if (deleted) return null;
 
   return (
-    <article className={`post${detailMode ? " post-detail-card" : ""}`}>
+    <article className={`post${detailMode ? " post-detail-card" : ""}${post.mentions_me ? " post-tagged-me" : ""}`}>
+      {post.mentions_me && (
+        <div className="mention-tag">
+          Tagged you
+        </div>
+      )}
       {repostedBy && (
         <div className="repost-tag">
           <IconRepost className="repost-tag-icon" />
@@ -162,6 +167,7 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
             <Link to={`/u/${post.author.username}`} className={badgeNameClass(post.author, "post-username")}>
               @{post.author.username}
             </Link>
+            {post.likely_ai ? <span className="ai-draft-tag">Possible AI draft</span> : null}
             <span className="post-dot">·</span>
             {detailMode ? (
               <span className="post-time" title={whenTitle}>

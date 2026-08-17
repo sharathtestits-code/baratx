@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { messagesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "../components/Avatar";
+import ContentSafetyNote from "../components/ContentSafetyNote";
+import PlazaPageHeader from "../components/PlazaPageHeader";
 
 export default function Messages() {
   const { token } = useAuth();
@@ -36,10 +38,10 @@ export default function Messages() {
   }, [token]);
 
   return (
-    <div className="feed-wrap">
-      <div className="feed-header">
-        <h1>Messages</h1>
-      </div>
+    <div className="plaza-page dm-inbox">
+      <PlazaPageHeader title="Messages" sub="Private chats with people you follow and debate." />
+      <ContentSafetyNote />
+
       {loading ? (
         <p className="hint search-status">Loading messages…</p>
       ) : error ? (
@@ -52,12 +54,17 @@ export default function Messages() {
           </div>
         </div>
       ) : items.length === 0 ? (
-        <div className="empty-state">
-          <p className="empty-state-title">No conversations yet</p>
-          <p className="hint">Open a profile and tap Message to start a DM.</p>
+        <div className="dm-inbox-empty">
+          <p className="dm-empty-title">Your inbox is quiet</p>
+          <p className="hint">
+            Open someone&apos;s profile and tap <strong>Message</strong> to start a respectful chat.
+          </p>
+          <Link to="/search" className="btn btn-primary dm-empty-cta">
+            Find people to message
+          </Link>
         </div>
       ) : (
-        <div className="people-list">
+        <div className="people-list dm-inbox-list">
           {items.map((c) => (
             <Link key={c.user.id} to={`/messages/${c.user.username}`} className="people-row dm-row">
               <Avatar name={c.user.display_name} username={c.user.username} url={c.user.avatar_url} size={48} />
@@ -66,7 +73,7 @@ export default function Messages() {
                   {c.user.display_name}
                   {c.unread_count > 0 && <span className="dm-unread">{c.unread_count}</span>}
                 </div>
-                <div className="people-bio">{c.last_message?.text}</div>
+                <div className="people-bio dm-preview">{c.last_message?.text || "Say hello"}</div>
               </div>
             </Link>
           ))}

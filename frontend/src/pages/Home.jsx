@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { arenasApi, postsApi, spacesApi, topicsApi } from "../api";
+import { arenasApi, notificationsApi, postsApi, spacesApi, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { useT } from "../context/LocaleContext";
 import { arenaMeta } from "../arenas";
@@ -13,7 +13,7 @@ import SoftLaunchBanner from "../components/SoftLaunchBanner";
 import EmptyState from "../components/EmptyState";
 
 /**
- * Personal hub — Welcome, Continue, Following activity, Your arenas, Live peek.
+ * Personal hub. Welcome, Continue, Tagged you, Following activity, Your arenas, Live peek.
  * Public takes / compose live on Square (`/feed`).
  */
 export default function Home() {
@@ -23,6 +23,7 @@ export default function Home() {
 
   const [arenas, setArenas] = useState([]);
   const [topics, setTopics] = useState([]);
+  const [mentions, setMentions] = useState([]);
   const [following, setFollowing] = useState([]);
   const [liveDebates, setLiveDebates] = useState([]);
   const [busy, setBusy] = useState(true);
@@ -39,9 +40,10 @@ export default function Home() {
       setBusy(true);
       setError("");
       try {
-        const [arenaRows, topicRows, followRows, liveRows] = await Promise.all([
+        const [arenaRows, topicRows, mentionRows, followRows, liveRows] = await Promise.all([
           arenasApi.list(token).catch(() => []),
           topicsApi.mine(token).catch(() => []),
+          postsApi.list(token, { feed: "mentions" }).catch(() => []),
           postsApi.list(token, { feed: "following" }).catch(() => []),
           spacesApi
             .listForYou(token)
@@ -54,8 +56,11 @@ export default function Home() {
         if (cancelled) return;
         setArenas(Array.isArray(arenaRows) ? arenaRows : []);
         setTopics(Array.isArray(topicRows) ? topicRows : []);
+        setMentions(Array.isArray(mentionRows) ? mentionRows.slice(0, 8) : []);
         setFollowing(Array.isArray(followRows) ? followRows.slice(0, 8) : []);
         setLiveDebates(Array.isArray(liveRows) ? liveRows : []);
+        // Mentions also live in Alerts; keep unread badge accurate without forcing read.
+        notificationsApi.unreadCount(token).catch(() => {});
       } catch (err) {
         if (!cancelled) setError(err.message || t("home.loadError"));
       } finally {
@@ -198,6 +203,31 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+          </section>
+
+          <section className="home-section home-mentions" aria-labelledby="home-mentions-title">
+            <div className="home-section-head">
+              <h2 id="home-mentions-title">{t("home.mentions")}</h2>
+              <Link to="/notifications">{t("home.seeAll")}</Link>
+            </div>
+            {busy ? (
+              <p className="hint">{t("home.loading")}</p>
+            ) : mentions.length === 0 ? (
+              <p className="hint">{t("home.mentionsEmpty")}</p>
+            ) : (
+              <div className="feed home-mentions-feed">
+                {mentions.map((item) => (
+                  <PostCard
+                    key={`mention-${item.post.id}`}
+                    post={item.post}
+                    repostedBy={item.reposted_by}
+                    onDeleted={(id) =>
+                      setMentions((prev) => prev.filter((row) => row.post.id !== id))
+                    }
+                  />
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="home-section home-following" aria-labelledby="home-following-title">

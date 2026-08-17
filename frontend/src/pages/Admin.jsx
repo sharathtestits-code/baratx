@@ -15,20 +15,20 @@ const TABS = [
 ];
 
 const OFFICIAL_OPTIONS = [
-  { value: "baratx", label: "@baratx — BarathX (blue)" },
-  { value: "sharath", label: "@sharath — Sharath (blue)" },
-  { value: "bharatvoices", label: "@bharatvoices — Bharat Voices (gold)" },
-  { value: "indiatech", label: "@indiatech — India Tech Daily (gold)" },
+  { value: "baratx", label: "@baratx. BarathX (blue)" },
+  { value: "sharath", label: "@sharath. Sharath (blue)" },
+  { value: "bharatvoices", label: "@bharatvoices. Bharat Voices (gold)" },
+  { value: "indiatech", label: "@indiatech. India Tech Daily (gold)" },
 ];
 
 const WELCOME_PROMPTS = [
-  "Welcome to BarathX — glad you’re here. What’s your city?",
+  "Welcome to BarathX, glad you’re here. What’s your city?",
   "Nice first post. What made you join BarathX today?",
   "Welcome! Reply with one India take you wish more people heard.",
 ];
 
 function formatWhen(iso) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   try {
     return new Date(iso).toLocaleString(undefined, {
       dateStyle: "medium",
@@ -40,7 +40,7 @@ function formatWhen(iso) {
 }
 
 function formatShortWhen(iso) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   try {
     return new Date(iso).toLocaleDateString(undefined, {
       month: "short",
@@ -59,11 +59,11 @@ function verifiedLabel(u) {
   if (u.phone) {
     parts.push(u.is_phone_verified ? "phone verified" : "phone unverified");
   }
-  return parts.length ? parts.join(" · ") : "—";
+  return parts.length ? parts.join(" · ") : "-";
 }
 
 function emailDisplay(u) {
-  if (!u.email) return "—";
+  if (!u.email) return "-";
   return u.is_email_verified ? u.email : `${u.email} (unverified)`;
 }
 
@@ -178,7 +178,7 @@ export default function Admin() {
         setRace(null);
         const msg = err.message || "Could not load admin data";
         setError(msg);
-        // Wrong / revoked secret — drop session so unlock screen returns.
+        // Wrong / revoked secret, drop session so unlock screen returns.
         if (/admin secret|unauthorized|401/i.test(msg)) {
           sessionStorage.removeItem(SECRET_KEY);
           setSecret("");
@@ -227,7 +227,7 @@ export default function Admin() {
     setBusy(true);
     setError("");
     try {
-      // Validate before persisting — wrong secrets never stick in sessionStorage.
+      // Validate before persisting, wrong secrets never stick in sessionStorage.
       await adminApi.stats(next);
       sessionStorage.setItem(SECRET_KEY, next);
       setSecret(next);
@@ -283,7 +283,7 @@ export default function Admin() {
     try {
       const row = await adminApi.closeRace(secret, {});
       setMsg(
-        `Locked Square Race winner @${row.username} — ${row.like_count} likes → ₹${row.amount_inr}`
+        `Locked Square Race winner @${row.username}, ${row.like_count} likes → ₹${row.amount_inr}`
       );
       load(secret);
     } catch (err) {
@@ -474,10 +474,10 @@ export default function Admin() {
     ? [
         { value: stats.total_users, label: "Total users", tab: "users" },
         { value: stats.users_last_24h, label: "Signups (24h)", tab: "users" },
-        { value: stats.users_with_posts ?? "—", label: "Users who posted", tab: "engage" },
-        { value: stats.posters_last_24h ?? "—", label: "Posters (24h)", tab: "engage" },
-        { value: stats.posts_last_24h ?? "—", label: "Posts (24h)", tab: "engage" },
-        { value: stats.total_posts ?? "—", label: "Total posts", tab: "engage" },
+        { value: stats.users_with_posts ?? "-", label: "Users who posted", tab: "engage" },
+        { value: stats.posters_last_24h ?? "-", label: "Posters (24h)", tab: "engage" },
+        { value: stats.posts_last_24h ?? "-", label: "Posts (24h)", tab: "engage" },
+        { value: stats.total_posts ?? "-", label: "Total posts", tab: "engage" },
         { value: stats.email_verified, label: "Email verified", tab: "users" },
         { value: stats.with_phone, label: "With phone", tab: "users" },
       ]
@@ -494,7 +494,7 @@ export default function Admin() {
       <header className="admin-header">
         <div>
           <h1>Ops</h1>
-          <p className="admin-lead">Jump to what you need — no endless scroll.</p>
+          <p className="admin-lead">Jump to what you need, no endless scroll.</p>
         </div>
         <div className="admin-actions">
           <button
@@ -563,7 +563,7 @@ export default function Admin() {
                 </span>
                 <span className="admin-attention-label">Founding ready to pay</span>
                 <span className="admin-attention-meta">
-                  {founding?.slots_remaining ?? "—"} slots left · {founding?.eligible_count ?? 0} waiting
+                  {founding?.slots_remaining ?? "-"} slots left · {founding?.eligible_count ?? 0} waiting
                 </span>
               </button>
               <button type="button" className="admin-attention-card" onClick={() => goTab("payouts")}>
@@ -581,7 +581,7 @@ export default function Admin() {
                 <span className="admin-attention-meta">Welcome / comment queue</span>
               </button>
               <button type="button" className="admin-attention-card" onClick={() => goTab("users")}>
-                <span className="admin-attention-value">{stats?.users_last_24h ?? "—"}</span>
+                <span className="admin-attention-value">{stats?.users_last_24h ?? "-"}</span>
                 <span className="admin-attention-label">Signups today</span>
                 <span className="admin-attention-meta">{total} total users</span>
               </button>
@@ -749,7 +749,7 @@ export default function Admin() {
                                   ? u.is_phone_verified
                                     ? u.phone
                                     : `${u.phone} (unverified)`
-                                  : "—"}
+                                  : "-"}
                               </dd>
                             </div>
                             <div>
@@ -844,7 +844,7 @@ export default function Admin() {
               <div>
                 <h2 id="admin-engage-title">Comment on new users</h2>
                 <p className="admin-lead">
-                  Auto-replies: one human voice per post (@baratx or @sharath), content-aware —
+                  Auto-replies: one human voice per post (@baratx or @sharath), content-aware -
                   bug reports get support questions, not growth-bait. Use this tab for an extra
                   manual comment when you want.
                 </p>
@@ -962,13 +962,13 @@ export default function Admin() {
                         onChange={(e) =>
                           setReplyDrafts((prev) => ({ ...prev, [post.id]: e.target.value }))
                         }
-                        maxLength={220}
+                        maxLength={500}
                         rows={3}
                         placeholder={`Comment as @${replyAs}… type @ to tag`}
                         required
                       />
                       <div className="admin-compose-footer">
-                        <span className="admin-char-count">{draftText.length}/220</span>
+                        <span className="admin-char-count">{draftText.length}/500</span>
                         <button
                           type="submit"
                           className="admin-btn admin-btn-primary"
@@ -1041,7 +1041,7 @@ export default function Admin() {
         <div className="admin-tab-panel">
           {founding && (
             <section className="admin-compose" aria-labelledby="admin-founding-title">
-              <h2 id="admin-founding-title">Founding {founding.cap} — UPI payouts</h2>
+              <h2 id="admin-founding-title">Founding {founding.cap}. UPI payouts</h2>
               <p className="admin-lead">
                 ₹{founding.amount_inr} for one problem post or any-arena debate. Floor → community rating
                 (likes/replies) → you pay. {founding.slots_remaining} slots left · {founding.eligible_count}{" "}
@@ -1096,7 +1096,7 @@ export default function Admin() {
                                   onClick={() => handleMarkFoundingPaid(r)}
                                   title={
                                     r.status === "eligible"
-                                      ? "Bar not met yet — only pay after review if intentional"
+                                      ? "Bar not met yet, only pay after review if intentional"
                                       : "Ready to pay"
                                   }
                                 >
@@ -1116,7 +1116,7 @@ export default function Admin() {
 
           {race && (
             <section className="admin-compose" aria-labelledby="admin-race-title">
-              <h2 id="admin-race-title">Square Race — biweekly likes</h2>
+              <h2 id="admin-race-title">Square Race, biweekly likes</h2>
               <p className="admin-lead">
                 Highest-liked Home post each {race.current?.cadence_days || 14} days wins ₹
                 {race.current?.prize_min || 150}–₹{race.current?.prize_max || 500} (scaled by likes).
@@ -1160,7 +1160,7 @@ export default function Admin() {
                             <Link to={`/${row.username}`}>@{row.username}</Link>
                           </td>
                           <td>{row.like_count}</td>
-                          <td>₹{row.prize_inr || "—"}</td>
+                          <td>₹{row.prize_inr || "-"}</td>
                           <td className="admin-muted">{row.text}</td>
                         </tr>
                       ))}
@@ -1237,7 +1237,7 @@ export default function Admin() {
                   try {
                     const res = await adminApi.refreshPrompts(secret, true);
                     setMsg(
-                      `Prompts refreshed — created ${res.created || 0}, skipped ${res.skipped || 0}`
+                      `Prompts refreshed, created ${res.created || 0}, skipped ${res.skipped || 0}`
                     );
                     load(secret);
                   } catch (err) {
@@ -1263,7 +1263,7 @@ export default function Admin() {
                     const res = await adminApi.dailyDigest(secret, true);
                     if (res.skipped) {
                       setMsg(
-                        `Peak digest skipped — ${res.reason || "already posted"} (${res.slot || "slot"})`
+                        `Peak digest skipped, ${res.reason || "already posted"} (${res.slot || "slot"})`
                       );
                     } else {
                       const arenas = (res.pairs || res.posts || [])
@@ -1271,7 +1271,7 @@ export default function Admin() {
                         .filter(Boolean)
                         .join(", ");
                       setMsg(
-                        `Peak digest · ${res.slot || "slot"} — ${res.created_pairs || 0} topic pair(s)` +
+                        `Peak digest · ${res.slot || "slot"}, ${res.created_pairs || 0} topic pair(s)` +
                           ` (${res.created || 0} posts)` +
                           (arenas ? ` · ${arenas}` : "") +
                           " · @baratx + @sharath replies + likes"

@@ -137,6 +137,8 @@ You already have a **Web application** client (used as `VITE_GOOGLE_CLIENT_ID` /
 
 Plugin: `@capgo/capacitor-social-login` (Capacitor 8). Providers other than Google are disabled in `capacitor.config.json` to keep APK size down.
 
+**Android scopes note:** Do not pass custom `scopes` in `SocialLogin.login` unless `MainActivity` implements Capgo’s `ModifiedMainActivityForSocialLoginPlugin`. Default OIDC scopes (email / profile / openid) are enough for `POST /auth/google` ID tokens. Passing scopes without that MainActivity change shows: *You CANNOT use scopes without modifying the main activity.*
+
 ## Icons & splash
 
 - Android launchers: `frontend/android/app/src/main/res/mipmap-*`

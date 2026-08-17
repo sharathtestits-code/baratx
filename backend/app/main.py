@@ -14,7 +14,8 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, media_store, models, ops_access, rewards, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
+from app import ai_filter, anti_scrape, data_protection, search_query
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -25,7 +26,7 @@ Base.metadata.create_all(bind=engine)
 
 def run_migrations():
     """
-    Base.metadata.create_all() only creates tables that don't exist yet — it
+    Base.metadata.create_all() only creates tables that don't exist yet, it
     never alters existing tables. Add missing columns safely on startup.
     """
     url = str(engine.url)
@@ -48,6 +49,12 @@ def run_migrations():
                 conn.execute(
                     text("ALTER TABLE users ADD COLUMN email_activity_enabled BOOLEAN DEFAULT 1")
                 )
+            if "token_version" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
+            if "privacy_accepted_at" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at DATETIME"))
+            if "privacy_notice_version" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -58,6 +65,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
             if "debate_side" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+            if "likely_ai" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN likely_ai BOOLEAN DEFAULT 0"))
 
             # communities arena flags
             try:
@@ -92,6 +101,8 @@ def run_migrations():
             reply_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(replies)"))}
             if "parent_reply_id" not in reply_cols:
                 conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+            if "likely_ai" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN likely_ai BOOLEAN DEFAULT 0"))
 
             notif_tables = {
                 row[0]
@@ -139,6 +150,12 @@ def run_migrations():
                             "ALTER TABLE users ADD COLUMN email_activity_enabled BOOLEAN DEFAULT TRUE"
                         )
                     )
+                if "token_version" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
+                if "privacy_accepted_at" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at TIMESTAMP"))
+                if "privacy_notice_version" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -149,6 +166,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
             if post_cols and "debate_side" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+            if post_cols and "likely_ai" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN likely_ai BOOLEAN DEFAULT FALSE"))
 
             community_cols = cols("communities")
             if community_cols:
@@ -175,6 +194,8 @@ def run_migrations():
             reply_cols = cols("replies")
             if reply_cols and "parent_reply_id" not in reply_cols:
                 conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+            if reply_cols and "likely_ai" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN likely_ai BOOLEAN DEFAULT FALSE"))
 
             notif_cols = cols("notifications")
             if notif_cols and "kind" not in notif_cols:
@@ -202,11 +223,20 @@ def run_migrations():
 
 run_migrations()
 
+# DPDP retention: purge expired OTPs / auth tokens on boot (purpose completed).
+with SessionLocal() as _dpdp_db:
+    try:
+        data_protection.purge_ephemeral_personal_data(_dpdp_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("DPDP ephemeral purge on boot failed")
+
 # Cold-start density: official BarathX accounts + starter posts + communities.
 with SessionLocal() as _seed_db:
     try:
         seed.seed_official_accounts(_seed_db)
-    except Exception:  # noqa: BLE001 — never block API boot on seed
+    except Exception:  # noqa: BLE001, never block API boot on seed
         import logging
 
         logging.getLogger("baratx").exception("Official account seed failed")
@@ -250,9 +280,15 @@ with SessionLocal() as _seed_db:
         logging.getLogger("baratx").exception("Prompt refresh on boot failed")
 
 
-app = FastAPI(title="BarathX API", version="0.5.0")
-
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+
+app = FastAPI(
+    title="BarathX API",
+    version="0.5.0",
+    docs_url=None if ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if ENVIRONMENT == "production" else "/redoc",
+    openapi_url=None if ENVIRONMENT == "production" else "/openapi.json",
+)
 
 
 def mvp_version_info() -> dict:
@@ -304,9 +340,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def anti_scrape_middleware(request: Request, call_next):
+    """Block scraper UAs + throttle anonymous bulk reads on content APIs."""
+    blocked = anti_scrape.enforce_anti_scrape(request)
+    if blocked is not None:
+        return blocked
+    response = await call_next(request)
+    # Discourage AI trainers / indexers from caching API JSON.
+    path = request.url.path or ""
+    if anti_scrape.is_bulk_scrape_path(path):
+        response.headers.setdefault("X-Robots-Tag", "noindex, nofollow, noai, noimageai")
+    # Baseline hardening on every API response.
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=()",
+    )
+    return response
+
+
 BASE_DIR = media_store.BASE_DIR
 MEDIA_DIR = media_store.MEDIA_DIR
 os.makedirs(MEDIA_DIR, exist_ok=True)
+
+
+@app.get("/robots.txt")
+def robots_txt():
+    """API-host robots — refuse scrapers and AI training crawls."""
+    return Response(content=anti_scrape.robots_txt_body(), media_type="text/plain; charset=utf-8")
 
 
 @app.get("/media/{name}")
@@ -331,7 +396,7 @@ if not media_store.use_db_store() and not media_store.s3_enabled():
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 MAX_POST_LENGTH = 500
-MAX_REPLY_LENGTH = 220
+MAX_REPLY_LENGTH = 500
 MAX_AVATAR_BYTES = 3 * 1024 * 1024  # 3MB
 MAX_COVER_BYTES = 5 * 1024 * 1024  # 5MB
 
@@ -344,16 +409,14 @@ PASSWORD_RESET_TTL_HOURS = 1
 
 
 def _otp_response(code: str, sms_sent: bool = False) -> dict:
-    """Never leak OTP codes in production when SMS was actually sent."""
+    """Never leak OTP codes in production. Dev may include demo OTP when SMS is off."""
     body = {
         "message": "OTP sent" if (ENVIRONMENT == "production" or sms_sent) else "OTP generated (demo mode)",
         "expires_in_minutes": OTP_TTL_MINUTES,
         "sms_sent": sms_sent,
     }
-    if ENVIRONMENT != "production" or not sms_sent:
+    if ENVIRONMENT != "production" and not sms_sent:
         body["dev_otp"] = code
-    else:
-        print("[otp] generated for production request (not returned in response)")
     return body
 
 
@@ -363,10 +426,16 @@ def issue_otp(db: Session, phone: str, purpose: str) -> dict:
     except ValueError as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
 
+    if ENVIRONMENT == "production" and not sms.sms_configured():
+        raise HTTPException(
+            status_code=503,
+            detail="Phone OTP is not available right now. Sign in with Google or email.",
+        )
+
     code = auth.generate_otp()
     otp = models.OTP(
         phone=phone,
-        code=code,
+        code=auth.hash_otp(code),
         purpose=purpose,
         expires_at=datetime.now(timezone.utc) + timedelta(minutes=OTP_TTL_MINUTES),
     )
@@ -374,15 +443,14 @@ def issue_otp(db: Session, phone: str, purpose: str) -> dict:
     db.commit()
     sms_sent = sms.send_otp_sms(phone, code)
     if not sms_sent:
-        print(f"[otp] {purpose} for {phone}: {code} (SMS not sent)")
-        # MSG91 configured but send failed — don't silently fall back to leaking OTP in prod UI
-        if ENVIRONMENT == "production" and sms.sms_configured():
+        # Never log the OTP or full phone in production.
+        masked = phone[:4] + "…" if phone else "?"
+        print(f"[otp] {purpose} for {masked} (SMS not sent)")
+        if ENVIRONMENT == "production":
             raise HTTPException(
                 status_code=502,
                 detail="Could not send SMS OTP. Check the number and try again, or use Google/email.",
             )
-        if ENVIRONMENT == "production" and not sms.sms_configured():
-            print("[otp] WARNING: MSG91 not configured — returning demo OTP in response")
     return _otp_response(code, sms_sent=sms_sent)
 
 
@@ -416,15 +484,15 @@ def issue_email_verification(db: Session, user: models.User) -> tuple[bool, Opti
         sent, verify_url = email_service.send_verification_email(
             user.email, user.display_name, raw
         )
-    except Exception as exc:  # noqa: BLE001 — surface as soft failure; account still created
-        print(f"[email] failed to send verification to {user.email}: {exc}")
+    except Exception as exc:  # noqa: BLE001, surface as soft failure; account still created
+        print(f"[email] failed to send verification: {exc}")
         verify_url = email_service.build_verify_url(raw)
         sent = False
 
     dev_url = None
     if not sent and ENVIRONMENT != "production":
         dev_url = verify_url
-        print(f"[email] DEV verify URL for {user.email}: {verify_url}")
+        print(f"[email] DEV verify URL ready")
     return sent, dev_url
 
 
@@ -435,10 +503,14 @@ async def save_upload_image(image: UploadFile, max_bytes: int) -> str:
     contents = await image.read()
     if len(contents) > max_bytes:
         raise HTTPException(status_code=400, detail=f"Image must be {max_bytes // (1024 * 1024)}MB or smaller")
+    try:
+        sniffed = image_validate.assert_image_bytes(contents, image.content_type)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     return media_store.save_bytes(
         contents,
-        content_type=image.content_type or "application/octet-stream",
+        content_type=sniffed,
         filename=image.filename,
     )
 
@@ -451,12 +523,14 @@ def get_current_user(
     creds: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> models.User:
-    user_id = auth.decode_access_token(creds.credentials)
+    user_id, tv = auth.decode_access_token(creds.credentials)
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     user = db.query(models.User).filter(models.User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    if int(getattr(user, "token_version", 0) or 0) != int(tv or 0):
+        raise HTTPException(status_code=401, detail="Session expired, sign in again")
     return user
 
 
@@ -466,10 +540,15 @@ def get_current_user_optional(
 ) -> Optional[models.User]:
     if not creds:
         return None
-    user_id = auth.decode_access_token(creds.credentials)
+    user_id, tv = auth.decode_access_token(creds.credentials)
     if not user_id:
         return None
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        return None
+    if int(getattr(user, "token_version", 0) or 0) != int(tv or 0):
+        return None
+    return user
 
 
 def serialize_user(user: models.User, current_user: Optional[models.User]) -> schemas.UserOut:
@@ -486,8 +565,9 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         id=user.id,
         username=user.username,
         display_name=user.display_name,
-        email=user.email,
-        phone=user.phone,
+        # Never leak email/phone on public profiles, self only.
+        email=user.email if self_view else None,
+        phone=user.phone if self_view else None,
         language=user.language,
         theme=getattr(user, "theme", None) or "midnight",
         bio=user.bio,
@@ -496,7 +576,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         email_activity_enabled=bool(getattr(user, "email_activity_enabled", True)),
         badge=badge,
         is_official=is_official,
-        # Only expose on self — never leak owner status via profiles/followers.
+        # Only expose on self, never leak owner status via profiles/followers.
         is_ops_owner=owner_self,
         ops_console_path=ops_access.ops_console_path() if owner_self else None,
         created_at=user.created_at,
@@ -553,6 +633,11 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
 
     tags = text_parse.extract_hashtags(post.text)
     safe_text = text_parse.sanitize_user_text(post.text or "")
+    likely_ai = bool(getattr(post, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
+    mentions_me = False
+    if current_user and getattr(current_user, "username", None):
+        me = current_user.username.lower()
+        mentions_me = me in {m.lower() for m in text_parse.extract_mentions(safe_text)}
 
     return schemas.PostOut(
         id=post.id,
@@ -570,22 +655,54 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         hashtags=tags,
         debate_side=getattr(post, "debate_side", None),
         space_id=getattr(post, "space_id", None),
+        likely_ai=likely_ai,
+        mentions_me=mentions_me,
     )
 
+
+
+
+def require_verified_to_post(user: models.User) -> None:
+    """Email-password accounts must verify email before posting (phone/Google already verified)."""
+    if user.email and not user.is_email_verified and not user.is_phone_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Confirm your email before posting. Check your inbox or resend from Settings.",
+        )
+
+
+def enforce_human_take(user: models.User, text: str) -> bool:
+    """Reject hard AI slop; return likely_ai flag for softer hits. Official voices skip reject."""
+    score = ai_filter.score_ai_text(text)
+    is_official = bool(getattr(user, "is_official", False))
+    if score.reject and not is_official:
+        raise HTTPException(status_code=400, detail=ai_filter.AI_REJECT_DETAIL)
+    return bool(score.likely_ai) and not is_official
+
+
+def otp_matches(otp_row: models.OTP, code: str) -> bool:
+    """Accept bcrypt-hashed OTP (preferred) or legacy plaintext rows during rollout."""
+    stored = otp_row.code or ""
+    if stored.startswith("$2"):
+        return auth.verify_otp(code, stored)
+    return secrets.compare_digest(stored, code)
 
 def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) -> schemas.ReplyOut:
     liked_by_me = False
     if current_user:
         liked_by_me = any(like.user_id == current_user.id for like in reply.likes)
+    safe_text = text_parse.sanitize_user_text(reply.text or "")
+    likely_ai = bool(getattr(reply, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
     return schemas.ReplyOut(
         id=reply.id,
         post_id=reply.post_id,
-        text=text_parse.sanitize_user_text(reply.text or ""),
+        text=safe_text,
         created_at=reply.created_at,
         author=author_out(reply.author),
         like_count=len(reply.likes),
         liked_by_me=liked_by_me,
         parent_reply_id=getattr(reply, "parent_reply_id", None),
+        likely_ai=likely_ai,
     )
 
 
@@ -650,6 +767,105 @@ def hidden_author_ids(db: Session, current_user: Optional[models.User]) -> set[s
         for r in db.query(models.Mute.muted_id).filter(models.Mute.muter_id == current_user.id).all()
     }
     return blocked | blocked_by | muted
+
+
+def list_mention_feed(
+    db: Session,
+    *,
+    current_user: models.User,
+    limit: int,
+    before: Optional[str],
+) -> list[schemas.FeedItemOut]:
+    """Posts (and reply parents) where someone @tagged the current user."""
+    username = (current_user.username or "").strip().lower()
+    if not username:
+        return []
+
+    cursor = None
+    if before:
+        try:
+            cursor = datetime.fromisoformat(before)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid 'before' timestamp")
+
+    # Match @username with a non-username char (or end) after the handle.
+    pattern = f"%@{username}%"
+    hidden = hidden_author_ids(db, current_user)
+    post_ids: dict[str, datetime] = {}
+
+    post_q = db.query(models.Post).filter(models.Post.text.ilike(pattern))
+    if cursor is not None:
+        post_q = post_q.filter(models.Post.created_at < cursor)
+    for p in post_q.order_by(models.Post.created_at.desc()).limit(limit * 4).all():
+        if p.author_id in hidden or p.author_id == current_user.id:
+            continue
+        # Avoid false positives like @rahul catching @rahul99
+        mentioned = {m.lower() for m in text_parse.extract_mentions(p.text or "")}
+        if username not in mentioned:
+            continue
+        post_ids[p.id] = p.created_at
+
+    reply_q = db.query(models.Reply).filter(models.Reply.text.ilike(pattern))
+    if cursor is not None:
+        reply_q = reply_q.filter(models.Reply.created_at < cursor)
+    for r in reply_q.order_by(models.Reply.created_at.desc()).limit(limit * 4).all():
+        if r.author_id in hidden or r.author_id == current_user.id:
+            continue
+        mentioned = {m.lower() for m in text_parse.extract_mentions(r.text or "")}
+        if username not in mentioned:
+            continue
+        # Surface the parent post so Home can open the thread.
+        ts = r.created_at
+        prev = post_ids.get(r.post_id)
+        if prev is None or (ts and prev and ts > prev):
+            post_ids[r.post_id] = ts
+
+    # Also pick up mention notifications (covers edge cases / older rows).
+    notif_q = (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.recipient_id == current_user.id,
+            models.Notification.kind == "mention",
+            models.Notification.post_id.isnot(None),
+        )
+        .order_by(models.Notification.created_at.desc())
+        .limit(limit * 3)
+    )
+    if cursor is not None:
+        notif_q = notif_q.filter(models.Notification.created_at < cursor)
+    for n in notif_q.all():
+        if not n.post_id:
+            continue
+        ts = n.created_at
+        prev = post_ids.get(n.post_id)
+        if prev is None or (ts and prev and ts > prev):
+            post_ids[n.post_id] = ts
+
+    if not post_ids:
+        return []
+
+    ordered_ids = sorted(post_ids.keys(), key=lambda pid: post_ids[pid] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)[
+        :limit
+    ]
+    posts = (
+        db.query(models.Post)
+        .filter(models.Post.id.in_(ordered_ids))
+        .all()
+    )
+    by_id = {p.id: p for p in posts}
+    items: list[schemas.FeedItemOut] = []
+    for pid in ordered_ids:
+        post = by_id.get(pid)
+        if not post or post.author_id in hidden:
+            continue
+        items.append(
+            schemas.FeedItemOut(
+                post=serialize_post(post, current_user),
+                reposted_by=None,
+                item_time=post_ids.get(pid) or post.created_at,
+            )
+        )
+    return items
 
 
 def create_notification(
@@ -775,7 +991,7 @@ def health():
 
 @app.get("/ops/config", response_model=schemas.OpsConfigOut)
 def ops_config():
-    """Path only — needed so the SPA can route the secret URL.
+    """Path only, needed so the SPA can route the secret URL.
 
     Opening the console UI still requires an OPS owner login + ADMIN_SECRET unlock.
     """
@@ -784,7 +1000,16 @@ def ops_config():
 
 # ---------- Admin (password-protected signup insights) ----------
 
-def require_admin(x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret")):
+def require_admin(
+    request: Request,
+    x_admin_secret: Optional[str] = Header(None, alias="X-Admin-Secret"),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"admin:{rate_limit.client_ip(request)}", limit=60, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     if not ADMIN_SECRET:
         raise HTTPException(
             status_code=503,
@@ -870,6 +1095,21 @@ def get_suggestions(
     )
 
 
+@app.get("/trending", response_model=schemas.TrendingOut)
+def get_trending(
+    q: Optional[str] = None,
+    lane: Optional[str] = None,
+    limit: int = 8,
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """India-now topics + headlines for Explore (RSS-scored, taxonomy fallback)."""
+    from app import trending as trending_mod
+
+    _ = current_user  # optional auth; anti-scrape still applies
+    data = trending_mod.get_trending(q=q, lane=lane, limit=limit)
+    return schemas.TrendingOut(**data)
+
+
 @app.get("/admin/users", response_model=schemas.AdminUsersOut)
 def admin_users(
     limit: int = 50,
@@ -917,7 +1157,7 @@ def admin_delete_user(
     db: Session = Depends(get_db),
 ):
     """Remove a misleading / abusive account. Protected blue founders cannot be deleted.
-    Admins can act immediately — no queue wait. Auto-mod also deletes after repeated reports.
+    Admins can act immediately, no queue wait. Auto-mod also deletes after repeated reports.
     """
     from app.moderation import purge_user
 
@@ -1085,7 +1325,7 @@ def admin_recent_posts(
     _: bool = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    """Recent posts from community members — for welcoming new joiners with replies."""
+    """Recent posts from community members, for welcoming new joiners with replies."""
     limit = max(1, min(limit, 100))
     days = max(1, min(days, 30))
     official = set(seed.OFFICIAL_USERNAMES)
@@ -1123,6 +1363,7 @@ def admin_create_reply(
         author_id=author.id,
         text=text,
         parent_reply_id=None,
+        likely_ai=False,
     )
     db.add(reply)
     db.flush()
@@ -1226,15 +1467,27 @@ def _official_author(db: Session, username: str) -> models.User:
         )
     author = db.query(models.User).filter(models.User.username == username).first()
     if not author:
-        raise HTTPException(status_code=404, detail=f"@{username} not found — seed may not have run")
+        raise HTTPException(status_code=404, detail=f"@{username} not found, seed may not have run")
     return author
 
 
 # ---------- Email signup / login ----------
 
 @app.post("/auth/signup/email", response_model=schemas.TokenResponse)
-def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_db)):
-    if db.query(models.User).filter(models.User.email == payload.email).first():
+def signup_email(
+    payload: schemas.EmailSignupRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"signup:{rate_limit.client_ip(request)}", limit=8, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
+
+    email = str(payload.email).strip().lower()
+    if db.query(models.User).filter(models.User.email == email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
     if db.query(models.User).filter(models.User.username == payload.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
@@ -1242,11 +1495,14 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
     user = models.User(
         username=payload.username,
         display_name=payload.display_name,
-        email=payload.email,
+        email=email,
         password_hash=auth.hash_password(payload.password),
         is_email_verified=False,
         badge="none",
         is_official=False,
+        token_version=0,
+        privacy_accepted_at=datetime.now(timezone.utc),
+        privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
     )
     db.add(user)
     db.commit()
@@ -1257,7 +1513,7 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
 
     sent, dev_url = issue_email_verification(db, user)
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(
         access_token=token,
         email_verification_sent=sent,
@@ -1267,26 +1523,34 @@ def signup_email(payload: schemas.EmailSignupRequest, db: Session = Depends(get_
 
 @app.post("/auth/verify-email", response_model=schemas.MessageResponse)
 def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_db)):
+    raw = (payload.token or "").strip()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Missing verification token")
+
     row = (
         db.query(models.EmailVerificationToken)
-        .filter(
-            models.EmailVerificationToken.token == payload.token,
-            models.EmailVerificationToken.consumed == False,  # noqa: E712
-        )
+        .filter(models.EmailVerificationToken.token == raw)
         .first()
     )
     if not row:
         raise HTTPException(status_code=400, detail="Invalid or already used verification link")
 
+    user = db.query(models.User).filter(models.User.id == row.user_id).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="User not found")
+
+    # Idempotent: refresh / double-click / React remount after first success.
+    if row.consumed or user.is_email_verified:
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            db.commit()
+        return schemas.MessageResponse(message="Email confirmed. Your BarathX account is active.")
+
     expires = row.expires_at
     if expires.tzinfo is None:
         expires = expires.replace(tzinfo=timezone.utc)
     if expires < datetime.now(timezone.utc):
-        raise HTTPException(status_code=400, detail="Verification link expired — request a new one")
-
-    user = db.query(models.User).filter(models.User.id == row.user_id).first()
-    if not user:
-        raise HTTPException(status_code=400, detail="User not found")
+        raise HTTPException(status_code=400, detail="Verification link expired, request a new one")
 
     row.consumed = True
     user.is_email_verified = True
@@ -1336,15 +1600,25 @@ def resend_verification(
             detail="Email delivery is not configured yet. Try again later.",
         )
     return schemas.MessageResponse(
-        message="Email provider not configured — use the development verify link.",
+        message="Email provider not configured, use the development verify link.",
         email_verification_sent=False,
         dev_verify_url=dev_url,
     )
 
 
 @app.post("/auth/forgot-password", response_model=schemas.MessageResponse)
-def forgot_password(payload: schemas.ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(
+    payload: schemas.ForgotPasswordRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
     """Always returns a generic success message to avoid email enumeration."""
+    try:
+        rate_limit.check_rate_limit(
+            f"forgot:{rate_limit.client_ip(request)}", limit=5, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     generic = schemas.MessageResponse(
         message="If that email is registered, we sent a password reset link."
     )
@@ -1377,7 +1651,7 @@ def forgot_password(payload: schemas.ForgotPasswordRequest, db: Session = Depend
             user.email, user.display_name, raw
         )
     except Exception as exc:  # noqa: BLE001
-        print(f"[email] failed to send password reset to {user.email}: {exc}")
+        print(f"[email] failed to send password reset: {exc}")
         sent = False
         reset_url = email_service.build_reset_url(raw)
 
@@ -1389,7 +1663,7 @@ def forgot_password(payload: schemas.ForgotPasswordRequest, db: Session = Depend
             detail="Email delivery is not configured yet. Try again later.",
         )
     return schemas.MessageResponse(
-        message="Email provider not configured — use the development reset link.",
+        message="Email provider not configured, use the development reset link.",
         dev_reset_url=reset_url,
     )
 
@@ -1419,26 +1693,64 @@ def reset_password(payload: schemas.ResetPasswordRequest, db: Session = Depends(
 
     row.consumed = True
     user.password_hash = auth.hash_password(payload.password)
+    auth.bump_token_version(user)
     db.commit()
     return schemas.MessageResponse(message="Password updated. You can sign in with your new password.")
 
 
+@app.post("/auth/revoke-sessions", response_model=schemas.MessageResponse)
+def revoke_sessions(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Invalidate every JWT for this account (stolen-token / shared-device recovery)."""
+    auth.bump_token_version(current_user)
+    db.commit()
+    return schemas.MessageResponse(
+        message="All sessions signed out. Sign in again on devices you still use."
+    )
+
+
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)
-def login_email(payload: schemas.EmailLoginRequest, db: Session = Depends(get_db)):
+def login_email(
+    payload: schemas.EmailLoginRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"login:{rate_limit.client_ip(request)}", limit=20, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     ident = payload.email.strip()
     if "@" in ident:
-        user = db.query(models.User).filter(models.User.email == ident.lower()).first()
+        user = (
+            db.query(models.User)
+            .filter(func.lower(models.User.email) == ident.lower())
+            .first()
+        )
     else:
         user = db.query(models.User).filter(models.User.username == ident).first()
     if not user or not auth.verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect email/username or password")
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
 @app.post("/auth/google", response_model=schemas.TokenResponse)
-def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db)):
+def auth_google(
+    payload: schemas.GoogleAuthRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"google:{rate_limit.client_ip(request)}", limit=30, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     if not google_auth.google_configured():
         raise HTTPException(
             status_code=503,
@@ -1447,7 +1759,16 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
     try:
         claims = google_auth.verify_google_id_token(payload.id_token)
     except ValueError as exc:
-        raise HTTPException(status_code=401, detail=str(exc)) from exc
+        # Map common Google token failures to actionable copy (mobile aud mismatch, etc.).
+        msg = str(exc)
+        if "audience mismatch" in msg.lower():
+            msg = (
+                "Google sign-in misconfigured (client ID mismatch). "
+                "Use the web Google button on barathx.com, or update the app’s Google client IDs."
+            )
+        elif "not verified" in msg.lower():
+            msg = "That Google account’s email is not verified. Use another Google account or email signup."
+        raise HTTPException(status_code=401, detail=msg) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -1455,12 +1776,22 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
     display_name = (claims.get("name") or email.split("@")[0])[:50]
     picture = claims.get("picture")
 
-    user = db.query(models.User).filter(models.User.email == email).first()
+    # Case-insensitive match, legacy rows may have mixed-case emails.
+    user = (
+        db.query(models.User)
+        .filter(func.lower(models.User.email) == email)
+        .first()
+    )
     if not user:
         if not payload.confirm_age_18:
             raise HTTPException(
                 status_code=400,
                 detail="You must be 18 or older to join BarathX. Confirm your age to continue.",
+            )
+        if not payload.accept_privacy:
+            raise HTTPException(
+                status_code=400,
+                detail="New accounts must accept the Privacy Policy. Open Sign up, tick Privacy (DPDP), then continue with Google.",
             )
         base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
         username = base
@@ -1478,18 +1809,47 @@ def auth_google(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
             avatar_url=picture,
             badge="none",
             is_official=False,
+            token_version=0,
+            privacy_accepted_at=datetime.now(timezone.utc),
+            privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
         )
         db.add(user)
-        db.commit()
-        db.refresh(user)
-        seed.follow_official_accounts(db, user)
-        db.commit()
+        try:
+            db.commit()
+        except Exception:
+            # Race / case-variant duplicate, re-load and continue as login.
+            db.rollback()
+            user = (
+                db.query(models.User)
+                .filter(func.lower(models.User.email) == email)
+                .first()
+            )
+            if not user:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Could not create account with Google. Try email signup or try again.",
+                )
+        else:
+            db.refresh(user)
+            seed.follow_official_accounts(db, user)
+            db.commit()
     else:
+        # Google already proved mailbox ownership (email_verified claim), safe to
+        # mark verified and sign in (same as prior production behavior).
+        dirty = False
+        if user.email != email:
+            user.email = email
+            dirty = True
         if not user.is_email_verified:
             user.is_email_verified = True
+            dirty = True
+        if picture and not user.avatar_url:
+            user.avatar_url = picture
+            dirty = True
+        if dirty:
             db.commit()
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
@@ -1516,7 +1876,7 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         .order_by(models.OTP.created_at.desc())
         .first()
     )
-    if not otp_row or otp_row.code != payload.otp:
+    if not otp_row or not otp_matches(otp_row, payload.otp):
         raise HTTPException(status_code=400, detail="Invalid OTP")
     if otp_row.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="OTP expired, request a new one")
@@ -1536,6 +1896,8 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         is_phone_verified=True,
         badge="none",
         is_official=False,
+        privacy_accepted_at=datetime.now(timezone.utc),
+        privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
     )
     db.add(user)
     db.commit()
@@ -1544,15 +1906,24 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
     seed.follow_official_accounts(db, user)
     db.commit()
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
 @app.post("/auth/login/phone/request-otp")
 def login_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depends(get_db)):
+    """Do not reveal whether the phone is registered."""
     user = db.query(models.User).filter(models.User.phone == payload.phone).first()
     if not user:
-        raise HTTPException(status_code=404, detail="No account with this phone number")
+        try:
+            sms.check_otp_rate_limit(payload.phone)
+        except ValueError as exc:
+            raise HTTPException(status_code=429, detail=str(exc)) from exc
+        return {
+            "message": "OTP sent" if ENVIRONMENT == "production" else "OTP generated (demo mode)",
+            "expires_in_minutes": OTP_TTL_MINUTES,
+            "sms_sent": False,
+        }
     return issue_otp(db, payload.phone, "login")
 
 
@@ -1568,19 +1939,19 @@ def login_phone_verify(payload: schemas.PhoneLoginVerify, db: Session = Depends(
         .order_by(models.OTP.created_at.desc())
         .first()
     )
-    if not otp_row or otp_row.code != payload.otp:
+    if not otp_row or not otp_matches(otp_row, payload.otp):
         raise HTTPException(status_code=400, detail="Invalid OTP")
     if otp_row.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
         raise HTTPException(status_code=400, detail="OTP expired, request a new one")
 
     user = db.query(models.User).filter(models.User.phone == payload.phone).first()
     if not user:
-        raise HTTPException(status_code=404, detail="No account with this phone number")
+        raise HTTPException(status_code=400, detail="Invalid phone or OTP")
 
     otp_row.consumed = True
     db.commit()
 
-    token = auth.create_access_token(user.id)
+    token = auth.create_access_token(user.id, getattr(user, "token_version", 0))
     return schemas.TokenResponse(access_token=token)
 
 
@@ -1589,6 +1960,47 @@ def login_phone_verify(payload: schemas.PhoneLoginVerify, db: Session = Depends(
 @app.get("/users/me", response_model=schemas.UserOut)
 def get_me(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return serialize_user(current_user, current_user)
+
+
+@app.delete("/users/me", response_model=schemas.MessageResponse)
+def delete_my_account(
+    payload: schemas.DeleteAccountRequest,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """DPDP right to erasure — permanent account + personal data deletion."""
+    if current_user.username in set(seed.OFFICIAL_USERNAMES) or getattr(current_user, "is_official", False):
+        raise HTTPException(status_code=400, detail="Official accounts cannot be self-deleted")
+    uid = current_user.id
+    phone = current_user.phone
+    delete_media_file(current_user.avatar_url)
+    delete_media_file(current_user.cover_url)
+    data_protection.erase_user_auth_artefacts(db, uid)
+    if phone:
+        db.query(models.OTP).filter(models.OTP.phone == phone).delete(synchronize_session=False)
+    # Soft-clear PII then remove user row (cascades posts/likes via relationships where configured).
+    current_user.email = None
+    current_user.phone = None
+    current_user.display_name = "Deleted"
+    current_user.bio = ""
+    current_user.avatar_url = None
+    current_user.cover_url = None
+    auth.bump_token_version(current_user)
+    db.commit()
+    user = db.query(models.User).filter(models.User.id == uid).first()
+    if user:
+        db.delete(user)
+        db.commit()
+    return schemas.MessageResponse(message="Your BarathX account and personal data have been deleted.")
+
+
+@app.get("/users/me/data-export")
+def export_my_data(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """DPDP right to access — download a copy of your personal data."""
+    return data_protection.build_personal_data_export(db, current_user)
 
 
 @app.post("/users/me/bootstrap-follows", response_model=schemas.MessageResponse)
@@ -1702,7 +2114,7 @@ def set_user_badge(
                 detail="Only gold accounts can be promoted to blue. Grant gold first.",
             )
     elif new_badge == "gold":
-        # From none (grant) or from blue (demote for security) — both allowed.
+        # From none (grant) or from blue (demote for security), both allowed.
         if current not in ("none", "blue"):
             raise HTTPException(status_code=400, detail="Cannot set gold from this status")
     elif new_badge == "none":
@@ -1714,7 +2126,7 @@ def set_user_badge(
 
     seed._apply_badge(target, new_badge)
 
-    # Optional in-app notification — never block the badge change if notify fails.
+    # Optional in-app notification, never block the badge change if notify fails.
     if payload.notify:
         try:
             if current == "blue" and new_badge == "gold":
@@ -1977,11 +2389,19 @@ async def create_post(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_verified_to_post(current_user)
     text = text_parse.sanitize_user_text(text).strip()
     if not text:
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
     if len(text) > MAX_POST_LENGTH:
         raise HTTPException(status_code=400, detail=f"Post must be {MAX_POST_LENGTH} characters or fewer")
+    try:
+        from app.moderation import assert_safe_public_text
+
+        assert_safe_public_text(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    likely_ai = enforce_human_take(current_user, text)
 
     quoted_post_id = None
     if quote_post_id:
@@ -1998,10 +2418,14 @@ async def create_post(
         contents = await image.read()
         if len(contents) > MAX_IMAGE_BYTES:
             raise HTTPException(status_code=400, detail="Image must be 5MB or smaller")
+        try:
+            sniffed = image_validate.assert_image_bytes(contents, image.content_type)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
         image_url = media_store.save_bytes(
             contents,
-            content_type=image.content_type or "application/octet-stream",
+            content_type=sniffed,
             filename=image.filename,
         )
 
@@ -2010,6 +2434,7 @@ async def create_post(
         text=text,
         image_url=image_url,
         quoted_post_id=quoted_post_id,
+        likely_ai=likely_ai,
     )
     # Lifetime welcome: fire once per account even if every post is later deleted.
     is_first_post = not bool(getattr(current_user, "has_posted_once", False))
@@ -2039,7 +2464,7 @@ async def create_post(
         logging.getLogger("baratx").exception("Official engage on create_post failed")
 
     # Alert @baratx + @sharath when a community member posts (so Alerts isn't empty for ops).
-    # Only skip seeded platform accounts — blue/gold badge members still notify.
+    # Only skip seeded platform accounts, blue/gold badge members still notify.
     if current_user.username not in set(seed.OFFICIAL_USERNAMES):
         officials = (
             db.query(models.User)
@@ -2091,7 +2516,7 @@ async def create_post(
         if awarded:
             founding_awarded = True
             founding_status = awarded.status
-            founding_message = "Floor cleared — you're on Founding 100. India rates next."
+            founding_message = "Floor cleared, you're on Founding 100. India rates next."
         else:
             existing = rewards.my_reward(db, current_user.id)
             if existing:
@@ -2100,11 +2525,11 @@ async def create_post(
             elif getattr(current_user, "is_official", False) or (
                 (getattr(current_user, "badge", None) or "").lower() == "blue"
             ):
-                founding_message = "Official/blue accounts aren't eligible for Founding 100 — post still published."
+                founding_message = "Official/blue accounts aren't eligible for Founding 100, post still published."
             elif rewards.slots_remaining(db) <= 0:
-                founding_message = "Founding 100 is full — post still published."
+                founding_message = "Founding 100 is full, post still published."
             else:
-                founding_message = "Could not claim Founding 100 floor — post still published."
+                founding_message = "Could not claim Founding 100 floor, post still published."
 
     db.commit()
     db.refresh(post)
@@ -2126,11 +2551,22 @@ async def create_post(
 def list_posts(
     limit: int = 20,
     before: Optional[str] = None,  # ISO timestamp cursor for pagination
-    feed: str = "global",  # "global" | "following"
+    feed: str = "global",  # "global" | "following" | "mentions"
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
     limit = max(1, min(limit, 50))
+
+    # Mentions / @tags: always show on Home even if you don't follow the author.
+    if feed == "mentions":
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Log in to see posts that tagged you")
+        return list_mention_feed(
+            db,
+            current_user=current_user,
+            limit=limit,
+            before=before,
+        )
 
     author_filter_ids = None
     if feed == "following":
@@ -2176,7 +2612,7 @@ def list_posts(
         post_query = post_query.filter(models.Post.created_at < cursor)
         repost_query = repost_query.filter(models.Repost.created_at < cursor)
 
-    # pull a generous window from each side, then merge + trim — good enough at demo scale
+    # pull a generous window from each side, then merge + trim, good enough at demo scale
     # For You (global): over-fetch so community takes aren't buried under digest flood.
     window = limit * (8 if feed == "global" else 3)
     posts = post_query.limit(window).all()
@@ -2204,18 +2640,44 @@ def list_posts(
         )
 
     if feed == "global":
-        # Square "For you": real member takes first (including blue/gold badges),
-        # then seeded official digest accounts — follow not required.
+        # Pull recent @tags into For you so tagged posts aren’t missed.
+        if current_user and not before:
+            seen_ids = {i.post.id for i in items}
+            for mention_item in list_mention_feed(
+                db, current_user=current_user, limit=min(10, limit), before=None
+            ):
+                if mention_item.post.id in seen_ids:
+                    # Ensure mentions_me is set even if the post was already in the window.
+                    mention_item.post.mentions_me = True
+                    for existing in items:
+                        if existing.post.id == mention_item.post.id:
+                            existing.post.mentions_me = True
+                            break
+                    continue
+                mention_item.post.mentions_me = True
+                items.append(mention_item)
+                seen_ids.add(mention_item.post.id)
+
+        # Square "For you": tagged posts first, then member takes, then official digests.
+        # Within each band, human takes beat likely-AI drafts.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
             uname = (getattr(author, "username", None) or "").lower() if author else ""
             is_seed_official = uname in official_names
+            is_ai = bool(getattr(i.post, "likely_ai", False))
+            tagged = bool(getattr(i.post, "mentions_me", False))
             ts = i.item_time.timestamp() if i.item_time else 0.0
-            return (1 if is_seed_official else 0, -ts)
+            return (0 if tagged else 1, 1 if is_seed_official else 0, 1 if is_ai else 0, -ts)
 
         items.sort(key=_sort_key)
     else:
-        items.sort(key=lambda i: i.item_time, reverse=True)
+        items.sort(
+            key=lambda i: (
+                0 if getattr(i.post, "mentions_me", False) else 1,
+                1 if getattr(i.post, "likely_ai", False) else 0,
+                -(i.item_time.timestamp() if i.item_time else 0.0),
+            )
+        )
     return items[:limit]
 
 
@@ -2251,7 +2713,7 @@ def delete_post(
         for r in db.query(models.Reply.id).filter(models.Reply.post_id == post_id).all()
     ]
 
-    # Explicit cleanup — Postgres enforces FKs that SQLite often skips.
+    # Explicit cleanup. Postgres enforces FKs that SQLite often skips.
     db.query(models.Notification).filter(models.Notification.post_id == post_id).delete(
         synchronize_session=False
     )
@@ -2287,7 +2749,7 @@ def delete_post(
         {models.Post.quoted_post_id: None}, synchronize_session=False
     )
 
-    # Reward FKs — null founding links; drop race rows that point at this post.
+    # Reward FKs, null founding links; drop race rows that point at this post.
     if hasattr(models, "FoundingReward"):
         db.query(models.FoundingReward).filter(
             models.FoundingReward.qualifying_post_id == post_id
@@ -2450,6 +2912,7 @@ def create_reply(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    require_verified_to_post(current_user)
     post = db.query(models.Post).filter(models.Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -2459,6 +2922,13 @@ def create_reply(
         raise HTTPException(status_code=400, detail="Reply text cannot be empty")
     if len(text) > MAX_REPLY_LENGTH:
         raise HTTPException(status_code=400, detail=f"Reply must be {MAX_REPLY_LENGTH} characters or fewer")
+    try:
+        from app.moderation import assert_safe_public_text
+
+        assert_safe_public_text(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    likely_ai = enforce_human_take(current_user, text)
 
     parent_reply_id = payload.parent_reply_id
     if parent_reply_id:
@@ -2471,6 +2941,7 @@ def create_reply(
         author_id=current_user.id,
         text=text,
         parent_reply_id=parent_reply_id,
+        likely_ai=likely_ai,
     )
     db.add(reply)
     db.flush()
@@ -2487,7 +2958,7 @@ def create_reply(
     notified.add(post.author_id)
     if parent_reply_id:
         parent = db.query(models.Reply).filter(models.Reply.id == parent_reply_id).first()
-        # One email only — skip if parent author already got the post-owner notify.
+        # One email only, skip if parent author already got the post-owner notify.
         if parent and parent.author_id not in notified:
             create_notification(
                 db,
@@ -2528,7 +2999,15 @@ def list_replies(
         .order_by(models.Reply.created_at.asc())
         .all()
     )
-    return [serialize_reply(r, current_user) for r in replies]
+    # Human replies first; flagged AI drafts sink to the bottom (still visible).
+    serialized = [serialize_reply(r, current_user) for r in replies]
+    serialized.sort(
+        key=lambda r: (
+            1 if r.likely_ai else 0,
+            r.created_at.timestamp() if r.created_at else 0.0,
+        )
+    )
+    return serialized
 
 
 # ---------- Reply likes ----------
@@ -2587,22 +3066,149 @@ def search(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    q = q.strip()
-    if not q:
-        return schemas.SearchResults(users=[], posts=[])
+    """Explore search: people, posts, hashtags, and topic/arena homes."""
+    variants = search_query.search_variants(q)
+    if not variants:
+        return schemas.SearchResults(users=[], posts=[], topics=[], arenas=[])
 
-    like_pattern = f"%{q}%"
+    # Escape LIKE wildcards; SQLite + Postgres both accept ESCAPE '\\'.
+    likes = [search_query.like_pattern(v) for v in variants]
+    user_filters = []
+    post_text_filters = []
+    hashtag_filters = []
+    topic_filters = []
+    community_filters = []
+    space_title_filters = []
+    for like in likes:
+        user_filters.extend(
+            [
+                models.User.username.ilike(like, escape="\\"),
+                models.User.display_name.ilike(like, escape="\\"),
+                models.User.bio.ilike(like, escape="\\"),
+            ]
+        )
+        post_text_filters.append(models.Post.text.ilike(like, escape="\\"))
+        hashtag_filters.append(models.Hashtag.tag.ilike(like, escape="\\"))
+        topic_filters.extend(
+            [
+                models.Topic.name.ilike(like, escape="\\"),
+                models.Topic.key.ilike(like, escape="\\"),
+            ]
+        )
+        community_filters.extend(
+            [
+                models.Community.name.ilike(like, escape="\\"),
+                models.Community.slug.ilike(like, escape="\\"),
+                models.Community.arena_key.ilike(like, escape="\\"),
+            ]
+        )
+        space_title_filters.append(models.Space.title.ilike(like, escape="\\"))
 
     users = (
         db.query(models.User)
-        .filter(or_(models.User.username.ilike(like_pattern), models.User.display_name.ilike(like_pattern)))
+        .filter(or_(*user_filters))
         .limit(20)
         .all()
     )
 
+    topic_rows = (
+        db.query(models.Topic)
+        .filter(or_(*topic_filters))
+        .limit(12)
+        .all()
+    )
+    # Dedupe by (arena_key, key) keeping first
+    seen_topics: set[tuple[str, str]] = set()
+    topics_out: list[schemas.TopicSearchOut] = []
+    topic_ids: list[str] = []
+    for t in topic_rows:
+        pair = (t.arena_key, t.key)
+        if pair in seen_topics:
+            continue
+        seen_topics.add(pair)
+        topic_ids.append(t.id)
+        topics_out.append(
+            schemas.TopicSearchOut(
+                id=t.id,
+                key=t.key,
+                name=t.name,
+                arena_key=t.arena_key,
+                blurb=t.blurb or "",
+            )
+        )
+
+    community_rows = (
+        db.query(models.Community)
+        .filter(or_(*community_filters))
+        .limit(12)
+        .all()
+    )
+    arenas_out: list[schemas.ArenaSearchOut] = []
+    community_ids: list[str] = []
+    seen_arenas: set[str] = set()
+    for c in community_rows:
+        community_ids.append(c.id)
+        key = (c.arena_key or c.slug or "").strip()
+        if not key or key in seen_arenas:
+            continue
+        if not c.is_arena and not c.arena_key:
+            continue
+        seen_arenas.add(key)
+        arenas_out.append(
+            schemas.ArenaSearchOut(
+                key=key,
+                name=c.name,
+                slug=c.slug,
+            )
+        )
+
+    # Posts matching body text OR linked hashtags OR topic/arena spaces OR debate titles.
+    matching_hashtag_ids = [
+        row.id
+        for row in db.query(models.Hashtag.id).filter(or_(*hashtag_filters)).limit(40).all()
+    ]
+    hashtag_post_ids = []
+    if matching_hashtag_ids:
+        hashtag_post_ids = [
+            row.post_id
+            for row in (
+                db.query(models.PostHashtag.post_id)
+                .filter(models.PostHashtag.hashtag_id.in_(matching_hashtag_ids))
+                .limit(80)
+                .all()
+            )
+        ]
+
+    topic_space_ids = []
+    if topic_ids:
+        topic_space_ids = [
+            row.id
+            for row in (
+                db.query(models.Space.id)
+                .filter(models.Space.topic_id.in_(topic_ids))
+                .limit(80)
+                .all()
+            )
+        ]
+
+    titled_space_ids = [
+        row.id
+        for row in db.query(models.Space.id).filter(or_(*space_title_filters)).limit(40).all()
+    ]
+
+    post_filters = list(post_text_filters)
+    if hashtag_post_ids:
+        post_filters.append(models.Post.id.in_(hashtag_post_ids))
+    if topic_space_ids:
+        post_filters.append(models.Post.space_id.in_(topic_space_ids))
+    if titled_space_ids:
+        post_filters.append(models.Post.space_id.in_(titled_space_ids))
+    if community_ids:
+        post_filters.append(models.Post.community_id.in_(community_ids))
+
     posts = (
         db.query(models.Post)
-        .filter(models.Post.text.ilike(like_pattern))
+        .filter(or_(*post_filters))
         .order_by(models.Post.created_at.desc())
         .limit(30)
         .all()
@@ -2625,6 +3231,8 @@ def search(
             for u in users
         ],
         posts=[serialize_post(p, current_user) for p in posts],
+        topics=topics_out,
+        arenas=arenas_out,
     )
 
 
@@ -2727,7 +3335,7 @@ def admin_daily_digest(
     db: Session = Depends(get_db),
 ):
     """Run a peak digest slot (morning/midday/evening): @baratx glimpse + @sharath take,
-    cross-replies, and mutual likes — credible news sources only.
+    cross-replies, and mutual likes, credible news sources only.
     """
     from app import daily_digest
 
@@ -2759,7 +3367,7 @@ def founding_status(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    """Quiet Founding 100 status — slots left + whether this user already earned."""
+    """Quiet Founding 100 status, slots left + whether this user already earned."""
     return rewards.status_payload(db, current_user)
 
 
@@ -2768,7 +3376,7 @@ def race_status(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    """Biweekly Square Race — highest likes win ₹150–₹500."""
+    """Biweekly Square Race, highest likes win ₹150–₹500."""
     data = rewards.race_status_for_user(db, current_user)
     return schemas.RaceStatusOut(**data)
 
@@ -3014,7 +3622,7 @@ except Exception:  # noqa: BLE001
 
     logging.getLogger("baratx").exception("Instagram scheduler failed to start")
 
-# Always-on was twin-bot replies — now OFF unless ENABLE_OFFICIAL_ENGAGE=1
+# Always-on was twin-bot replies, now OFF unless ENABLE_OFFICIAL_ENGAGE=1
 try:
     from app import engagement_replies
 
@@ -3025,7 +3633,7 @@ except Exception:  # noqa: BLE001
     logging.getLogger("baratx").exception("Official engage scheduler failed to start")
 
 
-# Optional SPA (built into Docker as /app/frontend_dist) — same-origin Square UI on Railway.
+# Optional SPA (built into Docker as /app/frontend_dist), same-origin Square UI on Railway.
 _FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend_dist"
 
 

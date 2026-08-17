@@ -1,9 +1,6 @@
-# Live product carousel (BarathX)
+# live-product
 
-Built from **live** https://barathx.com screenshots (2026-08-12).
-
-- Brand spelling on every slide: **BarathX** (never BaratX / BharathX)
-- Screens: landing, Square feed, Arenas, login, signup, menu
-- Do not reuse old `brand/carousel/export` plain pack
-
-Publisher points here via `brand/ig/carousel/live-product`.
+BarathX IG carousel pack — product UI + crisp dark/saffron type.
+Brand spelling: **BarathX** only.
+Each daily pack (signup-excite / how-it-works / launch-pain) uses a distinct layout family so posts never look like the same carousel.
+Regenerate: `python3 brand/ig/render_product_carousels.py`

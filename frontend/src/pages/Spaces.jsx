@@ -9,7 +9,7 @@ import { useT } from "../context/LocaleContext";
 
 const SUGGESTED_DEBATES = [
   "Should WFH stay the default in India tech?",
-  "Kohli or Rohit — who carries big games?",
+  "Kohli or Rohit, who carries big games?",
   "One civic problem your city still ignores",
   "Is hustle culture burning junior talent?",
 ];

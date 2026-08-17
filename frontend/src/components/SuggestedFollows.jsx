@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../context/AuthContext";
 import Avatar from "./Avatar";
@@ -9,35 +9,42 @@ export const SUGGESTED_PEOPLE = [
   {
     display_name: "BarathX",
     username: "baratx",
-    blurb: "Official blue — product updates & India conversation prompts",
+    blurb: "Official blue, product updates & India conversation prompts",
     badge: "blue",
   },
   {
     display_name: "Sharath",
     username: "sharath",
-    blurb: "Founder — building India’s public square",
+    blurb: "Founder, building India’s public square",
     badge: "blue",
   },
   {
     display_name: "Bharat Voices",
     username: "bharatvoices",
-    blurb: "Gold BarathX — culture, ideas, everyday India",
+    blurb: "Gold BarathX, culture, ideas, everyday India",
     badge: "gold",
   },
   {
     display_name: "India Tech Daily",
     username: "indiatech",
-    blurb: "Gold BarathX — startups, policy & builders",
+    blurb: "Gold BarathX, startups, policy & builders",
     badge: "gold",
   },
 ];
 
 /**
- * Who-to-follow list with Follow buttons — shown on mobile feed/search
+ * Who-to-follow list with Follow buttons, shown on mobile feed/search
  * (right rail is desktop-only).
  */
-export default function SuggestedFollows({ title = "Who to follow", note, dismissible = false }) {
+export default function SuggestedFollows({
+  title = "Who to follow",
+  note,
+  dismissible = false,
+  onExplorePeople,
+}) {
   const { token, user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [following, setFollowing] = useState({});
   const [busy, setBusy] = useState("");
   const [hidden, setHidden] = useState(
@@ -75,11 +82,10 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
     setBusy("__all__");
     setError("");
     try {
-      const res = await api.bootstrapFollows(token);
+      await api.bootstrapFollows(token);
       const next = {};
       for (const p of people) next[p.username] = true;
       setFollowing((prev) => ({ ...prev, ...next }));
-      if (res.message) setError(""); // clear
     } catch (err) {
       setError(err.message || "Could not follow accounts");
     } finally {
@@ -90,6 +96,22 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
   function dismiss() {
     localStorage.setItem("bx_hide_suggested", "1");
     setHidden(true);
+  }
+
+  function handleExplorePeople(e) {
+    // Already on Explore: don't no-op to /search — focus search / load people.
+    if (typeof onExplorePeople === "function") {
+      e.preventDefault();
+      onExplorePeople();
+      return;
+    }
+    if (location.pathname === "/search") {
+      e.preventDefault();
+      navigate("/search?q=india");
+      window.setTimeout(() => {
+        document.querySelector(".plaza-search-form input, .search-form input")?.focus?.();
+      }, 50);
+    }
   }
 
   return (
@@ -111,13 +133,18 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
           const isFollowing = !!following[person.username];
           return (
             <li key={person.username} className="suggested-follows-row">
-              <Link to={`/u/${encodeURIComponent(person.username)}`} className="suggested-follows-person">
+              <Link
+                to={`/u/${encodeURIComponent(person.username)}`}
+                className="suggested-follows-person"
+              >
                 <Avatar name={person.display_name} username={person.username} size={40} />
                 <div className="suggested-follows-info">
                   <div className={badgeNameClass(person, "suggested-follows-name")}>
                     {person.display_name}
                   </div>
-                  <div className={badgeNameClass(person, "suggested-follows-username")}>@{person.username}</div>
+                  <div className={badgeNameClass(person, "suggested-follows-username")}>
+                    @{person.username}
+                  </div>
                   {person.blurb ? <div className="suggested-follows-blurb">{person.blurb}</div> : null}
                 </div>
               </Link>
@@ -125,7 +152,11 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
                 type="button"
                 className={`follow-btn suggested-follow-btn${isFollowing ? " following" : ""}`}
                 disabled={busy === person.username || busy === "__all__"}
-                onClick={() => toggleFollow(person.username)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleFollow(person.username);
+                }}
               >
                 {busy === person.username ? "…" : isFollowing ? "Following" : "Follow"}
               </button>
@@ -143,7 +174,11 @@ export default function SuggestedFollows({ title = "Who to follow", note, dismis
         >
           {busy === "__all__" ? "Following…" : "Follow all official"}
         </button>
-        <Link to="/search" className="rail-card-more suggested-explore">
+        <Link
+          to="/search?q=india"
+          className="rail-card-more suggested-explore"
+          onClick={handleExplorePeople}
+        >
           Explore people
         </Link>
       </div>

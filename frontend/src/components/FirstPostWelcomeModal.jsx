@@ -61,7 +61,7 @@ export default function FirstPostWelcomeModal({ open, onShowWhere, onWriteHere, 
 
         <div className="first-post-welcome-body">
           <p className="first-post-welcome-lead">
-            Welcome to BarathX — India&apos;s public square. Your first post goes in{" "}
+            Welcome to BarathX. India&apos;s public square. Your first post goes in{" "}
             <strong>The Square</strong>: the compose box at the top of the home feed.
           </p>
 
@@ -82,7 +82,7 @@ export default function FirstPostWelcomeModal({ open, onShowWhere, onWriteHere, 
                 take
               </li>
               <li>
-                A <strong>surprise gift</strong> — details revealed later
+                A <strong>surprise gift</strong>, details revealed later
               </li>
             </ul>
             <p className="first-post-welcome-tc">

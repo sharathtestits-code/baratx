@@ -1,8 +1,8 @@
 """
-Official first replies — @baratx + @sharath.
+Official first replies, @baratx + @sharath.
 
 Rules (anti-slop):
-- Read the post. Answer *that* post — not a recycled “say more / uncomfortable detail” line.
+- Read the post. Answer *that* post, not a recycled “say more / uncomfortable detail” line.
 - Every community post gets BOTH @baratx and @sharath (two distinct human voices).
 - Feedback → “we’ve taken it / next release” + follow IG/X/WhatsApp for what’s shipping.
 - Bug / product reports → support tone (“where are you seeing that?”), never philosophy.
@@ -49,7 +49,7 @@ def engage_disabled() -> bool:
         return False
     return True
 
-# Phrases from the old template bot — used to purge + never regenerate.
+# Phrases from the old template bot, used to purge + never regenerate.
 SLOP_PHRASES = (
     "almost deleted",
     "uncomfortable detail",
@@ -62,9 +62,9 @@ SLOP_PHRASES = (
     "who disagrees with you hardest",
     "next sentence you didn’t type",
     "next sentence you didn't type",
-    "real take — what’s the version from your city",
+    "real take, what’s the version from your city",
     "real take - what's the version from your city",
-    "who should disagree with this — the vibe",
+    "who should disagree with this, the vibe",
     "drop one real take from your city",
     "i’ll read the replies",
     "stick around and pick a side",
@@ -210,15 +210,15 @@ def _welcome_baratx(username: str, post_text: str) -> str:
         return _engage_feedback(username, post_text, voice="baratx")
     if topic == "support":
         return _clip(
-            f"Hey {who} — thanks for flagging this. Where are you seeing it (Live room, phone/desktop), "
+            f"Hey {who}, thanks for flagging this. Where are you seeing it (Live room, phone/desktop), "
             f"and did unmute ask for mic permission?"
         )
     variants = [
-        f"Hey {who} — welcome. What’s your city?",
-        f"Welcome {who}. Glad you’re here — what’s one thing you want this square to stay honest about?",
+        f"Hey {who}, welcome. What’s your city?",
+        f"Welcome {who}. Glad you’re here, what’s one thing you want this square to stay honest about?",
     ]
     if bit and topic != "short":
-        variants.append(f"Welcome {who}. Caught “{bit}” — curious what you meant by that.")
+        variants.append(f"Welcome {who}. Caught “{bit}”, curious what you meant by that.")
     return _clip(random.choice(variants))
 
 
@@ -229,63 +229,63 @@ def _welcome_sharath(username: str, post_text: str) -> str:
         return _engage_feedback(username, post_text, voice="sharath")
     if topic == "support":
         return _clip(
-            f"Hey {who}, Sharath here — sorry that’s broken for you. Browser + phone or laptop? "
+            f"Hey {who}, Sharath here, sorry that’s broken for you. Browser + phone or laptop? "
             f"I’ll dig if you drop one more detail."
         )
     variants = [
-        f"Hey {who} — Sharath. Welcome. Tell me your city.",
-        f"{who} welcome. Write like you talk — that’s the whole point here.",
+        f"Hey {who}. Sharath. Welcome. Tell me your city.",
+        f"{who} welcome. Write like you talk, that’s the whole point here.",
     ]
     return _clip(random.choice(variants))
 
 
 def _engage_feedback(username: str, post_text: str, *, voice: str) -> str:
-    """Product feedback — acknowledge + next release + where to follow shipping notes."""
+    """Product feedback, acknowledge + next release + where to follow shipping notes."""
     who = _handle(username)
     if voice == "sharath":
         pool = [
-            f"{who} Sharath here — logged. Follow what we’re shipping: IG & X @getbaratx · "
+            f"{who} Sharath here, logged. Follow what we’re shipping: IG & X @getbaratx · "
             f"WhatsApp community via barathx.com",
-            f"Got it {who}. Stay close for the next release — @getbaratx on IG/X + WhatsApp on barathx.com",
+            f"Got it {who}. Stay close for the next release, @getbaratx on IG/X + WhatsApp on barathx.com",
         ]
     else:
         pool = [
-            f"Hey {who} — we’ve taken your feedback. We’ll fix this in the next release. Thank you.",
-            f"Thanks {who}. Feedback noted — targeting a fix in the next release. Appreciate you posting it.",
+            f"Hey {who}, we’ve taken your feedback. We’ll fix this in the next release. Thank you.",
+            f"Thanks {who}. Feedback noted, targeting a fix in the next release. Appreciate you posting it.",
         ]
     return _clip(random.choice(pool))
 
 
 def _engage_support(username: str, post_text: str, *, voice: str) -> str:
-    """Product / bug reports — sound like a person on support, not a growth bot."""
+    """Product / bug reports, sound like a person on support, not a growth bot."""
     who = _handle(username)
     low = (post_text or "").lower()
     bit = _snippet(post_text, 8) or "that"
     if any(k in low for k in ("audio", "mic", "unmute", "sound", "hear", "speaker")):
         pool = [
-            f"Hey {who} — audio’s dead for you too? Live room or somewhere else, and mic permission on?",
+            f"Hey {who}, audio’s dead for you too? Live room or somewhere else, and mic permission on?",
             f"{who} ugh, that’s annoying. After you hit Unmute, does the browser ask for mic? "
             f"What device are you on?",
-            f"Got it {who} — “{bit}”. Can you hear others, or is it both ways? Phone or desktop?",
+            f"Got it {who}, “{bit}”. Can you hear others, or is it both ways? Phone or desktop?",
         ]
     elif any(k in low for k in ("video", "camera")):
         pool = [
-            f"Hey {who} — camera acting up? Did the browser block camera permission, or is the button grey?",
+            f"Hey {who}, camera acting up? Did the browser block camera permission, or is the button grey?",
             f"{who} on video: phone or laptop, and Chrome/Safari? I’ll try to reproduce.",
         ]
     elif any(k in low for k in ("crash", "freeze", "lag", "error", "bug", "glitch", "broken", "not working", "not coming")):
         pool = [
-            f"Hey {who} — sorry that’s busted. What were you doing right before it happened?",
-            f"{who} thanks for the report. Phone/desktop + roughly when — so we can chase it.",
+            f"Hey {who}, sorry that’s busted. What were you doing right before it happened?",
+            f"{who} thanks for the report. Phone/desktop + roughly when, so we can chase it.",
         ]
     else:
         pool = [
-            f"Hey {who} — sounds like something’s off. What exactly are you stuck on?",
-            f"{who} got it. One more detail so we can fix it — screen + what you tapped?",
+            f"Hey {who}, sounds like something’s off. What exactly are you stuck on?",
+            f"{who} got it. One more detail so we can fix it, screen + what you tapped?",
         ]
     if voice == "sharath":
         pool.append(
-            f"{who} Sharath here — yeah that’s not okay. Drop device + step and I’ll look."
+            f"{who} Sharath here, yeah that’s not okay. Drop device + step and I’ll look."
         )
     return _clip(random.choice(pool))
 
@@ -294,12 +294,12 @@ def _engage_short(username: str, post_text: str, *, voice: str) -> str:
     who = _handle(username)
     bit = _snippet(post_text, 10) or "that"
     pool = [
-        f"Hey {who} — what do you mean by “{bit}”? Where are you seeing it?",
-        f"{who} got your note. Can you add one line — what broke / what you expected?",
+        f"Hey {who}, what do you mean by “{bit}”? Where are you seeing it?",
+        f"{who} got your note. Can you add one line, what broke / what you expected?",
         f"Hmm {who}, thin on detail. Phone or desktop, and which screen?",
     ]
     if voice == "sharath":
-        pool.append(f"{who} say more in plain words — what happened?")
+        pool.append(f"{who} say more in plain words, what happened?")
     return _clip(random.choice(pool))
 
 
@@ -316,11 +316,11 @@ def _engage_baratx(username: str, post_text: str) -> str:
 
     by_topic = {
         "geopolitics": [
-            f"{who} geopolitics is loud — what’s the India stake in that story?",
-            f"Okay {who}. Neighbour, trade, or great-power game — which lens are you using?",
+            f"{who} geopolitics is loud, what’s the India stake in that story?",
+            f"Okay {who}. Neighbour, trade, or great-power game, which lens are you using?",
         ],
         "reels_speed": [
-            f"{who} reels vs a real argument — which one do you trust more with your own time?",
+            f"{who} reels vs a real argument, which one do you trust more with your own time?",
             f"Ha {who}. Do you still finish thoughts, or has the feed trained that out?",
         ],
         "genz": [
@@ -329,26 +329,26 @@ def _engage_baratx(username: str, post_text: str) -> str:
         ],
         "startup": [
             f"{who} what’s the boring part of that idea that usually kills it?",
-            f"Noted {who}. Who’s the customer in one sentence — not the pitch deck version?",
+            f"Noted {who}. Who’s the customer in one sentence, not the pitch deck version?",
         ],
         "cricket": [
-            f"{who} for or against — clean side. Why?",
+            f"{who} for or against, clean side. Why?",
             f"Okay {who}, who’s actually wrong in that take?",
         ],
         "city": [
             f"{who} which city, and what’s the street-level version of that?",
-            f"Felt that {who}. Commute or civic — which one are you mad about today?",
+            f"Felt that {who}. Commute or civic, which one are you mad about today?",
         ],
         "campus": [
             f"{who} campus pressure hits different. What would you change first?",
-            f"Respect {who}. Exam grind or life admin — which is worse right now?",
+            f"Respect {who}. Exam grind or life admin, which is worse right now?",
         ],
         "work": [
-            f"{who} money, dignity, or both — which bit is the post really about?",
+            f"{who} money, dignity, or both, which bit is the post really about?",
             f"Hmm {who}. What won’t people say out loud at work about this?",
         ],
         "politics": [
-            f"{who} keep it concrete — one policy or local example?",
+            f"{who} keep it concrete, one policy or local example?",
             f"Square heard you {who}. What’s the version where you live?",
         ],
         "ai": [
@@ -356,7 +356,7 @@ def _engage_baratx(username: str, post_text: str) -> str:
             f"Fair {who}. Tool for you, or is it flattening how people talk?",
         ],
         "food": [
-            f"{who} name the city and the dish — then we can actually fight about it.",
+            f"{who} name the city and the dish, then we can actually fight about it.",
             f"Okay {who}, best plate this month?",
         ],
         "climate": [
@@ -364,26 +364,26 @@ def _engage_baratx(username: str, post_text: str) -> str:
             f"Heavy {who}. One local fix that isn’t a slogan?",
         ],
         "culture": [
-            f"{who} hot take or soft take — which are you claiming?",
+            f"{who} hot take or soft take, which are you claiming?",
             f"Saw that {who}. Would you say it the same way to friends IRL?",
         ],
         "question": [
             f"Good question {who}. What’s your own answer before the room piles on?",
-            f"{who} curious — who do you most want an answer from?",
+            f"{who} curious, who do you most want an answer from?",
         ],
         "general": [
-            f"Hey {who} — what’s the bit you care about most in that?",
+            f"Hey {who}, what’s the bit you care about most in that?",
             f"{who} okay, listening. What made you post it today?",
             f"Got you {who}. Who around you would push back on that?",
         ],
     }
     pool = list(by_topic.get(topic, by_topic["general"]))
     if bit and topic in ("general", "question") and len(bit) > 3:
-        pool.append(f"{who} on “{bit}” — what happened right before you typed that?")
+        pool.append(f"{who} on “{bit}”, what happened right before you typed that?")
     text = _clip(random.choice(pool))
     # Never ship the old slop even if someone reintroduces a phrase.
     if _looks_like_slop(text):
-        text = _clip(f"Hey {who} — what’s going on, in one plain sentence?")
+        text = _clip(f"Hey {who}, what’s going on, in one plain sentence?")
     return text
 
 
@@ -400,24 +400,24 @@ def _engage_sharath(username: str, post_text: str) -> str:
 
     by_topic = {
         "geopolitics": [
-            f"{who} Sharath — skip the cable-TV heat. What’s the real Indian interest here?",
+            f"{who} Sharath, skip the cable-TV heat. What’s the real Indian interest here?",
             f"{who} fair. Who benefits if India stays quiet on that?",
         ],
         "reels_speed": [
             f"{who} I think boredom got farmed, not just “Gen Z speed”. You feel that?",
-            f"Sharath — {who}, defend the reel era for me in one line.",
+            f"Sharath, {who}, defend the reel era for me in one line.",
         ],
         "genz": [
             f"{who} millennials invented the scroll. What does your lot do better?",
             f"Real talk {who}: who around you still goes deep?",
         ],
         "startup": [
-            f"{who} what’s broken in your world right now — not the LinkedIn version?",
+            f"{who} what’s broken in your world right now, not the LinkedIn version?",
             f"{who} if you had a week and no slides, what would you ship?",
         ],
         "cricket": [
             f"{who} peak India argument. Who’s wrong?",
-            f"Haha {who}. Cricket or ego — honest answer?",
+            f"Haha {who}. Cricket or ego, honest answer?",
         ],
         "city": [
             f"{who} paint the street you’re on. National slogans can wait.",
@@ -429,7 +429,7 @@ def _engage_sharath(username: str, post_text: str) -> str:
         ],
         "work": [
             f"{who} what would you quit if money wasn’t the issue?",
-            f"Felt that {who}. Dignity over title — agree, or am I soft?",
+            f"Felt that {who}. Dignity over title, agree, or am I soft?",
         ],
         "politics": [
             f"{who} party labels are easy. What’s the mechanism?",
@@ -437,7 +437,7 @@ def _engage_sharath(username: str, post_text: str) -> str:
         ],
         "ai": [
             f"{who} if a bot writes the take, this place dies. What’s only you can add?",
-            f"Sharath — {who}, allergic to AI slop. Keep it messy and human.",
+            f"Sharath, {who}, allergic to AI slop. Keep it messy and human.",
         ],
         "food": [
             f"{who} pick a city side if you’re starting a food fight.",
@@ -452,21 +452,21 @@ def _engage_sharath(username: str, post_text: str) -> str:
             f"Hooked {who}. What’s the unpopular half?",
         ],
         "question": [
-            f"{who} gut answer in one line first — then I’ll pile on.",
+            f"{who} gut answer in one line first, then I’ll pile on.",
             f"Good prompt {who}. My bias: platforms pay for speed. Yours?",
         ],
         "general": [
-            f"Sharath here — {who}, that landed. What are you actually asking for?",
+            f"Sharath here, {who}, that landed. What are you actually asking for?",
             f"Reading you {who}. What should someone do after reading this?",
-            f"{who} plain words — what happened?",
+            f"{who} plain words, what happened?",
         ],
     }
     pool = list(by_topic.get(topic, by_topic["general"]))
     if bit and topic not in ("support", "short"):
-        pool.append(f"{who} re: “{bit}” — am I reading that right?")
+        pool.append(f"{who} re: “{bit}”, am I reading that right?")
     text = _clip(random.choice(pool))
     if _looks_like_slop(text):
-        text = _clip(f"{who} Sharath — say that again with one more concrete detail?")
+        text = _clip(f"{who} Sharath, say that again with one more concrete detail?")
     return text
 
 
@@ -486,7 +486,7 @@ def _official_pair(db: Session) -> tuple[Optional[models.User], Optional[models.
 
 
 def _author_is_official(user: Optional[models.User]) -> bool:
-    """Seeded platform accounts only — blue/gold members still get engagement."""
+    """Seeded platform accounts only, blue/gold members still get engagement."""
     if not user:
         return True
     return (user.username or "").lower() in {
@@ -520,7 +520,7 @@ def _pick_voice(
     sharath: Optional[models.User],
     topic: str,
 ) -> Optional[models.User]:
-    """One human voice per post — product bugs → @baratx, else either."""
+    """One human voice per post, product bugs → @baratx, else either."""
     if topic == "support" and admin:
         return admin
     choices = [u for u in (admin, sharath) if u is not None]
@@ -551,6 +551,7 @@ def _add_reply(
         author_id=official.id,
         text=_clip(text),
         parent_reply_id=None,
+        likely_ai=False,
     )
     db.add(reply)
     db.flush()
@@ -576,7 +577,7 @@ def engage_on_new_post(
 ) -> dict:
     """
     Both @baratx and @sharath reply on every community post (distinct copy).
-    Idempotent for the poller — fills any missing official voice.
+    Idempotent for the poller, fills any missing official voice.
     """
     if engage_disabled():
         return {"ok": True, "skipped": True, "reason": "disabled"}

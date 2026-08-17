@@ -22,24 +22,37 @@ export default function GoogleSignInButton({
   onError,
   confirmAge18 = false,
   requireAgeConfirm = false,
+  acceptPrivacy = false,
+  requirePrivacyConfirm = false,
 }) {
   const { login } = useAuth();
   const navigate = useNavigate();
   const wrapRef = useRef(null);
   const hostRef = useRef(null);
   const callbackRef = useRef(null);
-  const ageRef = useRef({ confirmAge18, requireAgeConfirm });
+  const ageRef = useRef({ confirmAge18, requireAgeConfirm, acceptPrivacy, requirePrivacyConfirm });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
   const native = isNativeApp();
 
-  ageRef.current = { confirmAge18, requireAgeConfirm };
+  ageRef.current = { confirmAge18, requireAgeConfirm, acceptPrivacy, requirePrivacyConfirm };
 
   async function finishWithIdToken(idToken) {
-    const { confirmAge18: ageOk, requireAgeConfirm: needAge } = ageRef.current;
+    const {
+      confirmAge18: ageOk,
+      requireAgeConfirm: needAge,
+      acceptPrivacy: privacyOk,
+      requirePrivacyConfirm: needPrivacy,
+    } = ageRef.current;
     if (needAge && !ageOk) {
       const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    if (needPrivacy && !privacyOk) {
+      const msg = "Accept the Privacy Policy (DPDP) to create an account.";
       setError(msg);
       onError?.(msg);
       return;
@@ -50,6 +63,7 @@ export default function GoogleSignInButton({
       const data = await api.loginGoogle({
         id_token: idToken,
         ...(ageOk ? { confirm_age_18: true } : {}),
+        ...(privacyOk ? { accept_privacy: true } : {}),
       });
       login(data.access_token);
       const next =
@@ -88,16 +102,27 @@ export default function GoogleSignInButton({
   };
 
   async function handleNativeGoogle() {
-    const { confirmAge18: ageOk, requireAgeConfirm: needAge } = ageRef.current;
+    const {
+      confirmAge18: ageOk,
+      requireAgeConfirm: needAge,
+      acceptPrivacy: privacyOk,
+      requirePrivacyConfirm: needPrivacy,
+    } = ageRef.current;
     if (needAge && !ageOk) {
       const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
       setError(msg);
       onError?.(msg);
       return;
     }
+    if (needPrivacy && !privacyOk) {
+      const msg = "Accept the Privacy Policy (DPDP) to create an account.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
     if (!nativeGoogleConfigured()) {
       const msg =
-        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client — see MOBILE.md). Use phone OTP to join now.";
+        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client, see MOBILE.md). Use phone OTP to join now.";
       setError(msg);
       onError?.(msg);
       return;
@@ -130,10 +155,13 @@ export default function GoogleSignInButton({
       window.google.accounts.id.initialize({
         client_id: CLIENT_ID,
         callback: (res) => callbackRef.current?.(res),
+        // popup is more reliable than redirect on iOS Safari / in-app browsers
         ux_mode: "popup",
         auto_select: false,
         cancel_on_tap_outside: true,
         context: "signin",
+        // Prefer FedCM where available; falls back when unsupported.
+        use_fedcm_for_prompt: true,
       });
 
       try {
@@ -186,12 +214,14 @@ export default function GoogleSignInButton({
 
   if (native) {
     const ageBlocked = requireAgeConfirm && !confirmAge18;
+    const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
+    const blocked = ageBlocked || privacyBlocked;
     return (
       <div className="x-google-wrap">
         <button
           type="button"
           className="x-btn x-btn-google"
-          disabled={busy || ageBlocked}
+          disabled={busy || blocked}
           onClick={handleNativeGoogle}
         >
           <GoogleG className="x-btn-icon" />
@@ -200,7 +230,10 @@ export default function GoogleSignInButton({
         {ageBlocked && (
           <p className="hint x-google-loading">Confirm you are 18+ below to continue with Google.</p>
         )}
-        {!ageBlocked && (
+        {privacyBlocked && !ageBlocked && (
+          <p className="hint x-google-loading">Accept the Privacy Policy below to continue with Google.</p>
+        )}
+        {!blocked && (
           <p className="hint x-google-loading">Phone OTP also works if Google isn’t set up on this build yet.</p>
         )}
         {error && <p className="x-inline-error">{error}</p>}
@@ -229,12 +262,14 @@ export default function GoogleSignInButton({
   }
 
   const ageBlocked = requireAgeConfirm && !confirmAge18;
+  const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
+  const blocked = ageBlocked || privacyBlocked;
 
   return (
-    <div className={`x-google-wrap${ageBlocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
+    <div className={`x-google-wrap${blocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
       <div
         className={`x-google-shell ${busy ? "is-busy" : ""} ${gisReady ? "is-ready" : ""}${
-          ageBlocked ? " is-age-blocked" : ""
+          blocked ? " is-age-blocked" : ""
         }`}
       >
         <div className="x-btn x-btn-google x-google-face" aria-hidden="true">
@@ -244,15 +279,24 @@ export default function GoogleSignInButton({
         <div
           ref={hostRef}
           className="google-btn-host"
-          title={ageBlocked ? "Confirm you are 18+ first" : label}
+          title={
+            ageBlocked
+              ? "Confirm you are 18+ first"
+              : privacyBlocked
+                ? "Accept Privacy Policy first"
+                : label
+          }
           aria-label={label}
-          aria-disabled={ageBlocked}
+          aria-disabled={blocked}
         />
       </div>
       {ageBlocked && (
         <p className="hint x-google-loading">Confirm you are 18+ below to continue with Google.</p>
       )}
-      {!gisReady && !error && !ageBlocked && <p className="hint x-google-loading">Loading Google…</p>}
+      {privacyBlocked && !ageBlocked && (
+        <p className="hint x-google-loading">Accept the Privacy Policy below to continue with Google.</p>
+      )}
+      {!gisReady && !error && !blocked && <p className="hint x-google-loading">Loading Google…</p>}
       {error && <p className="x-inline-error">{error}</p>}
     </div>
   );
