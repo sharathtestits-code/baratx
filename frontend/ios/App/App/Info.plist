@@ -22,12 +22,16 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>BarathX needs camera access so you can take a profile or post photo.</string>
+	<string>BarathX needs camera access for Live Talk video and so you can take a profile or post photo.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>BarathX needs the microphone so you can speak in Live Talk rooms.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>BarathX needs photo library access so you can attach images to posts.</string>
+	<string>BarathX needs photo library access so you can attach images to posts and your profile.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -53,7 +57,7 @@
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>

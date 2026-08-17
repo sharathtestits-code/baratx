@@ -86,6 +86,8 @@ Send APK only to trusted testers (not public). Prefer Play Internal for updates.
 
 ## B. iOS soft launch (after Android is in testers’ hands)
 
+Full App Store / TestFlight checklist: **[APP-STORE-IOS.md](./APP-STORE-IOS.md)**
+
 On a **Mac**:
 ```bash
 cd frontend

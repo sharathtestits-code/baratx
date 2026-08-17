@@ -12,6 +12,7 @@ FastAPI + SQLite (local), frontend is React (Vite).
 
 Public hosting checklist: see [DEPLOY.md](./DEPLOY.md).
 Android / App Store (Capacitor): see [MOBILE.md](./MOBILE.md).
+iOS App Store checklist (accounts, listing copy, review notes): [brand/mobile/APP-STORE-IOS.md](./brand/mobile/APP-STORE-IOS.md).
 
 ## Structure
 

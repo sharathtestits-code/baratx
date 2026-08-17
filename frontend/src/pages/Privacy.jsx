@@ -4,7 +4,7 @@ export default function Privacy() {
   return (
     <div className="legal-page">
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: August 6, 2026</p>
+      <p className="legal-updated">Last updated: August 17, 2026</p>
       <p>
         BarathX (BX) is India’s text-first public square at <strong>barathx.com</strong>. This page
         explains what we collect and how we use it, in plain language.
@@ -15,6 +15,10 @@ export default function Privacy() {
         <li>Account details you provide: display name, username, email and/or phone</li>
         <li>Content you post: posts, replies, images you upload</li>
         <li>Basic technical data needed to run the service (login session, device/browser basics)</li>
+        <li>
+          Optional Live Talk: microphone (and camera if you turn video on) so you can speak in a
+          room. Audio goes to other people in that room, not to advertisers.
+        </li>
       </ul>
 
       <h2>How we use it</h2>
@@ -42,7 +46,10 @@ export default function Privacy() {
       <ul>
         <li>Edit your profile anytime</li>
         <li>Delete posts you create</li>
-        <li>Contact us to request account deletion</li>
+        <li>
+          Delete your account in the app: Settings → Privacy &amp; security → type DELETE. You can
+          also email <a href="mailto:hello@barathx.com">hello@barathx.com</a>
+        </li>
       </ul>
 
       <h2>Contact</h2>

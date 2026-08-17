@@ -6,12 +6,27 @@
  * - Web application → VITE_GOOGLE_CLIENT_ID (also GOOGLE_CLIENT_ID on API)
  * - Android (package com.baratx.app + SHA-1) — console only, not passed to JS
  * - iOS (bundle com.baratx.app) → VITE_GOOGLE_IOS_CLIENT_ID + Info.plist URL scheme
+ *
+ * Apple guideline 4.8: Google on iOS also requires Sign in with Apple.
+ * Keep IOS_SIGN_IN_WITH_APPLE_READY false until that button + backend are live.
  */
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { getNativePlatform, isNativeApp } from "./native";
+import { googleSignInAllowed } from "./iosStorePolicy";
 
 const WEB_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || "").trim();
 const IOS_CLIENT_ID = (import.meta.env.VITE_GOOGLE_IOS_CLIENT_ID || "").trim();
+
+/** Flip to true only when Sign in with Apple is an equivalent option on iOS. */
+export const IOS_SIGN_IN_WITH_APPLE_READY = false;
+
+/**
+ * Google is allowed on web + Android. Hidden on iOS until Apple Sign-In ships.
+ */
+export function showGoogleSignIn() {
+  if (!isNativeApp()) return googleSignInAllowed("web", IOS_SIGN_IN_WITH_APPLE_READY);
+  return googleSignInAllowed(getNativePlatform(), IOS_SIGN_IN_WITH_APPLE_READY);
+}
 
 let initPromise = null;
 

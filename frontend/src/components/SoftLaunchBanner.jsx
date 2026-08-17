@@ -4,13 +4,16 @@ import {
   SOFT_LAUNCH_BANNER,
   SOFT_LAUNCH_SHORT,
 } from "../softLaunch";
+import { isNativeApp } from "../native";
 
 /**
  * Compact soft-launch strip for Square / logged-in chrome (browser).
- * Native iOS & Android apps are coming soon.
+ * Hidden in the native iOS/Android shells so the store listing does not say
+ * "apps coming soon" inside the app itself.
  */
 export default function SoftLaunchBanner({ compact = false }) {
   if (!isSoftLaunchWindow()) return null;
+  if (isNativeApp()) return null;
   return (
     <div className={`bx-soft-launch${compact ? " is-compact" : ""}`} role="status">
       <span className="bx-soft-launch-label">

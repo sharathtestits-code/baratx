@@ -7,6 +7,7 @@ import {
   friendlyNativeGoogleError,
   nativeGoogleConfigured,
   nativeGoogleIdToken,
+  showGoogleSignIn,
 } from "../nativeGoogleAuth";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
@@ -186,6 +187,10 @@ export default function GoogleSignInButton({
       }
     };
   }, [native]);
+
+  if (!showGoogleSignIn()) {
+    return null;
+  }
 
   if (native) {
     const ageBlocked = requireAgeConfirm && !confirmAge18;

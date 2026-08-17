@@ -87,12 +87,16 @@ cd frontend/android
 
 ## iOS → App Store
 
+**Full PM checklist, listing copy, privacy labels, and rejection risks:**
+**[brand/mobile/APP-STORE-IOS.md](./brand/mobile/APP-STORE-IOS.md)**
+
 1. On a Mac: `cd frontend && npm run build:app && npm run open:ios`
 2. In Xcode: select the **App** target → **Signing & Capabilities** → your Team.
-3. Confirm Bundle Identifier `com.baratx.app`.
-4. Set version / build numbers as needed.
+3. Confirm Bundle Identifier `com.baratx.app`. First listing is **iPhone only**.
+4. Version **1.0** / bump **build** on every upload.
 5. Product → Archive → Distribute App → App Store Connect.
-6. Complete App Store Connect metadata, screenshots, privacy nutrition labels, and age rating.
+6. Complete App Store Connect metadata, **6.9" screenshots**, privacy nutrition labels, and age rating.
+7. **Do not** enable Google Sign-In on iOS until Sign in with Apple ships (guideline 4.8). Phone OTP + email stay live.
 
 ## Google OAuth for stores (required for native Google)
 
