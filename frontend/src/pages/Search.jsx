@@ -239,7 +239,11 @@ export default function Search() {
           />
           <SuggestedFollows
             title="Who to follow"
-            note="Tap Follow to start seeing their posts."
+            note="Tap a name to open their profile, or Follow to see their posts."
+            onExplorePeople={() => {
+              setSearchParams({ q: "india" });
+              window.setTimeout(() => inputRef.current?.focus?.(), 80);
+            }}
           />
           <div className="search-chips" aria-label="Suggested searches">
             {QUICK_SEARCHES.map((item) => (

@@ -3766,6 +3766,15 @@ a.profile-edit-btn:hover {
   min-width: 0;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 0.15rem 0.2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.suggested-follows-person:hover {
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
 }
 
 .suggested-follows-info {
@@ -3795,6 +3804,8 @@ a.profile-edit-btn:hover {
 .suggested-follow-btn {
   flex-shrink: 0;
   white-space: nowrap;
+  position: relative;
+  z-index: 2;
 }
 
 .suggested-follows-actions {
@@ -3802,6 +3813,7 @@ a.profile-edit-btn:hover {
   flex-direction: column;
   gap: 0.35rem;
   margin-top: 0.75rem;
+  padding-bottom: 0.25rem;
 }
 
 .suggested-follows-actions .welcome-follow-btn {
@@ -3810,6 +3822,18 @@ a.profile-edit-btn:hover {
 
 .suggested-explore {
   text-align: center;
+  cursor: pointer;
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  padding: 0.65rem 0.75rem !important;
+  border-radius: 10px;
+  font-weight: 700 !important;
+  color: var(--brand) !important;
+}
+
+.suggested-explore:hover {
+  background: color-mix(in srgb, var(--brand) 10%, transparent);
 }
 
 .suggested-follows-error {
