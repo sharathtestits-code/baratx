@@ -75,7 +75,7 @@ Useful scripts:
 4. Configure signing in `android/app` (Android Studio → Build → Generate Signed Bundle / APK), or add a local `keystore.properties` (gitignored).
 5. **Build → Generate Signed Bundle / APK → Android App Bundle**.
 6. Upload the `.aab` in Play Console → Production / Internal testing.
-7. Store listing needs: title, short/full description, screenshots (phone), feature graphic, privacy policy URL (`https://barathx.com` privacy page when live).
+7. Store listing + remaining Play Console setup: **[brand/mobile/PLAY-CONSOLE.md](./brand/mobile/PLAY-CONSOLE.md)** (icon + feature graphic in `brand/mobile/play-listing/`). Privacy policy URL: `https://barathx.com/privacy`.
 
 ### Debug APK (device / emulator)
 

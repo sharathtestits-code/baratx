@@ -1,5 +1,5 @@
 # BaratX mobile soft launch (Gen Z)
-Updated: **2026-08-09**
+Updated: **2026-08-17**
 
 **Why:** Indian Gen Z prefers apps over browser. Soft-launch Android first, iOS second.
 
@@ -23,11 +23,12 @@ Do **not** wait for public Production store listing to start Campus Voice testin
 
 | Blocker | Status | Action |
 |---|---|---|
-| Privacy Policy URL | **Added** `/privacy` | Deploy frontend so https://barathx.com/privacy works |
-| Terms of Service URL | **Added** `/terms` | Deploy frontend so https://barathx.com/terms works |
+| Privacy Policy URL | **Live** | https://barathx.com/privacy |
+| Terms of Service URL | **Live** | https://barathx.com/terms |
 | Real SMS OTP (MSG91) | Often demo OTP in API | Soft launch **needs real OTP** — set `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` on Railway |
 | Google Sign-In in app | **Wired** — needs Cloud SHA-1 | Create Android OAuth client (`com.baratx.app` + SHA-1). Phone OTP still works. |
-| Play Console account | You | Create / pay $25 one-time |
+| Play Console + Internal testing | **Done** | Testers can install now. Finish **View tasks** — [PLAY-CONSOLE.md](./PLAY-CONSOLE.md) |
+| Closed testing (12 testers × 14 days) | **Locked** until setup | Required before Production on a new personal Play account |
 | Apple Developer | You | $99/year — only when iOS week starts |
 | Release keystore | You | Generate once; never commit |
 
@@ -35,10 +36,13 @@ Do **not** wait for public Production store listing to start Campus Voice testin
 
 ## A. Today / this week — Android soft launch
 
+**Play Console path (internal already created):** [PLAY-CONSOLE.md](./PLAY-CONSOLE.md) — testers can install from Internal testing **now**. Closed testing stays locked until store listing + policy tasks are finished.
+
 ### 1) Accounts & legal (30–60 min)
-- [ ] Confirm https://barathx.com/privacy and `/terms` load after deploy
-- [ ] Create [Google Play Console](https://play.google.com/console) app: **BaratX** / package `com.baratx.app`
-- [ ] Store listing draft (below)
+- [x] Confirm https://barathx.com/privacy and `/terms` load after deploy
+- [x] Create [Google Play Console](https://play.google.com/console) app: **BarathX** / package `com.baratx.app`
+- [x] Internal testing release created (Active)
+- [ ] Finish **View tasks** (store listing, 18+ audience, content rating, data safety, reviewer login) — copy + assets in [PLAY-CONSOLE.md](./PLAY-CONSOLE.md) and `play-listing/`
 - [ ] Privacy policy URL in Play Console: `https://barathx.com/privacy`
 
 ### 2) Wire real phone OTP (critical for India Gen Z)
@@ -65,7 +69,7 @@ keytool -genkey -v -keystore ~/baratx-release.jks -keyalg RSA -keysize 2048 -val
 ```
 
 In Android Studio: **Build → Generate Signed Bundle → Android App Bundle**  
-Current version: **0.1.0** (versionCode **2**).
+Current version: **0.1.2** (versionCode **4**).
 
 ### 4) Play — Internal testing (same day possible)
 1. Play Console → Testing → **Internal testing**
@@ -100,33 +104,33 @@ npm run open:ios
 
 ---
 
-## C. Soft-launch store listing copy (Independence Day · 15 August)
+## C. Soft-launch store listing copy
+
+Canonical paste-ready copy, Data safety answers, and the 12-tester / 14-day closed-test path: **[PLAY-CONSOLE.md](./PLAY-CONSOLE.md)**.
 
 **Title:** BarathX  
 **Short description (≤80 chars):**  
-Official soft launch · India’s public square — pick a side, argue it live.
+India's public square — pick a side, argue it live.
 
 **Full description:**
 ```
-BarathX is India’s public square.
-
-Official soft launch on Independence Day — 15 August — in the browser (phone & desktop). iOS and Android apps coming soon.
+BarathX is India's public square.
 
 Short posts. Real sides. Real debate.
 
 • Square — drop a take, get real replies
 • Arenas — Sports, Politics, Entertainment, News, Startups, Spirituality
-• Live rooms — pick a side, argue now (optional Live Talk audio)
+• Live rooms — pick a side, argue now
 • Human takes only. No AI slop.
 
 No endless Reels feed inside the app.
 Just say it. Prove it.
 
-Join early → leave your first take → https://barathx.com
+18+ only. Join → leave your first take → https://barathx.com
 ```
 
 **Category:** Social  
-**Tags:** debate, India, social, campus, startups, Independence Day  
+**Tags:** debate, India, social, campus, startups  
 **Contact:** hello@barathx.com  
 **WhatsApp:** https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 
