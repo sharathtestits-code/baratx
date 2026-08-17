@@ -6,6 +6,7 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import { validateUsername } from "../username";
 import { safeNextPath } from "../safeNextPath";
+import { showGoogleSignIn } from "../nativeGoogleAuth";
 
 export default function Signup() {
   const [params] = useSearchParams();
@@ -194,16 +195,20 @@ export default function Signup() {
 
       {!otpSent && (
         <>
-          <GoogleSignInButton
-            label="Sign up with Google"
-            onError={setError}
-            confirmAge18={confirmAge18}
-            requireAgeConfirm
-          />
+          {showGoogleSignIn() ? (
+            <>
+              <GoogleSignInButton
+                label="Sign up with Google"
+                onError={setError}
+                confirmAge18={confirmAge18}
+                requireAgeConfirm
+              />
 
-          <div className="x-auth-or" role="separator">
-            <span>or</span>
-          </div>
+              <div className="x-auth-or" role="separator">
+                <span>or</span>
+              </div>
+            </>
+          ) : null}
 
           <div className="method-toggle">
             <button

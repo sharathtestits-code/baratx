@@ -6,6 +6,7 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import Logo, { LogoMark } from "../components/Logo";
 import { isNativeApp } from "../native";
+import { showGoogleSignIn } from "../nativeGoogleAuth";
 
 export default function Login() {
   const [params] = useSearchParams();
@@ -261,7 +262,7 @@ export default function Login() {
             </form>
           )}
 
-          {!otpSent && (
+          {!otpSent && showGoogleSignIn() && (
             <>
               <div className="x-auth-or bx-login-or" role="separator">
                 <span>or continue with</span>

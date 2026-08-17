@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import { isNativeApp } from "../native";
+import { showGoogleSignIn } from "../nativeGoogleAuth";
 import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../softLaunch";
 
 /**
@@ -10,6 +12,8 @@ import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../s
  */
 export default function Landing() {
   const softLaunch = isSoftLaunchWindow();
+  const native = isNativeApp();
+  const googleOn = showGoogleSignIn();
   return (
     <div className="bx-home">
       <header className="bx-home-nav">
@@ -39,13 +43,15 @@ export default function Landing() {
           <p className="bx-home-hero-tag">India&apos;s public square</p>
           {softLaunch ? (
             <p className="bx-home-hero-soft" role="status">
-              {SOFT_LAUNCH_LINE}
+              {native ? "Official soft launch · Independence Day · 15 August" : SOFT_LAUNCH_LINE}
             </p>
           ) : null}
           <p className="bx-home-hero-line">Pick a side. Argue it live.</p>
           <p className="bx-home-hero-sub">
             The place people who actually have an opinion go, not another feed to like and leave.
-            Soft launch live in your browser (phone or desktop). {APP_COMING_SOON_LINE}.
+            {native
+              ? " Join with your phone or email."
+              : ` Soft launch live in your browser (phone or desktop). ${APP_COMING_SOON_LINE}.`}
           </p>
           <p className="bx-home-hero-anti-ai">Human takes only. No AI slop.</p>
           <div className="bx-home-hero-ctas">
@@ -56,9 +62,11 @@ export default function Landing() {
               Watch a live debate
             </Link>
           </div>
-          <div className="bx-home-hero-google">
-            <GoogleSignInButton label="Continue with Google" confirmAge18 />
-          </div>
+          {googleOn ? (
+            <div className="bx-home-hero-google">
+              <GoogleSignInButton label="Continue with Google" confirmAge18 />
+            </div>
+          ) : null}
           <p className="bx-home-founding-chip">
             <Link to="/signup?next=/rewards">100 Founding spots</Link>, earned by opening a debate
             that gets real engagement, not by signing up.
@@ -77,12 +85,14 @@ export default function Landing() {
           Old way: argue in an Instagram thread that vanishes in an hour, or a WhatsApp group where
           fifteen people talk past each other. BarathX: a live, sided debate (Agree vs Disagree)
           where a real person answers you on the record. We&apos;re officially soft launching on
-          Independence Day (15 August) in the browser (phone and desktop), early on purpose so those
-          rooms stay real, not performed for growth numbers. Native apps for Apple and Android are
-          coming soon.
+          Independence Day (15 August)
+          {native
+            ? ", early on purpose so those rooms stay real, not performed for growth numbers."
+            : " in the browser (phone and desktop), early on purpose so those rooms stay real, not performed for growth numbers. Native apps for Apple and Android are coming soon."}
         </p>
       </section>
 
+      {!native ? (
       <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-apps">
         <p className="bx-home-kicker">Apps</p>
         <h2 id="bx-home-apps">App coming soon: Apple &amp; Android</h2>
@@ -118,6 +128,7 @@ export default function Landing() {
           Join in your browser
         </Link>
       </section>
+      ) : null}
 
       <section className="bx-home-section" aria-labelledby="bx-home-how">
         <p className="bx-home-kicker">How it works</p>
