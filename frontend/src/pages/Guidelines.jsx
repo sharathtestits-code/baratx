@@ -25,6 +25,11 @@ export default function Guidelines() {
 
         <h2>Don&apos;t</h2>
         <ul>
+          <li>
+            <strong>Adult or sexual content</strong> — porn, nudes, sexting, or sexual
+            solicitation. Blocked in posts, replies, DMs, and Live. BarathX is a public square,
+            not an adult app.
+          </li>
           <li>Threats, doxxing, sexual content involving minors, or illegal activity.</li>
           <li>Spam, scams, or bot farms posting the same take everywhere.</li>
           <li>

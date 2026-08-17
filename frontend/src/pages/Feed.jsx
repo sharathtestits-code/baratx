@@ -21,6 +21,8 @@ import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 import { sanitizeUserText } from "../sanitizeUserText";
+import { assertSafePublicText } from "../contentSafety";
+import ContentSafetyNote from "../components/ContentSafetyNote";
 import { focusCompose } from "../focusCompose";
 import { useT } from "../context/LocaleContext";
 
@@ -366,6 +368,7 @@ export default function Feed() {
     setPosting(true);
     try {
       const cleanText = sanitizeUserText(text).trim();
+      assertSafePublicText(cleanText);
       const newPost = await postsApi.create(token, {
         text: cleanText,
         image: imageFile,
@@ -568,6 +571,7 @@ export default function Feed() {
               </span>
             </label>
             {foundingNotice && <p className="hint ok-hint compose-founding-notice">{foundingNotice}</p>}
+            <ContentSafetyNote compact />
             <div className="compose-footer">
               <label className="attach-btn" title="Add image">
                 <IconImage />

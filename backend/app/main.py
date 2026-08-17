@@ -2395,6 +2395,12 @@ async def create_post(
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
     if len(text) > MAX_POST_LENGTH:
         raise HTTPException(status_code=400, detail=f"Post must be {MAX_POST_LENGTH} characters or fewer")
+    try:
+        from app.moderation import assert_safe_public_text
+
+        assert_safe_public_text(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     likely_ai = enforce_human_take(current_user, text)
 
     quoted_post_id = None
@@ -2916,6 +2922,12 @@ def create_reply(
         raise HTTPException(status_code=400, detail="Reply text cannot be empty")
     if len(text) > MAX_REPLY_LENGTH:
         raise HTTPException(status_code=400, detail=f"Reply must be {MAX_REPLY_LENGTH} characters or fewer")
+    try:
+        from app.moderation import assert_safe_public_text
+
+        assert_safe_public_text(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     likely_ai = enforce_human_take(current_user, text)
 
     parent_reply_id = payload.parent_reply_id

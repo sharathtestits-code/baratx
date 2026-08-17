@@ -27,6 +27,14 @@ function normalizeResults(data) {
   };
 }
 
+/** Strip @/# so @arvi999 finds the same person as arvi999. */
+function cleanSearchQuery(raw) {
+  return String(raw || "")
+    .trim()
+    .replace(/^[@#]+/, "")
+    .trim();
+}
+
 function TrendingBlock({ trending, onSearchHeadline }) {
   if (!trending) return null;
   const topics = trending.topics || [];
@@ -89,8 +97,13 @@ export default function Search() {
 
   useEffect(() => {
     setInputValue(q);
-    if (q.trim()) {
-      runSearch(q);
+    const cleaned = cleanSearchQuery(q);
+    if (cleaned) {
+      if (cleaned !== q.trim()) {
+        setSearchParams({ q: cleaned }, { replace: true });
+        return;
+      }
+      runSearch(cleaned);
     } else {
       setResults({ users: [], posts: [], topics: [], arenas: [] });
       setLoading(false);
@@ -102,8 +115,8 @@ export default function Search() {
 
   // Live Explore: debounce typing into the URL so results appear without a second tap.
   useEffect(() => {
-    const next = inputValue.trim();
-    if (next === q.trim()) return undefined;
+    const next = cleanSearchQuery(inputValue);
+    if (next === cleanSearchQuery(q)) return undefined;
     const timer = window.setTimeout(() => {
       if (!next) {
         setSearchParams({});
@@ -146,7 +159,7 @@ export default function Search() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    const next = inputValue.trim();
+    const next = cleanSearchQuery(inputValue);
     if (!next) return;
     setSearchParams({ q: next });
   }

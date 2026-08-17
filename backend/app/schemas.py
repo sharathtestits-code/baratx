@@ -6,6 +6,17 @@ from pydantic import BaseModel, EmailStr, Field, field_validator, model_validato
 
 from app.phoneutil import normalize_phone
 from app.text_parse import sanitize_user_text
+from app.moderation import assert_safe_public_text
+
+
+def _validated_user_text(v: str, *, empty: str, max_len: int, too_long: str) -> str:
+    text = sanitize_user_text(v or "").strip()
+    if not text:
+        raise ValueError(empty)
+    if len(text) > max_len:
+        raise ValueError(too_long)
+    assert_safe_public_text(text)
+    return text
 
 # Letters/numbers first; allow . _ - (Instagram/Twitter-style handles)
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]{2,19}$")
@@ -344,12 +355,12 @@ class ReplyCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Reply cannot be empty")
-        if len(v) > 500:
-            raise ValueError("Reply must be 500 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Reply cannot be empty",
+            max_len=500,
+            too_long="Reply must be 500 characters or fewer",
+        )
 
 
 class ReplyOut(BaseModel):
@@ -499,12 +510,12 @@ class MessageCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Message cannot be empty")
-        if len(v) > 1000:
-            raise ValueError("Message must be 1000 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Message cannot be empty",
+            max_len=1000,
+            too_long="Message must be 1000 characters or fewer",
+        )
 
 
 class MessageOut(BaseModel):
@@ -581,12 +592,12 @@ class AdminPostCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Post cannot be empty")
-        if len(v) > 500:
-            raise ValueError("Post must be 500 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Post cannot be empty",
+            max_len=500,
+            too_long="Post must be 500 characters or fewer",
+        )
 
     @field_validator("username")
     @classmethod
@@ -604,12 +615,12 @@ class AdminReplyCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Reply cannot be empty")
-        if len(v) > 500:
-            raise ValueError("Reply must be 500 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Reply cannot be empty",
+            max_len=500,
+            too_long="Reply must be 500 characters or fewer",
+        )
 
     @field_validator("username")
     @classmethod
@@ -818,10 +829,12 @@ class LiveTalkMessageCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if len(v) < 1 or len(v) > 500:
-            raise ValueError("Message must be 1–500 characters")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Message must be 1–500 characters",
+            max_len=500,
+            too_long="Message must be 1–500 characters",
+        )
 
 
 class LiveTalkRemoveBody(BaseModel):
@@ -963,13 +976,12 @@ class SurfacePostCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Post cannot be empty")
-        # Same cap as Square — one product limit everywhere members post.
-        if len(v) > 500:
-            raise ValueError("Post must be 500 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Post cannot be empty",
+            max_len=500,
+            too_long="Post must be 500 characters or fewer",
+        )
 
     @field_validator("debate_side")
     @classmethod

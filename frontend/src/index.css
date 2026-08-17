@@ -2734,11 +2734,24 @@ a.profile-edit-btn:hover {
 .dm-row {
   text-decoration: none;
   color: inherit;
+  border-radius: var(--radius-lg, 14px);
+  padding: 0.65rem 0.75rem;
+  transition: background 0.15s ease;
+}
+
+.dm-row:hover {
+  background: var(--brand-tint);
 }
 
 .dm-main {
   flex: 1;
   min-width: 0;
+}
+
+.dm-preview {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dm-unread {
@@ -2752,10 +2765,80 @@ a.profile-edit-btn:hover {
   font-weight: 800;
 }
 
+.dm-inbox-empty,
+.dm-empty {
+  text-align: center;
+  padding: 2.5rem 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dm-empty-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.dm-empty-cta {
+  margin-top: 0.75rem;
+  text-decoration: none;
+}
+
 .dm-thread {
   display: flex;
   flex-direction: column;
-  min-height: 70vh;
+  min-height: min(78vh, 720px);
+  background:
+    radial-gradient(120% 80% at 10% 0%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 55%),
+    var(--bg, var(--surface));
+  border-radius: var(--radius-lg, 16px);
+  overflow: hidden;
+}
+
+.dm-thread-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.dm-back {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.dm-peer {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+}
+
+.dm-peer-name {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.dm-peer-handle {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .dm-messages {
@@ -2763,14 +2846,27 @@ a.profile-edit-btn:hover {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  padding: 1rem;
+  padding: 1.1rem 1rem 0.5rem;
+  overflow-y: auto;
 }
 
 .dm-bubble {
   display: flex;
   gap: 0.5rem;
   align-items: flex-end;
-  max-width: 85%;
+  max-width: min(85%, 420px);
+  animation: dm-in 0.28s ease;
+}
+
+@keyframes dm-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .dm-bubble.mine {
@@ -2782,41 +2878,97 @@ a.profile-edit-btn:hover {
 }
 
 .dm-bubble-text {
-  padding: 0.65rem 0.85rem;
-  border-radius: 14px;
-  background: var(--brand-tint);
-  line-height: 1.35;
+  padding: 0.7rem 0.95rem;
+  border-radius: 16px 16px 16px 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  line-height: 1.4;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 4%, transparent);
 }
 
 .dm-bubble.mine .dm-bubble-text {
   background: var(--brand);
   color: #fff;
+  border-color: transparent;
+  border-radius: 16px 16px 6px 16px;
+}
+
+.dm-error {
+  margin: 0 1rem 0.35rem;
 }
 
 .dm-compose {
   display: flex;
-  gap: 0.5rem;
-  padding: 0.85rem 1rem;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.75rem 1rem 1rem;
   border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.dm-compose-row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
 }
 
 .dm-compose input {
   flex: 1;
-  border: 1px solid var(--border);
+  min-width: 0;
+  border: 1px solid var(--border-strong, var(--border));
   border-radius: 999px;
-  padding: 0.65rem 0.9rem;
-  background: var(--surface);
+  padding: 0.75rem 1rem;
+  background: var(--bg, var(--surface));
   color: var(--text);
+  font: inherit;
 }
 
-.dm-compose button {
+.dm-compose input:focus {
+  outline: 2px solid color-mix(in srgb, var(--brand) 45%, transparent);
+  border-color: var(--brand);
+}
+
+.dm-send,
+.dm-compose button.dm-send {
   border: none;
   background: var(--brand);
   color: #fff;
   border-radius: 999px;
-  padding: 0.65rem 1rem;
+  padding: 0.75rem 1.15rem;
   font-weight: 800;
   cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.dm-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.content-safety-note {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--border));
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface));
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.content-safety-note a {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.content-safety-note--compact {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.78rem;
+  color: var(--muted);
 }
 
 .action-btn.bookmark-action.active,
