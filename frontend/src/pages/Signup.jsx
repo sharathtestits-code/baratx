@@ -18,6 +18,7 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [confirmAge18, setConfirmAge18] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
@@ -73,6 +74,10 @@ export default function Signup() {
       setError("You must be 18 or older to join BarathX. Confirm your age to continue.");
       return false;
     }
+    if (!acceptPrivacy) {
+      setError("Accept the Privacy Policy (DPDP) to create an account.");
+      return false;
+    }
     return true;
   }
 
@@ -100,6 +105,7 @@ export default function Signup() {
         username,
         display_name: displayName,
         confirm_age_18: true,
+        accept_privacy: true,
       });
       if (res.dev_verify_url) {
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
@@ -157,6 +163,7 @@ export default function Signup() {
         display_name: displayName,
         region,
         confirm_age_18: true,
+        accept_privacy: true,
       });
       login(access_token);
       await joinArenaFromParams(access_token);
@@ -173,19 +180,42 @@ export default function Signup() {
   );
 
   const ageGate = (
-    <label className="age-gate">
-      <input
-        type="checkbox"
-        checked={confirmAge18}
-        onChange={(e) => {
-          setConfirmAge18(e.target.checked);
-          if (e.target.checked) setError("");
-        }}
-      />
-      <span>
-        I confirm I am <strong>18 or older</strong>. BarathX is for adults only.
-      </span>
-    </label>
+    <>
+      <label className="age-gate">
+        <input
+          type="checkbox"
+          checked={confirmAge18}
+          onChange={(e) => {
+            setConfirmAge18(e.target.checked);
+            if (e.target.checked) setError("");
+          }}
+        />
+        <span>
+          I confirm I am <strong>18 or older</strong>. BarathX is for adults only.
+        </span>
+      </label>
+      <label className="age-gate">
+        <input
+          type="checkbox"
+          checked={acceptPrivacy}
+          onChange={(e) => {
+            setAcceptPrivacy(e.target.checked);
+            if (e.target.checked) setError("");
+          }}
+        />
+        <span>
+          I have read and accept the{" "}
+          <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+            Privacy Policy
+          </Link>{" "}
+          (India DPDP) and{" "}
+          <Link to="/terms" target="_blank" rel="noopener noreferrer">
+            Terms
+          </Link>
+          .
+        </span>
+      </label>
+    </>
   );
 
   return (
@@ -198,7 +228,9 @@ export default function Signup() {
             label="Sign up with Google"
             onError={setError}
             confirmAge18={confirmAge18}
+            acceptPrivacy={acceptPrivacy}
             requireAgeConfirm
+            requirePrivacyConfirm
           />
 
           <div className="x-auth-or" role="separator">
@@ -277,7 +309,7 @@ export default function Signup() {
             />
           </label>
           {ageGate}
-          <button type="submit" disabled={busy || !confirmAge18}>
+          <button type="submit" disabled={busy || !confirmAge18 || !acceptPrivacy}>
             {busy ? "Creating account..." : "Sign up"}
           </button>
         </form>
@@ -311,7 +343,7 @@ export default function Signup() {
             onPhoneChange={setPhone}
           />
           {ageGate}
-          <button type="submit" disabled={busy || !confirmAge18}>
+          <button type="submit" disabled={busy || !confirmAge18 || !acceptPrivacy}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>
         </form>
@@ -349,7 +381,7 @@ export default function Signup() {
             />
           </label>
           {ageGate}
-          <button type="submit" disabled={busy || !confirmAge18}>
+          <button type="submit" disabled={busy || !confirmAge18 || !acceptPrivacy}>
             {busy ? "Verifying..." : "Verify & create account"}
           </button>
           <button type="button" className="auth-back-btn" onClick={goBackFromOtp} disabled={busy}>

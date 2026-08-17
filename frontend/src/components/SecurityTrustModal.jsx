@@ -60,6 +60,14 @@ export default function SecurityTrustModal() {
             attempts.
           </li>
           <li>
+            <strong>India DPDP</strong>. Clear notice, consent at signup, download/delete your data
+            in Settings, privacy@barathx.com for grievances.
+          </li>
+          <li>
+            <strong>Session kill switch</strong>. Log out or “Sign out everywhere” in Settings
+            invalidates stolen tokens on other devices.
+          </li>
+          <li>
             <strong>You control mail</strong>, unsubscribe anytime; delete your account in Settings.
           </li>
         </ul>

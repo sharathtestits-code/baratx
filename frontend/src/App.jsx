@@ -1,6 +1,7 @@
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
+import NativeLaunch from "./pages/NativeLaunch";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -10,6 +11,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Guidelines from "./pages/Guidelines";
+import EarlyIssues from "./pages/EarlyIssues";
 import Home from "./pages/Home";
 import Feed from "./pages/Feed";
 import Profile from "./pages/Profile";
@@ -45,6 +47,7 @@ import ComposeFab from "./components/ComposeFab";
 import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
 import { canAccessOpsConsole, loadOpsConsolePath, opsConsolePath, applyOpsPathFromUser } from "./opsAccess";
+import { isNativeApp } from "./native";
 
 function AuthChrome({ children, legal = false }) {
   return (
@@ -126,6 +129,7 @@ function AppRoutes() {
       <Route path="/onboarding/topics" element={<OnboardingTopics />} />
       <Route path="/rewards" element={<Rewards />} />
       <Route path="/guidelines" element={<Guidelines />} />
+      <Route path="/early-issues" element={<EarlyIssues />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="*" element={<NotFound homeTo="/home" homeLabel="Back to Home" />} />
@@ -253,11 +257,19 @@ export default function App() {
       </AuthChrome>
     );
   }
+  if (location.pathname === "/early-issues") {
+    return (
+      <AuthChrome legal>
+        <EarlyIssues />
+      </AuthChrome>
+    );
+  }
 
   if (!token) {
+    const native = isNativeApp();
     return (
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={native ? <NativeLaunch /> : <Landing />} />
         <Route
           path="/signup"
           element={
@@ -299,6 +311,14 @@ export default function App() {
             </AuthChrome>
           }
         />
+        <Route
+          path="/early-issues"
+          element={
+            <AuthChrome legal>
+              <EarlyIssues />
+            </AuthChrome>
+          }
+        />
         {/* Public profiles/posts while logged out — avoid false 404 after session blips */}
         <Route
           path="/u/:username"
@@ -317,7 +337,10 @@ export default function App() {
           }
         />
         {/* Unknown logged-out URLs → explicit 404 (not a silent landing bounce) */}
-        <Route path="*" element={<NotFound homeTo="/" homeLabel="Back to BarathX" />} />
+        <Route
+          path="*"
+          element={<NotFound homeTo="/" homeLabel="Back to BarathX" />}
+        />
       </Routes>
     );
   }

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../softLaunch";
+import { WHATSAPP_CHANNEL, WHATSAPP_COMMUNITY, X_PROFILE } from "../socialLinks";
 
 /**
  * Debate-first brand landing (audit Week 1).
@@ -10,6 +12,8 @@ import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../s
  */
 export default function Landing() {
   const softLaunch = isSoftLaunchWindow();
+  const [confirmAge18, setConfirmAge18] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   return (
     <div className="bx-home">
       <header className="bx-home-nav">
@@ -57,14 +61,41 @@ export default function Landing() {
             </Link>
           </div>
           <div className="bx-home-hero-google">
-            <GoogleSignInButton label="Continue with Google" confirmAge18 />
+            <label className="age-gate bx-home-consent">
+              <input
+                type="checkbox"
+                checked={confirmAge18}
+                onChange={(e) => setConfirmAge18(e.target.checked)}
+              />
+              <span>
+                I am <strong>18+</strong>
+              </span>
+            </label>
+            <label className="age-gate bx-home-consent">
+              <input
+                type="checkbox"
+                checked={acceptPrivacy}
+                onChange={(e) => setAcceptPrivacy(e.target.checked)}
+              />
+              <span>
+                I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
+                <Link to="/terms">Terms</Link>
+              </span>
+            </label>
+            <GoogleSignInButton
+              label="Continue with Google"
+              confirmAge18={confirmAge18}
+              acceptPrivacy={acceptPrivacy}
+              requireAgeConfirm
+              requirePrivacyConfirm
+            />
           </div>
           <p className="bx-home-founding-chip">
             <Link to="/signup?next=/rewards">100 Founding spots</Link>, earned by opening a debate
             that gets real engagement, not by signing up.
           </p>
           <p className="bx-home-hero-legal">
-            18+ · By joining you agree to the <Link to="/terms">Terms</Link> and{" "}
+            Personal data is processed under India&apos;s DPDP Act. Details in{" "}
             <Link to="/privacy">Privacy</Link>.
           </p>
         </div>
@@ -264,18 +295,25 @@ export default function Landing() {
           </Link>
           <a
             className="btn btn-secondary bx-home-cta-secondary"
-            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            href={WHATSAPP_COMMUNITY}
             target="_blank"
             rel="noreferrer"
           >
-            WhatsApp community
+            WhatsApp Community
           </a>
         </div>
         <p className="bx-home-closing-follow">
-          Follow on X →{" "}
-          <a href="https://x.com/getbaratx" target="_blank" rel="noreferrer">
+          Channel →{" "}
+          <a href={WHATSAPP_CHANNEL} target="_blank" rel="noreferrer">
+            WhatsApp Channel
+          </a>
+          {" · "}
+          X →{" "}
+          <a href={X_PROFILE} target="_blank" rel="noreferrer">
             @getbaratx
           </a>
+          {" · "}
+          <Link to="/early-issues">Early issues</Link>
         </p>
       </section>
 
@@ -283,6 +321,7 @@ export default function Landing() {
         <span>© {new Date().getFullYear()} BarathX</span>
         <span className="bx-home-foot-links">
           <Link to="/guidelines">Guidelines</Link>
+          <Link to="/early-issues">Early issues</Link>
           <Link to="/terms">Terms</Link>
           <Link to="/privacy">Privacy</Link>
           <a href="https://barathx.com">barathx.com</a>

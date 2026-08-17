@@ -62,10 +62,13 @@ export async function ensureNativeGoogleReady() {
  */
 export async function nativeGoogleIdToken() {
   await ensureNativeGoogleReady();
+  // Do NOT pass `scopes` on Android unless MainActivity implements
+  // ModifiedMainActivityForSocialLoginPlugin — Capgo rejects with:
+  // "You CANNOT use scopes without modifying the main activity…"
+  // Defaults already include email + profile + openid (enough for our ID token).
   const res = await SocialLogin.login({
     provider: "google",
     options: {
-      scopes: ["email", "profile", "openid"],
       style: "bottom",
       filterByAuthorizedAccounts: false,
     },
@@ -83,6 +86,9 @@ export function friendlyNativeGoogleError(err) {
   const code = err?.code || "";
   if (code === "USER_CANCELLED" || /cancel/i.test(raw)) {
     return "Google sign-in was cancelled.";
+  }
+  if (/CANNOT use scopes|modifying the main activity/i.test(raw)) {
+    return "Google Sign-In hit an Android setup bug (scopes). Update the app build, or use phone OTP for now.";
   }
   if (/28444|Developer console is not set up|console is not set up/i.test(raw)) {
     return "Google Sign-In needs Android OAuth setup: add package com.baratx.app + this build’s SHA-1 in Google Cloud (see MOBILE.md). Phone OTP still works.";

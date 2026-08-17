@@ -63,12 +63,16 @@ PEAK_SLOTS = (
 LINK_SITE = "https://barathx.com"
 LINK_IG = "https://www.instagram.com/getbarathx/"
 LINK_X = "https://x.com/getbaratx"
-LINK_WA = "https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+LINK_WA_CHANNEL = "https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+LINK_WA_COMMUNITY = "https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU"
+# Keep LINK_WA as channel for short footers / legacy callers.
+LINK_WA = LINK_WA_CHANNEL
 
 FOOTER_IG = (
     f"app → {LINK_SITE}\n"
     f"X → {LINK_X}\n"
-    f"WhatsApp → {LINK_WA}"
+    f"WhatsApp channel → {LINK_WA_CHANNEL}\n"
+    f"WhatsApp community → {LINK_WA_COMMUNITY}"
 )
 
 CAPTIONS = {

@@ -38,6 +38,32 @@ SEVERE_RE = re.compile(
     re.I,
 )
 
+# Explicit adult / sexual content — blocked everywhere (posts, replies, DMs, Live).
+# Aimed at porn/solicitation, not civic debate about policy or harassment as a topic.
+ADULT_CONTENT_RE = re.compile(
+    r"("
+    r"\bporn(o|ography|hub)?\b|"
+    r"\bonlyfans\b|\bfansly\b|"
+    r"\bnudes?\b|\bnsfw\b|\bxxx+\b|"
+    r"send\s+nudes?|"
+    r"\bsext(ing|s)?\b|"
+    r"\bsex\s*(tape|video|chat|cam|worker|work|pics?|photos?)\b|"
+    r"\b(escort|hookers?)\b|"
+    r"\b(dick|cock)\s*pics?\b|"
+    r"\b(blow\s*jobs?|hand\s*jobs?)\b|"
+    r"\b(cum\s*shot|deepthroat)\b|"
+    r"\berotic\s+(pics?|photos?|videos?|content)\b|"
+    r"\badult\s+(videos?|content|sites?|links?)\b|"
+    r"\bnaked\s+(pics?|photos?|selfies?|videos?)\b"
+    r")",
+    re.I,
+)
+
+ADULT_BLOCK_MESSAGE = (
+    "Adult or sexual content is not allowed on BarathX. "
+    "Keep posts, replies, and messages suitable for India's public square."
+)
+
 SPAM_RE = re.compile(
     r"("
     r"https?://\S+\s+https?://|"
@@ -69,12 +95,24 @@ def is_protected_user(user: models.User) -> bool:
     return (user.username or "") in seed.PROTECTED_BLUE_USERNAMES
 
 
+def is_adult_or_sexual_content(text: str) -> bool:
+    return bool(ADULT_CONTENT_RE.search(text or ""))
+
+
+def assert_safe_public_text(text: str) -> None:
+    """Raise ValueError when text must not be posted or messaged on BarathX."""
+    if is_adult_or_sexual_content(text):
+        raise ValueError(ADULT_BLOCK_MESSAGE)
+    if SEVERE_RE.search(text or ""):
+        raise ValueError("This text violates BarathX community guidelines.")
+
+
 def text_violation_level(text: str) -> Optional[str]:
     """Return 'severe' | 'mild' | None."""
     t = (text or "").strip()
     if not t:
         return None
-    if SEVERE_RE.search(t):
+    if SEVERE_RE.search(t) or ADULT_CONTENT_RE.search(t):
         return "severe"
     if SPAM_RE.search(t):
         return "mild"

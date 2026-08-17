@@ -11,7 +11,7 @@ import { LOCALES, getStoredLanguage, localeMeta } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout, revokeAllSessions, updateUser } = useAuth();
   const { language: localeLang, setLanguage: setLocaleLanguage, t } = useLocale();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -21,7 +21,7 @@ export default function Settings() {
   const [language, setLanguage] = useState(() => user?.language || localeLang || getStoredLanguage());
   const [languageSaving, setLanguageSaving] = useState(false);
   const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
-  const [emailSaving, setEmailSaving] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [mutes, setMutes] = useState([]);
@@ -173,9 +173,45 @@ export default function Settings() {
     }
   }
 
-  function handleLogout() {
-    logout();
+  async function handleExportData() {
+    setExportBusy(true);
+    setError("");
+    try {
+      const data = await api.exportMyData(token);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `barathx-data-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setMsg("Download started. That’s a copy of personal data we hold (DPDP right to access).");
+    } catch (err) {
+      setError(err.message || "Could not export your data.");
+    } finally {
+      setExportBusy(false);
+    }
+  }
+
+  async function handleLogout() {
+    await logout();
     navigate("/");
+  }
+
+  async function handleRevokeAll() {
+    if (
+      !window.confirm(
+        "Sign out every device and browser that has your BarathX account? You’ll need to log in again here too."
+      )
+    ) {
+      return;
+    }
+    try {
+      await revokeAllSessions();
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Could not sign out all sessions.");
+    }
   }
 
   return (
@@ -257,17 +293,29 @@ export default function Settings() {
         <h2>Privacy &amp; security</h2>
         <p className="hint">
           Your password is hashed. Email and phone stay private on your profile. Sessions expire;
-          password reset signs out other devices.
+          password reset and “sign out everywhere” kill stolen tokens on other devices.
         </p>
         <ul className="settings-security-points">
           <li>Passwords stored with bcrypt, never plain text</li>
           <li>Email / phone visible only to you</li>
           <li>Confirm email before posting (if you signed up with email)</li>
           <li>Login &amp; OTP attempts are rate-limited</li>
+          <li>Log out revokes your session token so a copied key stops working</li>
+          <li>
+            India DPDP: access, correct, erase, and withdraw consent (see Privacy Policy)
+          </li>
         </ul>
-        <Link className="btn btn-secondary" to="/privacy">
-          Read Privacy Policy
-        </Link>
+        <div className="settings-security-actions">
+          <button type="button" className="btn btn-secondary" onClick={handleExportData} disabled={exportBusy}>
+            {exportBusy ? "Preparing…" : "Download my data"}
+          </button>
+          <Link className="btn btn-secondary" to="/privacy">
+            Read Privacy Policy
+          </Link>
+          <button type="button" className="btn btn-secondary" onClick={handleRevokeAll}>
+            Sign out everywhere
+          </button>
+        </div>
 
         <div className="settings-danger">
           <h3>Delete account</h3>
@@ -351,6 +399,35 @@ export default function Settings() {
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="settings-section">
+        <h2>Help &amp; WhatsApp</h2>
+        <p className="hint">
+          First 1000 members can log bugs on Early issues (ops gets an email). Join WhatsApp to
+          talk concerns live.
+        </p>
+        <div className="settings-security-actions">
+          <Link className="btn btn-secondary" to="/early-issues">
+            Early issues
+          </Link>
+          <a
+            className="btn btn-secondary"
+            href="https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU?mode=gi_t"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Community
+          </a>
+          <a
+            className="btn btn-secondary"
+            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Channel
+          </a>
+        </div>
       </section>
 
       <section className="settings-section">

@@ -15,6 +15,7 @@ from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
 from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
+from app import ai_filter, anti_scrape, data_protection, search_query
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
 from app.social_surfaces import register_social_surfaces
@@ -50,6 +51,10 @@ def run_migrations():
                 )
             if "token_version" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
+            if "privacy_accepted_at" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at DATETIME"))
+            if "privacy_notice_version" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -60,6 +65,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
             if "debate_side" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+            if "likely_ai" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN likely_ai BOOLEAN DEFAULT 0"))
 
             # communities arena flags
             try:
@@ -94,6 +101,8 @@ def run_migrations():
             reply_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(replies)"))}
             if "parent_reply_id" not in reply_cols:
                 conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+            if "likely_ai" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN likely_ai BOOLEAN DEFAULT 0"))
 
             notif_tables = {
                 row[0]
@@ -143,6 +152,10 @@ def run_migrations():
                     )
                 if "token_version" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0"))
+                if "privacy_accepted_at" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at TIMESTAMP"))
+                if "privacy_notice_version" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -153,6 +166,8 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE posts ADD COLUMN space_id VARCHAR"))
             if post_cols and "debate_side" not in post_cols:
                 conn.execute(text("ALTER TABLE posts ADD COLUMN debate_side VARCHAR"))
+            if post_cols and "likely_ai" not in post_cols:
+                conn.execute(text("ALTER TABLE posts ADD COLUMN likely_ai BOOLEAN DEFAULT FALSE"))
 
             community_cols = cols("communities")
             if community_cols:
@@ -179,6 +194,8 @@ def run_migrations():
             reply_cols = cols("replies")
             if reply_cols and "parent_reply_id" not in reply_cols:
                 conn.execute(text("ALTER TABLE replies ADD COLUMN parent_reply_id VARCHAR"))
+            if reply_cols and "likely_ai" not in reply_cols:
+                conn.execute(text("ALTER TABLE replies ADD COLUMN likely_ai BOOLEAN DEFAULT FALSE"))
 
             notif_cols = cols("notifications")
             if notif_cols and "kind" not in notif_cols:
@@ -205,6 +222,15 @@ def run_migrations():
 
 
 run_migrations()
+
+# DPDP retention: purge expired OTPs / auth tokens on boot (purpose completed).
+with SessionLocal() as _dpdp_db:
+    try:
+        data_protection.purge_ephemeral_personal_data(_dpdp_db)
+    except Exception:  # noqa: BLE001
+        import logging
+
+        logging.getLogger("baratx").exception("DPDP ephemeral purge on boot failed")
 
 # Cold-start density: official BarathX accounts + starter posts + communities.
 with SessionLocal() as _seed_db:
@@ -314,9 +340,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def anti_scrape_middleware(request: Request, call_next):
+    """Block scraper UAs + throttle anonymous bulk reads on content APIs."""
+    blocked = anti_scrape.enforce_anti_scrape(request)
+    if blocked is not None:
+        return blocked
+    response = await call_next(request)
+    # Discourage AI trainers / indexers from caching API JSON.
+    path = request.url.path or ""
+    if anti_scrape.is_bulk_scrape_path(path):
+        response.headers.setdefault("X-Robots-Tag", "noindex, nofollow, noai, noimageai")
+    # Baseline hardening on every API response.
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault(
+        "Permissions-Policy",
+        "camera=(), microphone=(), geolocation=()",
+    )
+    return response
+
+
 BASE_DIR = media_store.BASE_DIR
 MEDIA_DIR = media_store.MEDIA_DIR
 os.makedirs(MEDIA_DIR, exist_ok=True)
+
+
+@app.get("/robots.txt")
+def robots_txt():
+    """API-host robots — refuse scrapers and AI training crawls."""
+    return Response(content=anti_scrape.robots_txt_body(), media_type="text/plain; charset=utf-8")
 
 
 @app.get("/media/{name}")
@@ -341,7 +396,7 @@ if not media_store.use_db_store() and not media_store.s3_enabled():
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5MB
 MAX_POST_LENGTH = 500
-MAX_REPLY_LENGTH = 220
+MAX_REPLY_LENGTH = 500
 MAX_AVATAR_BYTES = 3 * 1024 * 1024  # 3MB
 MAX_COVER_BYTES = 5 * 1024 * 1024  # 5MB
 
@@ -578,6 +633,11 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
 
     tags = text_parse.extract_hashtags(post.text)
     safe_text = text_parse.sanitize_user_text(post.text or "")
+    likely_ai = bool(getattr(post, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
+    mentions_me = False
+    if current_user and getattr(current_user, "username", None):
+        me = current_user.username.lower()
+        mentions_me = me in {m.lower() for m in text_parse.extract_mentions(safe_text)}
 
     return schemas.PostOut(
         id=post.id,
@@ -595,6 +655,8 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         hashtags=tags,
         debate_side=getattr(post, "debate_side", None),
         space_id=getattr(post, "space_id", None),
+        likely_ai=likely_ai,
+        mentions_me=mentions_me,
     )
 
 
@@ -609,6 +671,15 @@ def require_verified_to_post(user: models.User) -> None:
         )
 
 
+def enforce_human_take(user: models.User, text: str) -> bool:
+    """Reject hard AI slop; return likely_ai flag for softer hits. Official voices skip reject."""
+    score = ai_filter.score_ai_text(text)
+    is_official = bool(getattr(user, "is_official", False))
+    if score.reject and not is_official:
+        raise HTTPException(status_code=400, detail=ai_filter.AI_REJECT_DETAIL)
+    return bool(score.likely_ai) and not is_official
+
+
 def otp_matches(otp_row: models.OTP, code: str) -> bool:
     """Accept bcrypt-hashed OTP (preferred) or legacy plaintext rows during rollout."""
     stored = otp_row.code or ""
@@ -620,15 +691,18 @@ def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) ->
     liked_by_me = False
     if current_user:
         liked_by_me = any(like.user_id == current_user.id for like in reply.likes)
+    safe_text = text_parse.sanitize_user_text(reply.text or "")
+    likely_ai = bool(getattr(reply, "likely_ai", False)) or ai_filter.looks_like_ai(safe_text)
     return schemas.ReplyOut(
         id=reply.id,
         post_id=reply.post_id,
-        text=text_parse.sanitize_user_text(reply.text or ""),
+        text=safe_text,
         created_at=reply.created_at,
         author=author_out(reply.author),
         like_count=len(reply.likes),
         liked_by_me=liked_by_me,
         parent_reply_id=getattr(reply, "parent_reply_id", None),
+        likely_ai=likely_ai,
     )
 
 
@@ -693,6 +767,105 @@ def hidden_author_ids(db: Session, current_user: Optional[models.User]) -> set[s
         for r in db.query(models.Mute.muted_id).filter(models.Mute.muter_id == current_user.id).all()
     }
     return blocked | blocked_by | muted
+
+
+def list_mention_feed(
+    db: Session,
+    *,
+    current_user: models.User,
+    limit: int,
+    before: Optional[str],
+) -> list[schemas.FeedItemOut]:
+    """Posts (and reply parents) where someone @tagged the current user."""
+    username = (current_user.username or "").strip().lower()
+    if not username:
+        return []
+
+    cursor = None
+    if before:
+        try:
+            cursor = datetime.fromisoformat(before)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid 'before' timestamp")
+
+    # Match @username with a non-username char (or end) after the handle.
+    pattern = f"%@{username}%"
+    hidden = hidden_author_ids(db, current_user)
+    post_ids: dict[str, datetime] = {}
+
+    post_q = db.query(models.Post).filter(models.Post.text.ilike(pattern))
+    if cursor is not None:
+        post_q = post_q.filter(models.Post.created_at < cursor)
+    for p in post_q.order_by(models.Post.created_at.desc()).limit(limit * 4).all():
+        if p.author_id in hidden or p.author_id == current_user.id:
+            continue
+        # Avoid false positives like @rahul catching @rahul99
+        mentioned = {m.lower() for m in text_parse.extract_mentions(p.text or "")}
+        if username not in mentioned:
+            continue
+        post_ids[p.id] = p.created_at
+
+    reply_q = db.query(models.Reply).filter(models.Reply.text.ilike(pattern))
+    if cursor is not None:
+        reply_q = reply_q.filter(models.Reply.created_at < cursor)
+    for r in reply_q.order_by(models.Reply.created_at.desc()).limit(limit * 4).all():
+        if r.author_id in hidden or r.author_id == current_user.id:
+            continue
+        mentioned = {m.lower() for m in text_parse.extract_mentions(r.text or "")}
+        if username not in mentioned:
+            continue
+        # Surface the parent post so Home can open the thread.
+        ts = r.created_at
+        prev = post_ids.get(r.post_id)
+        if prev is None or (ts and prev and ts > prev):
+            post_ids[r.post_id] = ts
+
+    # Also pick up mention notifications (covers edge cases / older rows).
+    notif_q = (
+        db.query(models.Notification)
+        .filter(
+            models.Notification.recipient_id == current_user.id,
+            models.Notification.kind == "mention",
+            models.Notification.post_id.isnot(None),
+        )
+        .order_by(models.Notification.created_at.desc())
+        .limit(limit * 3)
+    )
+    if cursor is not None:
+        notif_q = notif_q.filter(models.Notification.created_at < cursor)
+    for n in notif_q.all():
+        if not n.post_id:
+            continue
+        ts = n.created_at
+        prev = post_ids.get(n.post_id)
+        if prev is None or (ts and prev and ts > prev):
+            post_ids[n.post_id] = ts
+
+    if not post_ids:
+        return []
+
+    ordered_ids = sorted(post_ids.keys(), key=lambda pid: post_ids[pid] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)[
+        :limit
+    ]
+    posts = (
+        db.query(models.Post)
+        .filter(models.Post.id.in_(ordered_ids))
+        .all()
+    )
+    by_id = {p.id: p for p in posts}
+    items: list[schemas.FeedItemOut] = []
+    for pid in ordered_ids:
+        post = by_id.get(pid)
+        if not post or post.author_id in hidden:
+            continue
+        items.append(
+            schemas.FeedItemOut(
+                post=serialize_post(post, current_user),
+                reposted_by=None,
+                item_time=post_ids.get(pid) or post.created_at,
+            )
+        )
+    return items
 
 
 def create_notification(
@@ -920,6 +1093,21 @@ def get_suggestions(
     return suggestions_mod.list_suggestions(
         db, surface=surface, arena_key=arena, topic_key=topic, limit=limit
     )
+
+
+@app.get("/trending", response_model=schemas.TrendingOut)
+def get_trending(
+    q: Optional[str] = None,
+    lane: Optional[str] = None,
+    limit: int = 8,
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """India-now topics + headlines for Explore (RSS-scored, taxonomy fallback)."""
+    from app import trending as trending_mod
+
+    _ = current_user  # optional auth; anti-scrape still applies
+    data = trending_mod.get_trending(q=q, lane=lane, limit=limit)
+    return schemas.TrendingOut(**data)
 
 
 @app.get("/admin/users", response_model=schemas.AdminUsersOut)
@@ -1175,6 +1363,7 @@ def admin_create_reply(
         author_id=author.id,
         text=text,
         parent_reply_id=None,
+        likely_ai=False,
     )
     db.add(reply)
     db.flush()
@@ -1312,6 +1501,8 @@ def signup_email(
         badge="none",
         is_official=False,
         token_version=0,
+        privacy_accepted_at=datetime.now(timezone.utc),
+        privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
     )
     db.add(user)
     db.commit()
@@ -1507,6 +1698,19 @@ def reset_password(payload: schemas.ResetPasswordRequest, db: Session = Depends(
     return schemas.MessageResponse(message="Password updated. You can sign in with your new password.")
 
 
+@app.post("/auth/revoke-sessions", response_model=schemas.MessageResponse)
+def revoke_sessions(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Invalidate every JWT for this account (stolen-token / shared-device recovery)."""
+    auth.bump_token_version(current_user)
+    db.commit()
+    return schemas.MessageResponse(
+        message="All sessions signed out. Sign in again on devices you still use."
+    )
+
+
 @app.post("/auth/login/email", response_model=schemas.TokenResponse)
 def login_email(
     payload: schemas.EmailLoginRequest,
@@ -1584,6 +1788,11 @@ def auth_google(
                 status_code=400,
                 detail="You must be 18 or older to join BarathX. Confirm your age to continue.",
             )
+        if not payload.accept_privacy:
+            raise HTTPException(
+                status_code=400,
+                detail="New accounts must accept the Privacy Policy. Open Sign up, tick Privacy (DPDP), then continue with Google.",
+            )
         base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
         username = base
         n = 0
@@ -1601,6 +1810,8 @@ def auth_google(
             badge="none",
             is_official=False,
             token_version=0,
+            privacy_accepted_at=datetime.now(timezone.utc),
+            privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
         )
         db.add(user)
         try:
@@ -1685,6 +1896,8 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         is_phone_verified=True,
         badge="none",
         is_official=False,
+        privacy_accepted_at=datetime.now(timezone.utc),
+        privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
     )
     db.add(user)
     db.commit()
@@ -1755,10 +1968,16 @@ def delete_my_account(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Self-serve permanent account deletion (Privacy Policy)."""
+    """DPDP right to erasure — permanent account + personal data deletion."""
     if current_user.username in set(seed.OFFICIAL_USERNAMES) or getattr(current_user, "is_official", False):
         raise HTTPException(status_code=400, detail="Official accounts cannot be self-deleted")
     uid = current_user.id
+    phone = current_user.phone
+    delete_media_file(current_user.avatar_url)
+    delete_media_file(current_user.cover_url)
+    data_protection.erase_user_auth_artefacts(db, uid)
+    if phone:
+        db.query(models.OTP).filter(models.OTP.phone == phone).delete(synchronize_session=False)
     # Soft-clear PII then remove user row (cascades posts/likes via relationships where configured).
     current_user.email = None
     current_user.phone = None
@@ -1772,7 +1991,16 @@ def delete_my_account(
     if user:
         db.delete(user)
         db.commit()
-    return schemas.MessageResponse(message="Your BarathX account has been deleted.")
+    return schemas.MessageResponse(message="Your BarathX account and personal data have been deleted.")
+
+
+@app.get("/users/me/data-export")
+def export_my_data(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """DPDP right to access — download a copy of your personal data."""
+    return data_protection.build_personal_data_export(db, current_user)
 
 
 @app.post("/users/me/bootstrap-follows", response_model=schemas.MessageResponse)
@@ -2167,6 +2395,13 @@ async def create_post(
         raise HTTPException(status_code=400, detail="Post text cannot be empty")
     if len(text) > MAX_POST_LENGTH:
         raise HTTPException(status_code=400, detail=f"Post must be {MAX_POST_LENGTH} characters or fewer")
+    try:
+        from app.moderation import assert_safe_public_text
+
+        assert_safe_public_text(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    likely_ai = enforce_human_take(current_user, text)
 
     quoted_post_id = None
     if quote_post_id:
@@ -2199,6 +2434,7 @@ async def create_post(
         text=text,
         image_url=image_url,
         quoted_post_id=quoted_post_id,
+        likely_ai=likely_ai,
     )
     # Lifetime welcome: fire once per account even if every post is later deleted.
     is_first_post = not bool(getattr(current_user, "has_posted_once", False))
@@ -2315,11 +2551,22 @@ async def create_post(
 def list_posts(
     limit: int = 20,
     before: Optional[str] = None,  # ISO timestamp cursor for pagination
-    feed: str = "global",  # "global" | "following"
+    feed: str = "global",  # "global" | "following" | "mentions"
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
     limit = max(1, min(limit, 50))
+
+    # Mentions / @tags: always show on Home even if you don't follow the author.
+    if feed == "mentions":
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Log in to see posts that tagged you")
+        return list_mention_feed(
+            db,
+            current_user=current_user,
+            limit=limit,
+            before=before,
+        )
 
     author_filter_ids = None
     if feed == "following":
@@ -2393,18 +2640,44 @@ def list_posts(
         )
 
     if feed == "global":
-        # Square "For you": real member takes first (including blue/gold badges),
-        # then seeded official digest accounts, follow not required.
+        # Pull recent @tags into For you so tagged posts aren’t missed.
+        if current_user and not before:
+            seen_ids = {i.post.id for i in items}
+            for mention_item in list_mention_feed(
+                db, current_user=current_user, limit=min(10, limit), before=None
+            ):
+                if mention_item.post.id in seen_ids:
+                    # Ensure mentions_me is set even if the post was already in the window.
+                    mention_item.post.mentions_me = True
+                    for existing in items:
+                        if existing.post.id == mention_item.post.id:
+                            existing.post.mentions_me = True
+                            break
+                    continue
+                mention_item.post.mentions_me = True
+                items.append(mention_item)
+                seen_ids.add(mention_item.post.id)
+
+        # Square "For you": tagged posts first, then member takes, then official digests.
+        # Within each band, human takes beat likely-AI drafts.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
             uname = (getattr(author, "username", None) or "").lower() if author else ""
             is_seed_official = uname in official_names
+            is_ai = bool(getattr(i.post, "likely_ai", False))
+            tagged = bool(getattr(i.post, "mentions_me", False))
             ts = i.item_time.timestamp() if i.item_time else 0.0
-            return (1 if is_seed_official else 0, -ts)
+            return (0 if tagged else 1, 1 if is_seed_official else 0, 1 if is_ai else 0, -ts)
 
         items.sort(key=_sort_key)
     else:
-        items.sort(key=lambda i: i.item_time, reverse=True)
+        items.sort(
+            key=lambda i: (
+                0 if getattr(i.post, "mentions_me", False) else 1,
+                1 if getattr(i.post, "likely_ai", False) else 0,
+                -(i.item_time.timestamp() if i.item_time else 0.0),
+            )
+        )
     return items[:limit]
 
 
@@ -2649,6 +2922,13 @@ def create_reply(
         raise HTTPException(status_code=400, detail="Reply text cannot be empty")
     if len(text) > MAX_REPLY_LENGTH:
         raise HTTPException(status_code=400, detail=f"Reply must be {MAX_REPLY_LENGTH} characters or fewer")
+    try:
+        from app.moderation import assert_safe_public_text
+
+        assert_safe_public_text(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    likely_ai = enforce_human_take(current_user, text)
 
     parent_reply_id = payload.parent_reply_id
     if parent_reply_id:
@@ -2661,6 +2941,7 @@ def create_reply(
         author_id=current_user.id,
         text=text,
         parent_reply_id=parent_reply_id,
+        likely_ai=likely_ai,
     )
     db.add(reply)
     db.flush()
@@ -2718,7 +2999,15 @@ def list_replies(
         .order_by(models.Reply.created_at.asc())
         .all()
     )
-    return [serialize_reply(r, current_user) for r in replies]
+    # Human replies first; flagged AI drafts sink to the bottom (still visible).
+    serialized = [serialize_reply(r, current_user) for r in replies]
+    serialized.sort(
+        key=lambda r: (
+            1 if r.likely_ai else 0,
+            r.created_at.timestamp() if r.created_at else 0.0,
+        )
+    )
+    return serialized
 
 
 # ---------- Reply likes ----------
@@ -2777,22 +3066,149 @@ def search(
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
-    q = q.strip()
-    if not q:
-        return schemas.SearchResults(users=[], posts=[])
+    """Explore search: people, posts, hashtags, and topic/arena homes."""
+    variants = search_query.search_variants(q)
+    if not variants:
+        return schemas.SearchResults(users=[], posts=[], topics=[], arenas=[])
 
-    like_pattern = f"%{q}%"
+    # Escape LIKE wildcards; SQLite + Postgres both accept ESCAPE '\\'.
+    likes = [search_query.like_pattern(v) for v in variants]
+    user_filters = []
+    post_text_filters = []
+    hashtag_filters = []
+    topic_filters = []
+    community_filters = []
+    space_title_filters = []
+    for like in likes:
+        user_filters.extend(
+            [
+                models.User.username.ilike(like, escape="\\"),
+                models.User.display_name.ilike(like, escape="\\"),
+                models.User.bio.ilike(like, escape="\\"),
+            ]
+        )
+        post_text_filters.append(models.Post.text.ilike(like, escape="\\"))
+        hashtag_filters.append(models.Hashtag.tag.ilike(like, escape="\\"))
+        topic_filters.extend(
+            [
+                models.Topic.name.ilike(like, escape="\\"),
+                models.Topic.key.ilike(like, escape="\\"),
+            ]
+        )
+        community_filters.extend(
+            [
+                models.Community.name.ilike(like, escape="\\"),
+                models.Community.slug.ilike(like, escape="\\"),
+                models.Community.arena_key.ilike(like, escape="\\"),
+            ]
+        )
+        space_title_filters.append(models.Space.title.ilike(like, escape="\\"))
 
     users = (
         db.query(models.User)
-        .filter(or_(models.User.username.ilike(like_pattern), models.User.display_name.ilike(like_pattern)))
+        .filter(or_(*user_filters))
         .limit(20)
         .all()
     )
 
+    topic_rows = (
+        db.query(models.Topic)
+        .filter(or_(*topic_filters))
+        .limit(12)
+        .all()
+    )
+    # Dedupe by (arena_key, key) keeping first
+    seen_topics: set[tuple[str, str]] = set()
+    topics_out: list[schemas.TopicSearchOut] = []
+    topic_ids: list[str] = []
+    for t in topic_rows:
+        pair = (t.arena_key, t.key)
+        if pair in seen_topics:
+            continue
+        seen_topics.add(pair)
+        topic_ids.append(t.id)
+        topics_out.append(
+            schemas.TopicSearchOut(
+                id=t.id,
+                key=t.key,
+                name=t.name,
+                arena_key=t.arena_key,
+                blurb=t.blurb or "",
+            )
+        )
+
+    community_rows = (
+        db.query(models.Community)
+        .filter(or_(*community_filters))
+        .limit(12)
+        .all()
+    )
+    arenas_out: list[schemas.ArenaSearchOut] = []
+    community_ids: list[str] = []
+    seen_arenas: set[str] = set()
+    for c in community_rows:
+        community_ids.append(c.id)
+        key = (c.arena_key or c.slug or "").strip()
+        if not key or key in seen_arenas:
+            continue
+        if not c.is_arena and not c.arena_key:
+            continue
+        seen_arenas.add(key)
+        arenas_out.append(
+            schemas.ArenaSearchOut(
+                key=key,
+                name=c.name,
+                slug=c.slug,
+            )
+        )
+
+    # Posts matching body text OR linked hashtags OR topic/arena spaces OR debate titles.
+    matching_hashtag_ids = [
+        row.id
+        for row in db.query(models.Hashtag.id).filter(or_(*hashtag_filters)).limit(40).all()
+    ]
+    hashtag_post_ids = []
+    if matching_hashtag_ids:
+        hashtag_post_ids = [
+            row.post_id
+            for row in (
+                db.query(models.PostHashtag.post_id)
+                .filter(models.PostHashtag.hashtag_id.in_(matching_hashtag_ids))
+                .limit(80)
+                .all()
+            )
+        ]
+
+    topic_space_ids = []
+    if topic_ids:
+        topic_space_ids = [
+            row.id
+            for row in (
+                db.query(models.Space.id)
+                .filter(models.Space.topic_id.in_(topic_ids))
+                .limit(80)
+                .all()
+            )
+        ]
+
+    titled_space_ids = [
+        row.id
+        for row in db.query(models.Space.id).filter(or_(*space_title_filters)).limit(40).all()
+    ]
+
+    post_filters = list(post_text_filters)
+    if hashtag_post_ids:
+        post_filters.append(models.Post.id.in_(hashtag_post_ids))
+    if topic_space_ids:
+        post_filters.append(models.Post.space_id.in_(topic_space_ids))
+    if titled_space_ids:
+        post_filters.append(models.Post.space_id.in_(titled_space_ids))
+    if community_ids:
+        post_filters.append(models.Post.community_id.in_(community_ids))
+
     posts = (
         db.query(models.Post)
-        .filter(models.Post.text.ilike(like_pattern))
+        .filter(or_(*post_filters))
         .order_by(models.Post.created_at.desc())
         .limit(30)
         .all()
@@ -2815,6 +3231,8 @@ def search(
             for u in users
         ],
         posts=[serialize_post(p, current_user) for p in posts],
+        topics=topics_out,
+        arenas=arenas_out,
     )
 
 

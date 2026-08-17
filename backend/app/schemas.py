@@ -6,6 +6,17 @@ from pydantic import BaseModel, EmailStr, Field, field_validator, model_validato
 
 from app.phoneutil import normalize_phone
 from app.text_parse import sanitize_user_text
+from app.moderation import assert_safe_public_text
+
+
+def _validated_user_text(v: str, *, empty: str, max_len: int, too_long: str) -> str:
+    text = sanitize_user_text(v or "").strip()
+    if not text:
+        raise ValueError(empty)
+    if len(text) > max_len:
+        raise ValueError(too_long)
+    assert_safe_public_text(text)
+    return text
 
 # Letters/numbers first; allow . _ - (Instagram/Twitter-style handles)
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]{2,19}$")
@@ -29,6 +40,7 @@ class EmailSignupRequest(BaseModel):
     username: str
     display_name: str
     confirm_age_18: bool = False
+    accept_privacy: bool = False
 
     @field_validator("username")
     @classmethod
@@ -54,6 +66,13 @@ class EmailSignupRequest(BaseModel):
     def must_confirm_age(cls, v):
         if not v:
             raise ValueError("You must be 18 or older to join BarathX")
+        return True
+
+    @field_validator("accept_privacy")
+    @classmethod
+    def must_accept_privacy(cls, v):
+        if not v:
+            raise ValueError("Accept the Privacy Policy to create an account")
         return True
 
 
@@ -89,6 +108,7 @@ class PhoneSignupVerify(BaseModel):
     display_name: str
     region: Optional[str] = None
     confirm_age_18: bool = False
+    accept_privacy: bool = False
 
     @field_validator("username")
     @classmethod
@@ -100,6 +120,13 @@ class PhoneSignupVerify(BaseModel):
     def must_confirm_age(cls, v):
         if not v:
             raise ValueError("You must be 18 or older to join BarathX")
+        return True
+
+    @field_validator("accept_privacy")
+    @classmethod
+    def must_accept_privacy(cls, v):
+        if not v:
+            raise ValueError("Accept the Privacy Policy to create an account")
         return True
 
     @model_validator(mode="after")
@@ -157,8 +184,9 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
-    # Required only when Google creates a new BarathX account (18+ gate).
+    # Required only when Google creates a new BarathX account (18+ gate + DPDP consent).
     confirm_age_18: Optional[bool] = None
+    accept_privacy: Optional[bool] = None
 
 
 class DeleteAccountRequest(BaseModel):
@@ -308,6 +336,9 @@ class PostOut(BaseModel):
     hashtags: list[str] = []
     debate_side: Optional[str] = None
     space_id: Optional[str] = None
+    likely_ai: bool = False
+    # True when the viewer’s @username is tagged in this post text.
+    mentions_me: bool = False
     # Set only on create when civic/floor award is evaluated.
     founding_awarded: Optional[bool] = None
     founding_status: Optional[str] = None
@@ -324,12 +355,12 @@ class ReplyCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Reply cannot be empty")
-        if len(v) > 220:
-            raise ValueError("Reply must be 220 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Reply cannot be empty",
+            max_len=500,
+            too_long="Reply must be 500 characters or fewer",
+        )
 
 
 class ReplyOut(BaseModel):
@@ -341,6 +372,7 @@ class ReplyOut(BaseModel):
     like_count: int = 0
     liked_by_me: bool = False
     parent_reply_id: Optional[str] = None
+    likely_ai: bool = False
 
     class Config:
         from_attributes = True
@@ -364,9 +396,64 @@ class UserSearchOut(BaseModel):
         from_attributes = True
 
 
+class TopicSearchOut(BaseModel):
+    id: str
+    key: str
+    name: str
+    arena_key: str
+    blurb: str = ""
+
+
+class ArenaSearchOut(BaseModel):
+    key: str
+    name: str
+    slug: str
+
+
 class SearchResults(BaseModel):
     users: list[UserSearchOut]
     posts: list[PostOut]
+    topics: list[TopicSearchOut] = []
+    arenas: list[ArenaSearchOut] = []
+
+
+class TrendingTopicOut(BaseModel):
+    kind: str = "topic"
+    key: str
+    name: str
+    arena_key: str
+    blurb: str = ""
+    score: float = 0
+    href: str = ""
+
+
+class TrendingHeadlineOut(BaseModel):
+    kind: str = "headline"
+    title: str
+    source: str = ""
+    url: str = ""
+    arena_key: str = "news"
+    score: float = 0
+    search_q: str = ""
+
+
+class TrendingArenaOut(BaseModel):
+    key: str
+    name: str
+    href: str = ""
+
+
+class TrendingOut(BaseModel):
+    ok: bool = True
+    lane: str = "india"
+    label: str = "India now"
+    query_key: Optional[str] = None
+    source: str = "taxonomy"
+    cached: bool = False
+    refreshed_at: str = ""
+    topics: list[TrendingTopicOut] = []
+    headlines: list[TrendingHeadlineOut] = []
+    arenas: list[TrendingArenaOut] = []
 
 
 class NotificationOut(BaseModel):
@@ -423,12 +510,12 @@ class MessageCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Message cannot be empty")
-        if len(v) > 1000:
-            raise ValueError("Message must be 1000 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Message cannot be empty",
+            max_len=1000,
+            too_long="Message must be 1000 characters or fewer",
+        )
 
 
 class MessageOut(BaseModel):
@@ -505,12 +592,12 @@ class AdminPostCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Post cannot be empty")
-        if len(v) > 500:
-            raise ValueError("Post must be 500 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Post cannot be empty",
+            max_len=500,
+            too_long="Post must be 500 characters or fewer",
+        )
 
     @field_validator("username")
     @classmethod
@@ -528,12 +615,12 @@ class AdminReplyCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Reply cannot be empty")
-        if len(v) > 220:
-            raise ValueError("Reply must be 220 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Reply cannot be empty",
+            max_len=500,
+            too_long="Reply must be 500 characters or fewer",
+        )
 
     @field_validator("username")
     @classmethod
@@ -742,10 +829,12 @@ class LiveTalkMessageCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if len(v) < 1 or len(v) > 500:
-            raise ValueError("Message must be 1–500 characters")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Message must be 1–500 characters",
+            max_len=500,
+            too_long="Message must be 1–500 characters",
+        )
 
 
 class LiveTalkRemoveBody(BaseModel):
@@ -887,13 +976,12 @@ class SurfacePostCreate(BaseModel):
     @field_validator("text")
     @classmethod
     def valid_text(cls, v):
-        v = sanitize_user_text(v or "").strip()
-        if not v:
-            raise ValueError("Post cannot be empty")
-        # Same cap as Square — one product limit everywhere members post.
-        if len(v) > 500:
-            raise ValueError("Post must be 500 characters or fewer")
-        return v
+        return _validated_user_text(
+            v,
+            empty="Post cannot be empty",
+            max_len=500,
+            too_long="Post must be 500 characters or fewer",
+        )
 
     @field_validator("debate_side")
     @classmethod
@@ -1015,3 +1103,46 @@ class RaceCloseRequest(BaseModel):
 
 class RaceMarkPaid(BaseModel):
     note: Optional[str] = ""
+
+
+class ProductIssueCreate(BaseModel):
+    text: str
+    kind: str = "bug"  # bug | concern | idea
+
+    @field_validator("kind")
+    @classmethod
+    def valid_kind(cls, v):
+        k = (v or "bug").strip().lower()
+        if k not in ("bug", "concern", "idea"):
+            raise ValueError("Kind must be bug, concern, or idea")
+        return k
+
+    @field_validator("text")
+    @classmethod
+    def valid_text(cls, v):
+        v = sanitize_user_text(v or "").strip()
+        if len(v) < 10:
+            raise ValueError("Describe the issue in at least 10 characters")
+        if len(v) > 500:
+            raise ValueError("Issue must be 500 characters or fewer")
+        return v
+
+
+class ProductIssueOut(BaseModel):
+    id: str
+    text: str
+    kind: str
+    created_at: datetime
+    author: AuthorOut
+
+    class Config:
+        from_attributes = True
+
+
+class EarlyIssuesMetaOut(BaseModel):
+    early_cap: int = 1000
+    is_early_member: bool = False
+    early_rank: Optional[int] = None
+    whatsapp_community: str = ""
+    whatsapp_channel: str = ""
+    message: str = ""

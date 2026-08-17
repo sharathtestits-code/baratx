@@ -25,8 +25,17 @@ export default function Guidelines() {
 
         <h2>Don&apos;t</h2>
         <ul>
+          <li>
+            <strong>Adult or sexual content</strong> — porn, nudes, sexting, or sexual
+            solicitation. Blocked in posts, replies, DMs, and Live. BarathX is a public square,
+            not an adult app.
+          </li>
           <li>Threats, doxxing, sexual content involving minors, or illegal activity.</li>
           <li>Spam, scams, or bot farms posting the same take everywhere.</li>
+          <li>
+            Paste AI drafts as your take. Human takes only, obvious AI copy is blocked or sorted
+            under real replies.
+          </li>
           <li>Hate that targets people for who they are (not ideas you disagree with).</li>
         </ul>
 
@@ -56,11 +65,25 @@ export default function Guidelines() {
           debate that gets real engagement, not by signing up. Details on{" "}
           <Link to="/rewards">Rewards</Link> after you join.
         </p>
+        <p>
+          First 1000 members can log bugs and concerns on{" "}
+          <Link to="/early-issues">Early issues</Link>. We email ops when you post. Everyone can also
+          join{" "}
+          <a href="https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU?mode=gi_t" target="_blank" rel="noreferrer">
+            WhatsApp Community
+          </a>{" "}
+          or follow the{" "}
+          <a href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o" target="_blank" rel="noreferrer">
+            WhatsApp Channel
+          </a>
+          .
+        </p>
 
         <p className="hint">
           Questions:{" "}
           <a href="mailto:hello@barathx.com">hello@barathx.com</a> ·{" "}
-          <Link to="/terms">Terms</Link> · <Link to="/privacy">Privacy</Link>
+          <Link to="/early-issues">Early issues</Link> · <Link to="/terms">Terms</Link> ·{" "}
+          <Link to="/privacy">Privacy</Link>
         </p>
       </article>
     </div>

@@ -1,17 +1,25 @@
-"""Bookmarks, block/mute/report, DMs, hashtag lookup — mounted from main."""
+"""Bookmarks, block/mute/report, DMs, hashtag lookup, early issues — mounted from main."""
 
 from __future__ import annotations
 
+import logging
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app import models, schemas
+from app import email as email_service, models, schemas
 from app.database import get_db
 
+logger = logging.getLogger("baratx.extra")
+
 router = APIRouter()
+
+EARLY_ISSUE_CAP = 1000
+WHATSAPP_CHANNEL = "https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+WHATSAPP_COMMUNITY = "https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU?mode=gi_t"
 
 
 def _blocked_ids(db: Session, user_id: str) -> set[str]:
@@ -228,6 +236,17 @@ def register_extra_routes(app, *, get_current_user, get_current_user_optional, s
                     purge_fn=mod.purge_user,
                 )
         db.commit()
+        # Ops email on every report / bug log.
+        try:
+            email_service.send_ops_alert_email(
+                subject=f"[BarathX] Report: {payload.reason[:60]}",
+                summary=payload.reason,
+                details=payload.details or "",
+                reporter=f"@{current_user.username}",
+                kind="report",
+            )
+        except Exception:
+            logger.exception("Report alert email failed")
         return schemas.MessageResponse(message=msg)
 
     @router.get("/hashtags/{tag}", response_model=list[schemas.PostOut])
@@ -394,6 +413,129 @@ def register_extra_routes(app, *, get_current_user, get_current_user_optional, s
             is_read=msg.is_read,
             sender=schemas.AuthorOut.model_validate(msg.sender),
             recipient=schemas.AuthorOut.model_validate(msg.recipient),
+        )
+
+    def _early_rank(db: Session, user: models.User) -> int:
+        """1-based join order among non-official accounts (first 1000 = early circle)."""
+        earlier = (
+            db.query(func.count(models.User.id))
+            .filter(
+                models.User.is_official.is_(False),
+                or_(
+                    models.User.created_at < user.created_at,
+                    and_(
+                        models.User.created_at == user.created_at,
+                        models.User.id <= user.id,
+                    ),
+                ),
+            )
+            .scalar()
+        )
+        return int(earlier or 0)
+
+    def _author_out(user: models.User) -> schemas.AuthorOut:
+        badge = (getattr(user, "badge", None) or "none").strip().lower()
+        if badge not in ("none", "gold", "blue"):
+            badge = "none"
+        return schemas.AuthorOut(
+            id=user.id,
+            username=user.username,
+            display_name=user.display_name,
+            avatar_url=user.avatar_url,
+            badge=badge,
+            is_official=bool(getattr(user, "is_official", False) or badge == "blue"),
+        )
+
+    @router.get("/early-issues/meta", response_model=schemas.EarlyIssuesMetaOut)
+    def early_issues_meta(
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
+        db: Session = Depends(get_db),
+    ):
+        is_early = False
+        rank = None
+        if current_user and not getattr(current_user, "is_official", False):
+            rank = _early_rank(db, current_user)
+            is_early = rank <= EARLY_ISSUE_CAP
+        return schemas.EarlyIssuesMetaOut(
+            early_cap=EARLY_ISSUE_CAP,
+            is_early_member=is_early,
+            early_rank=rank,
+            whatsapp_community=WHATSAPP_COMMUNITY,
+            whatsapp_channel=WHATSAPP_CHANNEL,
+            message=(
+                "First 1000 members can post bugs and concerns here. "
+                "Everyone can join WhatsApp Community / Channel to talk it through."
+            ),
+        )
+
+    @router.get("/early-issues", response_model=list[schemas.ProductIssueOut])
+    def list_early_issues(
+        limit: int = 40,
+        db: Session = Depends(get_db),
+        current_user: Optional[models.User] = Depends(get_current_user_optional),
+    ):
+        limit = max(1, min(limit, 100))
+        rows = (
+            db.query(models.ProductIssue)
+            .options(joinedload(models.ProductIssue.author))
+            .order_by(models.ProductIssue.created_at.desc())
+            .limit(limit)
+            .all()
+        )
+        return [
+            schemas.ProductIssueOut(
+                id=r.id,
+                text=r.text,
+                kind=r.kind,
+                created_at=r.created_at,
+                author=_author_out(r.author),
+            )
+            for r in rows
+            if r.author
+        ]
+
+    @router.post("/early-issues", response_model=schemas.ProductIssueOut)
+    def create_early_issue(
+        payload: schemas.ProductIssueCreate,
+        current_user: models.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        if getattr(current_user, "is_official", False):
+            raise HTTPException(status_code=400, detail="Official accounts use ops tools for bugs")
+        rank = _early_rank(db, current_user)
+        if rank > EARLY_ISSUE_CAP:
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    "Early issues board is for the first 1000 members. "
+                    "Join WhatsApp Community to share concerns, or report a post from ···."
+                ),
+            )
+        issue = models.ProductIssue(
+            author_id=current_user.id,
+            kind=payload.kind,
+            text=payload.text,
+            created_at=datetime.now(timezone.utc),
+        )
+        db.add(issue)
+        db.commit()
+        db.refresh(issue)
+        try:
+            email_service.send_ops_alert_email(
+                subject=f"[BarathX] Early issue ({payload.kind}) from @{current_user.username}",
+                summary=payload.text[:200],
+                details=payload.text,
+                reporter=f"@{current_user.username} (early #{rank})",
+                kind=payload.kind,
+            )
+        except Exception:
+            logger.exception("Early issue alert email failed")
+        return schemas.ProductIssueOut(
+            id=issue.id,
+            text=issue.text,
+            kind=issue.kind,
+            created_at=issue.created_at,
+            author=_author_out(current_user),
         )
 
     app.include_router(router)

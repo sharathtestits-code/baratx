@@ -54,6 +54,9 @@ class User(Base):
     email_activity_enabled = Column(Boolean, default=True, nullable=False)
     # Bumped on password reset / security events to invalidate existing JWTs.
     token_version = Column(Integer, default=0, nullable=False)
+    # DPDP: affirmative consent to privacy notice (Data Principal).
+    privacy_accepted_at = Column(DateTime, nullable=True)
+    privacy_notice_version = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -128,6 +131,8 @@ class Post(Base):
     community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
     debate_side = Column(String, nullable=True)  # for | against (arena debates only)
+    # Heuristic AI-slop flag — demoted in feeds so human takes stay on top.
+    likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     author = relationship("User", back_populates="posts")
@@ -160,6 +165,8 @@ class Reply(Base):
     author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     parent_reply_id = Column(String, ForeignKey("replies.id"), nullable=True, index=True)
     text = Column(Text, nullable=False)
+    # Heuristic AI-slop flag — human replies sort above these.
+    likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     post = relationship("Post", back_populates="replies")
@@ -570,3 +577,17 @@ class RaceReward(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     post = relationship("Post", foreign_keys=[post_id])
+
+
+class ProductIssue(Base):
+    """Early-member (first 1000) product bugs / concerns board."""
+
+    __tablename__ = "product_issues"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, default="bug", index=True)  # bug | concern | idea
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    author = relationship("User", foreign_keys=[author_id])
