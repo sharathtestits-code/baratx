@@ -649,10 +649,8 @@ def start_daily_digest_scheduler(*, attach_hashtags, notify_mentions) -> None:
         if os.environ.get("DISABLE_DAILY_DIGEST", "").strip().lower() in ("1", "true", "yes"):
             logger.info("Daily digest scheduler disabled via DISABLE_DAILY_DIGEST")
             return
-        # Default OFF, automated official posts/replies felt botty. Opt in with ENABLE_DAILY_DIGEST=1
-        if os.environ.get("ENABLE_DAILY_DIGEST", "").strip().lower() not in ("1", "true", "yes"):
-            logger.info("Daily digest scheduler OFF by default (set ENABLE_DAILY_DIGEST=1 to opt in)")
-            return
+        # Default ON so @baratx / @sharath keep posting at IST peak slots.
+        # Set DISABLE_DAILY_DIGEST=1 to pause. ENABLE_DAILY_DIGEST=1 is accepted but not required.
         _scheduler_started = True
 
     def _run_slot(slot: str, *, label: str) -> None:

@@ -3593,7 +3593,7 @@ register_social_surfaces(
     notify_mentions=notify_mentions,
 )
 
-# Daily @sharath trending digest (~09:05 IST). Disable with DISABLE_DAILY_DIGEST=1.
+# Daily @baratx + @sharath peak digest (09:00 / 13:30 / 20:00 IST). Disable with DISABLE_DAILY_DIGEST=1.
 try:
     from app import daily_digest
 

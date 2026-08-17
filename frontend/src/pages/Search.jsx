@@ -35,6 +35,22 @@ function cleanSearchQuery(raw) {
     .trim();
 }
 
+/** True when the query is meant to find people (@handle or matching usernames). */
+function isPeopleSearch(raw, users) {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed) return false;
+  if (trimmed.startsWith("@")) return true;
+  const cleaned = cleanSearchQuery(trimmed).toLowerCase();
+  if (!cleaned || /\s/.test(cleaned)) return false;
+  if (!/^[a-z0-9_]{2,32}$/i.test(cleaned)) return false;
+  const list = Array.isArray(users) ? users : [];
+  // Bare tokens only count as people when a username clearly matches — not topic words like "india".
+  return list.some((u) => {
+    const un = String(u.username || "").toLowerCase();
+    return un === cleaned || un.startsWith(cleaned) || (cleaned.length >= 3 && cleaned.startsWith(un));
+  });
+}
+
 function TrendingBlock({ trending, onSearchHeadline }) {
   if (!trending) return null;
   const topics = trending.topics || [];
@@ -80,6 +96,94 @@ function TrendingBlock({ trending, onSearchHeadline }) {
   );
 }
 
+function PeopleResults({
+  users,
+  token,
+  me,
+  followingMap,
+  followBusy,
+  onToggleFollow,
+}) {
+  if (!users.length) return null;
+  return (
+    <>
+      <h3 className="section-title">People</h3>
+      <div className="user-results">
+        {users.map((u) => {
+          const isFollowing = !!(followingMap[u.username] ?? u.is_following);
+          const isMe = u.username === me;
+          return (
+            <div key={u.id} className="user-result user-result-row">
+              <Link to={`/u/${u.username}`} className="user-result-main">
+                <Avatar name={u.display_name} username={u.username} url={u.avatar_url} size={44} />
+                <div>
+                  <div className="user-result-name">{u.display_name}</div>
+                  <div className="user-result-username">@{u.username}</div>
+                  {u.bio && <div className="user-result-bio">{u.bio}</div>}
+                </div>
+              </Link>
+              {token && !isMe && (
+                <button
+                  type="button"
+                  className={`follow-btn suggested-follow-btn${isFollowing ? " following" : ""}`}
+                  disabled={followBusy === u.username}
+                  onClick={() => onToggleFollow(u)}
+                >
+                  {followBusy === u.username ? "…" : isFollowing ? "Following" : "Follow"}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function TopicArenaResults({ topics, arenas }) {
+  return (
+    <>
+      {arenas.length > 0 && (
+        <>
+          <h3 className="section-title">Arenas</h3>
+          <div className="user-results search-topic-results">
+            {arenas.map((a) => (
+              <Link key={a.key} to={`/arenas/${encodeURIComponent(a.key)}`} className="user-result user-result-row">
+                <div>
+                  <div className="user-result-name">{a.name}</div>
+                  <div className="user-result-username">Arena · {a.key}</div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+      {topics.length > 0 && (
+        <>
+          <h3 className="section-title">Topics</h3>
+          <div className="user-results search-topic-results">
+            {topics.map((t) => (
+              <Link
+                key={`${t.arena_key}:${t.key}:${t.id}`}
+                to={`/arenas/${encodeURIComponent(t.arena_key)}`}
+                className="user-result user-result-row"
+              >
+                <div>
+                  <div className="user-result-name">{t.name}</div>
+                  <div className="user-result-username">
+                    {t.arena_key}
+                    {t.blurb ? ` · ${t.blurb}` : ""}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
 export default function Search() {
   const { token, user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -99,15 +203,20 @@ export default function Search() {
     setInputValue(q);
     const cleaned = cleanSearchQuery(q);
     if (cleaned) {
-      if (cleaned !== q.trim()) {
+      if (cleaned !== q.trim() && !String(q).trim().startsWith("@")) {
+        // Keep @ in the URL when the user typed it (people intent), else normalize.
         setSearchParams({ q: cleaned }, { replace: true });
         return;
       }
-      runSearch(cleaned);
+      if (cleaned !== q.trim() && String(q).trim().startsWith("@") && q.trim() !== `@${cleaned}`) {
+        setSearchParams({ q: `@${cleaned}` }, { replace: true });
+        return;
+      }
+      runSearch(q);
     } else {
       setResults({ users: [], posts: [], topics: [], arenas: [] });
+      setTrending(null);
       setLoading(false);
-      loadTrending("trending in india");
       inputRef.current?.focus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,43 +224,54 @@ export default function Search() {
 
   // Live Explore: debounce typing into the URL so results appear without a second tap.
   useEffect(() => {
-    const next = cleanSearchQuery(inputValue);
-    if (next === cleanSearchQuery(q)) return undefined;
+    const raw = String(inputValue || "").trim();
+    const nextClean = cleanSearchQuery(inputValue);
+    const urlClean = cleanSearchQuery(q);
+    const urlRaw = String(q || "").trim();
+    if (raw.startsWith("@")) {
+      const want = nextClean ? `@${nextClean}` : "";
+      if (want === urlRaw) return undefined;
+      const timer = window.setTimeout(() => {
+        if (!want) setSearchParams({});
+        else setSearchParams({ q: want });
+      }, 350);
+      return () => window.clearTimeout(timer);
+    }
+    if (nextClean === urlClean) return undefined;
     const timer = window.setTimeout(() => {
-      if (!next) {
+      if (!nextClean) {
         setSearchParams({});
         return;
       }
-      setSearchParams({ q: next });
+      setSearchParams({ q: nextClean });
     }, 350);
     return () => window.clearTimeout(timer);
   }, [inputValue, q, setSearchParams]);
 
-  async function loadTrending(query) {
-    try {
-      const data = await trendingApi.list(token, { q: query || "trending in india", limit: 8 });
-      setTrending(data);
-    } catch {
-      setTrending(null);
-    }
-  }
-
   async function runSearch(query) {
     const seq = ++searchSeq.current;
+    const cleaned = cleanSearchQuery(query);
+    const peopleIntent = String(query || "").trim().startsWith("@");
     setLoading(true);
     setError("");
     try {
-      const [data, trend] = await Promise.all([
-        searchApi.search(query, token),
-        trendingApi.list(token, { q: query, limit: 8 }).catch(() => null),
-      ]);
+      const data = await searchApi.search(cleaned, token);
       if (seq !== searchSeq.current) return;
-      setResults(normalizeResults(data));
-      setTrending(trend);
+      const normalized = normalizeResults(data);
+      setResults(normalized);
+      // Headlines/topics lane only for topic exploration — never bury @people results.
+      if (peopleIntent || isPeopleSearch(query, normalized.users)) {
+        setTrending(null);
+      } else {
+        const trend = await trendingApi.list(token, { q: cleaned, limit: 8 }).catch(() => null);
+        if (seq !== searchSeq.current) return;
+        setTrending(trend);
+      }
     } catch (err) {
       if (seq !== searchSeq.current) return;
       setError(err.message);
       setResults({ users: [], posts: [], topics: [], arenas: [] });
+      setTrending(null);
     } finally {
       if (seq === searchSeq.current) setLoading(false);
     }
@@ -159,9 +279,10 @@ export default function Search() {
 
   function handleSubmit(e) {
     e.preventDefault();
+    const raw = String(inputValue || "").trim();
     const next = cleanSearchQuery(inputValue);
     if (!next) return;
-    setSearchParams({ q: next });
+    setSearchParams({ q: raw.startsWith("@") ? `@${next}` : next });
   }
 
   function clearQuery() {
@@ -191,6 +312,7 @@ export default function Search() {
   }
 
   const hasQuery = !!q.trim();
+  const peopleMode = hasQuery && isPeopleSearch(q, results.users);
   const emptyResults =
     hasQuery &&
     !loading &&
@@ -204,7 +326,7 @@ export default function Search() {
     <div className="plaza-page plaza-explore">
       <PlazaPageHeader
         title="Explore"
-        sub="What’s trending in India — news, cricket, politics, and more."
+        sub="Search people or topics. Human takes only — no AI slop."
       />
 
       <form className="plaza-search-form search-form" onSubmit={handleSubmit} role="search">
@@ -212,7 +334,7 @@ export default function Search() {
         <input
           ref={inputRef}
           type="search"
-          placeholder="Try news, cricket, politics…"
+          placeholder="Try @username, news, cricket, politics…"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           aria-label="Search BarathX"
@@ -233,16 +355,15 @@ export default function Search() {
 
       {!hasQuery ? (
         <div className="search-empty plaza-explore-empty">
-          <TrendingBlock
-            trending={trending}
-            onSearchHeadline={(text) => setSearchParams({ q: text })}
-          />
+          <p className="hint search-status search-empty-lead">
+            Type a @username to find people, or a topic like cricket / politics to explore India now.
+          </p>
           <SuggestedFollows
             title="Who to follow"
             note="Tap a name to open their profile, or Follow to see their posts."
             onExplorePeople={() => {
-              setSearchParams({ q: "india" });
-              window.setTimeout(() => inputRef.current?.focus?.(), 80);
+              setInputValue("@");
+              inputRef.current?.focus?.();
             }}
           />
           <div className="search-chips" aria-label="Suggested searches">
@@ -260,92 +381,55 @@ export default function Search() {
         </div>
       ) : loading ? (
         <p className="hint search-status">Searching…</p>
+      ) : peopleMode ? (
+        <>
+          <PeopleResults
+            users={results.users}
+            token={token}
+            me={user?.username}
+            followingMap={followingMap}
+            followBusy={followBusy}
+            onToggleFollow={toggleFollowUser}
+          />
+          {results.users.length === 0 && (
+            <div className="search-empty-results">
+              <p className="hint search-status">No people for “{q}”.</p>
+              <p className="hint search-status">Check the spelling, or try without spaces.</p>
+            </div>
+          )}
+        </>
       ) : (
         <>
+          <TopicArenaResults topics={results.topics} arenas={results.arenas} />
+
           <TrendingBlock
             trending={trending}
             onSearchHeadline={(text) => setSearchParams({ q: text })}
           />
 
-          {results.arenas.length > 0 && (
-            <>
-              <h3 className="section-title">Arenas</h3>
-              <div className="user-results search-topic-results">
-                {results.arenas.map((a) => (
-                  <Link key={a.key} to={`/arenas/${encodeURIComponent(a.key)}`} className="user-result user-result-row">
-                    <div>
-                      <div className="user-result-name">{a.name}</div>
-                      <div className="user-result-username">Arena · {a.key}</div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-
-          {results.topics.length > 0 && (
-            <>
-              <h3 className="section-title">Topics</h3>
-              <div className="user-results search-topic-results">
-                {results.topics.map((t) => (
-                  <Link
-                    key={`${t.arena_key}:${t.key}:${t.id}`}
-                    to={`/arenas/${encodeURIComponent(t.arena_key)}`}
-                    className="user-result user-result-row"
-                  >
-                    <div>
-                      <div className="user-result-name">{t.name}</div>
-                      <div className="user-result-username">
-                        {t.arena_key}
-                        {t.blurb ? ` · ${t.blurb}` : ""}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-
           {results.users.length > 0 && (
-            <>
-              <h3 className="section-title">People</h3>
-              <div className="user-results">
-                {results.users.map((u) => {
-                  const isFollowing = !!(followingMap[u.username] ?? u.is_following);
-                  const isMe = u.username === user?.username;
-                  return (
-                    <div key={u.id} className="user-result user-result-row">
-                      <Link to={`/u/${u.username}`} className="user-result-main">
-                        <Avatar name={u.display_name} username={u.username} url={u.avatar_url} size={44} />
-                        <div>
-                          <div className="user-result-name">{u.display_name}</div>
-                          <div className="user-result-username">@{u.username}</div>
-                          {u.bio && <div className="user-result-bio">{u.bio}</div>}
-                        </div>
-                      </Link>
-                      {token && !isMe && (
-                        <button
-                          type="button"
-                          className={`follow-btn suggested-follow-btn${isFollowing ? " following" : ""}`}
-                          disabled={followBusy === u.username}
-                          onClick={() => toggleFollowUser(u)}
-                        >
-                          {followBusy === u.username ? "…" : isFollowing ? "Following" : "Follow"}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
+            <PeopleResults
+              users={results.users}
+              token={token}
+              me={user?.username}
+              followingMap={followingMap}
+              followBusy={followBusy}
+              onToggleFollow={toggleFollowUser}
+            />
           )}
 
           {(results.posts.length > 0 ||
-            (results.users.length === 0 && results.topics.length === 0 && results.arenas.length === 0)) && (
+            (results.users.length === 0 &&
+              results.topics.length === 0 &&
+              results.arenas.length === 0 &&
+              !(trending?.topics?.length || trending?.headlines?.length))) && (
             <h3 className="section-title">Posts</h3>
           )}
           {results.posts.length === 0 ? (
-            results.users.length === 0 && results.topics.length === 0 && results.arenas.length === 0 ? null : (
+            results.users.length === 0 &&
+            results.topics.length === 0 &&
+            results.arenas.length === 0 &&
+            !(trending?.topics?.length || trending?.headlines?.length) ? null : (
               <p className="hint search-status">No posts found.</p>
             )
           ) : (
