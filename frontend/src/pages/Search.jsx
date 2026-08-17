@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { api, searchApi } from "../api";
+import { api, searchApi, trendingApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
@@ -8,14 +8,14 @@ import { IconSearch } from "../components/Icons";
 import PlazaPageHeader from "../components/PlazaPageHeader";
 import SuggestedFollows from "../components/SuggestedFollows";
 
-/** Chips use queries that match live posts/topics. */
+/** Chips map to India-now lanes (news / cricket / politics…). */
 const QUICK_SEARCHES = [
+  { label: "News", query: "news" },
+  { label: "Cricket", query: "cricket" },
   { label: "Politics", query: "politics" },
-  { label: "Geopolitics", query: "Geopolitics" },
-  { label: "BarathX", query: "BarathX" },
+  { label: "India now", query: "trending in india" },
   { label: "Startups", query: "startups" },
   { label: "Sports", query: "sports" },
-  { label: "News", query: "news" },
 ];
 
 function normalizeResults(data) {
@@ -27,6 +27,51 @@ function normalizeResults(data) {
   };
 }
 
+function TrendingBlock({ trending, onSearchHeadline }) {
+  if (!trending) return null;
+  const topics = trending.topics || [];
+  const headlines = trending.headlines || [];
+  if (!topics.length && !headlines.length) return null;
+
+  return (
+    <section className="explore-trending" aria-label={trending.label || "Trending in India"}>
+      <h3 className="section-title">
+        {trending.label || "India now"}
+        <span className="explore-trending-meta"> · live India headlines</span>
+      </h3>
+      {topics.length > 0 && (
+        <div className="search-chips explore-trending-topics" aria-label="Trending topics">
+          {topics.map((t) => (
+            <Link
+              key={`${t.arena_key}:${t.key}`}
+              to={t.href || `/arenas/${encodeURIComponent(t.arena_key)}`}
+              className="search-chip explore-topic-chip"
+            >
+              {t.name}
+            </Link>
+          ))}
+        </div>
+      )}
+      {headlines.length > 0 && (
+        <ul className="explore-headline-list">
+          {headlines.map((h, i) => (
+            <li key={`${h.title}-${i}`}>
+              <button
+                type="button"
+                className="explore-headline"
+                onClick={() => onSearchHeadline?.(h.search_q || h.title)}
+              >
+                <span className="explore-headline-title">{h.title}</span>
+                {h.source ? <span className="explore-headline-source">{h.source}</span> : null}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 export default function Search() {
   const { token, user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -36,6 +81,7 @@ export default function Search() {
 
   const [inputValue, setInputValue] = useState(q);
   const [results, setResults] = useState({ users: [], posts: [], topics: [], arenas: [] });
+  const [trending, setTrending] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [followBusy, setFollowBusy] = useState("");
@@ -48,6 +94,7 @@ export default function Search() {
     } else {
       setResults({ users: [], posts: [], topics: [], arenas: [] });
       setLoading(false);
+      loadTrending("trending in india");
       inputRef.current?.focus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,14 +114,27 @@ export default function Search() {
     return () => window.clearTimeout(timer);
   }, [inputValue, q, setSearchParams]);
 
+  async function loadTrending(query) {
+    try {
+      const data = await trendingApi.list(token, { q: query || "trending in india", limit: 8 });
+      setTrending(data);
+    } catch {
+      setTrending(null);
+    }
+  }
+
   async function runSearch(query) {
     const seq = ++searchSeq.current;
     setLoading(true);
     setError("");
     try {
-      const data = await searchApi.search(query, token);
+      const [data, trend] = await Promise.all([
+        searchApi.search(query, token),
+        trendingApi.list(token, { q: query, limit: 8 }).catch(() => null),
+      ]);
       if (seq !== searchSeq.current) return;
       setResults(normalizeResults(data));
+      setTrending(trend);
     } catch (err) {
       if (seq !== searchSeq.current) return;
       setError(err.message);
@@ -124,13 +184,14 @@ export default function Search() {
     results.users.length === 0 &&
     results.posts.length === 0 &&
     results.topics.length === 0 &&
-    results.arenas.length === 0;
+    results.arenas.length === 0 &&
+    !(trending?.topics?.length || trending?.headlines?.length);
 
   return (
     <div className="plaza-page plaza-explore">
       <PlazaPageHeader
         title="Explore"
-        sub="People, posts, and topics across India."
+        sub="What’s trending in India — news, cricket, politics, and more."
       />
 
       <form className="plaza-search-form search-form" onSubmit={handleSubmit} role="search">
@@ -138,7 +199,7 @@ export default function Search() {
         <input
           ref={inputRef}
           type="search"
-          placeholder="Search people, posts, topics…"
+          placeholder="Try news, cricket, politics…"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           aria-label="Search BarathX"
@@ -159,6 +220,10 @@ export default function Search() {
 
       {!hasQuery ? (
         <div className="search-empty plaza-explore-empty">
+          <TrendingBlock
+            trending={trending}
+            onSearchHeadline={(text) => setSearchParams({ q: text })}
+          />
           <SuggestedFollows
             title="Who to follow"
             note="Tap Follow to start seeing their posts."
@@ -180,6 +245,11 @@ export default function Search() {
         <p className="hint search-status">Searching…</p>
       ) : (
         <>
+          <TrendingBlock
+            trending={trending}
+            onSearchHeadline={(text) => setSearchParams({ q: text })}
+          />
+
           {results.arenas.length > 0 && (
             <>
               <h3 className="section-title">Arenas</h3>
@@ -272,7 +342,7 @@ export default function Search() {
           {emptyResults && (
             <div className="search-empty-results">
               <p className="hint search-status">No results for “{q}”.</p>
-              <p className="hint search-status">Try politics, startups, sports, news, or a @username.</p>
+              <p className="hint search-status">Try news, cricket, politics, or a @username.</p>
               <div className="search-chips" aria-label="Try these searches">
                 {QUICK_SEARCHES.map((item) => (
                   <button

@@ -1095,6 +1095,21 @@ def get_suggestions(
     )
 
 
+@app.get("/trending", response_model=schemas.TrendingOut)
+def get_trending(
+    q: Optional[str] = None,
+    lane: Optional[str] = None,
+    limit: int = 8,
+    current_user: Optional[models.User] = Depends(get_current_user_optional),
+):
+    """India-now topics + headlines for Explore (RSS-scored, taxonomy fallback)."""
+    from app import trending as trending_mod
+
+    _ = current_user  # optional auth; anti-scrape still applies
+    data = trending_mod.get_trending(q=q, lane=lane, limit=limit)
+    return schemas.TrendingOut(**data)
+
+
 @app.get("/admin/users", response_model=schemas.AdminUsersOut)
 def admin_users(
     limit: int = 50,

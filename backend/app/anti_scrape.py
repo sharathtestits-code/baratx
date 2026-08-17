@@ -50,7 +50,7 @@ _ALLOWED_UA = re.compile(
 
 # Paths that return bulk community content (scrape / scroll targets).
 _SCRAPE_PATHS = re.compile(
-    r"^/(posts|users|search|hashtags|communities|spaces|topics|feed)(/|$)",
+    r"^/(posts|users|search|trending|hashtags|communities|spaces|topics|feed)(/|$)",
     re.I,
 )
 
@@ -208,6 +208,7 @@ Disallow: /posts/
 Disallow: /users
 Disallow: /users/
 Disallow: /search
+Disallow: /trending
 Disallow: /hashtags
 Disallow: /communities
 Disallow: /spaces

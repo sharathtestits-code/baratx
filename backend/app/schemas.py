@@ -406,6 +406,45 @@ class SearchResults(BaseModel):
     arenas: list[ArenaSearchOut] = []
 
 
+class TrendingTopicOut(BaseModel):
+    kind: str = "topic"
+    key: str
+    name: str
+    arena_key: str
+    blurb: str = ""
+    score: float = 0
+    href: str = ""
+
+
+class TrendingHeadlineOut(BaseModel):
+    kind: str = "headline"
+    title: str
+    source: str = ""
+    url: str = ""
+    arena_key: str = "news"
+    score: float = 0
+    search_q: str = ""
+
+
+class TrendingArenaOut(BaseModel):
+    key: str
+    name: str
+    href: str = ""
+
+
+class TrendingOut(BaseModel):
+    ok: bool = True
+    lane: str = "india"
+    label: str = "India now"
+    query_key: Optional[str] = None
+    source: str = "taxonomy"
+    cached: bool = False
+    refreshed_at: str = ""
+    topics: list[TrendingTopicOut] = []
+    headlines: list[TrendingHeadlineOut] = []
+    arenas: list[TrendingArenaOut] = []
+
+
 class NotificationOut(BaseModel):
     id: str
     type: str  # follow | like | reply | repost | mention | message | badge | post

@@ -562,6 +562,17 @@ export const searchApi = {
     request(`/search?q=${encodeURIComponent(q)}`, { headers: authHeaders(token) }),
 };
 
+export const trendingApi = {
+  list: (token, { q, lane, limit = 8 } = {}) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (q) params.set("q", q);
+    if (lane) params.set("lane", lane);
+    return request(`/trending?${params}`, {
+      headers: token ? authHeaders(token) : {},
+    });
+  },
+};
+
 export const suggestionsApi = {
   list: (token, { surface = "square", arena, topic, limit = 20 } = {}) => {
     const params = new URLSearchParams({ surface, limit: String(limit) });
