@@ -1,81 +1,95 @@
 # Daily pack — 2026-08-18 (IST)
 
 **Cadence:** 2 posts/day · WhatsApp + X + LinkedIn  
-**Status:** READY TO PASTE  
-**Hook:** Soft launch live · human-first · Explore people/topics clarity
+**Status:** READY TO PASTE (draft only — you post manually)  
+**Feature of the day:** `live` · **Live**  
+**Trend hook:** Indian opposition disrupts parliament to support student protesters and pressure Modi  
+**Stills template:** `phone_center`  
+**Video:** `barathx-daily-reel-20s.mp4` (~20s · 9:16)
+
+> Automation prepares this pack + emails you. It does **not** post to WhatsApp, X, or LinkedIn.
 
 ---
 
 ## Post 1 — Morning (≈ 09:00 IST)
 
-**Images**
+**Images / video**
 | Channel | File |
 |---------|------|
 | WhatsApp + X | `morning-shared.jpg` |
 | LinkedIn | `morning-linkedin.jpg` |
+| Reel (WA Status / Reels / Shorts / X) | `barathx-daily-reel-20s.mp4` |
 
 ### WhatsApp community / channel
 ```
-Your take shouldn’t die in a chat.
+Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-BarathX is live —
-Square · Arenas · Live.
+BarathX · Live
+Argue it live — human voices, sided rooms.
+
+• Live rooms
+• Talk on the record
+• No scroll theater
+
 Human takes only. No AI slop.
-
-Soft launch open. Drop one honest take today.
 
 → https://barathx.com
 ```
 
 ### X
 ```
-Your take shouldn’t die in a chat.
+Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-BarathX = India’s public square.
-Pick a side. Argue live. On the record.
-Human only — no AI slop.
+BarathX · Live
+Argue it live — human voices, sided rooms.
 
-Soft launch → https://barathx.com
+Human takes only. No AI slop.
 
-#BarathX #India #PublicSquare #HumanFirst
+→ https://barathx.com
+
+#BarathX #Live #India #ArgueLive
 ```
 
 ### LinkedIn
 ```
-Most “debate” happens in disappearing chats.
+India hook: Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-BarathX keeps the take on the record:
+Product focus today: Live
 
-• Square — short posts that stay
-• Arenas — Agree vs Disagree
-• Live — sided argument, live
-• Human-first ranking (AI drafts demoted)
+Argue it live — human voices, sided rooms.
+
+• Live rooms
+• Talk on the record
+• No scroll theater
 
 Soft launch is open in the browser (phone + desktop). Apps coming soon.
+Human takes only. No AI slop.
 
-One honest take → https://barathx.com
+→ https://barathx.com
 
-#BarathX #India #BuildInPublic #Debate
+#BarathX #Live #India #ArgueLive #BuildInPublic
 ```
 
 ---
 
 ## Post 2 — Evening (≈ 20:00 IST)
 
-**Images**
+**Images / video**
 | Channel | File |
 |---------|------|
 | X + LinkedIn | `evening-shared.jpg` |
 | WhatsApp | `evening-whatsapp.jpg` |
+| Reel | `barathx-daily-reel-20s.mp4` |
 
 ### WhatsApp community / channel
 ```
-Tonight: Explore people + topics without the noise.
+Tonight on BarathX — Live.
 
-Type @username → find people.
-Type a topic → India now.
+Argue it live — human voices, sided rooms.
 
-BarathX soft launch.
+Trend still moving: Indian opposition disrupts parliament to support student protesters and pressure Modi
+
+Square · Arenas · Live · Explore
 Human takes only. No AI slop.
 
 → https://barathx.com
@@ -83,38 +97,42 @@ Human takes only. No AI slop.
 
 ### X
 ```
-Explore without the scroll trap.
+Tonight · Live
 
-@username → people.
-Topic → India now.
+Argue it live — human voices, sided rooms.
 
-BarathX soft launch.
+Indian opposition disrupts parliament to support student protesters and pressure Modi
+
 Human first. No AI slop.
-
 → https://barathx.com
 
-#BarathX #India #Explore #HumanFirst
+#BarathX #Live #India #ArgueLive
 ```
 
 ### LinkedIn
 ```
-Discovery should be clear: people or topics — not a buried list.
+Evening build note — Live
 
-On BarathX Explore:
-• Search @username → people first
-• Search a topic → arenas + India headlines
-• Human takes ranked ahead of AI slop
+Argue it live — human voices, sided rooms.
 
-Soft launch open: https://barathx.com
+Why it matters with today’s India conversation:
+Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-#BarathX #Product #India #PublicSquare
+• Live rooms
+• Talk on the record
+• No scroll theater
+
+Paste-ready soft launch: https://barathx.com
+
+#BarathX #Live #India #ArgueLive
 ```
 
 ---
 
-## After you post
+## After you post (manual)
 
 - [ ] WhatsApp Channel: https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 - [ ] WhatsApp Community: https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU
-- [ ] X / LinkedIn / IG as usual
-- [ ] Confirm in-app Square shows @baratx / @sharath takes
+- [ ] X
+- [ ] LinkedIn
+- [ ] Optional: IG Reels with `barathx-daily-reel-20s.mp4`

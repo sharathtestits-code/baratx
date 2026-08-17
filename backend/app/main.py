@@ -3342,6 +3342,37 @@ def admin_daily_digest(
     )
 
 
+@app.post("/admin/social-pack-notify", response_model=schemas.SocialPackNotifyOut)
+def admin_social_pack_notify(
+    payload: schemas.SocialPackNotifyIn,
+    _: bool = Depends(require_admin),
+):
+    """Email owner: daily pack is ready to paste. Never posts to WhatsApp/X/LinkedIn."""
+    slot = (payload.slot or "morning").strip().lower()
+    if slot not in ("morning", "evening"):
+        raise HTTPException(status_code=400, detail="slot must be morning or evening")
+    pack_path = payload.pack_path or f"brand/social/daily/{payload.date}/PACK.md"
+    sent = email_service.send_daily_pack_ready_email(
+        date=payload.date,
+        slot=slot,
+        channels=payload.channels or "WhatsApp + X + LinkedIn",
+        pack_path=pack_path,
+        wa_body=payload.wa_body or "",
+        x_body=payload.x_body or "",
+        li_body=payload.li_body or "",
+        image_hint=payload.image_hint or "",
+        feature=payload.feature or "",
+        trend=payload.trend or "",
+        video_hint=payload.video_hint or "",
+    )
+    return schemas.SocialPackNotifyOut(
+        sent=bool(sent),
+        to=email_service.SOCIAL_PACK_EMAIL,
+        date=payload.date,
+        slot=slot,
+    )
+
+
 @app.post("/admin/instagram-carousel")
 def admin_instagram_carousel(
     pack: str = "evening",

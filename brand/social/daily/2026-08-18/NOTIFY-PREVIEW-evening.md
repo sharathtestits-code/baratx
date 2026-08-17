@@ -1,19 +1,25 @@
 # Notify preview — 2026-08-18 evening
 
 Email sent: **False**
-To: `hello@barathx.com`
+To: `sharathtestits@gmail.com`
 Subject: Your BarathX post is ready — 2026-08-18 Evening
 
+Feature: Live (live)
+Trend: Indian opposition disrupts parliament to support student protesters and pressure Modi
 Images: evening-shared.jpg, evening-whatsapp.jpg
+Video: barathx-daily-reel-20s.mp4
+
+> Draft only — paste yourself. Do not auto-post to WhatsApp.
 
 ## WhatsApp
 ```
-Tonight: Explore people + topics without the noise.
+Tonight on BarathX — Live.
 
-Type @username → find people.
-Type a topic → India now.
+Argue it live — human voices, sided rooms.
 
-BarathX soft launch.
+Trend still moving: Indian opposition disrupts parliament to support student protesters and pressure Modi
+
+Square · Arenas · Live · Explore
 Human takes only. No AI slop.
 
 → https://barathx.com
@@ -21,29 +27,32 @@ Human takes only. No AI slop.
 
 ## X
 ```
-Explore without the scroll trap.
+Tonight · Live
 
-@username → people.
-Topic → India now.
+Argue it live — human voices, sided rooms.
 
-BarathX soft launch.
+Indian opposition disrupts parliament to support student protesters and pressure Modi
+
 Human first. No AI slop.
-
 → https://barathx.com
 
-#BarathX #India #Explore #HumanFirst
+#BarathX #Live #India #ArgueLive
 ```
 
 ## LinkedIn
 ```
-Discovery should be clear: people or topics — not a buried list.
+Evening build note — Live
 
-On BarathX Explore:
-• Search @username → people first
-• Search a topic → arenas + India headlines
-• Human takes ranked ahead of AI slop
+Argue it live — human voices, sided rooms.
 
-Soft launch open: https://barathx.com
+Why it matters with today’s India conversation:
+Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-#BarathX #Product #India #PublicSquare
+• Live rooms
+• Talk on the record
+• No scroll theater
+
+Paste-ready soft launch: https://barathx.com
+
+#BarathX #Live #India #ArgueLive
 ```

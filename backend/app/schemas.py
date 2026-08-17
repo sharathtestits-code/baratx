@@ -550,6 +550,29 @@ class AdminStatsOut(BaseModel):
     posters_last_24h: int = 0
 
 
+class SocialPackNotifyIn(BaseModel):
+    """Email Sharath that a daily social pack is ready to paste (never auto-posts)."""
+
+    date: str
+    slot: str = "morning"  # morning | evening
+    channels: str = "WhatsApp + X + LinkedIn"
+    pack_path: str = ""
+    wa_body: str = ""
+    x_body: str = ""
+    li_body: str = ""
+    image_hint: str = ""
+    feature: str = ""
+    trend: str = ""
+    video_hint: str = ""
+
+
+class SocialPackNotifyOut(BaseModel):
+    sent: bool
+    to: str
+    date: str
+    slot: str
+
+
 class AdminUserRow(BaseModel):
     id: str
     username: str

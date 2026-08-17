@@ -411,7 +411,7 @@ SOCIAL_PACK_EMAIL = (
     os.environ.get("SOCIAL_PACK_EMAIL")
     or os.environ.get("BUG_ALERT_EMAIL")
     or os.environ.get("OPS_ALERT_EMAIL")
-    or "hello@barathx.com"
+    or "sharathtestits@gmail.com"
 ).strip()
 
 
@@ -425,14 +425,22 @@ def send_daily_pack_ready_email(
     x_body: str = "",
     li_body: str = "",
     image_hint: str = "",
+    feature: str = "",
+    trend: str = "",
+    video_hint: str = "",
 ) -> bool:
-    """Email Sharath when a daily social pack is ready to paste manually."""
+    """Email Sharath when a daily social pack is ready to paste manually.
+
+    Never auto-posts to WhatsApp / X / LinkedIn — draft + notify only.
+    """
     to_email = SOCIAL_PACK_EMAIL
     if not to_email:
         return False
 
     slot_label = (slot or "daily").strip().title()
     subject = f"Your BarathX post is ready — {date} {slot_label}"
+    if feature:
+        subject += f" · {feature}"
     text_body = (
         f"Your BarathX post is ready.\n\n"
         f"Date: {date} (IST)\n"
@@ -440,8 +448,14 @@ def send_daily_pack_ready_email(
         f"Channels: {channels}\n"
         f"Pack: {pack_path}\n"
     )
+    if feature:
+        text_body += f"Feature: {feature}\n"
+    if trend:
+        text_body += f"Trend: {trend}\n"
     if image_hint:
         text_body += f"Images: {image_hint}\n"
+    if video_hint:
+        text_body += f"Video (~20s): {video_hint}\n"
     text_body += "\n— Paste yourself (WhatsApp / X / LinkedIn). Do not auto-blast.\n"
     if wa_body:
         text_body += f"\n--- WhatsApp ---\n{wa_body.strip()}\n"
@@ -476,8 +490,11 @@ def send_daily_pack_ready_email(
   <p style="font-size:20px;font-weight:700;">Your BarathX post is ready</p>
   <p>Date: <strong>{_esc(date)}</strong> (IST) · Slot: <strong>{_esc(slot_label)}</strong></p>
   <p>Channels: {_esc(channels)}</p>
+  {"<p>Feature: <strong>" + _esc(feature) + "</strong></p>" if feature else ""}
+  {"<p style='color:#536471;font-size:14px;'>Trend: " + _esc(trend) + "</p>" if trend else ""}
   <p style="color:#536471;font-size:14px;">Pack: {_esc(pack_path)}</p>
   {"<p style='color:#536471;font-size:14px;'>Images: " + _esc(image_hint) + "</p>" if image_hint else ""}
+  {"<p style='color:#536471;font-size:14px;'>Video (~20s): " + _esc(video_hint) + "</p>" if video_hint else ""}
   <p style="margin:20px 0;padding:12px 16px;background:#fff4ec;border-left:4px solid #FF671F;">
     Paste yourself on WhatsApp / X / LinkedIn. Do not auto-blast.
   </p>

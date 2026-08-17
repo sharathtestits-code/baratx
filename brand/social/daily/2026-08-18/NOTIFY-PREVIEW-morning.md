@@ -1,51 +1,62 @@
 # Notify preview — 2026-08-18 morning
 
 Email sent: **False**
-To: `hello@barathx.com`
+To: `sharathtestits@gmail.com`
 Subject: Your BarathX post is ready — 2026-08-18 Morning
 
+Feature: Live (live)
+Trend: Indian opposition disrupts parliament to support student protesters and pressure Modi
 Images: morning-shared.jpg, morning-linkedin.jpg
+Video: barathx-daily-reel-20s.mp4
+
+> Draft only — paste yourself. Do not auto-post to WhatsApp.
 
 ## WhatsApp
 ```
-Your take shouldn’t die in a chat.
+Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-BarathX is live —
-Square · Arenas · Live.
+BarathX · Live
+Argue it live — human voices, sided rooms.
+
+• Live rooms
+• Talk on the record
+• No scroll theater
+
 Human takes only. No AI slop.
-
-Soft launch open. Drop one honest take today.
 
 → https://barathx.com
 ```
 
 ## X
 ```
-Your take shouldn’t die in a chat.
+Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-BarathX = India’s public square.
-Pick a side. Argue live. On the record.
-Human only — no AI slop.
+BarathX · Live
+Argue it live — human voices, sided rooms.
 
-Soft launch → https://barathx.com
+Human takes only. No AI slop.
 
-#BarathX #India #PublicSquare #HumanFirst
+→ https://barathx.com
+
+#BarathX #Live #India #ArgueLive
 ```
 
 ## LinkedIn
 ```
-Most “debate” happens in disappearing chats.
+India hook: Indian opposition disrupts parliament to support student protesters and pressure Modi
 
-BarathX keeps the take on the record:
+Product focus today: Live
 
-• Square — short posts that stay
-• Arenas — Agree vs Disagree
-• Live — sided argument, live
-• Human-first ranking (AI drafts demoted)
+Argue it live — human voices, sided rooms.
+
+• Live rooms
+• Talk on the record
+• No scroll theater
 
 Soft launch is open in the browser (phone + desktop). Apps coming soon.
+Human takes only. No AI slop.
 
-One honest take → https://barathx.com
+→ https://barathx.com
 
-#BarathX #India #BuildInPublic #Debate
+#BarathX #Live #India #ArgueLive #BuildInPublic
 ```
