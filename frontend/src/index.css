@@ -10091,6 +10091,16 @@ html:has(.bx-home) {
   width: 100%;
 }
 
+.bx-home-hero-google .hint,
+.bx-home-hero-google .x-google-loading {
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+}
+
+.bx-home-hero-google .x-inline-error {
+  text-align: center;
+}
+
 .bx-home-hero-legal {
   margin: 1.1rem 0 0;
   font-size: 0.78rem;
