@@ -109,6 +109,9 @@ BarathX · {feature.name}
 
 {founding_line}
 
+Android soft launch: https://barathx.com/get-app/
+(Phone OTP — fastest way in)
+
 → https://barathx.com
 ```
 
@@ -120,6 +123,10 @@ BarathX · {feature.name}
 {feature.one_liner}
 
 {founding_line}
+
+Android soft launch (APK):
+https://barathx.com/get-app/
+Phone OTP to join.
 
 → https://barathx.com
 
@@ -136,10 +143,12 @@ Product focus today: {feature.name}
 
 {chr(10).join('• ' + b for b in feature.bullets)}
 
-Soft launch is open in the browser (phone + desktop). Apps coming soon.
-{founding_line}
+Soft launch is open:
+• Web: https://barathx.com
+• Android APK (sideload): https://barathx.com/get-app/
+• Fastest login: phone OTP
 
-→ https://barathx.com
+{founding_line}
 
 {feature.hashtags} #BuildInPublic
 ```
@@ -166,6 +175,10 @@ Trend still moving: {trend_short}
 Square · Arenas · Live · Explore
 {founding_line}
 
+Get the Android soft-launch build:
+https://barathx.com/get-app/
+Then Continue with phone.
+
 → https://barathx.com
 ```
 
@@ -178,7 +191,10 @@ Tonight · {feature.name}
 {trend_short}
 
 Human first. No AI slop.
-→ https://barathx.com
+
+Android soft launch:
+https://barathx.com/get-app/
+Phone OTP → you’re in.
 
 {feature.hashtags}
 ```
@@ -194,7 +210,12 @@ Why it matters with today’s India conversation:
 
 {chr(10).join('• ' + b for b in feature.bullets)}
 
-Paste-ready soft launch: https://barathx.com
+Soft launch distribution (manual paste — no auto-post):
+• X + LinkedIn + WhatsApp today
+• Android APK: https://barathx.com/get-app/
+• Login with phone OTP
+
+Web: https://barathx.com
 
 {feature.hashtags}
 ```
@@ -205,8 +226,8 @@ Paste-ready soft launch: https://barathx.com
 
 - [ ] WhatsApp Channel: https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o
 - [ ] WhatsApp Community: https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU
-- [ ] X
-- [ ] LinkedIn
+- [ ] X (paste from this pack)
+- [ ] LinkedIn (paste from this pack)
 - [ ] Optional: IG Reels with `barathx-daily-reel-20s.mp4`
 """
     path = out_dir / "PACK.md"
