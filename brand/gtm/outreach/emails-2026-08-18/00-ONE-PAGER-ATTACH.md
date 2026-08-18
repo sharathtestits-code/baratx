@@ -7,7 +7,7 @@
 
 ## What is BarathX?
 
-**BarathX** is India’s public square.
+**BarathX** is India’s public square — a platform built by Indians, for Indians, owned by Indians.
 
 People already argue in WhatsApp groups and Instagram comments. Those takes get buried. Reels reward the scroll, not the opinion.
 
@@ -20,7 +20,7 @@ BarathX is a place to **drop a take, pick a side, and get real replies** — Squ
 
 ## What we’re trying to achieve
 
-We’re building a home for honest public conversation in India — especially Gen Z and young India — where debate isn’t a performance and a good take doesn’t disappear in a chat thread.
+We’re building a home for honest public conversation in India — especially Gen Z and young India — where debate isn’t a performance and a good take doesn’t disappear in a chat thread. And we’re doing it as an Indian-owned product, made for this country, not borrowed from somewhere else.
 
 Soft launch is live. We’re growing through creators and communities whose audiences already talk, argue, and care about ideas — not through bland ads.
 

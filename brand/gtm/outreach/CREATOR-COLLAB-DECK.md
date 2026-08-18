@@ -26,7 +26,8 @@ India needs a place to **pick a side and argue it live.**
 ## Slide 3 — What BarathX is
 **BarathX** = Square · Arenas · Live  
 Drop a take → pick a side → real replies.  
-Human takes only. No AI slop.
+Human takes only. No AI slop.  
+Built by Indians · for Indians · owned by Indians.
 
 ---
 

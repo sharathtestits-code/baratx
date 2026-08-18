@@ -7,9 +7,9 @@ Hi Ajay,
 
 Hope you’re well. I’m Sharath — building BarathX.
 
-I’ll keep this short. We’re trying to build **India’s public square** — a place where people pick a side and argue it live, instead of dumping hot takes into WhatsApp where they die by morning. Site is live: barathx.com.
+I’ll keep this short. We’re trying to build **India’s public square** — built by Indians, for Indians, owned by Indians. A place where people pick a side and argue it live, instead of dumping hot takes into WhatsApp where they die by morning. Site is live: barathx.com.
 
-What we’re after long-term: a real culture of public conversation for Gen Z / young India. Not another content app. Not AI chat. Human takes, sided debate, actual replies.
+What we’re after long-term: a real culture of public conversation for Gen Z / young India, on something that actually belongs to this country. Not another content app. Not AI chat. Human takes, sided debate, actual replies.
 
 Aye Jude sits in lifestyle / culture with a huge audience that already talks back in comments. That’s the kind of energy we’re trying to meet — so I wanted to ask if you’d be open to a collab conversation (Reel / Story / whatever format you actually like doing).
 
