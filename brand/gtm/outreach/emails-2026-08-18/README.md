@@ -6,7 +6,7 @@
 - **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — 6 visual slides with product screens
 - **[HOW-TO-SHARE.md](./HOW-TO-SHARE.md)** — PDF + PPT > MD
 
-Rebuild visuals: `python3 build_visual_deck.py`
+Rebuild visuals (live midnight screens): `python3 build_visual_deck.py`
 
 Long drafts `01–07` are backup only.
 
