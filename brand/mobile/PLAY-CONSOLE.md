@@ -237,6 +237,8 @@ Main store listing. Paste [§ Store listing copy](#store-listing-copy). Upload `
 | Phone screenshots | At least **2** (aim for 5). Capture on a real phone — [§ Screenshots](#screenshots) |
 | Privacy policy | already set in task 1 |
 
+**AI asset declaration** (after Assets): choose **Don't label assets**. The icon and feature graphic are brand-kit vectors exported to PNG, not generative-AI pictures. Label only if a later screenshot or video was made with an image/video generator (Midjourney, Imagen, ChatGPT images, etc.). Real-phone screenshots are not labeled.
+
 Tags if asked: debate, social, india, campus, news, sports.
 
 This task stays incomplete until **icon + feature graphic + ≥2 phone screenshots** are uploaded.
