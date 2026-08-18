@@ -10017,14 +10017,78 @@ html:has(.bx-home) {
 }
 
 .bx-home-hero-google {
-  margin-top: 1.25rem;
+  margin-top: 1.35rem;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 22rem);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bx-home-consent-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.bx-home-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+}
+
+.bx-home-consent input {
+  margin-top: 0.2rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+  accent-color: #ff671f;
+}
+
+.bx-home-consent strong {
+  color: #fff;
+}
+
+.bx-home-consent a {
+  color: #ffb088;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.bx-home-consent a:hover {
+  color: #fff;
+}
+
+.bx-home-google-hint {
+  margin: 0;
+  width: 100%;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.48);
+  text-align: center;
 }
 
 .bx-home-hero-google .x-btn,
-.bx-home-hero-google button {
-  width: min(100%, 22rem);
+.bx-home-hero-google button,
+.bx-home-hero-google .x-google-shell,
+.bx-home-hero-google .x-google-wrap {
+  width: 100%;
 }
 
 .bx-home-hero-legal {

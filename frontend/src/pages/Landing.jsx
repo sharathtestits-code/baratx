@@ -61,27 +61,34 @@ export default function Landing() {
             </Link>
           </div>
           <div className="bx-home-hero-google">
-            <label className="age-gate bx-home-consent">
-              <input
-                type="checkbox"
-                checked={confirmAge18}
-                onChange={(e) => setConfirmAge18(e.target.checked)}
-              />
-              <span>
-                I am <strong>18+</strong>
-              </span>
-            </label>
-            <label className="age-gate bx-home-consent">
-              <input
-                type="checkbox"
-                checked={acceptPrivacy}
-                onChange={(e) => setAcceptPrivacy(e.target.checked)}
-              />
-              <span>
-                I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
-                <Link to="/terms">Terms</Link>
-              </span>
-            </label>
+            <div className="bx-home-consent-card" role="group" aria-label="Confirm before Google sign-in">
+              <label className="bx-home-consent">
+                <input
+                  type="checkbox"
+                  checked={confirmAge18}
+                  onChange={(e) => setConfirmAge18(e.target.checked)}
+                />
+                <span>
+                  I am <strong>18+</strong>
+                </span>
+              </label>
+              <label className="bx-home-consent">
+                <input
+                  type="checkbox"
+                  checked={acceptPrivacy}
+                  onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                />
+                <span>
+                  I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
+                  <Link to="/terms">Terms</Link>
+                </span>
+              </label>
+            </div>
+            <p className="bx-home-google-hint" aria-live="polite">
+              {confirmAge18 && acceptPrivacy
+                ? "Ready — continue with Google"
+                : "Tick both boxes, then continue with Google"}
+            </p>
             <GoogleSignInButton
               label="Continue with Google"
               confirmAge18={confirmAge18}
