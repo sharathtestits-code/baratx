@@ -20,6 +20,7 @@ Individual drafts from Instagram bio emails. Tone: founder-written, no fee/payme
 ## Rules baked into every draft
 
 - What BarathX is trying to achieve is in the body  
+- Line: built by Indians, for Indians, owned by Indians  
 - No “we’ll pay / budget / ₹”  
 - Ask how *they* partner  
 - Spelling: **BarathX**  
