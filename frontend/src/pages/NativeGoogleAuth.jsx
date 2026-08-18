@@ -27,13 +27,22 @@ export default function NativeGoogleAuth() {
     let cancelled = false;
 
     function finish(accessToken) {
-      const url = `${DEEP_LINK}?token=${encodeURIComponent(accessToken)}`;
-      window.location.href = url;
-      // Fallback message if the app doesn’t catch the deep link
+      const deep = `${DEEP_LINK}?token=${encodeURIComponent(accessToken)}`;
+      const intent =
+        `intent://google-auth?token=${encodeURIComponent(accessToken)}` +
+        `#Intent;scheme=barathx;package=com.baratx.app;end`;
+      const isAndroid = /Android/i.test(navigator.userAgent || "");
+      window.location.href = isAndroid ? intent : deep;
+      // Fallback UI if the app doesn’t catch the deep link
       setTimeout(() => {
         if (!cancelled) {
           setBusy(false);
-          setError("Signed in. Return to the BarathX app — if it didn’t open, tap the app icon.");
+          setError("");
+          setReady(true);
+          const host = hostRef.current;
+          if (host) {
+            host.innerHTML = `<a href="${deep}" style="display:inline-block;background:#ff671f;color:#111;font-weight:700;text-decoration:none;padding:0.85rem 1.1rem;border-radius:999px;">Open BarathX app</a>`;
+          }
         }
       }, 1200);
     }

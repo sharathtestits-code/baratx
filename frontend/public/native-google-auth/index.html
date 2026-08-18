@@ -109,12 +109,30 @@
           statusEl.textContent = "";
         }
 
+        function openApp(token) {
+          var q = "token=" + encodeURIComponent(token);
+          var deep = DEEP + "?" + q;
+          // Android Custom Tabs often need an intent:// URL to hand off to the app.
+          var intent =
+            "intent://google-auth?" +
+            q +
+            "#Intent;scheme=barathx;package=com.baratx.app;end";
+          var isAndroid = /Android/i.test(navigator.userAgent || "");
+          location.href = isAndroid ? intent : deep;
+          return deep;
+        }
+
         function finish(token) {
           statusEl.textContent = "Signed in — returning to the app…";
-          location.href = DEEP + "?token=" + encodeURIComponent(token);
+          var deep = openApp(token);
           setTimeout(function () {
-            showError("Signed in. Switch back to the BarathX app if it didn’t open automatically.");
-          }, 1500);
+            statusEl.innerHTML =
+              'Signed in. If the app didn’t open, tap below:<br/><br/>' +
+              '<a id="open-app" href="' +
+              deep +
+              '" style="display:inline-block;background:#ff671f;color:#111;font-weight:700;text-decoration:none;padding:0.85rem 1.1rem;border-radius:999px;">Open BarathX app</a>';
+            errorEl.hidden = true;
+          }, 900);
         }
 
         function exchange(idToken) {
