@@ -21,6 +21,7 @@ export default function Settings() {
   const [language, setLanguage] = useState(() => user?.language || localeLang || getStoredLanguage());
   const [languageSaving, setLanguageSaving] = useState(false);
   const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
+  const [emailSaving, setEmailSaving] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);

@@ -36,8 +36,8 @@ export default function NativeLaunch() {
           Log in with email
         </Link>
 
-        <div className="bx-native-launch-consent">
-          <label className="age-gate bx-home-consent">
+        <div className="bx-native-launch-consent bx-home-consent-card" role="group" aria-label="Confirm before Google sign-in">
+          <label className="bx-home-consent">
             <input
               type="checkbox"
               checked={confirmAge18}
@@ -47,7 +47,7 @@ export default function NativeLaunch() {
               I am <strong>18+</strong>
             </span>
           </label>
-          <label className="age-gate bx-home-consent">
+          <label className="bx-home-consent">
             <input
               type="checkbox"
               checked={acceptPrivacy}
@@ -59,6 +59,12 @@ export default function NativeLaunch() {
             </span>
           </label>
         </div>
+
+        <p className="bx-home-google-hint" aria-live="polite">
+          {confirmAge18 && acceptPrivacy
+            ? "Ready — continue with Google"
+            : "Tick both boxes, then continue with Google"}
+        </p>
 
         <GoogleSignInButton
           label="Continue with Google"
