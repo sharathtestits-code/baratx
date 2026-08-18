@@ -158,8 +158,11 @@ export default function GoogleSignInButton({
       return;
     }
     if (!nativeGoogleConfigured()) {
-      // Fall through to browser OAuth (works with Web client only).
-      await startBrowserGoogle();
+      const msg =
+        "Native Google isn’t fully set up on this build. Tap “Continue with Google in browser” below, or use phone OTP.";
+      setError(msg);
+      setBrowserHint(msg);
+      onError?.(msg);
       return;
     }
     setBusy(true);
@@ -171,12 +174,15 @@ export default function GoogleSignInButton({
       await finishWithIdToken(idToken);
     } catch (err) {
       const msg = friendlyNativeGoogleError(err);
-      // Error 16 / re-auth: open working web Google Sign-In automatically.
+      // Error 16 / re-auth: do NOT auto-open the browser (feels broken).
+      // User taps “Continue with Google in browser” when ready.
       if (err?.code === "16" || /couldn't re-auth|Play App Signing SHA-1/i.test(msg)) {
         setBusy(false);
-        setError(msg);
-        onError?.(msg);
-        await startBrowserGoogle();
+        const hint =
+          "Native Google failed on this Play build. Tap “Continue with Google in browser” below — sign in there, then you’ll return to the app.";
+        setError(hint);
+        setBrowserHint(hint);
+        onError?.(hint);
         return;
       }
       setError(msg);

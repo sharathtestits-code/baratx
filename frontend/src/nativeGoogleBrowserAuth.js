@@ -34,7 +34,12 @@ export async function openBrowserGoogleSignIn({
     throw new Error("Browser Google Sign-In is only for the app.");
   }
   const url = buildNativeGoogleAuthUrl({ confirmAge18, acceptPrivacy });
-  await Browser.open({ url, presentationStyle: "popover" });
+  // Custom Tabs (toolbar) so users can finish Google Sign-In and return via deep link.
+  await Browser.open({
+    url,
+    presentationStyle: "popover",
+    toolbarColor: "#FF671F",
+  });
 }
 
 export function parseGoogleAuthDeepLink(url) {

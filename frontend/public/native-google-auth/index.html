@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0D0D12" />
+    <title>BarathX — Continue with Google</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d0d12;
+        --fg: #f4f4f5;
+        --muted: #a1a1aa;
+        --accent: #ff671f;
+        --err: #f87171;
+        --card: #18181f;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "DM Sans", system-ui, sans-serif;
+        background: radial-gradient(1200px 600px at 50% -10%, #2a1810 0%, var(--bg) 55%);
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+      main {
+        width: 100%;
+        max-width: 420px;
+        background: var(--card);
+        border: 1px solid #2a2a35;
+        border-radius: 16px;
+        padding: 1.75rem 1.5rem 1.5rem;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #111;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 0.85rem;
+      }
+      h1 {
+        margin: 1.1rem 0 0.4rem;
+        font-size: 1.45rem;
+        line-height: 1.2;
+      }
+      .hint { color: var(--muted); font-size: 0.95rem; line-height: 1.45; margin: 0.35rem 0; }
+      .error { color: var(--err); font-size: 0.95rem; line-height: 1.4; margin-top: 0.85rem; }
+      #google-host { margin-top: 1.25rem; min-height: 48px; }
+      .links { margin-top: 1.4rem; font-size: 0.85rem; }
+      .links a { color: var(--muted); }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </head>
+  <body>
+    <main>
+      <div class="brand"><span class="mark">BX</span><span>BarathX</span></div>
+      <h1>Continue with Google</h1>
+      <p class="hint">
+        Sign in here to return to the BarathX app. This uses the website Google login (works even when Play SHA-1 isn’t ready).
+      </p>
+      <div id="age-warn" class="error" hidden>
+        Go back to the app, tick <strong>18+</strong> and <strong>Privacy</strong>, then try again.
+      </div>
+      <div id="google-host"></div>
+      <p id="status" class="hint">Loading Google…</p>
+      <p id="error" class="error" hidden></p>
+      <p class="links">
+        <a href="https://barathx.com/privacy">Privacy</a> ·
+        <a href="https://barathx.com/terms">Terms</a>
+      </p>
+    </main>
+    <script>
+      (function () {
+        var API = "https://baratx-production.up.railway.app";
+        var CLIENT_ID = "682923055091-imk39450dk207psnoetvhnvseslvq0qp.apps.googleusercontent.com";
+        var DEEP = "barathx://google-auth";
+        var params = new URLSearchParams(location.search);
+        var ageOk = params.get("age") === "1";
+        var privacyOk = params.get("privacy") === "1";
+        var statusEl = document.getElementById("status");
+        var errorEl = document.getElementById("error");
+        var host = document.getElementById("google-host");
+
+        if (!ageOk || !privacyOk) {
+          document.getElementById("age-warn").hidden = false;
+        }
+
+        function showError(msg) {
+          errorEl.hidden = false;
+          errorEl.textContent = msg;
+          statusEl.textContent = "";
+        }
+
+        function finish(token) {
+          statusEl.textContent = "Signed in — returning to the app…";
+          location.href = DEEP + "?token=" + encodeURIComponent(token);
+          setTimeout(function () {
+            showError("Signed in. Switch back to the BarathX app if it didn’t open automatically.");
+          }, 1500);
+        }
+
+        function exchange(idToken) {
+          statusEl.textContent = "Signing you in…";
+          fetch(API + "/auth/google", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-BarathX-Client": "web",
+            },
+            body: JSON.stringify({
+              id_token: idToken,
+              confirm_age_18: ageOk,
+              accept_privacy: privacyOk,
+            }),
+          })
+            .then(function (res) {
+              return res.json().then(function (data) {
+                if (!res.ok) throw new Error(data.detail || data.message || "Google sign-in failed");
+                if (!data.access_token) throw new Error("No access token returned");
+                finish(data.access_token);
+              });
+            })
+            .catch(function (err) {
+              var msg = String((err && err.message) || err);
+              showError(msg);
+              location.href = DEEP + "?error=" + encodeURIComponent(msg.slice(0, 180));
+            });
+        }
+
+        function render() {
+          if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+          window.google.accounts.id.initialize({
+            client_id: CLIENT_ID,
+            callback: function (res) {
+              if (res && res.credential) exchange(res.credential);
+            },
+            // Custom Tabs / in-app browsers: popup is unreliable; button still works in-page on mobile Chrome.
+            ux_mode: "popup",
+            auto_select: false,
+            context: "signin",
+          });
+          host.innerHTML = "";
+          window.google.accounts.id.renderButton(host, {
+            theme: "outline",
+            size: "large",
+            shape: "pill",
+            text: "continue_with",
+            width: Math.min(320, host.offsetWidth || 280),
+          });
+          statusEl.textContent = "Tap Continue with Google below.";
+          return true;
+        }
+
+        function boot() {
+          if (render()) return;
+          var n = 0;
+          var t = setInterval(function () {
+            n += 1;
+            if (render() || n > 40) clearInterval(t);
+            if (n > 40 && !host.childNodes.length) showError("Could not load Google. Check your connection and retry.");
+          }, 200);
+        }
+
+        if (document.readyState === "complete") boot();
+        else window.addEventListener("load", boot);
+      })();
+    </script>
+  </body>
+</html>
