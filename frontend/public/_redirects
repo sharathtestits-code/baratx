@@ -1,6 +1,8 @@
 # Prefer static Google auth page for the Android browser fallback (Custom Tabs).
 /native-google-auth /native-google-auth/index.html 200
 /native-google-auth/ /native-google-auth/index.html 200
+/get-app /get-app/index.html 200
+/get-app/ /get-app/index.html 200
 
 # SPA fallback for everything else
 /*    /index.html   200
