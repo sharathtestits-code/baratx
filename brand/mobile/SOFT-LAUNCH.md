@@ -1,9 +1,12 @@
 # BaratX mobile soft launch (Gen Z)
-Updated: **2026-08-09**
+Updated: **2026-08-18**
 
 **Why:** Indian Gen Z prefers apps over browser. Soft-launch Android first, iOS second.
 
 Capacitor shells already exist (`com.baratx.app`). This is the ship checklist.
+
+> **Working path (2026-08-18):** Sideload APK + **phone OTP** — verified. See `SOFT-LAUNCH-WORKING.md`.  
+> Install: https://barathx.com/get-app/ · Push `barathx-latest-release.apk` to main when you ship app changes.
 
 ---
 
