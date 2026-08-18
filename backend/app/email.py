@@ -441,9 +441,10 @@ def send_daily_pack_ready_email(
     slot_label = (slot or "daily").strip().title()
     is_morning = (slot or "").strip().lower() == "morning"
     soft_launch_nudge = (
-        "SOFT LAUNCH REMINDER (daily): If you shipped app changes, push "
-        "barathx-latest-release.apk to main + keep https://barathx.com/get-app/ current. "
-        "Testers: sideload APK → Continue with phone (OTP). Do not block on Google/Play SHA-1."
+        "DAILY PASTE (do all three): WhatsApp + X + LinkedIn from today’s pack — "
+        "copy includes Android soft launch https://barathx.com/get-app/ (phone OTP). "
+        "If you shipped app changes, also push barathx-latest-release.apk to main. "
+        "Do not block on Google/Play SHA-1. Never auto-post."
     )
 
     subject = f"Your BarathX post is ready — {date} {slot_label}"
