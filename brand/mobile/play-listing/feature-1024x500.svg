@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500" role="img" aria-label="BarathX feature graphic">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF8F2"/>
+      <stop offset="55%" stop-color="#FFE8D6"/>
+      <stop offset="100%" stop-color="#FFF1E6"/>
+    </linearGradient>
+    <linearGradient id="bxRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3D2314"/>
+      <stop offset="55%" stop-color="#C45A12"/>
+      <stop offset="100%" stop-color="#FF671F"/>
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#C45A12"/>
+      <stop offset="100%" stop-color="#FF671F"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#bg)"/>
+
+  <g fill="#FF671F" opacity="0.12">
+    <circle cx="620" cy="120" r="5"/>
+    <circle cx="680" cy="160" r="4"/>
+    <circle cx="740" cy="110" r="6"/>
+    <circle cx="800" cy="180" r="3.5"/>
+    <circle cx="860" cy="140" r="5"/>
+    <circle cx="920" cy="200" r="4"/>
+    <circle cx="980" cy="150" r="3"/>
+    <circle cx="720" cy="230" r="4"/>
+    <circle cx="820" cy="250" r="5"/>
+    <circle cx="900" cy="280" r="3.5"/>
+    <circle cx="960" cy="240" r="4"/>
+    <circle cx="640" cy="280" r="3"/>
+    <circle cx="760" cy="310" r="4.5"/>
+    <circle cx="840" cy="340" r="3"/>
+    <circle cx="940" cy="320" r="5"/>
+    <circle cx="990" cy="360" r="3.5"/>
+  </g>
+  <g stroke="#FF671F" stroke-width="1.2" opacity="0.1" fill="none">
+    <path d="M620 120 L680 160 L740 110 L800 180 L860 140 L920 200"/>
+    <path d="M740 110 L720 230 L760 310 L840 340"/>
+    <path d="M860 140 L820 250 L900 280 L960 240 L990 360"/>
+    <path d="M680 160 L640 280 L760 310"/>
+  </g>
+
+  <text x="72" y="230" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="900" font-size="84" letter-spacing="-0.04em">
+    <tspan fill="#1A1A1A">Barat</tspan><tspan fill="#FF671F">X</tspan>
+  </text>
+  <text x="76" y="286" font-family="Helvetica Neue, Arial, sans-serif" font-weight="500" font-size="26" fill="#5C534C" letter-spacing="0.02em">
+    India's public square
+  </text>
+  <text x="76" y="328" font-family="Helvetica Neue, Arial, sans-serif" font-weight="400" font-size="18" fill="#8A7F76">
+    Pick a side. Argue it live.
+  </text>
+  <rect x="76" y="356" width="200" height="6" rx="3" fill="url(#accentBar)"/>
+
+  <g transform="translate(860 250)">
+    <circle cx="0" cy="0" r="118" fill="url(#bxRing)"/>
+    <circle cx="0" cy="0" r="94" fill="#FF671F"/>
+    <text x="0" y="28" text-anchor="middle" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="900" font-size="78" letter-spacing="-0.06em" fill="#FFFFFF">BX</text>
+  </g>
+</svg>
