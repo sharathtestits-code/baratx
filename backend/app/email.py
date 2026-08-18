@@ -432,12 +432,20 @@ def send_daily_pack_ready_email(
     """Email Sharath when a daily social pack is ready to paste manually.
 
     Never auto-posts to WhatsApp / X / LinkedIn — draft + notify only.
+    Morning slot also nudges soft-launch mobile: push APK + phone OTP path.
     """
     to_email = SOCIAL_PACK_EMAIL
     if not to_email:
         return False
 
     slot_label = (slot or "daily").strip().title()
+    is_morning = (slot or "").strip().lower() == "morning"
+    soft_launch_nudge = (
+        "SOFT LAUNCH REMINDER (daily): If you shipped app changes, push "
+        "barathx-latest-release.apk to main + keep https://barathx.com/get-app/ current. "
+        "Testers: sideload APK → Continue with phone (OTP). Do not block on Google/Play SHA-1."
+    )
+
     subject = f"Your BarathX post is ready — {date} {slot_label}"
     if feature:
         subject += f" · {feature}"
@@ -456,6 +464,8 @@ def send_daily_pack_ready_email(
         text_body += f"Images: {image_hint}\n"
     if video_hint:
         text_body += f"Video (~20s): {video_hint}\n"
+    if is_morning:
+        text_body += f"\n{soft_launch_nudge}\n"
     text_body += "\n— Paste yourself (WhatsApp / X / LinkedIn). Do not auto-blast.\n"
     if wa_body:
         text_body += f"\n--- WhatsApp ---\n{wa_body.strip()}\n"
@@ -483,6 +493,14 @@ def send_daily_pack_ready_email(
             f"padding:14px;border-radius:10px;font-size:14px;'>{_esc(body.strip())}</pre>"
         )
     blocks_html = "\n".join(blocks)
+    soft_html = ""
+    if is_morning:
+        soft_html = f"""
+  <p style="margin:20px 0;padding:12px 16px;background:#0f1419;color:#f5f5f5;border-left:4px solid #FF671F;border-radius:8px;">
+    <strong style="color:#FF671F;">Soft launch (daily)</strong><br/>
+    {_esc(soft_launch_nudge)}
+  </p>
+"""
     html_body = f"""\
 <!DOCTYPE html>
 <html>
@@ -495,6 +513,7 @@ def send_daily_pack_ready_email(
   <p style="color:#536471;font-size:14px;">Pack: {_esc(pack_path)}</p>
   {"<p style='color:#536471;font-size:14px;'>Images: " + _esc(image_hint) + "</p>" if image_hint else ""}
   {"<p style='color:#536471;font-size:14px;'>Video (~20s): " + _esc(video_hint) + "</p>" if video_hint else ""}
+  {soft_html}
   <p style="margin:20px 0;padding:12px 16px;background:#fff4ec;border-left:4px solid #FF671F;">
     Paste yourself on WhatsApp / X / LinkedIn. Do not auto-blast.
   </p>
