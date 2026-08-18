@@ -2,9 +2,11 @@
 
 ## Send these
 - **[SHORT-EMAILS.md](./SHORT-EMAILS.md)** — crisp versions (use these)
-- **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — **default attach** (1 page)
-- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — optional fuller deck
+- **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — **default attach** (visual, live screens)
+- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — 6 visual slides with product screens
 - **[HOW-TO-SHARE.md](./HOW-TO-SHARE.md)** — PDF + PPT > MD
+
+Rebuild visuals: `python3 build_visual_deck.py`
 
 Long drafts `01–07` are backup only.
 
