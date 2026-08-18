@@ -8,6 +8,7 @@ import {
   nativeGoogleConfigured,
   nativeGoogleIdToken,
 } from "../nativeGoogleAuth";
+import { openBrowserGoogleSignIn } from "../nativeGoogleBrowserAuth";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -16,6 +17,7 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
  * Google sign-in:
  * - Web: GIS renderButton (popup account chooser)
  * - Native Capacitor: @capgo/capacitor-social-login → ID token → /auth/google
+ * - Native fallback: system browser → barathx.com/native-google-auth → deep link JWT
  */
 export default function GoogleSignInButton({
   label = "Continue with Google",
@@ -34,6 +36,7 @@ export default function GoogleSignInButton({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
+  const [browserHint, setBrowserHint] = useState("");
   const native = isNativeApp();
 
   ageRef.current = { confirmAge18, requireAgeConfirm, acceptPrivacy, requirePrivacyConfirm };
@@ -101,6 +104,40 @@ export default function GoogleSignInButton({
     await finishWithIdToken(response.credential);
   };
 
+  async function startBrowserGoogle() {
+    const {
+      confirmAge18: ageOk,
+      requireAgeConfirm: needAge,
+      acceptPrivacy: privacyOk,
+      requirePrivacyConfirm: needPrivacy,
+    } = ageRef.current;
+    if (needAge && !ageOk) {
+      const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    if (needPrivacy && !privacyOk) {
+      const msg = "Accept the Privacy Policy (DPDP) to create an account.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setBrowserHint("Opening Google in your browser… Sign in there, then you’ll return to the app.");
+    try {
+      await openBrowserGoogleSignIn({ confirmAge18: ageOk, acceptPrivacy: privacyOk });
+    } catch (err) {
+      const msg = err?.message || "Could not open browser for Google Sign-In.";
+      setError(msg);
+      onError?.(msg);
+      setBrowserHint("");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleNativeGoogle() {
     const {
       confirmAge18: ageOk,
@@ -122,25 +159,48 @@ export default function GoogleSignInButton({
     }
     if (!nativeGoogleConfigured()) {
       const msg =
-        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client, see MOBILE.md). Use phone OTP to join now.";
+        "Native Google isn’t fully set up on this build. Tap “Continue with Google in browser” below, or use phone OTP.";
       setError(msg);
+      setBrowserHint(msg);
       onError?.(msg);
       return;
     }
     setBusy(true);
     setError("");
+    setBrowserHint("");
     try {
       const idToken = await nativeGoogleIdToken();
-      // finishWithIdToken manages busy / navigation for the API hop
       setBusy(false);
       await finishWithIdToken(idToken);
     } catch (err) {
       const msg = friendlyNativeGoogleError(err);
+      // Error 16 / re-auth: do NOT auto-open the browser (feels broken).
+      // User taps “Continue with Google in browser” when ready.
+      if (err?.code === "16" || /couldn't re-auth|Play App Signing SHA-1/i.test(msg)) {
+        setBusy(false);
+        const hint =
+          "Native Google failed on this Play build. Tap “Continue with Google in browser” below — sign in there, then you’ll return to the app.";
+        setError(hint);
+        setBrowserHint(hint);
+        onError?.(hint);
+        return;
+      }
       setError(msg);
       onError?.(msg);
       setBusy(false);
     }
   }
+
+  useEffect(() => {
+    function onBrowserAuthError(ev) {
+      const msg = ev?.detail || "Google sign-in failed in browser.";
+      setError(String(msg));
+      setBrowserHint("");
+      onError?.(String(msg));
+    }
+    window.addEventListener("bx-google-auth-error", onBrowserAuthError);
+    return () => window.removeEventListener("bx-google-auth-error", onBrowserAuthError);
+  }, [onError]);
 
   useEffect(() => {
     if (!CLIENT_ID || native) return undefined;
@@ -227,6 +287,15 @@ export default function GoogleSignInButton({
           <GoogleG className="x-btn-icon" />
           {busy ? "Signing in…" : label}
         </button>
+        <button
+          type="button"
+          className="x-btn x-btn-outline"
+          style={{ marginTop: "0.65rem" }}
+          disabled={busy || blocked}
+          onClick={startBrowserGoogle}
+        >
+          {busy ? "Opening browser…" : "Continue with Google in browser"}
+        </button>
         {ageBlocked && (
           <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
         )}
@@ -234,7 +303,10 @@ export default function GoogleSignInButton({
           <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
         )}
         {!blocked && (
-          <p className="hint x-google-loading">Phone OTP also works if Google isn’t set up on this build yet.</p>
+          <p className="hint x-google-loading">
+            {browserHint ||
+              "If Google fails on this Play build, use “in browser” above — or phone OTP."}
+          </p>
         )}
         {error && !onError && <p className="x-inline-error">{error}</p>}
       </div>

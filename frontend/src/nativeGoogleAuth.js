@@ -113,7 +113,7 @@ export async function nativeGoogleIdToken() {
     } catch (retryErr) {
       if (isReauthFailure(retryErr)) {
         const e = new Error(
-          "Google couldn’t re-auth that account. Pick another Google account, or use email / phone OTP. If this keeps happening on Play builds, add the Play App Signing SHA-1 in Google Cloud (see MOBILE.md)."
+          "Google couldn’t re-auth that account. Tap “Continue with Google in browser”, or use email / phone OTP. (Play builds also need the Play App Signing SHA-1 in Google Cloud; see MOBILE.md.)"
         );
         e.code = "16";
         e.cause = retryErr;
