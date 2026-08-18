@@ -123,10 +123,35 @@ Overview:
 |----------|--------|
 | Collects required user data types? | **Yes** |
 | Encrypted in transit? | **Yes** |
-| Users can request deletion? | **Yes** — hello@barathx.com |
-| Independent security review? | **No** |
-| Committed to Play Families policy? | **No** (18+ only) |
-| Advertising ID? | **No** |
+| Independent security review / UPI verified? | Leave unchecked |
+
+**Account creation (check only these three):**
+
+- **Username and password** — email signup
+- **Username and other authentication** — phone OTP
+- **OAuth** — Google Sign-In
+
+Uncheck **Username, password, and other authentication** (that is password plus extra auth on the same signup, which BarathX does not use). Leave **Other** and **does not allow accounts** unchecked.
+
+**Delete account URL** (required):
+
+```
+https://barathx.com/privacy#account-deletion
+```
+
+**Delete some data without deleting the account?** **Yes**
+
+**Delete data URL** (this is the red “Enter a valid URL” field — it is empty, so the form will not continue):
+
+```
+https://barathx.com/privacy#data-deletion
+```
+
+Both must start with `https://`. Do not paste an email address. If the hash URL is rejected, paste `https://barathx.com/privacy` in both fields.
+
+The live privacy page already exists. After the latest copy is deployed, those anchors describe Settings → Delete account and post delete / email for partial data.
+
+Data types — **Collected**, **not shared** with third parties (showing posts to other BarathX users is not “shared”). Not ephemeral. Purposes: **App functionality** + **Account management**; also **Fraud prevention, security, and compliance** for email/phone/session.
 
 Data types — **Collected**, **not shared** with third parties (showing posts to other BarathX users is not “shared”). Not ephemeral. Purposes: **App functionality** + **Account management**; also **Fraud prevention, security, and compliance** for email/phone/session.
 

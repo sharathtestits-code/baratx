@@ -4,7 +4,7 @@ export default function Privacy() {
   return (
     <div className="legal-page">
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: August 6, 2026</p>
+      <p className="legal-updated">Last updated: August 18, 2026</p>
       <p>
         BarathX (BX) is India’s text-first public square at <strong>barathx.com</strong>. This page
         explains what we collect and how we use it, in plain language.
@@ -41,8 +41,38 @@ export default function Privacy() {
       <h2>Your choices</h2>
       <ul>
         <li>Edit your profile anytime</li>
-        <li>Delete posts you create</li>
-        <li>Contact us to request account deletion</li>
+        <li>Delete posts you create from the post menu</li>
+        <li>Delete your account in Settings, or email us if you cannot sign in</li>
+      </ul>
+
+      <h2 id="account-deletion">Delete your account</h2>
+      <p>
+        You can delete your BarathX account yourself. This permanently removes the account and your
+        posts.
+      </p>
+      <ol>
+        <li>
+          Sign in at <a href="https://barathx.com">barathx.com</a> or in the BarathX app
+        </li>
+        <li>Open Settings</li>
+        <li>Under Delete account, type DELETE and confirm</li>
+      </ol>
+      <p>
+        If you cannot sign in, email{" "}
+        <a href="mailto:hello@barathx.com">hello@barathx.com</a> from the address or phone on the
+        account and ask us to delete it.
+      </p>
+
+      <h2 id="data-deletion">Delete some data without deleting your account</h2>
+      <p>You do not have to close the account to remove content.</p>
+      <ul>
+        <li>Delete any post you created: open the post → ··· → Delete</li>
+        <li>Edit or clear profile fields (display name, bio, photos) on your profile</li>
+        <li>
+          For other data we hold, email{" "}
+          <a href="mailto:hello@barathx.com">hello@barathx.com</a> and ask us to delete it. We will
+          not require you to delete the whole account.
+        </li>
       </ul>
 
       <h2>Contact</h2>
