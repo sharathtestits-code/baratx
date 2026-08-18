@@ -1,20 +1,18 @@
-# Play Console upload — BarathX 0.1.9
+# Skip Play Console wait
 
-## Use this build (versionCode **11**)
+**Install APK directly (no 15‑min verification):**
 
-| File | Use |
-|------|-----|
-| `barathx-0.1.9-release.aab` | **Upload this to Play Console** |
-| `barathx-0.1.9-release.apk` | Sideload / direct install |
+- Latest: https://github.com/sharathtestits-code/baratx/raw/main/brand/mobile/play-upload/barathx-latest-release.apk  
+- Or open: https://barathx.com/get-app/
 
-- package: `com.baratx.app`
-- versionCode: **11**
-- versionName: **0.1.9**
+1. Uninstall the Play build first (signature clash otherwise)  
+2. Download → Install  
+3. Open app → **Continue with phone** (OTP) — no Google Cloud / SHA-1 / Studio wait  
 
-## UX fix
+Current sideload build: **0.1.10** (`barathx-0.1.10-release.apk`)
 
-**One Google account pick** — app no longer tries Capgo native Google first (that caused a second account chooser).
+---
 
-Flow: tap **Continue with Google** → browser opens once → pick account once → return to app.
+# Play Console upload — optional later
 
-Site: `https://barathx.com/native-google-auth/`
+When you have time for Studio: use an AAB from this folder (`0.1.9` / newer). Soft launch users can stay on APK + phone OTP.

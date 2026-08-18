@@ -36,6 +36,10 @@ export default function NativeLaunch() {
           Log in with email
         </Link>
 
+        <p className="bx-native-launch-copy" style={{ marginTop: "0.35rem", marginBottom: "0.15rem" }}>
+          Soft launch: phone OTP is the fastest way in.
+        </p>
+
         <div className="bx-native-launch-consent bx-home-consent-card" role="group" aria-label="Confirm before Google sign-in">
           <label className="bx-home-consent">
             <input
@@ -62,8 +66,8 @@ export default function NativeLaunch() {
 
         <p className="bx-home-google-hint" aria-live="polite">
           {confirmAge18 && acceptPrivacy
-            ? "Ready — continue with Google"
-            : "Tick both boxes, then continue with Google"}
+            ? "Optional — Google (opens once, then back)"
+            : "Optional Google — tick both boxes first"}
         </p>
 
         <GoogleSignInButton
