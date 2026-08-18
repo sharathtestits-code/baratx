@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { App as CapApp } from "@capacitor/app";
 import { ApiError, api } from "../api";
+import { isNativeApp } from "../native";
+import {
+  listenForNativeGoogleAuth,
+  parseGoogleAuthDeepLink,
+} from "../nativeGoogleBrowserAuth";
 import { applyTheme, isValidTheme } from "../theme";
 
 const AuthContext = createContext(null);
@@ -24,6 +30,50 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("iv_token")));
   const [bootError, setBootError] = useState("");
+
+  // Browser Google Sign-In fallback: barathx://google-auth?token=…
+  useEffect(() => {
+    if (!isNativeApp()) return undefined;
+
+    const applyDeepLink = (url) => {
+      const parsed = parseGoogleAuthDeepLink(url);
+      if (!parsed) return;
+      if (parsed.error) {
+        window.dispatchEvent(
+          new CustomEvent("bx-google-auth-error", { detail: parsed.error })
+        );
+        return;
+      }
+      if (parsed.token) {
+        setLoading(true);
+        setUser(null);
+        setBootError("");
+        localStorage.setItem("iv_token", parsed.token);
+        setToken(parsed.token);
+      }
+    };
+
+    CapApp.getLaunchUrl()
+      .then((res) => {
+        if (res?.url) applyDeepLink(res.url);
+      })
+      .catch(() => {});
+
+    return listenForNativeGoogleAuth({
+      onToken: (accessToken) => {
+        setLoading(true);
+        setUser(null);
+        setBootError("");
+        localStorage.setItem("iv_token", accessToken);
+        setToken(accessToken);
+      },
+      onError: (msg) => {
+        if (msg) {
+          window.dispatchEvent(new CustomEvent("bx-google-auth-error", { detail: msg }));
+        }
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!token) {

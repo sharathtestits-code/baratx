@@ -2,6 +2,7 @@ import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Landing from "./pages/Landing";
 import NativeLaunch from "./pages/NativeLaunch";
+import NativeGoogleAuth from "./pages/NativeGoogleAuth";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -164,6 +165,11 @@ export default function App() {
     };
   }, [token]);
 
+  // Opened from the native app in a system browser — must work before auth boot.
+  if (location.pathname === "/native-google-auth") {
+    return <NativeGoogleAuth />;
+  }
+
   if (loading || !opsPathReady) {
     return <div className="page-loading">Starting BarathX…</div>;
   }
@@ -270,6 +276,7 @@ export default function App() {
     return (
       <Routes>
         <Route path="/" element={native ? <NativeLaunch /> : <Landing />} />
+        <Route path="/native-google-auth" element={<NativeGoogleAuth />} />
         <Route
           path="/signup"
           element={
