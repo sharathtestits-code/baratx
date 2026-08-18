@@ -151,22 +151,30 @@ Both must start with `https://`. Do not paste an email address. If the hash URL 
 
 The live privacy page already exists. After the latest copy is deployed, those anchors describe Settings → Delete account and post delete / email for partial data.
 
-Data types — **Collected**, **not shared** with third parties (showing posts to other BarathX users is not “shared”). Not ephemeral. Purposes: **App functionality** + **Account management**; also **Fraud prevention, security, and compliance** for email/phone/session.
+**Data types (this screen).** Click **Show** on each row. Target counts:
 
-Data types — **Collected**, **not shared** with third parties (showing posts to other BarathX users is not “shared”). Not ephemeral. Purposes: **App functionality** + **Account management**; also **Fraud prevention, security, and compliance** for email/phone/session.
+| Category | Tick | Do not tick |
+|----------|------|-------------|
+| Location | **None (0/2)** | Uncheck Approximate and Precise. IP is only used to rate-limit logins, not stored as a city/GPS |
+| Personal info | **4/9:** Name, Email address, User IDs, Phone number | Address, Race and ethnicity, Political or religious beliefs, Sexual orientation, Other info |
+| Financial info | 0/4 | All |
+| Health and fitness | 0/2 | All |
+| Messages | **1/3:** Other in-app messages | Emails, SMS or MMS |
+| Photos and videos | **1/2:** Photos | Videos |
+| Audio files | 0/3 | Live Talk is not saved as a recording |
+| Files and docs | 0/1 | All |
+| Calendar | 0/1 | All |
+| Contacts | 0/1 | All (no address-book access; follows are not Contacts) |
+| App activity | **2/5:** Other user-generated content; Other actions | App interactions, In-app search history, Installed apps |
+| Web browsing | 0/1 | All |
+| App info and performance | 0/3 | No crash SDK declared |
+| Device or other IDs | **1/1** if the row is below the fold | — |
 
-| Type | Required or optional |
-|------|----------------------|
-| Personal info → Name (display name) | Required |
-| Personal info → Email address | Users can choose (phone or Google instead) |
-| Personal info → Phone number | Users can choose |
-| Personal info → User IDs (username) | Required |
-| Photos and videos → Photos | Users can choose |
-| App activity → Other user-generated content (posts, replies) | Users can choose |
-| App info → Crash logs (if Play / OS collects) | Required if you keep them; skip if you do not |
-| Device or other IDs (login session) | Required |
+Political posts belong in **Other user-generated content**, not “Political or religious beliefs.” Beliefs is only if you store that as a profile field. BarathX does not.
 
-Do **not** declare: location, financial info, health, contacts, ads data, or “sold / shared for advertising”.
+If Location currently shows 1/2 and Personal info 7/9, open those rows and uncheck the extras before Next.
+
+On the next step (usage), every ticked type is **Collected**, **not shared**. Showing a take on Square is not “shared” with a third party. Not sold. Encrypted in transit already answered Yes.
 
 ### 7. Government apps
 
