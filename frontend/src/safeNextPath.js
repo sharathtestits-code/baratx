@@ -22,6 +22,7 @@ const ALLOWED_PREFIXES = [
   "/hashtag/",
   "/onboarding",
   "/guidelines",
+  "/child-safety",
   "/privacy",
   "/terms",
 ];

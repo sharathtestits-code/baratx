@@ -4,7 +4,7 @@ export default function Terms() {
   return (
     <div className="legal-page">
       <h1>Terms of Service</h1>
-      <p className="legal-updated">Last updated: August 6, 2026</p>
+      <p className="legal-updated">Last updated: August 18, 2026</p>
       <p>
         By using BarathX (BX) at <strong>barathx.com</strong>, you agree to these terms. BarathX is an
         early product, features may change as we improve the square.
@@ -15,7 +15,7 @@ export default function Terms() {
         <li>You must be 18 or older to create a BarathX account</li>
         <li>You’re responsible for what you post</li>
         <li>Don’t impersonate others or spam the square</li>
-        <li>Don’t post illegal content, harassment, or doxxing</li>
+        <li>Don’t post illegal content, harassment, doxxing, or CSAE / CSAM</li>
       </ul>
 
       <h2>Your content</h2>

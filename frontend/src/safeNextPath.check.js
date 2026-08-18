@@ -7,6 +7,7 @@ const cases = [
   ["/spaces", "/spaces"],
   ["/arenas/startups", "/arenas/startups"],
   ["/rewards", "/rewards"],
+  ["/child-safety", "/child-safety"],
   ["https://evil.com", "/home"],
   ["//evil.com", "/home"],
   ["/\\evil.com", "/home"],

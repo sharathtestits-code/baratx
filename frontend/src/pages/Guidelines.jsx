@@ -25,7 +25,11 @@ export default function Guidelines() {
 
         <h2>Don&apos;t</h2>
         <ul>
-          <li>Threats, doxxing, sexual content involving minors, or illegal activity.</li>
+          <li>
+            Threats, doxxing, child sexual abuse and exploitation (CSAE / CSAM), sexual content
+            involving minors, or illegal activity. Full standard:{" "}
+            <Link to="/child-safety">Child safety</Link>.
+          </li>
           <li>Spam, scams, or bot farms posting the same take everywhere.</li>
           <li>Hate that targets people for who they are (not ideas you disagree with).</li>
         </ul>
@@ -60,7 +64,8 @@ export default function Guidelines() {
         <p className="hint">
           Questions:{" "}
           <a href="mailto:hello@barathx.com">hello@barathx.com</a> ·{" "}
-          <Link to="/terms">Terms</Link> · <Link to="/privacy">Privacy</Link>
+          <Link to="/terms">Terms</Link> · <Link to="/privacy">Privacy</Link> ·{" "}
+          <Link to="/child-safety">Child safety</Link>
         </p>
       </article>
     </div>

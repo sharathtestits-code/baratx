@@ -283,6 +283,7 @@ export default function Landing() {
         <span>© {new Date().getFullYear()} BarathX</span>
         <span className="bx-home-foot-links">
           <Link to="/guidelines">Guidelines</Link>
+          <Link to="/child-safety">Child safety</Link>
           <Link to="/terms">Terms</Link>
           <Link to="/privacy">Privacy</Link>
           <a href="https://barathx.com">barathx.com</a>

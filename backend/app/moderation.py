@@ -61,6 +61,11 @@ GUIDELINE_REASONS = frozenset(
         "impersonation",
         "community guidelines",
         "guidelines",
+        "child safety",
+        "csam",
+        "csae",
+        "minor",
+        "child",
     }
 )
 

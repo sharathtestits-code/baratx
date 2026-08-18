@@ -243,7 +243,17 @@ Tags if asked: debate, social, india, campus, news, sports.
 
 This task stays incomplete until **icon + feature graphic + ≥2 phone screenshots** are uploaded.
 
-### After the 11 are green
+### 12. Child safety standards (Social category)
+
+Required because the store category is Social.
+
+- Safety standards URL: `https://barathx.com/child-safety` (must be live after deploy; not a PDF)
+- Contact: **Use another email address** → `hello@barathx.com` (not the personal Gmail unless that inbox is the one you will actually act on)
+- Tick both boxes: in-app report for child safety concerns, and compliance / reporting to authorities
+
+Users report in-app via post ··· → Report (reason can be `child safety` or `CSAM`).
+
+### After setup is green
 
 Closed testing unlocks on the same dashboard. When you create that closed release, include **India** plus every country a tester’s Google account is in. If a tester is abroad and India-only is selected, install fails.
 

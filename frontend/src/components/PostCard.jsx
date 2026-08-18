@@ -127,7 +127,9 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
 
   async function handleReport() {
     if (!token) return;
-    const reason = window.prompt("Why are you reporting this post?");
+    const reason = window.prompt(
+      "Why are you reporting this post? (spam, harassment, child safety / CSAM, etc.)"
+    );
     if (!reason || reason.trim().length < 3) return;
     try {
       await socialApi.report(token, { reason: reason.trim(), target_post_id: post.id });
