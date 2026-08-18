@@ -42,6 +42,10 @@ Slides are fetched by Meta from GitHub raw on **main**:
 ## Assets (product UI carousels)
 Canonical packs live under `brand/ig/carousel/{signup-excite,how-it-works,launch-pain}/`.
 
+**Hard rule:** slides must use **current** plaza UI from
+`brand/social/whatsapp/screens/live-2026-08-16/` — never retired
+`brand/carousel/screens/*` demo feeds (old sidebar Home / `@carouseldemo`).
+
 Regenerate (approved dark + saffron + real screens):
 
 ```bash

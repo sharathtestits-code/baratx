@@ -28,8 +28,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT_ROOT = ROOT / "brand" / "ig" / "carousel"
-SCREENS = ROOT / "brand" / "social" / "whatsapp" / "screens"
-CAROUSEL_SCREENS = ROOT / "brand" / "carousel" / "screens"
+# Current product UI only (Aug 2026 plaza shell). Never bake retired carousel/export demos.
+LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / "live-2026-08-16"
 LOGO = ROOT / "brand" / "baratx-logo-avatar.png"
 
 W = H = 1080
@@ -42,11 +42,24 @@ TEAL = (46, 196, 182)
 MUTED = (150, 150, 160)
 SLATE = (28, 30, 38)
 
-FONT = glob.glob("/usr/share/fonts/**/*Inter*Bold*.ttf", recursive=True)[0]
-FONT_REG = (
-    glob.glob("/usr/share/fonts/**/*Inter-Regular*.ttf", recursive=True)
-    or [FONT]
-)[0]
+def _font_paths() -> tuple[str, str]:
+    bold = (
+        glob.glob("/usr/share/fonts/**/*Inter*Bold*.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/DejaVuSans-Bold.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/LiberationSans-Bold.ttf", recursive=True)
+    )
+    regular = (
+        glob.glob("/usr/share/fonts/**/*Inter-Regular*.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/DejaVuSans.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/LiberationSans-Regular.ttf", recursive=True)
+        or bold
+    )
+    if not bold:
+        raise SystemExit("No usable Bold TTF under /usr/share/fonts")
+    return bold[0], regular[0]
+
+
+FONT, FONT_REG = _font_paths()
 
 
 def fnt(size: int, bold: bool = True) -> ImageFont.FreeTypeFont:
@@ -133,30 +146,39 @@ def load_phone(path: Path, target_h: int, *, frame_accent: tuple[int, int, int] 
 
 
 def screen(name: str) -> Path:
+    """Resolve UI screenshots. Prefer live plaza captures — ban old demo feed/home."""
     mapping = {
-        "square": SCREENS / "bx-site-square-b.jpg",
-        "square2": SCREENS / "bx-site-square-c.jpg",
-        "square_raw": SCREENS / "bx-site-square-raw.jpg",
-        "arenas": SCREENS / "bx-site-arenas.jpg",
-        "live": SCREENS / "bx-site-live.jpg",
-        "home": SCREENS / "bx-site-home.jpg",
-        "signup": SCREENS / "bx-site-signup.png",
-        "landing": SCREENS / "bx-site-landing.png",
-        "feed": CAROUSEL_SCREENS / "m03-feed.png",
-        "feed_desk": CAROUSEL_SCREENS / "03-feed.png",
-        "compose": CAROUSEL_SCREENS / "07-compose.png",
-        "profile": CAROUSEL_SCREENS / "m06-profile.png",
-        "detail": CAROUSEL_SCREENS / "m04-post-detail.png",
-        "search": CAROUSEL_SCREENS / "m05-search.png",
-        "signup_desk": CAROUSEL_SCREENS / "02-signup-or-login.png",
-        "landing_desk": CAROUSEL_SCREENS / "01-landing.png",
+        "square": LIVE / "square-mobile.png",
+        "square2": LIVE / "square-foryou-mobile.png",
+        "square_raw": LIVE / "square-mobile.png",
+        "arenas": LIVE / "arenas-mobile.png",
+        "live": LIVE / "live-mobile.png",
+        "home": LIVE / "home-mobile.png",
+        "home_desk": LIVE / "home-desktop.png",
+        "signup": LIVE / "signup-mobile.png",
+        "landing": LIVE / "landing-mobile.png",
+        "compose": LIVE / "compose-mobile.png",
+        "profile": LIVE / "profile-mobile.png",
+        "explore": LIVE / "explore-mobile.png",
+        "search": LIVE / "search-mobile.png",
+        "rewards": LIVE / "rewards-mobile.png",
+        # Aliases kept so older pack keys still resolve to CURRENT UI
+        "feed": LIVE / "home-mobile.png",
+        "feed_desk": LIVE / "home-desktop.png",
+        "detail": LIVE / "square-mobile.png",
+        "signup_desk": LIVE / "signup-mobile.png",
+        "landing_desk": LIVE / "landing-desktop.png",
+        "square_desk": LIVE / "square-desktop.png",
+        "arenas_desk": LIVE / "arenas-desktop.png",
+        "live_desk": LIVE / "live-desktop.png",
     }
-    path = mapping[name]
-    if not path.exists():
-        for alt in mapping.values():
-            if alt.exists():
-                return alt
-        raise FileNotFoundError(name)
+    path = mapping.get(name)
+    if path is None or not path.exists():
+        # Safe fallback: current Home, never retired carousel demo feeds
+        fallback = LIVE / "home-mobile.png"
+        if fallback.exists():
+            return fallback
+        raise FileNotFoundError(f"Missing screen {name!r} and home fallback")
     return path
 
 
@@ -667,21 +689,21 @@ PACKS: dict[str, list] = {
         ),
         lambda: slide_big_step(
             step="STEP 03",
-            title="Compose.",
-            title2="Say it clean.",
-            sub="Write the take you actually believe.",
-            screen_name="compose",
+            title="Home hub.",
+            title2="Pick up live.",
+            sub="Current Home — Square · Live · Arenas in one place.",
+            screen_name="home",
             pill="04 / 06",
-            cta="Write yours → barathx.com",
+            cta="Open Home → barathx.com",
         ),
         lambda: slide_flow_strip(
             kicker="Then go deeper",
-            title="Detail → search",
-            title2="→ Live.",
+            title="Explore → Live",
+            title2="→ Arenas.",
             screens=[
-                ("detail", "Thread"),
-                ("search", "Find"),
+                ("explore", "Explore"),
                 ("live", "Live"),
+                ("arenas", "Arenas"),
             ],
             pill="05 / 06",
             cta="Argue it live → barathx.com",
@@ -713,19 +735,19 @@ PACKS: dict[str, list] = {
         ),
         lambda: slide_phone_stack(
             kicker="Fix",
-            title="Square keeps",
+            title="Home keeps",
             title2="the debate.",
             sub="Human takes only. Threads that don’t disappear.",
-            front="feed",
-            back="detail",
+            front="home",
+            back="square",
             pill="03 / 06",
-            cta="Open Square → barathx.com",
+            cta="Open Home → barathx.com",
         ),
         lambda: slide_mid_duo(
             kicker="Proof",
             title="Search people.",
             title2="Find the fight.",
-            left=("search", "Discover"),
+            left=("explore", "Explore"),
             right=("live", "Go Live"),
             pill="04 / 06",
             cta="Join free → barathx.com",
@@ -737,7 +759,7 @@ PACKS: dict[str, list] = {
             title="60 seconds.",
             title2="You’re in.",
             sub="Google, phone, or email — then one take.",
-            screen_name="signup_desk",
+            screen_name="signup",
             pill="05 / 06",
             cta="Create account → barathx.com",
             side="right",
@@ -764,13 +786,13 @@ PACKS: dict[str, list] = {
             bar="corner",
         ),
         lambda: slide_phone(
-            kicker="Feed",
-            title="For you,",
+            kicker="Home",
+            title="Your hub,",
             title2="not for bots.",
             sub="Human ranking. AI drafts get demoted.",
-            screen_name="feed_desk",
+            screen_name="home_desk",
             pill="02 / 06",
-            cta="Scroll the Square → barathx.com",
+            cta="Open Home → barathx.com",
             side="left",
             bar="corner",
         ),
