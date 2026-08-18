@@ -16,6 +16,10 @@
 
 ## Daily reminder
 
-Morning daily-pack email includes a one-line nudge: push latest APK if you shipped app changes; keep soft launch on phone OTP + get-app.
+Morning daily-pack email nudges once:
+
+1. Paste **WhatsApp + X + LinkedIn** (pack copy includes get-app)
+2. Push `barathx-latest-release.apk` to main if you shipped app changes
+3. Soft launch login = phone OTP — not Google/Play SHA-1
 
 Owner: `sharathtestits@gmail.com`
