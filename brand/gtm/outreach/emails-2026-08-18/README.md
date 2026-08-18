@@ -2,8 +2,9 @@
 
 ## Send these
 - **[SHORT-EMAILS.md](./SHORT-EMAILS.md)** — crisp versions (use these)
-- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — attach this (not the MD)
-- **[HOW-TO-SHARE.md](./HOW-TO-SHARE.md)** — why PPT > MD
+- **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — **default attach** (1 page)
+- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — optional fuller deck
+- **[HOW-TO-SHARE.md](./HOW-TO-SHARE.md)** — PDF + PPT > MD
 
 Long drafts `01–07` are backup only.
 

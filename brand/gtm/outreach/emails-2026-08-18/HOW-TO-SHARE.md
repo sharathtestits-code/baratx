@@ -2,23 +2,26 @@
 
 | Format | Use? | Why |
 |--------|------|-----|
-| **`.pptx`** | **Yes — best** | Opens in PowerPoint / Google Slides / email attach |
-| Google Drive link to that PPT | Yes if attach fails | Easy open on phone |
-| PDF export of PPT | Fine backup | Universal |
-| `.md` | **No for cold email** | Looks like code; most people won’t open |
+| **`.pdf` one-pager** | **Yes — easiest attach** | Opens on phone; 1 page |
+| **`.pptx` deck** | Yes | Fuller brief (6 slides) |
+| Google Drive link | Yes if attach fails | Easy open on phone |
+| `.md` | **No for cold email** | Looks like code |
 
-## File to attach
-`BarathX-Creator-Collab-Brief.pptx` in this folder  
-(6 slides, **no fees / no ₹** — safe for first email)
+## Files to attach
+1. **`BarathX-One-Pager.pdf`** — default (always attach)
+2. **`BarathX-Creator-Collab-Brief.pptx`** — optional if they want more detail
 
-Rebuild anytime:
+Both have **no fees / no ₹** — safe for first email.
+
+Rebuild:
 ```bash
+python3 brand/gtm/outreach/emails-2026-08-18/build_one_pager_pdf.py
 python3 brand/gtm/outreach/emails-2026-08-18/build_collab_pptx.py
 ```
 
 ## Send recipe
-1. Copy body from `SHORT-EMAILS.md` (not the long `01–07` drafts)
-2. Attach the PPTX
+1. Copy body from `SHORT-EMAILS.md`
+2. Attach **`BarathX-One-Pager.pdf`** (add PPTX only if useful)
 3. Send from `contact@barathx.com` if you can
 
-Long drafts (`01-*.md` …) kept only as backup / if someone asks for more detail.
+Long drafts (`01-*.md` …) kept as backup only.

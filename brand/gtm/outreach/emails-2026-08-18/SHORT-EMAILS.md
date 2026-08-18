@@ -1,11 +1,11 @@
 # Short emails (send these)
 
-People skim. Keep body to ~5–7 lines. Attach the PPT — don’t paste the deck into the email.
+People skim. Keep body to ~5–7 lines. Attach **`BarathX-One-Pager.pdf`** by default. Add the PPT only if you want the fuller brief.
 
-**Best to share:** `BarathX-Creator-Collab-Brief.pptx` (generated)  
+**Best to share:** `BarathX-One-Pager.pdf` (+ optional `BarathX-Creator-Collab-Brief.pptx`)  
 **Don’t share:** raw `.md` files — most inboxes don’t render them well.
 
-Upload the PPTX to Google Drive → “Anyone with the link” if the attachment bounces; otherwise attach the file.
+Upload to Google Drive → “Anyone with the link” if the attachment bounces.
 
 ---
 
@@ -16,7 +16,7 @@ Hi team — Sharath from BarathX.
 
 We’re building India’s public square (built by Indians, for Indians, owned by Indians) — a place to pick a side and argue live, instead of losing takes in WhatsApp. Soft launch: barathx.com.
 
-Open to a quick collab chat? If yes, just reply how partnerships usually work on your side. Short deck attached.
+Open to a quick collab chat? If yes, just reply how partnerships usually work on your side. One-pager attached.
 
 Sharath · BarathX · @getbarathx
 
