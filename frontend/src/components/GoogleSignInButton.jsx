@@ -236,7 +236,7 @@ export default function GoogleSignInButton({
         {!blocked && (
           <p className="hint x-google-loading">Phone OTP also works if Google isn’t set up on this build yet.</p>
         )}
-        {error && <p className="x-inline-error">{error}</p>}
+        {error && !onError && <p className="x-inline-error">{error}</p>}
       </div>
     );
   }
@@ -297,7 +297,7 @@ export default function GoogleSignInButton({
         <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
       )}
       {!gisReady && !error && !blocked && <p className="hint x-google-loading">Loading Google…</p>}
-      {error && <p className="x-inline-error">{error}</p>}
+      {error && !onError && <p className="x-inline-error">{error}</p>}
     </div>
   );
 }

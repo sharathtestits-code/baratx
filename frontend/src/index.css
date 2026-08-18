@@ -7325,6 +7325,49 @@ button.topic-chip.selected {
   letter-spacing: -0.02em;
 }
 
+.settings-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.settings-header h1 {
+  text-align: center;
+  font-size: 1.05rem;
+}
+
+.settings-back {
+  appearance: none;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.06));
+  color: var(--text, #fff);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.settings-back:active {
+  opacity: 0.85;
+}
+
+.settings-header-spacer {
+  width: 4.5rem;
+}
+
+.settings-page {
+  min-height: 60vh;
+  padding-bottom: 5rem;
+}
+
+html.native-app .settings-page {
+  /* Keep content above bottom nav + Android gesture bar */
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 .rewards-page .rewards-lead {
   margin: 0.85rem 1.25rem 1rem;
 }

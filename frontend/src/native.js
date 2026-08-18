@@ -53,12 +53,20 @@ export async function initNativeShell() {
   }
 
   if (Capacitor.getPlatform() === "android") {
-    App.addListener("backButton", ({ canGoBack }) => {
-      if (canGoBack) {
-        window.history.back();
-      } else {
+    App.addListener("backButton", () => {
+      const path = window.location?.pathname || "/";
+      const atRoot =
+        path === "/" ||
+        path === "/home" ||
+        path === "/login" ||
+        path === "/signup" ||
+        path === "/native-launch";
+      // Prefer SPA history over Capacitor canGoBack (often wrong in WebView).
+      if (atRoot) {
         App.exitApp();
+        return;
       }
+      window.history.back();
     });
   }
 
