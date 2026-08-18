@@ -29,7 +29,7 @@ Hi Ajay — Sharath here, building BarathX.
 
 India’s public square: pick a side, leave a take, get real replies. Built by Indians, for Indians, owned by Indians. Live at barathx.com.
 
-Would you be open to a Reel/Story collab? If yes, tell me how you usually handle partnerships — happy to follow your process. Deck attached.
+Would you be open to a Reel/Story collab? If yes, tell me how you usually handle partnerships — happy to follow your process. One-pager attached.
 
 Sharath · @getbarathx
 
@@ -42,7 +42,7 @@ Hi team — Sharath from BarathX.
 
 We’re building India’s public square for sided debate (Indian-built, Indian-owned). Soft launch: barathx.com.
 
-Exploring early media/creator partnerships. If you evaluate collabs, what’s the best next step on your side? Short deck attached.
+Exploring early media/creator partnerships. If you evaluate collabs, what’s the best next step on your side? One-pager attached.
 
 Thanks,  
 Sharath · barathx.com · @getbarathx
@@ -56,7 +56,7 @@ Hi team — Sharath, BarathX.
 
 Building India’s public square — honest sided debate that doesn’t die in WhatsApp. Built by Indians, for Indians, owned by Indians. barathx.com
 
-If partnerships are open, what’s your usual process / who should I talk to? Deck attached.
+If partnerships are open, what’s your usual process / who should I talk to? One-pager attached.
 
 Sharath · @getbarathx
 
@@ -69,7 +69,7 @@ Hi team — Sharath from BarathX.
 
 We’re building India’s public square (Indian-built / owned) — drop a take, pick a side, real replies. Live: barathx.com.
 
-Open to a collab that fits Telugu Connects? Reply with how you usually partner and we can go from there. Deck attached.
+Open to a collab that fits Telugu Connects? Reply with how you usually partner and we can go from there. One-pager attached.
 
 Sharath · @getbarathx
 
@@ -82,7 +82,7 @@ Hi Sudheer — Sharath from BarathX.
 
 BarathX = India’s public square for sided debate. Built by Indians, for Indians, owned by Indians. Soft launch: barathx.com
 
-If Aadhan does platform/awareness collabs, what’s the right process on your side? Short deck attached.
+If Aadhan does platform/awareness collabs, what’s the right process on your side? One-pager attached.
 
 Sharath · @getbarathx
 
@@ -95,6 +95,6 @@ Hi team — Sharath, building BarathX (found you via IG bio).
 
 India’s public square — pick a side, argue live. Built by Indians, for Indians, owned by Indians. barathx.com
 
-If you do collabs, how do you usually work? Deck attached — happy to keep it simple.
+If you do collabs, how do you usually work? One-pager attached — happy to keep it simple.
 
 Sharath · @getbarathx
