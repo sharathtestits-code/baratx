@@ -89,21 +89,24 @@ Do not leave this blank. Social apps get rejected if reviewers cannot log in.
 
 ### 4. Content rating
 
-Start questionnaire → email `hello@barathx.com` → category **Social Networking** (or Communication if that is the only social option).
+Start questionnaire → email `hello@barathx.com` → category **Social or Communication**.
 
-| If asked | Answer |
-|----------|--------|
-| Users can interact / communicate | **Yes** (posts, replies, live rooms) |
-| User-generated content | **Yes** |
-| Unrestricted internet access | **No** (in-app Square / Arenas, not a general browser) |
-| Users share physical location | **No** |
-| In-app purchases / gambling | **No** |
-| Ads | **No** |
-| Violence / sexual content as a core feature | **No** |
-| Users may post mild language | **Yes** if asked (UGC debate) |
-| Age gate | **Yes — 18+** |
+**Social or Communication questionnaire (exact radios):**
 
-Submit. When IARC emails the rating, **apply it to the app**. A Teen / 12+ rating is normal for social UGC even though the product is 18+.
+| Question | Answer | Why |
+|----------|--------|-----|
+| Which best describes the app? | **Social** (Facebook / Twitter / Instagram type) | Public square, not 1:1 chat |
+| Significant portion for dating or sexual relationships? | **No** | Debate product |
+| Permit public sharing of nudity? | **No** | Guidelines forbid it |
+| Permit public sharing of real-world graphic violence outside news? | **No** | Not a violence-sharing app |
+| Share the user's current and precise physical location with other users? | **No** | Flip this if it is Yes. No location permission in the Android app |
+| Allow users to purchase digital goods? | **No** | No IAP |
+| Ability to block users or user-generated content? | **Yes** | Settings + profile mute/block |
+| Ability to report users or user-generated content? | **Yes** | Post ··· → Report |
+| Include chat moderation? | **Yes** | Live Talk filters, host remove, repeat reports auto-remove |
+| Can interactions be limited to invited friends only? | **No** | Square is public. Following is a feed filter, not a private-friends lock |
+
+Submit. When IARC emails the rating, **apply it to the app**. A Teen / 12+ rating is normal for public social UGC even though the product is 18+.
 
 ### 5. Target audience
 
