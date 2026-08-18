@@ -216,10 +216,11 @@ This is Store settings, not the listing graphics.
 
 - App or game: **App**
 - Category: **Social**
-- Email: `hello@barathx.com`
+- Tags: click **Manage tags**. Remove **Email** and **Web browser**. Add up to five that match a public square: **Social networking** first, then search for **Communities**, **Forums**, **Chat/IM**, **Events** if they appear. Do not use Email, Web browser, Dating, or News.
+- Email: `hello@barathx.com` (required, shown on Play)
 - Website: `https://barathx.com`
-- Phone: optional
-- Default language: English (India) if offered, else English (United States)
+- Phone: leave blank unless you want a public number on the listing
+- External marketing: leave Google’s default (usually on). That only lets Google reuse listing assets off Play, not ads inside BarathX.
 - Save.
 
 ### 11. Set up your store listing
