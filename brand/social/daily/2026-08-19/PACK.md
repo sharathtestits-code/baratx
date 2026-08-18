@@ -13,12 +13,14 @@
 
 ## Post 1 — Morning (≈ 09:00 IST)
 
-**Images / video**
+**Images / video** (live product UI — Explore + soft-launch phone OTP)
 | Channel | File |
 |---------|------|
-| WhatsApp + X | `morning-shared.jpg` |
-| LinkedIn | `morning-linkedin.jpg` |
-| Reel (WA Status / Reels / Shorts / X) | `barathx-daily-reel-20s.mp4` |
+| WhatsApp + X (Explore) | `morning-shared.jpg` |
+| LinkedIn (Explore) | `morning-linkedin.jpg` |
+| Soft launch alt (phone OTP) | `morning-softlaunch.jpg` |
+| Soft launch LinkedIn alt | `morning-softlaunch-linkedin.jpg` |
+| Reel | `barathx-daily-reel-20s.mp4` |
 
 ### WhatsApp community / channel
 ```

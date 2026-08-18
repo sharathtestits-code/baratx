@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 from features import Feature, feature_by_key, feature_for_date
 
 ROOT = Path(__file__).resolve().parents[3]
-LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / "live-2026-08-16"
+LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / "live-2026-08-19"
 LOGO = ROOT / "brand" / "baratx-logo-avatar.png"
 
 W, H = 1080, 1920
