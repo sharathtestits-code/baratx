@@ -174,7 +174,25 @@ Political posts belong in **Other user-generated content**, not “Political or 
 
 If Location currently shows 1/2 and Personal info 7/9, open those rows and uncheck the extras before Next.
 
-On the next step (usage), every ticked type is **Collected**, **not shared**. Showing a take on Square is not “shared” with a third party. Not sold. Encrypted in transit already answered Yes.
+**Data usage and handling (each type’s modal).** Same for every type unless the table says otherwise:
+
+- **Shared:** leave unchecked (not sent to a third-party ad/analytics SDK)
+- **Ephemeral:** **No, this collected data is not processed ephemerally** (it is stored)
+- Do not tick Advertising or Analytics
+
+| Data type | Required or optional | Why collected (tick these) |
+|-----------|----------------------|----------------------------|
+| Name | **Required** | **App functionality** + **Account management** |
+| Email address | **Users can choose** | App functionality, Account management, Fraud prevention, Developer communications (activity emails) |
+| User IDs | **Required** | App functionality + Account management |
+| Phone number | **Users can choose** | App functionality, Account management, Fraud prevention |
+| Other in-app messages | **Users can choose** | App functionality |
+| Photos | **Users can choose** | App functionality + Account management |
+| Other user-generated content | **Users can choose** | App functionality |
+| Other actions | **Users can choose** | App functionality |
+| Device or other IDs | **Required** | App functionality, Account management, Fraud prevention |
+
+For **Name** specifically: keep Shared off and Ephemeral **No**. Keep **Required**. Uncheck **Fraud prevention**. Tick **App functionality** and **Account management**, then Save. Name is the display name on posts and profile, not a fraud signal. Showing a take on Square is not “shared” with a third party.
 
 ### 7. Government apps
 
