@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFont
 from features import Feature, feature_by_key, feature_for_date
 
 ROOT = Path(__file__).resolve().parents[3]
-LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / "live-2026-08-16"
+LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / "live-2026-08-19"
 LOGO = ROOT / "brand" / "baratx-logo-avatar.png"
 DAILY = Path(__file__).resolve().parent
 
@@ -61,6 +61,9 @@ SCREEN_FILES = {
     "landing": "landing-mobile.png",
     "search": "search-mobile.png",
     "signup": "signup-mobile.png",
+    "get_app": "get-app-mobile.png",
+    "login_phone": "login-mobile.png",
+    "soft_launch_phone": "soft-launch-phone-mobile.png",
 }
 
 
@@ -232,7 +235,7 @@ def render_still(
         layer = base.convert("RGBA")
         layer.paste(ph, (W - ph.width - 24, 640), ph)
         d2 = ImageDraw.Draw(layer)
-        cta(d2, "Explore → barathx.com")
+        cta(d2, "Get app → barathx.com/get-app")
         out = layer.convert("RGB")
 
     elif tpl == "bold_type":
@@ -269,16 +272,16 @@ def render_still(
         base, d = canvas()
         stamp(base, d, pill=pill)
         d.text((36, 140), "SOFT LAUNCH", font=fnt(22), fill=SAFFRON)
-        d.text((36, 190), "India’s public", font=fnt(52), fill=WHITE)
-        d.text((36, 260), "square — live.", font=fnt(52), fill=SAFFRON)
-        d.text((36, 350), trend_line, font=fnt(24, False), fill=MUTED)
+        d.text((36, 190), "Install. Phone OTP.", font=fnt(48), fill=WHITE)
+        d.text((36, 255), "You’re in.", font=fnt(48), fill=SAFFRON)
+        d.text((36, 340), trend_line, font=fnt(24, False), fill=MUTED)
         for i, b in enumerate(feature.bullets[:3]):
-            d.text((48, 420 + i * 48), f"•  {b}", font=fnt(28), fill=CREAM)
+            d.text((48, 400 + i * 48), f"•  {b}", font=fnt(28), fill=CREAM)
         ph = phone(feature.screen, 400)
         layer = base.convert("RGBA")
-        layer.paste(ph, ((W - ph.width) // 2, 580), ph)
+        layer.paste(ph, ((W - ph.width) // 2, 560), ph)
         d2 = ImageDraw.Draw(layer)
-        cta(d2, "Open barathx.com")
+        cta(d2, "Get app → barathx.com/get-app")
         out = layer.convert("RGB")
 
     elif tpl == "linkedin_board":
@@ -288,12 +291,16 @@ def render_still(
         d.text((36, 165), feature.name, font=fnt(48), fill=WHITE)
         for i, line in enumerate(_wrap(d, feature.one_liner, fnt(28, False), W - 72)[:3]):
             d.text((36, 240 + i * 38), line, font=fnt(28, bold=False), fill=MUTED)
-        d.rounded_rectangle([36, 380, W - 36, 720], radius=22, fill=SLATE)
-        d.text((60, 410), f"Today’s India hook: {trend_line[:48]}", font=fnt(22), fill=SAFFRON)
+        d.rounded_rectangle([36, 370, 560, 720], radius=22, fill=SLATE)
+        d.text((56, 400), f"India hook: {trend_line[:40]}", font=fnt(20), fill=SAFFRON)
         for i, b in enumerate(feature.bullets[:4]):
-            d.text((60, 470 + i * 48), f"→  {b}", font=fnt(26, False), fill=CREAM)
-        cta(d, "Soft launch → barathx.com")
-        out = base
+            d.text((56, 450 + i * 48), f"→  {b}", font=fnt(24, False), fill=CREAM)
+        ph = phone(feature.screen, 420)
+        layer = base.convert("RGBA")
+        layer.paste(ph, (W - ph.width - 28, 360), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Get app → barathx.com/get-app")
+        out = layer.convert("RGB")
 
     elif tpl == "whatsapp_trio":
         base, d = canvas()

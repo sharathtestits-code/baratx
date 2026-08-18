@@ -81,9 +81,9 @@ FEATURES: tuple[Feature, ...] = (
     Feature(
         key="soft_launch",
         name="Soft launch",
-        one_liner="Live in your browser (phone + desktop). Apps coming soon.",
-        bullets=("Soft launch open", "Browser now", "Apple & Android soon"),
-        screen="landing",
+        one_liner="Android soft launch open — install APK, join with phone OTP.",
+        bullets=("barathx.com/get-app", "Continue with phone", "No Play wait"),
+        screen="login_phone",
         template="launch_hero",
         hashtags="#BarathX #SoftLaunch #India #PublicSquare",
     ),
