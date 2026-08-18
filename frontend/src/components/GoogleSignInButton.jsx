@@ -3,11 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { api, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { isNativeApp } from "../native";
-import {
-  friendlyNativeGoogleError,
-  nativeGoogleConfigured,
-  nativeGoogleIdToken,
-} from "../nativeGoogleAuth";
 import { openBrowserGoogleSignIn } from "../nativeGoogleBrowserAuth";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
@@ -15,9 +10,9 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
  * Google sign-in:
- * - Web: GIS renderButton (popup account chooser)
- * - Native Capacitor: @capgo/capacitor-social-login → ID token → /auth/google
- * - Native fallback: system browser → barathx.com/native-google-auth → deep link JWT
+ * - Web: GIS renderButton (one account chooser)
+ * - Native: one Custom Tabs session → barathx.com/native-google-auth (auto-starts Google)
+ *   Skips Capgo Credential Manager so users are not asked to pick an account twice.
  */
 export default function GoogleSignInButton({
   label = "Continue with Google",
@@ -125,11 +120,11 @@ export default function GoogleSignInButton({
     }
     setBusy(true);
     setError("");
-    setBrowserHint("Opening Google in your browser… Sign in there, then you’ll return to the app.");
+    setBrowserHint("Opening Google — pick your account once, then you’ll return to the app.");
     try {
       await openBrowserGoogleSignIn({ confirmAge18: ageOk, acceptPrivacy: privacyOk });
     } catch (err) {
-      const msg = err?.message || "Could not open browser for Google Sign-In.";
+      const msg = err?.message || "Could not open Google Sign-In.";
       setError(msg);
       onError?.(msg);
       setBrowserHint("");
@@ -138,62 +133,9 @@ export default function GoogleSignInButton({
     }
   }
 
-  async function handleNativeGoogle() {
-    const {
-      confirmAge18: ageOk,
-      requireAgeConfirm: needAge,
-      acceptPrivacy: privacyOk,
-      requirePrivacyConfirm: needPrivacy,
-    } = ageRef.current;
-    if (needAge && !ageOk) {
-      const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
-    if (needPrivacy && !privacyOk) {
-      const msg = "Accept the Privacy Policy (DPDP) to create an account.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
-    if (!nativeGoogleConfigured()) {
-      const msg =
-        "Native Google isn’t fully set up on this build. Tap “Continue with Google in browser” below, or use phone OTP.";
-      setError(msg);
-      setBrowserHint(msg);
-      onError?.(msg);
-      return;
-    }
-    setBusy(true);
-    setError("");
-    setBrowserHint("");
-    try {
-      const idToken = await nativeGoogleIdToken();
-      setBusy(false);
-      await finishWithIdToken(idToken);
-    } catch (err) {
-      const msg = friendlyNativeGoogleError(err);
-      // Error 16 / re-auth: do NOT auto-open the browser (feels broken).
-      // User taps “Continue with Google in browser” when ready.
-      if (err?.code === "16" || /couldn't re-auth|Play App Signing SHA-1/i.test(msg)) {
-        setBusy(false);
-        const hint =
-          "Native Google failed on this Play build. Tap “Continue with Google in browser” below — sign in there, then you’ll return to the app.";
-        setError(hint);
-        setBrowserHint(hint);
-        onError?.(hint);
-        return;
-      }
-      setError(msg);
-      onError?.(msg);
-      setBusy(false);
-    }
-  }
-
   useEffect(() => {
     function onBrowserAuthError(ev) {
-      const msg = ev?.detail || "Google sign-in failed in browser.";
+      const msg = ev?.detail || "Google sign-in failed.";
       setError(String(msg));
       setBrowserHint("");
       onError?.(String(msg));
@@ -215,12 +157,10 @@ export default function GoogleSignInButton({
       window.google.accounts.id.initialize({
         client_id: CLIENT_ID,
         callback: (res) => callbackRef.current?.(res),
-        // popup is more reliable than redirect on iOS Safari / in-app browsers
         ux_mode: "popup",
         auto_select: false,
         cancel_on_tap_outside: true,
         context: "signin",
-        // Prefer FedCM where available; falls back when unsupported.
         use_fedcm_for_prompt: true,
       });
 
@@ -282,19 +222,10 @@ export default function GoogleSignInButton({
           type="button"
           className="x-btn x-btn-google"
           disabled={busy || blocked}
-          onClick={handleNativeGoogle}
-        >
-          <GoogleG className="x-btn-icon" />
-          {busy ? "Signing in…" : label}
-        </button>
-        <button
-          type="button"
-          className="x-btn x-btn-outline"
-          style={{ marginTop: "0.65rem" }}
-          disabled={busy || blocked}
           onClick={startBrowserGoogle}
         >
-          {busy ? "Opening browser…" : "Continue with Google in browser"}
+          <GoogleG className="x-btn-icon" />
+          {busy ? "Opening Google…" : label}
         </button>
         {ageBlocked && (
           <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
@@ -304,8 +235,7 @@ export default function GoogleSignInButton({
         )}
         {!blocked && (
           <p className="hint x-google-loading">
-            {browserHint ||
-              "If Google fails on this Play build, use “in browser” above — or phone OTP."}
+            {browserHint || "One Google account pick — then you’re back in the app."}
           </p>
         )}
         {error && !onError && <p className="x-inline-error">{error}</p>}

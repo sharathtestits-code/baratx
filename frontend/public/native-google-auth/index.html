@@ -61,8 +61,19 @@
       .hint { color: var(--muted); font-size: 0.95rem; line-height: 1.45; margin: 0.35rem 0; }
       .error { color: var(--err); font-size: 0.95rem; line-height: 1.4; margin-top: 0.85rem; }
       #google-host { margin-top: 1.25rem; min-height: 48px; }
+      #google-host.is-busy { opacity: 0.4; pointer-events: none; }
       .links { margin-top: 1.4rem; font-size: 0.85rem; }
       .links a { color: var(--muted); }
+      .open-app {
+        display: inline-block;
+        background: var(--accent);
+        color: #111;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 0.85rem 1.1rem;
+        border-radius: 999px;
+        margin-top: 0.75rem;
+      }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -72,15 +83,15 @@
   <body>
     <main>
       <div class="brand"><span class="mark">BX</span><span>BarathX</span></div>
-      <h1>Continue with Google</h1>
-      <p class="hint">
-        Sign in here to return to the BarathX app. This uses the website Google login (works even when Play SHA-1 isn’t ready).
+      <h1>Signing you in</h1>
+      <p class="hint" id="lead">
+        Choose your Google account once — then you’ll return to BarathX.
       </p>
       <div id="age-warn" class="error" hidden>
         Go back to the app, tick <strong>18+</strong> and <strong>Privacy</strong>, then try again.
       </div>
       <div id="google-host"></div>
-      <p id="status" class="hint">Loading Google…</p>
+      <p id="status" class="hint">Connecting to Google…</p>
       <p id="error" class="error" hidden></p>
       <p class="links">
         <a href="https://barathx.com/privacy">Privacy</a> ·
@@ -98,45 +109,48 @@
         var statusEl = document.getElementById("status");
         var errorEl = document.getElementById("error");
         var host = document.getElementById("google-host");
+        var exchanged = false;
 
         if (!ageOk || !privacyOk) {
           document.getElementById("age-warn").hidden = false;
+          statusEl.textContent = "";
         }
 
         function showError(msg) {
           errorEl.hidden = false;
           errorEl.textContent = msg;
           statusEl.textContent = "";
+          host.classList.remove("is-busy");
         }
 
         function openApp(token) {
           var q = "token=" + encodeURIComponent(token);
           var deep = DEEP + "?" + q;
-          // Android Custom Tabs often need an intent:// URL to hand off to the app.
           var intent =
             "intent://google-auth?" +
             q +
             "#Intent;scheme=barathx;package=com.baratx.app;end";
-          var isAndroid = /Android/i.test(navigator.userAgent || "");
-          location.href = isAndroid ? intent : deep;
+          location.href = /Android/i.test(navigator.userAgent || "") ? intent : deep;
           return deep;
         }
 
         function finish(token) {
           statusEl.textContent = "Signed in — returning to the app…";
+          host.classList.add("is-busy");
           var deep = openApp(token);
           setTimeout(function () {
             statusEl.innerHTML =
-              'Signed in. If the app didn’t open, tap below:<br/><br/>' +
-              '<a id="open-app" href="' +
-              deep +
-              '" style="display:inline-block;background:#ff671f;color:#111;font-weight:700;text-decoration:none;padding:0.85rem 1.1rem;border-radius:999px;">Open BarathX app</a>';
+              'Signed in. If the app didn’t open, tap below:<br/>' +
+              '<a class="open-app" href="' + deep + '">Open BarathX app</a>';
             errorEl.hidden = true;
           }, 900);
         }
 
         function exchange(idToken) {
+          if (exchanged) return;
+          exchanged = true;
           statusEl.textContent = "Signing you in…";
+          host.classList.add("is-busy");
           fetch(API + "/auth/google", {
             method: "POST",
             headers: {
@@ -157,24 +171,30 @@
               });
             })
             .catch(function (err) {
-              var msg = String((err && err.message) || err);
-              showError(msg);
-              location.href = DEEP + "?error=" + encodeURIComponent(msg.slice(0, 180));
+              exchanged = false;
+              showError(String((err && err.message) || err));
             });
         }
 
-        function render() {
+        function startGoogle() {
           if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+          if (!ageOk || !privacyOk) {
+            statusEl.textContent = "";
+            return true;
+          }
+
           window.google.accounts.id.initialize({
             client_id: CLIENT_ID,
             callback: function (res) {
               if (res && res.credential) exchange(res.credential);
             },
-            // Custom Tabs / in-app browsers: popup is unreliable; button still works in-page on mobile Chrome.
-            ux_mode: "popup",
-            auto_select: false,
+            // Prefer silent/auto when Chrome already has the account (Custom Tabs).
+            auto_select: true,
+            cancel_on_tap_outside: false,
             context: "signin",
+            ux_mode: "popup",
           });
+
           host.innerHTML = "";
           window.google.accounts.id.renderButton(host, {
             theme: "outline",
@@ -183,17 +203,38 @@
             text: "continue_with",
             width: Math.min(320, host.offsetWidth || 280),
           });
-          statusEl.textContent = "Tap Continue with Google below.";
+
+          statusEl.textContent = "Choose your account…";
+          try {
+            window.google.accounts.id.prompt(function (notification) {
+              if (!notification) return;
+              if (notification.isDisplayed && notification.isDisplayed()) {
+                statusEl.textContent = "Choose your Google account…";
+                return;
+              }
+              if (
+                notification.isNotDisplayed() ||
+                notification.isSkippedMoment() ||
+                notification.isDismissedMoment()
+              ) {
+                statusEl.textContent = "Tap Continue with Google once.";
+              }
+            });
+          } catch (e) {
+            statusEl.textContent = "Tap Continue with Google once.";
+          }
           return true;
         }
 
         function boot() {
-          if (render()) return;
+          if (startGoogle()) return;
           var n = 0;
           var t = setInterval(function () {
             n += 1;
-            if (render() || n > 40) clearInterval(t);
-            if (n > 40 && !host.childNodes.length) showError("Could not load Google. Check your connection and retry.");
+            if (startGoogle() || n > 40) clearInterval(t);
+            if (n > 40 && !host.childNodes.length) {
+              showError("Could not load Google. Check your connection and retry.");
+            }
           }, 200);
         }
 

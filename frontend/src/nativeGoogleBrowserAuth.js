@@ -19,7 +19,8 @@ export function buildNativeGoogleAuthUrl({
   confirmAge18 = false,
   acceptPrivacy = false,
 } = {}) {
-  const u = new URL(`${PUBLIC_URL}/native-google-auth`);
+  // Trailing slash hits the static page; autostart jumps straight to Google (one account pick).
+  const u = new URL(`${PUBLIC_URL}/native-google-auth/`);
   if (confirmAge18) u.searchParams.set("age", "1");
   if (acceptPrivacy) u.searchParams.set("privacy", "1");
   u.searchParams.set("src", "app");
