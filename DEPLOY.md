@@ -80,6 +80,7 @@ QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
 - Repo: `sharathtestits-code/baratx`
 - Root `Dockerfile` + `railway.toml` build the **backend** from the monorepo (do not set Root Directory, or leave it `/`)
 - Alternate: Root Directory = `backend` uses `backend/Dockerfile`
+- Root `.dockerignore` excludes `frontend/android`, `frontend/ios`, and `brand/` so APK/AAB/social assets do not bloat the API image build (large Play uploads caused deploy failures around 2026-08-18).
 - After Postgres is added, set on the API service:
   - `DATABASE_URL=${{Postgres.DATABASE_URL}}` (or Railway’s variable reference UI)
   - `JWT_SECRET` = long random string
