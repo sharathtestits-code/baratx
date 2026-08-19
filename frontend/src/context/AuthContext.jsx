@@ -7,6 +7,7 @@ import {
   parseGoogleAuthDeepLink,
 } from "../nativeGoogleBrowserAuth";
 import { applyTheme, isValidTheme } from "../theme";
+import { disableBiometric } from "../biometricAuth";
 
 const AuthContext = createContext(null);
 
@@ -134,7 +135,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setBootError("");
     setLoading(false);
-    // Best-effort: don't block UI if the network is down.
+    disableBiometric().catch(() => {});
     if (current) {
       try {
         await api.revokeSessions(current);

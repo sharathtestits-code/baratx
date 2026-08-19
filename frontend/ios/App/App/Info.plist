@@ -26,6 +26,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>BarathX needs camera access so you can take a profile or post photo.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>BarathX uses Face ID so you can unlock the app without typing your password.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>BarathX needs photo library access so you can attach images to posts.</string>
 	<key>UIApplicationSceneManifest</key>
