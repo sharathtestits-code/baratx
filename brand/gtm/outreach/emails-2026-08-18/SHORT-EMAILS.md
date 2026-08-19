@@ -98,3 +98,16 @@ India’s public square — pick a side, argue live. Built by Indians, for India
 If you do collabs, how do you usually work? One-pager attached — happy to keep it simple.
 
 Sharath · @getbarathx
+
+---
+
+## Bhargavi — Mebhargavi49@gmail.com
+**Subject:** BarathX × you — quick collab?
+
+Hi Bhargavi — Sharath here, building BarathX.
+
+India’s public square: pick a side, leave a take, get real replies. Built by Indians, for Indians, owned by Indians. Soft launch: barathx.com
+
+Open to a short promo (Reel / Story — your call)? If yes, tell me what you’d usually ask for that and when you could post. One-pager attached.
+
+Sharath · @getbarathx

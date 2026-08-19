@@ -19,6 +19,7 @@ Long drafts `01–07` are backup only.
 | Telugu Connects | Teamteluguconnects@gmail.com |
 | Aadhan | sudheer@aadhan.in |
 | Sri Mahalakshmi | teamsrimahalakshmi@gmail.com |
+| Bhargavi | Mebhargavi49@gmail.com |
 
 ## Rules
 - Built by Indians, for Indians, owned by Indians  
