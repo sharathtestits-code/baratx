@@ -36,19 +36,9 @@ ffmpeg -i "ScreenRecording_08-18-2026 17-08-23_1.mov" \
 
 For vertical Reels, use `barathx-why-india-needs-20s-reel.mp4` and scale part A to 1080×1920 instead.
 
-## Caption (IG / WhatsApp)
+## Captions (WhatsApp · IG · X)
 
-```
-Why India needs BarathX 🇮🇳
-
-Not another Reels feed.
-Square · Arenas · Live — pick a side, argue it on the record.
-
-Human takes only. No AI slop.
-→ barathx.com
-
-#BarathX #India #PublicSquare #Debate #BuildInPublic
-```
+Paste-ready copy: **[CAPTIONS.md](./CAPTIONS.md)**
 
 ## Beats (20s)
 
