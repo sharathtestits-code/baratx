@@ -49,6 +49,7 @@ import { useAuth } from "./context/AuthContext";
 import { PlazaMenuProvider, usePlazaMenu } from "./context/PlazaMenuContext";
 import { canAccessOpsConsole, loadOpsConsolePath, opsConsolePath, applyOpsPathFromUser } from "./opsAccess";
 import { isNativeApp } from "./native";
+import { BiometricEnablePrompt, useBiometricAutoLogin } from "./components/BiometricPrompt";
 
 function AuthChrome({ children, legal = false }) {
   return (
@@ -91,6 +92,7 @@ function PlazaShell() {
           <EmailVerifyBanner />
           <ThemeOnboarding />
           <SecurityTrustModal />
+          <BiometricEnablePrompt />
           <AppRoutes />
         </main>
         <ComposeFab />
@@ -143,6 +145,7 @@ export default function App() {
   const location = useLocation();
   const [opsPath, setOpsPath] = useState(() => opsConsolePath());
   const [opsPathReady, setOpsPathReady] = useState(false);
+  const bioReady = useBiometricAutoLogin();
 
   useEffect(() => {
     if (user?.is_ops_owner && user.ops_console_path) {
@@ -170,7 +173,7 @@ export default function App() {
     return <NativeGoogleAuth />;
   }
 
-  if (loading || !opsPathReady) {
+  if (loading || !opsPathReady || !bioReady) {
     return <div className="page-loading">Starting BarathX…</div>;
   }
 

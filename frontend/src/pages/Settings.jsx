@@ -9,6 +9,12 @@ import ThemePicker from "../components/ThemePicker";
 import { applyTheme, getStoredTheme, markThemeChosen } from "../theme";
 import { LOCALES, getStoredLanguage, localeMeta } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
+import {
+  isBiometricAvailable,
+  isBiometricEnabled,
+  enableBiometric,
+  disableBiometric,
+} from "../biometricAuth";
 
 export default function Settings() {
   const { user, token, logout, revokeAllSessions, updateUser } = useAuth();
@@ -28,6 +34,9 @@ export default function Settings() {
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
+  const [bioAvailable, setBioAvailable] = useState(null);
+  const [bioEnabled, setBioEnabled] = useState(() => isBiometricEnabled());
+  const [bioToggling, setBioToggling] = useState(false);
 
   const selectedLocale = localeMeta(language);
 
@@ -78,6 +87,36 @@ export default function Settings() {
       cancelled = true;
     };
   }, [token]);
+
+  useEffect(() => {
+    isBiometricAvailable().then(setBioAvailable);
+  }, []);
+
+  async function toggleBiometric(enable) {
+    setBioToggling(true);
+    setError("");
+    setMsg("");
+    try {
+      if (enable) {
+        await enableBiometric(token, user?.username);
+        setBioEnabled(true);
+        setMsg(`${bioAvailable?.label || "Biometric unlock"} enabled.`);
+      } else {
+        await disableBiometric();
+        setBioEnabled(false);
+        setMsg("Biometric unlock disabled.");
+      }
+    } catch (err) {
+      const raw = String(err?.message || err || "");
+      if (/cancel/i.test(raw)) {
+        setMsg("Biometric setup cancelled.");
+      } else {
+        setError(raw || "Could not set up biometric unlock.");
+      }
+    } finally {
+      setBioToggling(false);
+    }
+  }
 
   async function saveTheme(nextId) {
     setTheme(nextId);
@@ -307,6 +346,29 @@ export default function Settings() {
         </label>
         {emailSaving && <p className="hint">{t("settings.saving")}</p>}
       </section>
+
+      {bioAvailable?.available && (
+        <section className="settings-section">
+          <h2>{bioAvailable.label || "Biometric unlock"}</h2>
+          <p className="hint">
+            Unlock BarathX with {bioAvailable.label} instead of typing your password every time.
+          </p>
+          <label className="age-gate settings-email-toggle">
+            <input
+              type="checkbox"
+              checked={bioEnabled}
+              disabled={bioToggling}
+              onChange={(e) => toggleBiometric(e.target.checked)}
+            />
+            <span>
+              {bioEnabled
+                ? `${bioAvailable.label} is on`
+                : `Enable ${bioAvailable.label}`}
+            </span>
+          </label>
+          {bioToggling && <p className="hint">Verifying…</p>}
+        </section>
+      )}
 
       <section className="settings-section settings-security">
         <h2>Privacy &amp; security</h2>
