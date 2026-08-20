@@ -11197,32 +11197,62 @@ a.suggestions-chip-link {
 .home-hub-body {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.15rem;
   padding-bottom: 1.5rem;
 }
 
+/* Orange pill tabs — match approved Home hub mockups (mobile + desktop) */
 .home-hub-tabs {
-  position: sticky;
-  top: 0;
-  z-index: 4;
-  border-radius: 0.85rem 0.85rem 0 0;
+  display: flex;
+  gap: 0.45rem;
+  margin: 0.95rem 0 0;
+  padding: 0.2rem 0;
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--bg) 92%, transparent),
+    color-mix(in srgb, var(--bg) 88%, transparent) 70%,
+    transparent
+  );
 }
 
 .home-hub-tabs::-webkit-scrollbar {
   display: none;
 }
 
-.home-hub-tabs .feed-tab {
-  flex: 1 0 auto;
-  min-width: 5.5rem;
-  padding: 0.85rem 0.65rem;
+.home-hub-tab {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 80%, var(--brand) 20%);
+  background: color-mix(in srgb, var(--surface) 88%, #000 12%);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.home-hub-tab.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.home-hub-tab.active::after {
+  display: none;
 }
 
 .home-tab-count {
@@ -11235,13 +11265,20 @@ a.suggestions-chip-link {
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 700;
-  background: color-mix(in srgb, var(--brand) 18%, var(--surface));
+  background: color-mix(in srgb, var(--brand) 22%, var(--surface));
   color: var(--brand);
 }
 
-.home-hub-tabs .feed-tab.active .home-tab-count {
-  background: var(--brand);
+.home-hub-tab.active .home-tab-count {
+  background: rgba(255, 255, 255, 0.22);
   color: #fff;
+}
+
+.home-section-card {
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, var(--brand) 4%);
 }
 
 .home-see-all-btn {
@@ -11280,6 +11317,32 @@ a.suggestions-chip-link {
   font-weight: 600;
   color: var(--brand);
   text-decoration: none;
+}
+
+/* Mobile browser: Welcome → tabs → feed first; Live peek after */
+@media (max-width: 1099px) {
+  .plaza-home .plaza-layout {
+    grid-template-areas:
+      "main-top"
+      "main-feed"
+      "rail-live";
+  }
+
+  .plaza-home .home-hub-tabs {
+    margin-top: 0.75rem;
+    padding-bottom: 0.45rem;
+  }
+
+  .plaza-home .home-hub-tab {
+    flex: 1 0 auto;
+    min-width: max-content;
+    font-size: 0.84rem;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .plaza-home .home-hub-rail {
+    margin-top: 0.35rem;
+  }
 }
 
 .home-continue-scroll {

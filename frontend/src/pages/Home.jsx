@@ -226,9 +226,56 @@ export default function Home() {
               {t("home.goSquare")}
             </Link>
           </section>
+
+          {/* Tabs sit in main-top so mobile browser shows them before Live peek */}
+          <div className="home-hub-tabs" role="tablist" aria-label={t("home.tabsAria")}>
+            <button
+              type="button"
+              className={`home-hub-tab${tab === "overview" ? " active" : ""}`}
+              role="tab"
+              aria-selected={tab === "overview"}
+              onClick={() => setTab("overview")}
+            >
+              {t("home.tabOverview")}
+            </button>
+            <button
+              type="button"
+              className={`home-hub-tab${tab === "tagged" ? " active" : ""}`}
+              role="tab"
+              aria-selected={tab === "tagged"}
+              onClick={() => setTab("tagged")}
+            >
+              {t("home.tabTagged")}
+              {mentions.length > 0 ? (
+                <span className="home-tab-count">{mentions.length}</span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              className={`home-hub-tab${tab === "following" ? " active" : ""}`}
+              role="tab"
+              aria-selected={tab === "following"}
+              onClick={() => setTab("following")}
+            >
+              {t("home.tabFollowing")}
+              {following.length > 0 ? (
+                <span className="home-tab-count">{following.length}</span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              className={`home-hub-tab${tab === "mine" ? " active" : ""}`}
+              role="tab"
+              aria-selected={tab === "mine"}
+              onClick={() => setTab("mine")}
+            >
+              {t("home.tabMine")}
+              {mine.length > 0 ? <span className="home-tab-count">{mine.length}</span> : null}
+            </button>
+          </div>
         </div>
 
-        <aside className="plaza-rail-stack" aria-label={t("home.livePeek")}>
+        <aside className="plaza-rail-stack home-hub-rail" aria-label={t("home.livePeek")}>
           <LiveNowStrip
             items={liveDebates}
             title={t("home.livePeek")}
@@ -242,55 +289,9 @@ export default function Home() {
         <div className="plaza-main-feed home-hub-body">
           {error ? <div className="error">{error}</div> : null}
 
-          <div className="feed-tabs home-hub-tabs" role="tablist" aria-label={t("home.tabsAria")}>
-            <button
-              type="button"
-              className={`feed-tab${tab === "overview" ? " active" : ""}`}
-              role="tab"
-              aria-selected={tab === "overview"}
-              onClick={() => setTab("overview")}
-            >
-              {t("home.tabOverview")}
-            </button>
-            <button
-              type="button"
-              className={`feed-tab${tab === "tagged" ? " active" : ""}`}
-              role="tab"
-              aria-selected={tab === "tagged"}
-              onClick={() => setTab("tagged")}
-            >
-              {t("home.tabTagged")}
-              {mentions.length > 0 ? (
-                <span className="home-tab-count">{mentions.length}</span>
-              ) : null}
-            </button>
-            <button
-              type="button"
-              className={`feed-tab${tab === "following" ? " active" : ""}`}
-              role="tab"
-              aria-selected={tab === "following"}
-              onClick={() => setTab("following")}
-            >
-              {t("home.tabFollowing")}
-              {following.length > 0 ? (
-                <span className="home-tab-count">{following.length}</span>
-              ) : null}
-            </button>
-            <button
-              type="button"
-              className={`feed-tab${tab === "mine" ? " active" : ""}`}
-              role="tab"
-              aria-selected={tab === "mine"}
-              onClick={() => setTab("mine")}
-            >
-              {t("home.tabMine")}
-              {mine.length > 0 ? <span className="home-tab-count">{mine.length}</span> : null}
-            </button>
-          </div>
-
           {tab === "overview" ? (
             <>
-              <section className="home-section home-continue" aria-labelledby="home-continue-title">
+              <section className="home-section home-section-card home-continue" aria-labelledby="home-continue-title">
                 <div className="home-section-head">
                   <h2 id="home-continue-title">{t("home.continue")}</h2>
                   <Link to="/arenas">{t("home.seeAll")}</Link>
@@ -312,7 +313,7 @@ export default function Home() {
                 </ul>
               </section>
 
-              <section className="home-section home-mentions" aria-labelledby="home-mentions-title">
+              <section className="home-section home-section-card home-mentions" aria-labelledby="home-mentions-title">
                 <div className="home-section-head">
                   <h2 id="home-mentions-title">{t("home.mentions")}</h2>
                   <button type="button" className="home-see-all-btn" onClick={() => setTab("tagged")}>
@@ -325,7 +326,7 @@ export default function Home() {
               </section>
 
               <section
-                className="home-section home-following"
+                className="home-section home-section-card home-following"
                 aria-labelledby="home-following-title"
               >
                 <div className="home-section-head">
@@ -343,7 +344,7 @@ export default function Home() {
                 )}
               </section>
 
-              <section className="home-section home-mine" aria-labelledby="home-mine-title">
+              <section className="home-section home-section-card home-mine" aria-labelledby="home-mine-title">
                 <div className="home-section-head">
                   <h2 id="home-mine-title">{t("home.mine")}</h2>
                   <button type="button" className="home-see-all-btn" onClick={() => setTab("mine")}>
@@ -355,7 +356,7 @@ export default function Home() {
                 )}
               </section>
 
-              <section className="home-section home-arenas" aria-labelledby="home-arenas-title">
+              <section className="home-section home-section-card home-arenas" aria-labelledby="home-arenas-title">
                 <div className="home-section-head">
                   <h2 id="home-arenas-title">{t("home.yourArenas")}</h2>
                   <Link to="/arenas">{t("home.seeAll")}</Link>
@@ -383,7 +384,7 @@ export default function Home() {
                 )}
               </section>
 
-              <section className="home-section home-live-inline" aria-labelledby="home-live-title">
+              <section className="home-section home-section-card home-live-inline" aria-labelledby="home-live-title">
                 <div className="home-section-head">
                   <h2 id="home-live-title">{t("home.livePeek")}</h2>
                   <Link to="/spaces">{t("home.seeAll")}</Link>
