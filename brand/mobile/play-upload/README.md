@@ -9,7 +9,7 @@
 2. Download → Install  
 3. Open app → **Continue with phone** (OTP) — no Google Cloud / SHA-1 / Studio wait  
 
-Current sideload build: **0.1.10** (`barathx-0.1.10-release.apk`)
+Current sideload build: **0.1.11** (`barathx-0.1.11-release.apk`) — includes Home hub tabs (Overview / Tagged / Following / My posts)
 
 ---
 
