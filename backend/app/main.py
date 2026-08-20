@@ -2545,7 +2545,7 @@ async def create_post(
 def list_posts(
     limit: int = 20,
     before: Optional[str] = None,  # ISO timestamp cursor for pagination
-    feed: str = "global",  # "global" | "following" | "mentions"
+    feed: str = "global",  # "global" | "following" | "mentions" | "mine"
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
@@ -2567,6 +2567,10 @@ def list_posts(
         if not current_user:
             raise HTTPException(status_code=401, detail="Log in to view your following feed")
         author_filter_ids = [f.followed_id for f in current_user.following] + [current_user.id]
+    elif feed == "mine":
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Log in to view your posts")
+        author_filter_ids = [current_user.id]
 
     # Home Square "For you": Square takes + Arena floor takes + Live/debate space takes.
     # Keep member-run Communities (non-arena) off Home so Arenas ≠ private groups.
