@@ -11201,6 +11201,65 @@ a.suggestions-chip-link {
   padding-bottom: 1.5rem;
 }
 
+.home-hub-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  border-radius: 0.85rem 0.85rem 0 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.home-hub-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.home-hub-tabs .feed-tab {
+  flex: 1 0 auto;
+  min-width: 5.5rem;
+  padding: 0.85rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.home-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--brand) 18%, var(--surface));
+  color: var(--brand);
+}
+
+.home-hub-tabs .feed-tab.active .home-tab-count {
+  background: var(--brand);
+  color: #fff;
+}
+
+.home-see-all-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--brand);
+  cursor: pointer;
+}
+
+.home-hub-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .home-section-head {
   display: flex;
   align-items: baseline;
@@ -11215,7 +11274,8 @@ a.suggestions-chip-link {
   letter-spacing: -0.02em;
 }
 
-.home-section-head a {
+.home-section-head a,
+.home-section-head .home-see-all-btn {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--brand);
