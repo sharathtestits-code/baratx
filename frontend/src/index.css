@@ -11201,12 +11201,12 @@ a.suggestions-chip-link {
   padding-bottom: 1.5rem;
 }
 
-/* Orange pill tabs — match approved Home hub mockups (mobile + desktop) */
+/* Orange pill tabs — match approved Home hub mockups (mobile + desktop web) */
 .home-hub-tabs {
   display: flex;
-  gap: 0.45rem;
+  gap: 0.5rem;
   margin: 0.95rem 0 0;
-  padding: 0.2rem 0;
+  padding: 0.25rem 0;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -11215,7 +11215,7 @@ a.suggestions-chip-link {
   z-index: 5;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--bg) 92%, transparent),
+    color-mix(in srgb, var(--bg) 94%, transparent),
     color-mix(in srgb, var(--bg) 88%, transparent) 70%,
     transparent
   );

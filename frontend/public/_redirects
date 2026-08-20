@@ -4,5 +4,8 @@
 /get-app /get-app/index.html 200
 /get-app/ /get-app/index.html 200
 
-# SPA fallback for everything else
+# Missing hashed assets must 404 — never return SPA HTML (immutable cache poison).
+/assets/*  /asset-missing.html  404
+
+# SPA fallback for app routes
 /*    /index.html   200

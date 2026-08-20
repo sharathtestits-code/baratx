@@ -47,7 +47,7 @@ const EN = {
   "brand.tagline": "India's public square",
 
   "home.title": "Home",
-  "home.sub": "Your hub, pick up where you left off.",
+  "home.sub": "Your hub — Overview, Tagged, Following, My posts.",
   "home.loading": "Loading…",
   "home.loadError": "Could not load Home.",
   "home.welcomeAria": "Welcome",
@@ -247,7 +247,7 @@ const HI = {
   "brand.tagline": "भारत का सार्वजनिक चौक",
 
   "home.title": "होम",
-  "home.sub": "आपका हब, जहाँ छोड़ा था वहीं से शुरू करें।",
+  "home.sub": "आपका हब — ओवरव्यू, टैग्ड, फ़ॉलोइंग, मेरी पोस्ट।",
   "home.loading": "लोड हो रहा है…",
   "home.loadError": "होम लोड नहीं हो सका।",
   "home.welcomeAria": "स्वागत",
@@ -447,7 +447,7 @@ const TE = {
   "brand.tagline": "భారత్ పబ్లిక్ స్క్వేర్",
 
   "home.title": "హోమ్",
-  "home.sub": "మీ హబ్, ఆపిన చోట నుంచి కొనసాగించండి.",
+  "home.sub": "మీ హబ్ — అవలోకనం, ట్యాగ్డ్, ఫాలోయింగ్, నా పోస్ట్‌లు.",
   "home.loading": "లోడ్ అవుతోంది…",
   "home.loadError": "హోమ్ లోడ్ కాలేదు.",
   "home.welcomeAria": "స్వాగతం",
