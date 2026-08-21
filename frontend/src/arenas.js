@@ -1,4 +1,4 @@
-/** BarathX Arenas — sided talk with Agree / Disagree / It depends (or Fund it / Pass) */
+/** BarathX Arenas + Circles — sided talk with Agree / Disagree / It depends (or Fund it / Pass) */
 
 export const ARENA_TOPICS = [
   {
@@ -53,6 +53,40 @@ export const ARENA_TOPICS = [
   },
 ];
 
+/** Belonging lanes under Arenas — Campus, City, Builders. */
+export const CIRCLE_TOPICS = [
+  {
+    key: "campus-careers",
+    name: "Campus & Careers",
+    blurb: "Placements, first jobs, WFH, salary talk, study abroad.",
+    accent: "#b45309",
+    kind: "circle",
+    debateDepends: "It depends",
+  },
+  {
+    key: "my-city",
+    name: "My City",
+    blurb: "Bengaluru, Hyderabad, Mumbai, Chennai, Delhi, Pune — local belonging.",
+    accent: "#0369a1",
+    kind: "circle",
+    debateDepends: "It depends",
+  },
+  {
+    key: "builders",
+    name: "Builders",
+    blurb: "Startup feedback, AI tools, product critique, hiring.",
+    accent: "#047857",
+    kind: "circle",
+    debateDepends: "It depends",
+  },
+];
+
+export const ALL_TOPIC_LANES = [...ARENA_TOPICS, ...CIRCLE_TOPICS];
+
 export function arenaMeta(key) {
-  return ARENA_TOPICS.find((a) => a.key === key) || null;
+  return ALL_TOPIC_LANES.find((a) => a.key === key) || null;
+}
+
+export function isCircleKey(key) {
+  return CIRCLE_TOPICS.some((c) => c.key === key);
 }

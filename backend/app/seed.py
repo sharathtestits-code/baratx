@@ -208,6 +208,24 @@ ARENA_TOPICS = [
         "name": "Startups",
         "description": "Funding, founders, and the India builder economy — Fund it or Pass.",
     },
+    {
+        "key": "campus-careers",
+        "slug": "campus-careers",
+        "name": "Campus & Careers",
+        "description": "Placements, first jobs, WFH, salary talk, study abroad — Circle.",
+    },
+    {
+        "key": "my-city",
+        "slug": "my-city",
+        "name": "My City",
+        "description": "Bengaluru, Hyderabad, Mumbai, Chennai, Delhi, Pune — local belonging Circle.",
+    },
+    {
+        "key": "builders",
+        "slug": "builders",
+        "name": "Builders",
+        "description": "Startup feedback, AI tools, product critique, hiring — Circle.",
+    },
 ]
 
 SAMPLE_DEBATES = [
@@ -252,6 +270,24 @@ SAMPLE_DEBATES = [
         "title": "Should India prioritize profitability over growth-at-all-costs?",
         "side_for": "Fund it",
         "side_against": "Pass",
+    },
+    {
+        "arena_key": "campus-careers",
+        "title": "Is a tier-1 campus still worth the pressure for your first job?",
+        "side_for": "Agree",
+        "side_against": "Disagree",
+    },
+    {
+        "arena_key": "my-city",
+        "title": "Would you stay in your city if remote work paid the same elsewhere?",
+        "side_for": "Agree",
+        "side_against": "Disagree",
+    },
+    {
+        "arena_key": "builders",
+        "title": "Should early builders ship weekly even if quality dips?",
+        "side_for": "Agree",
+        "side_against": "Disagree",
     },
 ]
 

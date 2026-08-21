@@ -50,6 +50,9 @@ class User(Base):
     is_official = Column(Boolean, default=False, nullable=False, index=True)
     # Lifetime flag: official first-post welcome fires once even if all posts are deleted.
     has_posted_once = Column(Boolean, default=False, nullable=False)
+    # Daily debate participation streak (IST calendar days with a stance or debate post).
+    debate_streak = Column(Integer, default=0, nullable=False)
+    debate_streak_day = Column(String, nullable=True)  # YYYY-MM-DD IST
     # Activity emails (likes/replies/follows). Users can unsubscribe from Settings or email footer.
     email_activity_enabled = Column(Boolean, default=True, nullable=False)
     # Bumped on password reset / security events to invalidate existing JWTs.
@@ -137,6 +140,7 @@ class Post(Base):
 
     author = relationship("User", back_populates="posts")
     likes = relationship("Like", back_populates="post", cascade="all, delete-orphan")
+    reactions = relationship("PostReaction", back_populates="post", cascade="all, delete-orphan")
     replies = relationship("Reply", back_populates="post", cascade="all, delete-orphan")
     reposts = relationship("Repost", back_populates="post", cascade="all, delete-orphan")
     quoted_post = relationship("Post", remote_side=[id], foreign_keys=[quoted_post_id])
@@ -155,6 +159,24 @@ class Like(Base):
 
     user = relationship("User", back_populates="likes")
     post = relationship("Post", back_populates="likes")
+
+
+class PostReaction(Base):
+    """Substance reactions beyond Spark: helpful / counterpoint / mind_changed."""
+
+    __tablename__ = "post_reactions"
+    __table_args__ = (
+        UniqueConstraint("user_id", "post_id", "kind", name="uq_post_reaction_user_kind"),
+    )
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    post_id = Column(String, ForeignKey("posts.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, index=True)  # helpful | counterpoint | mind_changed
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    user = relationship("User")
+    post = relationship("Post", back_populates="reactions")
 
 
 class Reply(Base):

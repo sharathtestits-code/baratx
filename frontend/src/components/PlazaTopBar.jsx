@@ -6,7 +6,7 @@ import { useT } from "../context/LocaleContext";
 import { notificationsApi } from "../api";
 import Logo from "./Logo";
 import Avatar from "./Avatar";
-import { ARENA_TOPICS } from "../arenas";
+import { ARENA_TOPICS, CIRCLE_TOPICS } from "../arenas";
 import { IconBell, IconSearch } from "./Icons";
 
 /**
@@ -119,7 +119,7 @@ export default function PlazaTopBar() {
       </div>
 
       <nav className="plaza-orbits" aria-label="Orbits">
-        {ARENA_TOPICS.map((a) => (
+        {[...CIRCLE_TOPICS, ...ARENA_TOPICS].map((a) => (
           <Link
             key={a.key}
             to={`/arenas/${a.key}`}

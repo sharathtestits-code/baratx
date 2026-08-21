@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, arenasApi, postsApi } from "../api";
 import { markTopicOnboardingSeen } from "../topicsOnboarding";
@@ -12,9 +12,17 @@ const ARENAS = [
   { key: "news", label: "News" },
   { key: "spirituality", label: "Spirituality" },
   { key: "startups", label: "Startups" },
+  { key: "campus-careers", label: "Campus & Careers" },
+  { key: "builders", label: "Builders" },
 ];
 
 const CITIES = ["Hyderabad", "Bangalore", "Delhi", "Mumbai", "Chennai", "Pune"];
+
+const STANCES = [
+  { id: "for", label: "Agree" },
+  { id: "against", label: "Disagree" },
+  { id: "depends", label: "It depends" },
+];
 
 const PROMPTS = [
   "What's one thing India gets wrong in public debate?",
@@ -23,26 +31,43 @@ const PROMPTS = [
   "What should this public square never become?",
 ];
 
+function readLandingTake() {
+  try {
+    const raw = sessionStorage.getItem("bx_landing_take");
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.stance) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Single first-session screen: arena → take → city → post.
- * Replaces stacked topics redirect + theme modal + welcome panel.
+ * First-session guarantee: side → take → city → post (human reply path stays on backend).
  */
 export default function FirstSessionGuide({ token, onComplete }) {
+  const landing = useMemo(() => readLandingTake(), []);
   const [arena, setArena] = useState("politics");
+  const [stance, setStance] = useState(landing?.stance || "");
   const [city, setCity] = useState("Hyderabad");
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => {
+    if (landing?.question && landing?.stance) {
+      const label = STANCES.find((s) => s.id === landing.stance)?.label || landing.stance;
+      return `On “${landing.question}” — I ${label.toLowerCase()} because `;
+    }
+    return "";
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Theme stays in Settings, don't stack a modal on first run.
     markThemeChosen();
   }, []);
 
   function applyPrompt(prompt) {
     setText(prompt);
     setError("");
-    // Make the next action obvious after picking a starter
     window.requestAnimationFrame(() => {
       document.querySelector(".first-session-cta")?.scrollIntoView({
         behavior: "smooth",
@@ -55,6 +80,17 @@ export default function FirstSessionGuide({ token, onComplete }) {
     setArena(key);
     setError("");
     window.requestAnimationFrame(() => {
+      document.getElementById("first-session-stance-block")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  function pickStance(id) {
+    setStance(id);
+    setError("");
+    window.requestAnimationFrame(() => {
       document.querySelector(".first-session-take")?.focus?.();
       document.getElementById("first-session-take-block")?.scrollIntoView({
         behavior: "smooth",
@@ -65,6 +101,10 @@ export default function FirstSessionGuide({ token, onComplete }) {
 
   async function submit(e) {
     e.preventDefault();
+    if (!stance) {
+      setError("Pick Agree, Disagree, or It depends first.");
+      return;
+    }
     if (!text.trim()) {
       setError("Write your first take.");
       return;
@@ -76,12 +116,22 @@ export default function FirstSessionGuide({ token, onComplete }) {
     setBusy(true);
     setError("");
     try {
-      await arenasApi.joinMany(token, [arena]).catch(() => {});
+      const joins = [arena];
+      if (city) joins.push("my-city");
+      await arenasApi.joinMany(token, joins).catch(() => {});
       markTopicOnboardingSeen();
-      const body = city ? `Hello from ${city}.\n\n${text.trim()}` : text.trim();
+      const sideLabel = STANCES.find((s) => s.id === stance)?.label || stance;
+      const body = [
+        city ? `Hello from ${city}.` : "",
+        `Side: ${sideLabel}.`,
+        text.trim(),
+      ]
+        .filter(Boolean)
+        .join("\n\n");
       await postsApi.create(token, { text: body.slice(0, 500) });
       localStorage.setItem("bx_first_post_done", "1");
       sessionStorage.removeItem("bx_welcome");
+      sessionStorage.removeItem("bx_landing_take");
       api.bootstrapFollows(token).catch(() => {});
       window.dispatchEvent(new CustomEvent("bx:first-post"));
       onComplete?.();
@@ -96,7 +146,6 @@ export default function FirstSessionGuide({ token, onComplete }) {
     markTopicOnboardingSeen();
     markThemeChosen();
     sessionStorage.removeItem("bx_welcome");
-    // Don't mark first post done, they can still use Starters later.
     onComplete?.({ skipped: true });
   }
 
@@ -105,14 +154,20 @@ export default function FirstSessionGuide({ token, onComplete }) {
       <div className="first-session-head">
         <Logo variant="mark" className="first-session-logo" />
         <div>
-          <h2 id="first-session-title">You&apos;re in. Drop your first take.</h2>
-          <p className="first-session-step">Step 1 of 2 · First take (then a quick nav tour)</p>
+          <h2 id="first-session-title">You&apos;re in. Take a side, then your take.</h2>
+          <p className="first-session-step">Step 1 of 2 · Side + first take (then a quick nav tour)</p>
         </div>
       </div>
 
+      {landing?.question ? (
+        <p className="first-session-landing-echo hint">
+          You picked a side on: <em>{landing.question}</em>
+        </p>
+      ) : null}
+
       <form className="first-session-form" onSubmit={submit}>
         <div className="first-session-block">
-          <p className="first-session-label">1 · Pick your arena</p>
+          <p className="first-session-label">1 · Pick your arena or Circle</p>
           <div className="first-session-arenas" role="group" aria-label="Arenas">
             {ARENAS.map((a) => (
               <button
@@ -128,8 +183,25 @@ export default function FirstSessionGuide({ token, onComplete }) {
           </div>
         </div>
 
+        <div className="first-session-block" id="first-session-stance-block">
+          <p className="first-session-label">2 · Pick your side</p>
+          <div className="first-session-stances" role="group" aria-label="Stance">
+            {STANCES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className={`first-session-stance${stance === s.id ? " is-selected" : ""}`}
+                aria-pressed={stance === s.id}
+                onClick={() => pickStance(s.id)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="first-session-block" id="first-session-take-block">
-          <p className="first-session-label">2 · Drop your first take</p>
+          <p className="first-session-label">3 · Drop your first take</p>
           <textarea
             className="first-session-take"
             value={text}
@@ -141,6 +213,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
             maxLength={500}
             placeholder={PROMPTS[0]}
             aria-label="Your first take"
+            disabled={!stance}
           />
           <p className="hint first-session-prompts-label">Or tap a starter take:</p>
           <div className="first-session-prompts">
@@ -150,6 +223,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
                 type="button"
                 className={`first-session-prompt${text === p ? " is-selected" : ""}`}
                 onClick={() => applyPrompt(p)}
+                disabled={!stance}
               >
                 {p}
               </button>
@@ -159,7 +233,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
         </div>
 
         <div className="first-session-block">
-          <p className="first-session-label">City (your base)</p>
+          <p className="first-session-label">City (joins My City Circle)</p>
           <div className="first-session-cities">
             {CITIES.map((c) => (
               <button
@@ -176,7 +250,11 @@ export default function FirstSessionGuide({ token, onComplete }) {
         </div>
 
         {error && <div className="error">{error}</div>}
-        {!text.trim() ? (
+        {!stance ? (
+          <p className="hint first-session-next-hint">
+            Pick <strong>Agree</strong>, <strong>Disagree</strong>, or <strong>It depends</strong>, then write your take.
+          </p>
+        ) : !text.trim() ? (
           <p className="hint first-session-next-hint">
             Tap a starter take above (or write your own), then <strong>Post &amp; enter</strong>.
           </p>
@@ -184,8 +262,12 @@ export default function FirstSessionGuide({ token, onComplete }) {
           <p className="hint first-session-next-hint">Ready, tap <strong>Post &amp; enter</strong> below.</p>
         )}
 
-        <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>
-          {busy ? "Entering…" : text.trim() ? "Post & enter →" : "Pick a take to continue"}
+        <button
+          type="submit"
+          className="btn btn-primary first-session-cta"
+          disabled={busy || !stance || !text.trim()}
+        >
+          {busy ? "Entering…" : stance && text.trim() ? "Post & enter →" : "Pick a side and take"}
         </button>
         <p className="first-session-founding">
           Early members (first 100–1,000): welcome reply from admin and the founder on your first

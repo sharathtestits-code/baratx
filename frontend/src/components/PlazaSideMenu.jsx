@@ -5,7 +5,7 @@ import { usePlazaMenu } from "../context/PlazaMenuContext";
 import { useAuth } from "../context/AuthContext";
 import { useLocale, useT } from "../context/LocaleContext";
 import { notificationsApi } from "../api";
-import { ARENA_TOPICS } from "../arenas";
+import { ARENA_TOPICS, CIRCLE_TOPICS } from "../arenas";
 import { IconLogout } from "./Icons";
 
 /**
@@ -198,7 +198,7 @@ export default function PlazaSideMenu() {
           hidden={!pickerOpen}
         >
           <ul className="plaza-side-arena-list">
-            {ARENA_TOPICS.map((a) => {
+            {[...CIRCLE_TOPICS, ...ARENA_TOPICS].map((a) => {
               const isActive = activeKey === a.key;
               return (
                 <li key={a.key}>

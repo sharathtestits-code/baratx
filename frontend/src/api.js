@@ -284,6 +284,18 @@ export const socialApi = {
   unlike: (token, postId) =>
     request(`/posts/${postId}/like`, { method: "DELETE", headers: authHeaders(token) }),
 
+  addReaction: (token, postId, kind) =>
+    request(`/posts/${postId}/reactions/${encodeURIComponent(kind)}`, {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
+
+  removeReaction: (token, postId, kind) =>
+    request(`/posts/${postId}/reactions/${encodeURIComponent(kind)}`, {
+      method: "DELETE",
+      headers: authHeaders(token),
+    }),
+
   repost: (token, postId) =>
     request(`/posts/${postId}/repost`, { method: "POST", headers: authHeaders(token) }),
 
