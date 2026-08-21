@@ -1,13 +1,13 @@
 """Outbound email helpers for account verification.
 
-Cloudflare Email Routing only receives mail at hello@barathx.com — it cannot
+Cloudflare Email Routing only receives mail at hello@barathx.com, it cannot
 send. Prefer Resend; keep Gmail SMTP as backup/debug:
 
   1) Resend (primary):
      RESEND_API_KEY=re_...
      EMAIL_FROM=BarathX <hello@barathx.com>   # domain must be verified in Resend
 
-  2) Gmail SMTP (backup / debug — App Password):
+  2) Gmail SMTP (backup / debug. App Password):
      SMTP_HOST=smtp.gmail.com
      SMTP_PORT=587
      SMTP_USER=you@gmail.com
@@ -176,7 +176,7 @@ def send_email(to_email: str, subject: str, text_body: str, html_body: str) -> b
         return True
 
     logger.warning(
-        "Email not configured — verification link for %s: see logs / dev_verify_url",
+        "Email not configured, verification link for %s: see logs / dev_verify_url",
         to_email,
     )
     logger.info("DEV email to=%s subject=%s\n%s", to_email, subject, text_body)
@@ -191,7 +191,7 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
         f"Welcome to BarathX. Confirm your email by opening this link:\n\n"
         f"{verify_url}\n\n"
         f"This link expires in 24 hours. If you did not sign up, ignore this email.\n\n"
-        f"— BarathX\n"
+        f"- BarathX\n"
     )
     html_body = f"""\
 <!DOCTYPE html>
@@ -209,7 +209,7 @@ def send_verification_email(to_email: str, display_name: str, token: str) -> tup
     <a href="{verify_url}" style="color:#000080;">{verify_url}</a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">This link expires in 24 hours.</p>
-  <p>— BarathX</p>
+  <p>- BarathX</p>
 </body>
 </html>
 """
@@ -225,7 +225,7 @@ def send_password_reset_email(to_email: str, display_name: str, token: str) -> t
         f"We received a request to reset your BarathX password. Open this link:\n\n"
         f"{reset_url}\n\n"
         f"This link expires in 1 hour. If you did not request a reset, ignore this email.\n\n"
-        f"— BarathX\n"
+        f"- BarathX\n"
     )
     html_body = f"""\
 <!DOCTYPE html>
@@ -243,7 +243,7 @@ def send_password_reset_email(to_email: str, display_name: str, token: str) -> t
     <a href="{reset_url}" style="color:#000080;">{reset_url}</a>
   </p>
   <p style="color:#8b98a5;font-size:13px;">This link expires in 1 hour.</p>
-  <p>— BarathX</p>
+  <p>- BarathX</p>
 </body>
 </html>
 """
@@ -304,7 +304,7 @@ def send_activity_email(
         f"{cta_label}: {cta}\n\n"
         f"Sign in at {FRONTEND_URL}/login if you need to.\n\n"
         f"Don’t want activity emails? Unsubscribe: {unsub}\n\n"
-        f"— BarathX\n"
+        f"- BarathX\n"
     )
     preview_html = (
         f'<p style="color:#536471;border-left:3px solid #efe8e0;padding-left:12px;">{preview[:140]}</p>'
@@ -331,7 +331,7 @@ def send_activity_email(
     Don’t want activity emails?
     <a href="{unsub}" style="color:#536471;">Unsubscribe</a>
   </p>
-  <p>— BarathX</p>
+  <p>- BarathX</p>
 </body>
 </html>
 """
@@ -339,4 +339,192 @@ def send_activity_email(
         return send_email(to_email, subject, text_body, html_body)
     except Exception:
         logger.exception("Activity email failed for %s", to_email)
+        return False
+
+
+OPS_ALERT_EMAIL = (os.environ.get("BUG_ALERT_EMAIL") or os.environ.get("OPS_ALERT_EMAIL") or "hello@barathx.com").strip()
+
+
+def send_ops_alert_email(
+    *,
+    subject: str,
+    summary: str,
+    details: str = "",
+    reporter: str = "",
+    kind: str = "alert",
+) -> bool:
+    """Notify ops when someone logs a bug, concern, or moderation report."""
+    to_email = OPS_ALERT_EMAIL
+    if not to_email:
+        return False
+
+    def _esc(s: str) -> str:
+        return (
+            (s or "")
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace('"', "&quot;")
+        )
+
+    safe_summary = _esc(summary)
+    safe_details = _esc(details)
+    safe_reporter = _esc(reporter or "unknown")
+    safe_kind = _esc(kind)
+    lines = [
+        f"Kind: {kind}",
+        f"Reporter: {reporter or 'unknown'}",
+        "",
+        summary.strip(),
+        "",
+    ]
+    if details:
+        lines.extend(["Details:", details.strip(), ""])
+    lines.append(f"Open app: {FRONTEND_URL}/early-issues")
+    text_body = "\n".join(lines)
+    details_html = (
+        f"<pre style='white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:8px;'>{safe_details}</pre>"
+        if details
+        else ""
+    )
+    html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
+  <p><strong>BarathX ops alert</strong> · {safe_kind}</p>
+  <p>Reporter: {safe_reporter}</p>
+  <p>{safe_summary}</p>
+  {details_html}
+  <p><a href="{FRONTEND_URL}/early-issues">Open Early issues</a></p>
+  <p>- BarathX</p>
+</body>
+</html>
+"""
+    try:
+        return send_email(to_email, subject, text_body, html_body)
+    except Exception:
+        logger.exception("Ops alert email failed for %s", to_email)
+        return False
+
+
+SOCIAL_PACK_EMAIL = (
+    os.environ.get("SOCIAL_PACK_EMAIL")
+    or os.environ.get("BUG_ALERT_EMAIL")
+    or os.environ.get("OPS_ALERT_EMAIL")
+    or "sharathtestits@gmail.com"
+).strip()
+
+
+def send_daily_pack_ready_email(
+    *,
+    date: str,
+    slot: str,
+    channels: str,
+    pack_path: str,
+    wa_body: str = "",
+    x_body: str = "",
+    li_body: str = "",
+    image_hint: str = "",
+    feature: str = "",
+    trend: str = "",
+    video_hint: str = "",
+) -> bool:
+    """Email Sharath when a daily social pack is ready to paste manually.
+
+    Never auto-posts to WhatsApp / X / LinkedIn — draft + notify only.
+    Morning slot also nudges soft-launch mobile: push APK + phone OTP path.
+    """
+    to_email = SOCIAL_PACK_EMAIL
+    if not to_email:
+        return False
+
+    slot_label = (slot or "daily").strip().title()
+    is_morning = (slot or "").strip().lower() == "morning"
+    soft_launch_nudge = (
+        "DAILY PASTE (do all three): WhatsApp + X + LinkedIn from today’s pack — "
+        "copy includes Android soft launch https://barathx.com/get-app/ (phone OTP). "
+        "If you shipped app changes, also push barathx-latest-release.apk to main. "
+        "Do not block on Google/Play SHA-1. Never auto-post."
+    )
+
+    subject = f"Your BarathX post is ready — {date} {slot_label}"
+    if feature:
+        subject += f" · {feature}"
+    text_body = (
+        f"Your BarathX post is ready.\n\n"
+        f"Date: {date} (IST)\n"
+        f"Slot: {slot_label}\n"
+        f"Channels: {channels}\n"
+        f"Pack: {pack_path}\n"
+    )
+    if feature:
+        text_body += f"Feature: {feature}\n"
+    if trend:
+        text_body += f"Trend: {trend}\n"
+    if image_hint:
+        text_body += f"Images: {image_hint}\n"
+    if video_hint:
+        text_body += f"Video (~20s): {video_hint}\n"
+    if is_morning:
+        text_body += f"\n{soft_launch_nudge}\n"
+    text_body += "\n— Paste yourself (WhatsApp / X / LinkedIn). Do not auto-blast.\n"
+    if wa_body:
+        text_body += f"\n--- WhatsApp ---\n{wa_body.strip()}\n"
+    if x_body:
+        text_body += f"\n--- X ---\n{x_body.strip()}\n"
+    if li_body:
+        text_body += f"\n--- LinkedIn ---\n{li_body.strip()}\n"
+    text_body += "\n- BarathX daily pack\n"
+
+    def _esc(s: str) -> str:
+        return (
+            (s or "")
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+        )
+
+    blocks = []
+    for label, body in (("WhatsApp", wa_body), ("X", x_body), ("LinkedIn", li_body)):
+        if not body:
+            continue
+        blocks.append(
+            f"<h3 style='margin:24px 0 8px;color:#FF671F;'>{_esc(label)}</h3>"
+            f"<pre style='white-space:pre-wrap;background:#111;color:#f5f5f5;"
+            f"padding:14px;border-radius:10px;font-size:14px;'>{_esc(body.strip())}</pre>"
+        )
+    blocks_html = "\n".join(blocks)
+    soft_html = ""
+    if is_morning:
+        soft_html = f"""
+  <p style="margin:20px 0;padding:12px 16px;background:#0f1419;color:#f5f5f5;border-left:4px solid #FF671F;border-radius:8px;">
+    <strong style="color:#FF671F;">Soft launch (daily)</strong><br/>
+    {_esc(soft_launch_nudge)}
+  </p>
+"""
+    html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #0f1419; line-height: 1.5;">
+  <p style="font-size:20px;font-weight:700;">Your BarathX post is ready</p>
+  <p>Date: <strong>{_esc(date)}</strong> (IST) · Slot: <strong>{_esc(slot_label)}</strong></p>
+  <p>Channels: {_esc(channels)}</p>
+  {"<p>Feature: <strong>" + _esc(feature) + "</strong></p>" if feature else ""}
+  {"<p style='color:#536471;font-size:14px;'>Trend: " + _esc(trend) + "</p>" if trend else ""}
+  <p style="color:#536471;font-size:14px;">Pack: {_esc(pack_path)}</p>
+  {"<p style='color:#536471;font-size:14px;'>Images: " + _esc(image_hint) + "</p>" if image_hint else ""}
+  {"<p style='color:#536471;font-size:14px;'>Video (~20s): " + _esc(video_hint) + "</p>" if video_hint else ""}
+  {soft_html}
+  <p style="margin:20px 0;padding:12px 16px;background:#fff4ec;border-left:4px solid #FF671F;">
+    Paste yourself on WhatsApp / X / LinkedIn. Do not auto-blast.
+  </p>
+  {blocks_html}
+  <p style="color:#8b98a5;font-size:13px;margin-top:28px;">- BarathX daily pack</p>
+</body>
+</html>
+"""
+    try:
+        return send_email(to_email, subject, text_body, html_body)
+    except Exception:
+        logger.exception("Daily pack ready email failed for %s", to_email)
         return False

@@ -98,6 +98,8 @@ cd frontend/android
 
 The app already calls native Google Sign-In. Until Cloud Console matches your signing keys, Android shows an error like `[28444] Developer console is not set up correctly` — use phone OTP meanwhile.
 
+**Browser fallback (0.1.8+):** If Credential Manager re-auth fails (error 16), the app opens `https://barathx.com/native-google-auth` in the system browser, completes Web Google Sign-In, then returns via `barathx://google-auth?token=…`. Keep `/native-google-auth` deployed on the website. Users can also tap **Continue with Google in browser**.
+
 ### 1) Same Google Cloud project as web
 
 You already have a **Web application** client (used as `VITE_GOOGLE_CLIENT_ID` / Railway `GOOGLE_CLIENT_ID`). Keep that ID — native Android passes it as `webClientId`. **Do not** put an Android client ID in `VITE_GOOGLE_CLIENT_ID`.
@@ -136,6 +138,8 @@ You already have a **Web application** client (used as `VITE_GOOGLE_CLIENT_ID` /
 3. If it fails, Logcat filter `GoogleProvider` — confirm `package`, `signingSha1`, `webClientId`.
 
 Plugin: `@capgo/capacitor-social-login` (Capacitor 8). Providers other than Google are disabled in `capacitor.config.json` to keep APK size down.
+
+**Android scopes note:** Do not pass custom `scopes` in `SocialLogin.login` unless `MainActivity` implements Capgo’s `ModifiedMainActivityForSocialLoginPlugin`. Default OIDC scopes (email / profile / openid) are enough for `POST /auth/google` ID tokens. Passing scopes without that MainActivity change shows: *You CANNOT use scopes without modifying the main activity.*
 
 ## Icons & splash
 

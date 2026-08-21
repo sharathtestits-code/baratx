@@ -22,7 +22,7 @@ function daysLeft(endsAt) {
   return Math.ceil(ms / 86400000);
 }
 
-/** One row per author — mirrors backend race_leaderboard dedupe. */
+/** One row per author, mirrors backend race_leaderboard dedupe. */
 function dedupeRaceRows(rows) {
   const best = new Map();
   for (const row of rows || []) {
@@ -37,7 +37,7 @@ function dedupeRaceRows(rows) {
 }
 
 /**
- * User progress page — Founding status + Square Race rank.
+ * User progress page. Founding status + Square Race rank.
  * No links to the private ops console (owner opens that URL directly).
  */
 export default function Rewards() {
@@ -83,7 +83,7 @@ export default function Rewards() {
         <h1 className="feed-title">Rewards</h1>
       </header>
       <p className="hint surface-lead rewards-lead">
-        You don’t rate yourself. India rates with likes and replies — this page shows your progress.
+        You don’t rate yourself. India rates with likes and replies, this page shows your progress.
       </p>
       {error && <div className="error">{error}</div>}
 
@@ -91,21 +91,32 @@ export default function Rewards() {
         <section className="rewards-card" aria-labelledby="founding-progress-title">
           <h2 id="founding-progress-title">Founding {founding.cap}</h2>
           <p className="rewards-card-sub">
-            {founding.cap} Founding spots, earned by opening a debate that gets real engagement, not
-            by signing up. {founding.slots_remaining} left.
+            Be one of BarathX&apos;s first recognized voices. {founding.slots_remaining} of{" "}
+            {founding.cap} spots left.
+          </p>
+          <ul className="rewards-founding-perks">
+            <li>Founder badge on your profile</li>
+            <li>Priority visibility in your favorite Arena</li>
+            <li>Invite to private creator / community rooms</li>
+            <li>Early access to new features</li>
+            <li>Eligibility for creator and ambassador opportunities</li>
+          </ul>
+          <p className="hint">
+            Multiple paths: high-quality takes, helpful replies, hosting, referrals, and consistent
+            participation — not controversy alone.
           </p>
           {(status === "payable" || status === "paid") && founding.amount_inr != null && (
             <p className="hint ok-hint rewards-surprise">
               {status === "paid"
-                ? `You're in. Thank-you sent — ₹${founding.amount_inr}, no strings.`
-                : `You're in. Small thank-you on the way — ₹${founding.amount_inr}, no strings.`}
+                ? `You're in. Thank-you sent, ₹${founding.amount_inr}, no strings.`
+                : `You're in. Small thank-you on the way, ₹${founding.amount_inr}, no strings.`}
             </p>
           )}
           <ol className="rewards-steps">
             <Step
               done={!!status}
               current={!status && founding.open}
-              label="1. Floor — do one real action"
+              label="1. Floor, do one real action"
               detail="Post a civic problem (≥50 chars + checkbox) or open any arena debate."
             />
             <Step
@@ -115,9 +126,9 @@ export default function Rewards() {
               detail={
                 status === "eligible"
                   ? founding.my_kind === "debate"
-                    ? `Need ${q.need_stances || 2} stances or ${q.need_posts || 3} posts — now ${q.stance_count || 0} / ${q.post_count || 0}.`
-                    : `Need ${q.need_likes || 25} likes or ${q.need_replies || 5} replies — now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
-                  : `Real engagement from people who aren’t official accounts — likes, replies, or debate stances.`
+                    ? `Need ${q.need_stances || 2} stances or ${q.need_posts || 3} posts, now ${q.stance_count || 0} / ${q.post_count || 0}.`
+                    : `Need ${q.need_likes || 25} likes or ${q.need_replies || 5} replies, now ${q.like_count || 0} likes / ${q.reply_count || 0} replies.`
+                  : `Real engagement from people who aren’t official accounts, likes, replies, or debate stances.`
               }
             />
             {(status === "payable" || status === "paid") && (
@@ -127,8 +138,8 @@ export default function Rewards() {
                 label="3. You're in"
                 detail={
                   status === "paid"
-                    ? `Thank-you sent — ₹${founding.amount_inr}, no strings.`
-                    : `Small thank-you on the way — ₹${founding.amount_inr}, no strings.`
+                    ? `Thank-you sent, ₹${founding.amount_inr}, no strings.`
+                    : `Small thank-you on the way, ₹${founding.amount_inr}, no strings.`
                 }
               />
             )}
@@ -203,7 +214,7 @@ export default function Rewards() {
                   </span>
                   <span className="rewards-board-likes">{row.like_count} likes</span>
                   <span className="rewards-board-prize">
-                    {row.prize_inr ? `₹${row.prize_inr}` : "—"}
+                    {row.prize_inr ? `₹${row.prize_inr}` : "-"}
                   </span>
                 </li>
               ))}

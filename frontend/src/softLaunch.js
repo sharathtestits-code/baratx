@@ -1,7 +1,7 @@
-/** Soft launch window — Independence Day 15 August 2026. */
+/** Soft launch window. Independence Day 15 August 2026. */
 
 export const SOFT_LAUNCH_LINE =
-  "Official soft launch · Independence Day · 15 August — join in your browser";
+  "Official soft launch · Independence Day · 15 August. Join in your browser";
 
 export const SOFT_LAUNCH_SHORT = "Soft launch · 15 August · join in browser";
 

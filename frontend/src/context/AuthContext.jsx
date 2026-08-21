@@ -1,5 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { App as CapApp } from "@capacitor/app";
 import { ApiError, api } from "../api";
+import { isNativeApp } from "../native";
+import {
+  listenForNativeGoogleAuth,
+  parseGoogleAuthDeepLink,
+} from "../nativeGoogleBrowserAuth";
 import { applyTheme, isValidTheme } from "../theme";
 
 const AuthContext = createContext(null);
@@ -24,6 +30,50 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(() => Boolean(localStorage.getItem("iv_token")));
   const [bootError, setBootError] = useState("");
+
+  // Browser Google Sign-In fallback: barathx://google-auth?token=…
+  useEffect(() => {
+    if (!isNativeApp()) return undefined;
+
+    const applyDeepLink = (url) => {
+      const parsed = parseGoogleAuthDeepLink(url);
+      if (!parsed) return;
+      if (parsed.error) {
+        window.dispatchEvent(
+          new CustomEvent("bx-google-auth-error", { detail: parsed.error })
+        );
+        return;
+      }
+      if (parsed.token) {
+        setLoading(true);
+        setUser(null);
+        setBootError("");
+        localStorage.setItem("iv_token", parsed.token);
+        setToken(parsed.token);
+      }
+    };
+
+    CapApp.getLaunchUrl()
+      .then((res) => {
+        if (res?.url) applyDeepLink(res.url);
+      })
+      .catch(() => {});
+
+    return listenForNativeGoogleAuth({
+      onToken: (accessToken) => {
+        setLoading(true);
+        setUser(null);
+        setBootError("");
+        localStorage.setItem("iv_token", accessToken);
+        setToken(accessToken);
+      },
+      onError: (msg) => {
+        if (msg) {
+          window.dispatchEvent(new CustomEvent("bx-google-auth-error", { detail: msg }));
+        }
+      },
+    });
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -77,7 +127,33 @@ export function AuthProvider({ children }) {
     setToken(newToken);
   }
 
-  function logout() {
+  async function logout() {
+    const current = localStorage.getItem("iv_token");
+    localStorage.removeItem("iv_token");
+    setToken(null);
+    setUser(null);
+    setBootError("");
+    setLoading(false);
+    // Best-effort: don't block UI if the network is down.
+    if (current) {
+      try {
+        await api.revokeSessions(current);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  async function revokeAllSessions() {
+    if (!token) {
+      logout();
+      return;
+    }
+    try {
+      await api.revokeSessions(token);
+    } catch {
+      /* still clear local session */
+    }
     localStorage.removeItem("iv_token");
     setToken(null);
     setUser(null);
@@ -115,7 +191,17 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, loading, bootError, login, logout, updateUser, retryBoot }}
+      value={{
+        token,
+        user,
+        loading,
+        bootError,
+        login,
+        logout,
+        revokeAllSessions,
+        updateUser,
+        retryBoot,
+      }}
     >
       {children}
     </AuthContext.Provider>

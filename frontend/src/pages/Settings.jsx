@@ -11,7 +11,7 @@ import { LOCALES, getStoredLanguage, localeMeta } from "../i18n";
 import { mvpLabel } from "../mvpVersion";
 
 export default function Settings() {
-  const { user, token, logout, updateUser } = useAuth();
+  const { user, token, logout, revokeAllSessions, updateUser } = useAuth();
   const { language: localeLang, setLanguage: setLocaleLanguage, t } = useLocale();
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -22,6 +22,9 @@ export default function Settings() {
   const [languageSaving, setLanguageSaving] = useState(false);
   const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
   const [emailSaving, setEmailSaving] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const [mutes, setMutes] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
@@ -48,6 +51,12 @@ export default function Settings() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
+      if (!token) {
+        setListsLoading(false);
+        setMutes([]);
+        setBlocks([]);
+        return;
+      }
       setListsLoading(true);
       try {
         const [m, b] = await Promise.all([
@@ -55,11 +64,11 @@ export default function Settings() {
           socialApi.listBlocks(token),
         ]);
         if (!cancelled) {
-          setMutes(m);
-          setBlocks(b);
+          setMutes(Array.isArray(m) ? m : []);
+          setBlocks(Array.isArray(b) ? b : []);
         }
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) setError(err.message || "Could not load mutes/blocks.");
       } finally {
         if (!cancelled) setListsLoading(false);
       }
@@ -123,7 +132,7 @@ export default function Settings() {
       updateUser(updated);
       setMsg(
         next
-          ? "Activity emails on — you’ll get one email per notification."
+          ? "Activity emails on, you’ll get one email per notification."
           : "Unsubscribed from activity emails. In-app Alerts still work."
       );
     } catch (err) {
@@ -131,6 +140,25 @@ export default function Settings() {
       setError(err.message);
     } finally {
       setEmailSaving(false);
+    }
+  }
+
+  async function deleteAccount() {
+    if (deleteConfirm.trim().toUpperCase() !== "DELETE") {
+      setError("Type DELETE to confirm account deletion");
+      return;
+    }
+    setDeleting(true);
+    setError("");
+    setMsg("");
+    try {
+      await api.deleteMe(token);
+      logout();
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -152,15 +180,63 @@ export default function Settings() {
     }
   }
 
-  function handleLogout() {
-    logout();
+  async function handleExportData() {
+    setExportBusy(true);
+    setError("");
+    try {
+      const data = await api.exportMyData(token);
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `barathx-data-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setMsg("Download started. That’s a copy of personal data we hold (DPDP right to access).");
+    } catch (err) {
+      setError(err.message || "Could not export your data.");
+    } finally {
+      setExportBusy(false);
+    }
+  }
+
+  async function handleLogout() {
+    await logout();
     navigate("/");
   }
 
+  async function handleRevokeAll() {
+    if (
+      !window.confirm(
+        "Sign out every device and browser that has your BarathX account? You’ll need to log in again here too."
+      )
+    ) {
+      return;
+    }
+    try {
+      await revokeAllSessions();
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Could not sign out all sessions.");
+    }
+  }
+
   return (
-    <div className="feed-wrap surface-page plaza-page">
-      <div className="feed-header">
+    <div className="feed-wrap surface-page plaza-page settings-page">
+      <div className="feed-header settings-header">
+        <button
+          type="button"
+          className="settings-back"
+          onClick={() => {
+            if (window.history.length > 1) navigate(-1);
+            else navigate("/home");
+          }}
+          aria-label="Back"
+        >
+          ← Back
+        </button>
         <h1>{t("settings.title")}</h1>
+        <span className="settings-header-spacer" aria-hidden="true" />
       </div>
 
       {error && <div className="error">{error}</div>}
@@ -213,7 +289,7 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Email notifications</h2>
         <p className="hint">
-          One email per activity (reply, like, follow, mention). Turn off anytime — Alerts in the app
+          One email per activity (reply, like, follow, mention). Turn off anytime. Alerts in the app
           still work.
         </p>
         <label className="age-gate settings-email-toggle">
@@ -230,6 +306,58 @@ export default function Settings() {
           </span>
         </label>
         {emailSaving && <p className="hint">{t("settings.saving")}</p>}
+      </section>
+
+      <section className="settings-section settings-security">
+        <h2>Privacy &amp; security</h2>
+        <p className="hint">
+          Your password is hashed. Email and phone stay private on your profile. Sessions expire;
+          password reset and “sign out everywhere” kill stolen tokens on other devices.
+        </p>
+        <ul className="settings-security-points">
+          <li>Passwords stored with bcrypt, never plain text</li>
+          <li>Email / phone visible only to you</li>
+          <li>Confirm email before posting (if you signed up with email)</li>
+          <li>Login &amp; OTP attempts are rate-limited</li>
+          <li>Log out revokes your session token so a copied key stops working</li>
+          <li>
+            India DPDP: access, correct, erase, and withdraw consent (see Privacy Policy)
+          </li>
+        </ul>
+        <div className="settings-security-actions">
+          <button type="button" className="btn btn-secondary" onClick={handleExportData} disabled={exportBusy}>
+            {exportBusy ? "Preparing…" : "Download my data"}
+          </button>
+          <Link className="btn btn-secondary" to="/privacy">
+            Read Privacy Policy
+          </Link>
+          <button type="button" className="btn btn-secondary" onClick={handleRevokeAll}>
+            Sign out everywhere
+          </button>
+        </div>
+
+        <div className="settings-danger">
+          <h3>Delete account</h3>
+          <p className="hint">
+            Permanently removes your account and posts. Type <strong>DELETE</strong> to confirm.
+          </p>
+          <input
+            type="text"
+            className="settings-delete-input"
+            placeholder="Type DELETE"
+            value={deleteConfirm}
+            onChange={(e) => setDeleteConfirm(e.target.value)}
+            autoComplete="off"
+          />
+          <button
+            type="button"
+            className="btn btn-danger"
+            disabled={deleting || deleteConfirm.trim().toUpperCase() !== "DELETE"}
+            onClick={deleteAccount}
+          >
+            {deleting ? "Deleting…" : "Delete my account"}
+          </button>
+        </div>
       </section>
 
       <section className="settings-section">
@@ -293,14 +421,43 @@ export default function Settings() {
       </section>
 
       <section className="settings-section">
+        <h2>Help &amp; WhatsApp</h2>
+        <p className="hint">
+          First 1000 members can log bugs on Early issues (ops gets an email). Join WhatsApp to
+          talk concerns live.
+        </p>
+        <div className="settings-security-actions">
+          <Link className="btn btn-secondary" to="/early-issues">
+            Early issues
+          </Link>
+          <a
+            className="btn btn-secondary"
+            href="https://chat.whatsapp.com/EV3Uj35EXrHImZ6MZxGAtU?mode=gi_t"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Community
+          </a>
+          <a
+            className="btn btn-secondary"
+            href="https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Channel
+          </a>
+        </div>
+      </section>
+
+      <section className="settings-section">
         <h2>Badges</h2>
         <ul className="settings-badge-legend">
           <li>
-            <strong className="badge-name badge-blue">Blue official</strong> — BarathX staff / platform
+            <strong className="badge-name badge-blue">Blue official</strong>. BarathX staff / platform
             accounts.
           </li>
           <li>
-            <strong className="badge-name badge-gold">Gold BarathX</strong> — BarathX brand voices (topic
+            <strong className="badge-name badge-gold">Gold BarathX</strong>. BarathX brand voices (topic
             accounts), not personal verification.
           </li>
         </ul>

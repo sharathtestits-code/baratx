@@ -34,7 +34,11 @@ export default function ReplyItem({ reply, onReplyTo }) {
   }
 
   return (
-    <div className={`reply${reply.parent_reply_id ? " reply-nested" : ""}`}>
+    <div
+      className={`reply${reply.parent_reply_id ? " reply-nested" : ""}${
+        reply.likely_ai ? " reply-likely-ai" : ""
+      }`}
+    >
       <Link to={`/u/${reply.author.username}`}>
         <Avatar name={reply.author.display_name} username={reply.author.username} url={reply.author.avatar_url} size={32} />
       </Link>
@@ -46,6 +50,7 @@ export default function ReplyItem({ reply, onReplyTo }) {
           <Link to={`/u/${reply.author.username}`} className={badgeNameClass(reply.author, "reply-username")}>
             @{reply.author.username}
           </Link>
+          {reply.likely_ai ? <span className="ai-draft-tag">Possible AI draft</span> : null}
         </div>
         <p className="reply-text">{linkifyText(reply.text)}</p>
         <div className="reply-actions">

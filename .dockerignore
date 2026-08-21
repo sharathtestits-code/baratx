@@ -1,0 +1,21 @@
+# Keep Railway/Docker context small — API image only needs frontend SPA sources + backend.
+.git
+.github
+**/.venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+frontend/android
+frontend/ios
+frontend/dist
+frontend/.env
+frontend/.env.local
+backend/.env
+backend/**/*.db
+brand
+*.jks
+*.keystore
+keystore.properties
+.DS_Store
+.idea
+.vscode

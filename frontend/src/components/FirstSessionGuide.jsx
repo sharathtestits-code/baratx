@@ -35,7 +35,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Theme stays in Settings — don't stack a modal on first run.
+    // Theme stays in Settings, don't stack a modal on first run.
     markThemeChosen();
   }, []);
 
@@ -96,7 +96,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
     markTopicOnboardingSeen();
     markThemeChosen();
     sessionStorage.removeItem("bx_welcome");
-    // Don't mark first post done — they can still use Starters later.
+    // Don't mark first post done, they can still use Starters later.
     onComplete?.({ skipped: true });
   }
 
@@ -181,7 +181,7 @@ export default function FirstSessionGuide({ token, onComplete }) {
             Tap a starter take above (or write your own), then <strong>Post &amp; enter</strong>.
           </p>
         ) : (
-          <p className="hint first-session-next-hint">Ready — tap <strong>Post &amp; enter</strong> below.</p>
+          <p className="hint first-session-next-hint">Ready, tap <strong>Post &amp; enter</strong> below.</p>
         )}
 
         <button type="submit" className="btn btn-primary first-session-cta" disabled={busy || !text.trim()}>

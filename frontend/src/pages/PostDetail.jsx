@@ -7,7 +7,7 @@ import Avatar from "../components/Avatar";
 import ReplyItem from "../components/ReplyItem";
 import MentionTextarea from "../components/MentionTextarea";
 
-const MAX_REPLY_LEN = 220;
+const MAX_REPLY_LEN = 500;
 
 export default function PostDetail() {
   const { postId } = useParams();
@@ -155,7 +155,7 @@ export default function PostDetail() {
                 placeholder={
                   parentReply
                     ? `Reply to @${parentReply.author.username}`
-                    : "Post your reply — type @ to tag someone"
+                    : "Post your reply, type @ to tag someone"
                 }
                 value={replyText}
                 onChange={setReplyText}
@@ -188,9 +188,18 @@ export default function PostDetail() {
           <p className="hint profile-posts-hint">No replies yet. Be the first.</p>
         ) : (
           <div className="detail-reply-list">
-            {replies.map((r) => (
-              <ReplyItem key={r.id} reply={r} onReplyTo={handleReplyTo} />
-            ))}
+            {replies.map((r, idx) => {
+              const prevAi = idx > 0 && replies[idx - 1].likely_ai;
+              const showAiDivider = r.likely_ai && !prevAi && replies.some((x) => !x.likely_ai);
+              return (
+                <div key={r.id}>
+                  {showAiDivider ? (
+                    <p className="hint ai-replies-divider">Possible AI drafts (sorted below human replies)</p>
+                  ) : null}
+                  <ReplyItem reply={r} onReplyTo={handleReplyTo} />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

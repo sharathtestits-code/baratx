@@ -1,1 +1,11 @@
+# Prefer static Google auth page for the Android browser fallback (Custom Tabs).
+/native-google-auth /native-google-auth/index.html 200
+/native-google-auth/ /native-google-auth/index.html 200
+/get-app /get-app/index.html 200
+/get-app/ /get-app/index.html 200
+
+# Missing hashed assets must 404 — never return SPA HTML (immutable cache poison).
+/assets/*  /asset-missing.html  404
+
+# SPA fallback for app routes
 /*    /index.html   200

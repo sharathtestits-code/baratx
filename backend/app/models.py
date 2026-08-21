@@ -52,6 +52,11 @@ class User(Base):
     has_posted_once = Column(Boolean, default=False, nullable=False)
     # Activity emails (likes/replies/follows). Users can unsubscribe from Settings or email footer.
     email_activity_enabled = Column(Boolean, default=True, nullable=False)
+    # Bumped on password reset / security events to invalidate existing JWTs.
+    token_version = Column(Integer, default=0, nullable=False)
+    # DPDP: affirmative consent to privacy notice (Data Principal).
+    privacy_accepted_at = Column(DateTime, nullable=True)
+    privacy_notice_version = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -76,13 +81,13 @@ class User(Base):
 
 
 class OTP(Base):
-    """Stores short-lived OTP codes for phone signup/login (demo: no real SMS sent)."""
+    """Short-lived phone OTP rows. `code` stores a bcrypt hash of the OTP (never plaintext)."""
 
     __tablename__ = "otps"
 
     id = Column(String, primary_key=True, default=gen_uuid)
     phone = Column(String, index=True, nullable=False)
-    code = Column(String, nullable=False)
+    code = Column(String, nullable=False)  # bcrypt hash of the 6-digit OTP
     purpose = Column(String, nullable=False)  # "signup" | "login"
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     expires_at = Column(DateTime, nullable=False)
@@ -125,7 +130,9 @@ class Post(Base):
     quoted_post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
     community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
-    debate_side = Column(String, nullable=True)  # for | against (arena debates only)
+    debate_side = Column(String, nullable=True)  # for | against | depends (arena debates only)
+    # Heuristic AI-slop flag — demoted in feeds so human takes stay on top.
+    likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     author = relationship("User", back_populates="posts")
@@ -158,6 +165,8 @@ class Reply(Base):
     author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
     parent_reply_id = Column(String, ForeignKey("replies.id"), nullable=True, index=True)
     text = Column(Text, nullable=False)
+    # Heuristic AI-slop flag — human replies sort above these.
+    likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
 
     post = relationship("Post", back_populates="replies")
@@ -377,6 +386,7 @@ class Space(Base):
     source_url = Column(String, nullable=True, index=True)  # RSS / news link for prompts
     side_for_label = Column(String, default="For", nullable=False)
     side_against_label = Column(String, default="Against", nullable=False)
+    side_depends_label = Column(String, default="It depends", nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     closes_at = Column(DateTime, nullable=True)
 
@@ -396,7 +406,7 @@ class SpaceStance(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
-    side = Column(String, nullable=False)  # for | against
+    side = Column(String, nullable=False)  # for | against | depends
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     space = relationship("Space", back_populates="stances")
@@ -568,3 +578,17 @@ class RaceReward(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     post = relationship("Post", foreign_keys=[post_id])
+
+
+class ProductIssue(Base):
+    """Early-member (first 1000) product bugs / concerns board."""
+
+    __tablename__ = "product_issues"
+
+    id = Column(String, primary_key=True, default=gen_uuid)
+    author_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    kind = Column(String, nullable=False, default="bug", index=True)  # bug | concern | idea
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
+
+    author = relationship("User", foreign_keys=[author_id])

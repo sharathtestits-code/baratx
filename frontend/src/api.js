@@ -1,5 +1,11 @@
+import { isNativeApp } from "./native";
+
 const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const DEFAULT_TIMEOUT_MS = 15000;
+
+function clientHeaderValue() {
+  return isNativeApp() ? "native" : "web";
+}
 
 export class ApiError extends Error {
   constructor(message, { status = 0, code = "" } = {}) {
@@ -35,7 +41,7 @@ async function request(path, options = {}) {
   }
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  const headers = { ...(extraHeaders || {}) };
+  const headers = { "X-BarathX-Client": clientHeaderValue(), ...(extraHeaders || {}) };
   // Prefer JSON from the same-origin API so document navigations can own HTML
   // routes like /notifications without colliding with fetch() (DEF-008).
   if (!headers.Accept && !headers.accept) {
@@ -86,7 +92,9 @@ async function request(path, options = {}) {
 }
 
 function authHeaders(token) {
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = { "X-BarathX-Client": clientHeaderValue() };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
 export const api = {
@@ -127,13 +135,28 @@ export const api = {
   loginPhoneVerify: (body) =>
     request("/auth/login/phone/verify", { method: "POST", body: JSON.stringify(body) }),
 
+  /** Invalidate every JWT for this account (stolen session recovery). */
+  revokeSessions: (token) =>
+    request("/auth/revoke-sessions", { method: "POST", headers: authHeaders(token) }),
+
   me: (token) => request("/users/me", { headers: authHeaders(token), timeoutMs: 12000 }),
+
+  /** DPDP right to access — JSON export of personal data we hold. */
+  exportMyData: (token) =>
+    request("/users/me/data-export", { headers: authHeaders(token), timeoutMs: 30000 }),
 
   updateMe: (token, body) =>
     request("/users/me", {
       method: "PATCH",
       headers: authHeaders(token),
       body: JSON.stringify(body),
+    }),
+
+  deleteMe: (token) =>
+    request("/users/me", {
+      method: "DELETE",
+      headers: authHeaders(token),
+      body: JSON.stringify({ confirm: "DELETE" }),
     }),
 
   unsubscribeEmail: (token) =>
@@ -327,6 +350,19 @@ export const socialApi = {
 
   hashtag: (tag, token) =>
     request(`/hashtags/${encodeURIComponent(tag)}`, { headers: authHeaders(token) }),
+};
+
+export const earlyIssuesApi = {
+  meta: (token) =>
+    request("/early-issues/meta", { headers: token ? authHeaders(token) : undefined }),
+  list: (token) =>
+    request("/early-issues", { headers: token ? authHeaders(token) : undefined }),
+  create: (token, body) =>
+    request("/early-issues", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify(body),
+    }),
 };
 
 export const listsApi = {
@@ -524,6 +560,17 @@ export const messagesApi = {
 export const searchApi = {
   search: (q, token) =>
     request(`/search?q=${encodeURIComponent(q)}`, { headers: authHeaders(token) }),
+};
+
+export const trendingApi = {
+  list: (token, { q, lane, limit = 8 } = {}) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (q) params.set("q", q);
+    if (lane) params.set("lane", lane);
+    return request(`/trending?${params}`, {
+      headers: token ? authHeaders(token) : {},
+    });
+  },
 };
 
 export const suggestionsApi = {

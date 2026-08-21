@@ -21,6 +21,8 @@ import { IconImage, IconClose } from "../components/Icons";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 import { sanitizeUserText } from "../sanitizeUserText";
+import { assertSafePublicText } from "../contentSafety";
+import ContentSafetyNote from "../components/ContentSafetyNote";
 import { focusCompose } from "../focusCompose";
 import { useT } from "../context/LocaleContext";
 
@@ -366,6 +368,7 @@ export default function Feed() {
     setPosting(true);
     try {
       const cleanText = sanitizeUserText(text).trim();
+      assertSafePublicText(cleanText);
       const newPost = await postsApi.create(token, {
         text: cleanText,
         image: imageFile,
@@ -413,7 +416,7 @@ export default function Feed() {
   const remaining = MAX_LEN - text.length;
   const charCountClass = remaining < 20 ? "char-count char-count-low" : "char-count";
 
-  // First session: guided take — welcome popup can sit on top.
+  // First session: guided take, welcome popup can sit on top.
   if (showFirstSession) {
     return (
       <div className="plaza-page plaza-square plaza-square-first">
@@ -528,7 +531,7 @@ export default function Feed() {
                 className={`compose-tile compose-tile-starters${showStarters ? " is-open" : ""}`}
                 aria-expanded={showStarters}
                 onClick={() => setShowStarters((v) => !v)}
-                title="Starter prompts — not AI drafts"
+                title="Starter prompts, not AI drafts"
               >
                 {t("square.starters")}
               </button>
@@ -568,6 +571,7 @@ export default function Feed() {
               </span>
             </label>
             {foundingNotice && <p className="hint ok-hint compose-founding-notice">{foundingNotice}</p>}
+            <ContentSafetyNote compact />
             <div className="compose-footer">
               <label className="attach-btn" title="Add image">
                 <IconImage />
@@ -609,6 +613,13 @@ export default function Feed() {
               >
                 {t("square.following")}
               </button>
+              <button
+                type="button"
+                className={tab === "mentions" ? "is-active" : ""}
+                onClick={() => setTab("mentions")}
+              >
+                {t("square.mentions")}
+              </button>
             </div>
           </div>
           {tab === "global" && (
@@ -616,6 +627,9 @@ export default function Feed() {
           )}
           {tab === "following" && (
             <p className="hint plaza-takes-hint">{t("square.followingHint")}</p>
+          )}
+          {tab === "mentions" && (
+            <p className="hint plaza-takes-hint">{t("square.mentionsHint")}</p>
           )}
 
           {feedError && <div className="error">{feedError}</div>}
@@ -634,14 +648,32 @@ export default function Feed() {
             </div>
           ) : items.length === 0 ? (
             <EmptyState
-              title={tab === "following" ? t("square.emptyFollowing") : t("square.emptyTakes")}
-              hint={
-                tab === "following" ? t("square.emptyFollowingHint") : t("square.emptyTakesHint")
-              }
-              primaryLabel={tab === "following" ? t("square.explorePeople") : t("square.writeTake")}
-              primaryTo={tab === "following" ? "/search" : undefined}
-              onPrimary={
+              title={
                 tab === "following"
+                  ? t("square.emptyFollowing")
+                  : tab === "mentions"
+                    ? t("square.emptyMentions")
+                    : t("square.emptyTakes")
+              }
+              hint={
+                tab === "following"
+                  ? t("square.emptyFollowingHint")
+                  : tab === "mentions"
+                    ? t("square.emptyMentionsHint")
+                    : t("square.emptyTakesHint")
+              }
+              primaryLabel={
+                tab === "following"
+                  ? t("square.explorePeople")
+                  : tab === "mentions"
+                    ? t("square.goAlerts")
+                    : t("square.writeTake")
+              }
+              primaryTo={
+                tab === "following" ? "/search" : tab === "mentions" ? "/notifications" : undefined
+              }
+              onPrimary={
+                tab === "following" || tab === "mentions"
                   ? undefined
                   : () => focusCompose(composeRef)
               }

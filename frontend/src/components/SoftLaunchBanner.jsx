@@ -4,6 +4,7 @@ import {
   SOFT_LAUNCH_BANNER,
   SOFT_LAUNCH_SHORT,
 } from "../softLaunch";
+import { WHATSAPP_COMMUNITY } from "../socialLinks";
 
 /**
  * Compact soft-launch strip for Square / logged-in chrome (browser).
@@ -20,7 +21,14 @@ export default function SoftLaunchBanner({ compact = false }) {
         <Link to="/signup" className="bx-soft-launch-cta">
           Join early
         </Link>
-      ) : null}
+      ) : (
+        <span className="bx-soft-launch-links">
+          <Link to="/early-issues">Issues</Link>
+          <a href={WHATSAPP_COMMUNITY} target="_blank" rel="noreferrer">
+            WA
+          </a>
+        </span>
+      )}
     </div>
   );
 }

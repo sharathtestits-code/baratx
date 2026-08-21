@@ -4,7 +4,7 @@ import { api } from "../api";
 import Logo from "../components/Logo";
 
 /**
- * One-click unsubscribe landing — linked from activity emails.
+ * One-click unsubscribe landing, linked from activity emails.
  */
 export default function Unsubscribe() {
   const [params] = useSearchParams();

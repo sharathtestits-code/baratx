@@ -1,0 +1,165 @@
+name: Daily social pack (draft + email)
+
+# Builds pack only — never posts to WhatsApp / X / LinkedIn.
+# Emails “Your BarathX post is ready” via Resend (or Railway admin notify).
+
+on:
+  schedule:
+    # 09:00 IST = 03:30 UTC
+    - cron: "30 3 * * *"
+    # 20:00 IST = 14:30 UTC
+    - cron: "30 14 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "IST YYYY-MM-DD (empty = today IST)"
+        required: false
+        default: ""
+      slot:
+        description: "morning | evening | all"
+        required: false
+        default: "all"
+      approve:
+        description: "Render finals without MOCKUP ribbon"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Resolve IST date + slot
+        id: meta
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            DATE="${{ github.event.inputs.date }}"
+          else
+            DATE=$(TZ=Asia/Kolkata date +%F)
+          fi
+          if [ -n "${{ github.event.inputs.slot }}" ]; then
+            SLOT="${{ github.event.inputs.slot }}"
+          else
+            HOUR=$(TZ=Asia/Kolkata date +%H)
+            if [ "$HOUR" -lt 14 ]; then SLOT=morning; else SLOT=evening; fi
+          fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "slot=$SLOT" >> "$GITHUB_OUTPUT"
+          echo "Building pack date=$DATE slot=$SLOT"
+
+      - name: Build pack (stills + 20s reel + notify)
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM: ${{ secrets.RESEND_FROM }}
+          SOCIAL_PACK_EMAIL: ${{ secrets.SOCIAL_PACK_EMAIL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+        run: |
+          APPROVE_FLAG=""
+          if [ "${{ github.event.inputs.approve || 'true' }}" = "true" ]; then
+            APPROVE_FLAG="--approve"
+          fi
+          python3 brand/social/daily/build_daily_pack.py \
+            --date "${{ steps.meta.outputs.date }}" \
+            --slot "${{ steps.meta.outputs.slot }}" \
+            --notify \
+            $APPROVE_FLAG
+
+      - name: Optional Railway notify (when Resend unset)
+        env:
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          API: https://baratx-production.up.railway.app
+        run: |
+          if [ -n "$RESEND_API_KEY" ]; then
+            echo "Resend configured — skipping Railway notify"
+            exit 0
+          fi
+          if [ -z "$ADMIN_SECRET" ]; then
+            echo "No ADMIN_SECRET — email may be preview-only"
+            exit 0
+          fi
+          python3 <<'PY'
+          import json, os, re, urllib.request
+          from pathlib import Path
+          date = "${{ steps.meta.outputs.date }}"
+          slot = "${{ steps.meta.outputs.slot }}"
+          slots = ["morning", "evening"] if slot == "all" else [slot]
+          pack = Path(f"brand/social/daily/{date}/PACK.md").read_text(encoding="utf-8")
+          def section(block, heading):
+              m = re.search(rf"###\s+{re.escape(heading)}\s*\n```\n(.*?)```", block, re.S|re.I)
+              return (m.group(1).strip() if m else "")
+          def meta(label):
+              m = re.search(rf"\*\*{re.escape(label)}:\*\*\s*(.+)", pack)
+              return (m.group(1).strip() if m else "")
+          feature = meta("Feature of the day")
+          trend = meta("Trend hook")
+          for s in slots:
+              if s == "morning":
+                  bm = re.search(r"## Post 1 — Morning.*?(?=## Post 2|\Z)", pack, re.S)
+              else:
+                  bm = re.search(r"## Post 2 — Evening.*?(?=## After|\Z)", pack, re.S)
+              block = bm.group(0) if bm else pack
+              body = {
+                  "date": date,
+                  "slot": s,
+                  "channels": "WhatsApp + X + LinkedIn",
+                  "pack_path": f"brand/social/daily/{date}/PACK.md",
+                  "wa_body": section(block, "WhatsApp community / channel"),
+                  "x_body": section(block, "X"),
+                  "li_body": section(block, "LinkedIn"),
+                  "image_hint": "see pack folder",
+                  "feature": feature,
+                  "trend": trend,
+                  "video_hint": "barathx-daily-reel-20s.mp4",
+              }
+              req = urllib.request.Request(
+                  f"{os.environ['API']}/admin/social-pack-notify",
+                  data=json.dumps(body).encode(),
+                  headers={
+                      "Content-Type": "application/json",
+                      "X-Admin-Secret": os.environ["ADMIN_SECRET"],
+                  },
+                  method="POST",
+              )
+              with urllib.request.urlopen(req, timeout=60) as resp:
+                  print(s, resp.read().decode())
+          PY
+
+      - name: Upload pack artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-pack-${{ steps.meta.outputs.date }}-${{ steps.meta.outputs.slot }}
+          path: brand/social/daily/${{ steps.meta.outputs.date }}
+          if-no-files-found: warn
+
+      - name: Commit pack artifacts
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "brand/social/daily/${{ steps.meta.outputs.date }}" || true
+          if git diff --cached --quiet; then
+            echo "No pack changes to commit"
+          else
+            git commit -m "social: daily pack ${{ steps.meta.outputs.date }} (${{ steps.meta.outputs.slot }})"
+            git push
+          fi

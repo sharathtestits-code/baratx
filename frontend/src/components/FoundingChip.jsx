@@ -4,7 +4,7 @@ import { rewardsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 
 /**
- * Compact Founding 100 chip for Square home header — membership, not a coupon.
+ * Compact Founding 100 chip for Square home header, membership, not a coupon.
  */
 export default function FoundingChip({ refreshKey = 0 }) {
   const { token } = useAuth();
@@ -28,7 +28,7 @@ export default function FoundingChip({ refreshKey = 0 }) {
 
   if (status.my_status === "paid") {
     return (
-      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership — thank-you sent">
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership, thank-you sent">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
@@ -43,7 +43,7 @@ export default function FoundingChip({ refreshKey = 0 }) {
 
   if (status.my_status === "payable") {
     return (
-      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership — you're in">
+      <Link to="/rewards" className="founding-chip founding-chip-done" aria-label="Founding membership, you're in">
         <span className="founding-chip-star" aria-hidden="true">
           ★
         </span>
@@ -87,7 +87,7 @@ export default function FoundingChip({ refreshKey = 0 }) {
       <span className="founding-chip-sep" aria-hidden="true">
         ·
       </span>
-      <span>{status.slots_remaining} left · earn it</span>
+        <span>{status.slots_remaining} left · earn with quality</span>
     </Link>
   );
 }

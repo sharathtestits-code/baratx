@@ -17,7 +17,7 @@ export default function SpaceRoom() {
   const [posting, setPosting] = useState(false);
   const [closing, setClosing] = useState(false);
   const [stanceBusy, setStanceBusy] = useState(false);
-  const [filter, setFilter] = useState("all"); // all | for | against
+  const [filter, setFilter] = useState("all"); // all | for | against | depends
   const [error, setError] = useState("");
   const [stanceHint, setStanceHint] = useState(false);
   const [talkJoinToken, setTalkJoinToken] = useState(0);
@@ -59,7 +59,7 @@ export default function SpaceRoom() {
     setStanceBusy(true);
     setError("");
     setStanceHint(false);
-    // Optimistic — unlock typing / Post immediately
+    // Optimistic, unlock typing / Post immediately
     setSpace((prev) => (prev ? { ...prev, my_side: side } : prev));
     try {
       const updated = await spacesApi.setStance(token, spaceId, side);
@@ -241,8 +241,8 @@ export default function SpaceRoom() {
           id="debate-stance-panel"
           className={`debate-stance-panel${stanceHint && !space.my_side ? " needs-side" : ""}`}
         >
-          <p className="debate-stance-lead">Pick a side to join the fight</p>
-          <div className="debate-stance-row">
+          <p className="debate-stance-lead">Pick a side to join the conversation</p>
+          <div className="debate-stance-row debate-stance-row-three">
             <button
               type="button"
               className={`debate-side-btn for${space.my_side === "for" ? " active" : ""}`}
@@ -253,6 +253,20 @@ export default function SpaceRoom() {
               <span className="debate-side-label">{space.side_for_label}</span>
               <span className="debate-side-count" title="People on this side">
                 {space.for_count}
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`debate-side-btn depends${space.my_side === "depends" ? " active" : ""}`}
+              disabled={!open || stanceBusy}
+              aria-pressed={space.my_side === "depends"}
+              onClick={() => pickSide("depends")}
+            >
+              <span className="debate-side-label">
+                {space.side_depends_label || "It depends"}
+              </span>
+              <span className="debate-side-count" title="People on this side">
+                {space.depends_count || 0}
               </span>
             </button>
             <button
@@ -268,14 +282,21 @@ export default function SpaceRoom() {
               </span>
             </button>
           </div>
-          <p className="hint debate-tally-hint">Counts are people on each side — not post totals.</p>
+          <p className="hint debate-tally-hint">Counts are people on each side, not post totals.</p>
           {space.my_side ? (
             <p className="hint ok-hint">
-              You’re on <strong>{space.my_side === "for" ? space.side_for_label : space.side_against_label}</strong> —
-              type your argument below.
+              You’re on{" "}
+              <strong>
+                {space.my_side === "for"
+                  ? space.side_for_label
+                  : space.my_side === "depends"
+                    ? space.side_depends_label || "It depends"
+                    : space.side_against_label}
+              </strong>{" "}
+              — type your take below.
             </p>
           ) : (
-            <p className="hint">Tap For or Against, then type your take.</p>
+            <p className="hint">Tap Agree, Disagree, or It depends, then type your take.</p>
           )}
           <div className="feed-tabs debate-filter-tabs">
             <button
@@ -291,6 +312,13 @@ export default function SpaceRoom() {
               onClick={() => setFilter("for")}
             >
               {space.side_for_label}
+            </button>
+            <button
+              type="button"
+              className={filter === "depends" ? "feed-tab active" : "feed-tab"}
+              onClick={() => setFilter("depends")}
+            >
+              {space.side_depends_label || "It depends"}
             </button>
             <button
               type="button"
@@ -319,10 +347,14 @@ export default function SpaceRoom() {
                   isDebate
                     ? space.my_side
                       ? `Argue for ${
-                          space.my_side === "for" ? space.side_for_label : space.side_against_label
+                          space.my_side === "for"
+                            ? space.side_for_label
+                            : space.my_side === "depends"
+                              ? space.side_depends_label || "It depends"
+                              : space.side_against_label
                         }… type @ to tag`
-                      : "Type your take — pick For or Against above to post"
-                    : "Say something in this Space — type @ to tag"
+                      : "Type your take, pick a side above to post"
+                    : "Say something in this Space, type @ to tag"
                 }
                 maxLength={500}
                 rows={3}
@@ -361,7 +393,11 @@ export default function SpaceRoom() {
             <div key={post.id} className="debate-post-wrap">
               {isDebate && post.debate_side && (
                 <span className={`debate-post-side ${post.debate_side}`}>
-                  {post.debate_side === "for" ? space.side_for_label : space.side_against_label}
+                  {post.debate_side === "for"
+                    ? space.side_for_label
+                    : post.debate_side === "depends"
+                      ? space.side_depends_label || "It depends"
+                      : space.side_against_label}
                 </span>
               )}
               <PostCard
