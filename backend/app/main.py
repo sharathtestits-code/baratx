@@ -91,6 +91,8 @@ def run_migrations():
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
                     if "side_against_label" not in space_cols:
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+                    if "side_depends_label" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN side_depends_label VARCHAR DEFAULT 'It depends'"))
                     if "topic_id" not in space_cols:
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN topic_id VARCHAR"))
                     if "source_url" not in space_cols:
@@ -186,6 +188,8 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
                 if "side_against_label" not in space_cols:
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+                if "side_depends_label" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN side_depends_label VARCHAR DEFAULT 'It depends'"))
                 if "topic_id" not in space_cols:
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN topic_id VARCHAR"))
                 if "source_url" not in space_cols:
@@ -2769,7 +2773,7 @@ def delete_post(
     db.delete(post)
     db.flush()
 
-    if space_id and debate_side in ("for", "against"):
+    if space_id and debate_side in ("for", "against", "depends"):
         remaining = (
             db.query(models.Post.id)
             .filter(

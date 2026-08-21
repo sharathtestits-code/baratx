@@ -6,6 +6,7 @@ import PlazaPageHeader from "../components/PlazaPageHeader";
 import LiveNowStrip from "../components/LiveNowStrip";
 import { focusCompose } from "../focusCompose";
 import { useT } from "../context/LocaleContext";
+import { debateHeadline, debateHeadlineContext, liveTakesLabel } from "../liveCopy";
 
 const SUGGESTED_DEBATES = [
   "Should WFH stay the default in India tech?",
@@ -79,17 +80,22 @@ export default function Spaces() {
             <span className="live-pill">{empty ? t("live.startOne") : t("live.liveNow")}</span>
             <h2 className="live-amphitheatre-title">
               {featured
-                ? featured.title
+                ? debateHeadline(featured.title)
                 : empty
                   ? t("live.noRooms")
                   : t("live.startRoom")}
             </h2>
+            {featured && debateHeadlineContext(featured.title) ? (
+              <p className="hint live-amphitheatre-context">{debateHeadlineContext(featured.title)}</p>
+            ) : null}
             <p className="live-amphitheatre-sub">
               {featured
-                ? t("live.hostTakes", {
-                    user: featured.host?.username,
-                    count: featured.post_count,
-                  })
+                ? featured.post_count > 0
+                  ? t("live.hostTakes", {
+                      user: featured.host?.username,
+                      count: featured.post_count,
+                    })
+                  : t("live.firstVoice")
                 : t("live.openTalk")}
             </p>
             {empty && (
@@ -211,10 +217,14 @@ export default function Spaces() {
                 <li key={s.id}>
                   <Link to={`/spaces/${s.id}`} className="plaza-onair-card">
                     <span className="live-room-dot" aria-hidden="true" />
-                    <strong>{s.title}</strong>
+                    <strong>{debateHeadline(s.title)}</strong>
+                    {debateHeadlineContext(s.title) ? (
+                      <span className="hint">{debateHeadlineContext(s.title)}</span>
+                    ) : null}
                     <span className="hint">
                       @{s.host?.username}
-                      {s.is_host ? " · you" : ""} · {s.post_count} posts
+                      {s.is_host ? " · you" : ""}
+                      {` · ${liveTakesLabel(s.post_count, { firstVoice: t("live.firstVoice") })}`}
                     </span>
                   </Link>
                 </li>

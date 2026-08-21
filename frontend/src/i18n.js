@@ -9,21 +9,21 @@ export const LOCALES = [
     label: "English",
     native: "English",
     brandNative: "BarathX",
-    tagline: "India's public square",
+    tagline: "India's conversation network",
   },
   {
     id: "hi",
     label: "Hindi",
     native: "हिन्दी",
     brandNative: "बारथX",
-    tagline: "भारत का सार्वजनिक चौक",
+    tagline: "भारत का बातचीत नेटवर्क",
   },
   {
     id: "te",
     label: "Telugu",
     native: "తెలుగు",
     brandNative: "బరత్X",
-    tagline: "భారత్ పబ్లిక్ స్క్వేర్",
+    tagline: "భారత్ సంభాషణ నెట్‌వర్క్",
   },
 ];
 
@@ -44,7 +44,7 @@ const EN = {
   "nav.main": "Main",
   "nav.plaza": "Plaza",
 
-  "brand.tagline": "India's public square",
+  "brand.tagline": "India's conversation network",
 
   "home.title": "Home",
   "home.sub": "Your hub — Overview, Tagged, Following, My posts.",
@@ -135,6 +135,7 @@ const EN = {
   "live.noRooms": "No rooms live, start one",
   "live.startRoom": "Start a room India can join",
   "live.hostTakes": "Hosted by @{user} · {count} takes in the room",
+  "live.firstVoice": "Be the first voice in this room.",
   "live.openTalk": "Open a 15-person talk. Argue live, mute, video, reactions.",
   "live.jumpIn": "Jump in",
   "live.startLive": "Start a live",
@@ -244,7 +245,7 @@ const HI = {
   "nav.main": "मुख्य",
   "nav.plaza": "प्लाज़ा",
 
-  "brand.tagline": "भारत का सार्वजनिक चौक",
+  "brand.tagline": "भारत का बातचीत नेटवर्क",
 
   "home.title": "होम",
   "home.sub": "आपका हब — ओवरव्यू, टैग्ड, फ़ॉलोइंग, मेरी पोस्ट।",
@@ -335,6 +336,7 @@ const HI = {
   "live.noRooms": "कोई रूम लाइव नहीं, एक शुरू करें",
   "live.startRoom": "एक रूम शुरू करें जिसमें भारत जुड़ सके",
   "live.hostTakes": "@{user} द्वारा होस्ट · रूम में {count} राय",
+  "live.firstVoice": "इस रूम में पहली आवाज़ बनें।",
   "live.openTalk": "15 लोगों की बातचीत खोलें। लाइव बहस, म्यूट, वीडियो, प्रतिक्रिया।",
   "live.jumpIn": "अंदर जाएँ",
   "live.startLive": "लाइव शुरू करें",
@@ -444,7 +446,7 @@ const TE = {
   "nav.main": "ప్రధాన",
   "nav.plaza": "ప్లాజా",
 
-  "brand.tagline": "భారత్ పబ్లిక్ స్క్వేర్",
+  "brand.tagline": "భారత్ సంభాషణ నెట్‌వర్క్",
 
   "home.title": "హోమ్",
   "home.sub": "మీ హబ్ — అవలోకనం, ట్యాగ్డ్, ఫాలోయింగ్, నా పోస్ట్‌లు.",
@@ -535,6 +537,7 @@ const TE = {
   "live.noRooms": "లైవ్ రూములు లేవు, ఒకటి ప్రారంభించండి",
   "live.startRoom": "భారత్ చేరగల రూమ్ ప్రారంభించండి",
   "live.hostTakes": "@{user} హోస్ట్ · రూమ్‌లో {count} అభిప్రాయాలు",
+  "live.firstVoice": "ఈ రూమ్‌లో మొదటి స్వరం అవ్వండి.",
   "live.openTalk": "15 మంది చర్చ తెరవండి. లైవ్‌లో వాదించండి, మ్యూట్, వీడియో, రియాక్షన్స్.",
   "live.jumpIn": "లోపలికి వెళ్లండి",
   "live.startLive": "లైవ్ ప్రారంభించండి",

@@ -5,14 +5,14 @@ Each topic has an RSS query for Google News (IN). Used to seed debate prompts.
 
 from __future__ import annotations
 
-# Default For/Against labels per arena.
-ARENA_DEBATE_SIDES: dict[str, tuple[str, str]] = {
-    "sports": ("Agree", "Disagree"),
-    "politics": ("Agree", "Disagree"),
-    "entertainment": ("Agree", "Disagree"),
-    "news": ("Agree", "Disagree"),
-    "spirituality": ("Resonates", "Skeptical"),
-    "startups": ("Fund it", "Pass"),
+# Default For / Against / It depends labels per arena.
+ARENA_DEBATE_SIDES: dict[str, tuple[str, str, str]] = {
+    "sports": ("Agree", "Disagree", "It depends"),
+    "politics": ("Agree", "Disagree", "It depends"),
+    "entertainment": ("Agree", "Disagree", "It depends"),
+    "news": ("Agree", "Disagree", "It depends"),
+    "spirituality": ("Resonates", "Skeptical", "It depends"),
+    "startups": ("Fund it", "Pass", "It depends"),
 }
 
 # Public arenas shown in product.
@@ -23,7 +23,15 @@ CIVIC_ARENA_KEYS = frozenset({"politics", "news"})
 
 
 def debate_sides_for(arena_key: str | None) -> tuple[str, str]:
-    return ARENA_DEBATE_SIDES.get(arena_key or "", ("Agree", "Disagree"))
+    """Backward-compatible (for, against) labels. """
+    for_label, against_label, _depends = ARENA_DEBATE_SIDES.get(
+        arena_key or "", ("Agree", "Disagree", "It depends")
+    )
+    return for_label, against_label
+
+
+def debate_sides_three(arena_key: str | None) -> tuple[str, str, str]:
+    return ARENA_DEBATE_SIDES.get(arena_key or "", ("Agree", "Disagree", "It depends"))
 
 
 # arena_key → list of {key, name, blurb, rss_query}

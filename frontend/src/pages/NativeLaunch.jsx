@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import Logo from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import { useState } from "react";
 
 /**
  * Native-app-only entry. Browser keeps the marketing Landing;
  * Capacitor opens here so mobile feels like an app, not a dumped website.
+ * Phone OTP first (soft launch). Age/terms only with optional Google.
  */
 export default function NativeLaunch() {
   const [confirmAge18, setConfirmAge18] = useState(false);
@@ -16,17 +17,18 @@ export default function NativeLaunch() {
       <div className="bx-native-launch-glow" aria-hidden="true" />
       <header className="bx-native-launch-top">
         <Logo variant="full" className="bx-native-launch-logo" title="BarathX" />
-        <p className="bx-native-launch-tag">India&apos;s public square</p>
+        <p className="bx-native-launch-tag">India&apos;s conversation network</p>
       </header>
 
       <main className="bx-native-launch-main">
         <p className="bx-native-launch-kicker">SOFT LAUNCH · APP</p>
         <h1 className="bx-native-launch-title">
-          Pick a side.
-          <span> Argue it live.</span>
+          India has opinions.
+          <span> Now it has a home.</span>
         </h1>
         <p className="bx-native-launch-copy">
-          Square · Arenas · Live. Human takes only. No AI slop.
+          Pick a side, share your take, meet people who care about the same conversations. Real
+          people. Real context. Respectful pushback. Human takes only.
         </p>
 
         <Link className="bx-native-launch-primary" to="/login?method=phone">
@@ -35,48 +37,57 @@ export default function NativeLaunch() {
         <Link className="bx-native-launch-secondary" to="/login?method=email">
           Log in with email
         </Link>
+        <Link className="bx-native-launch-secondary" to="/signup">
+          Take today&apos;s side
+        </Link>
 
-        <p className="bx-native-launch-copy" style={{ marginTop: "0.35rem", marginBottom: "0.15rem" }}>
-          Soft launch: phone OTP is the fastest way in.
+        <p className="bx-native-launch-copy" style={{ marginTop: "0.55rem", marginBottom: "0.15rem" }}>
+          Soft launch: phone OTP is the fastest way in. Age &amp; terms confirm when you create an
+          account (or with Google below).
         </p>
 
-        <div className="bx-native-launch-consent bx-home-consent-card" role="group" aria-label="Confirm before Google sign-in">
-          <label className="bx-home-consent">
-            <input
-              type="checkbox"
-              checked={confirmAge18}
-              onChange={(e) => setConfirmAge18(e.target.checked)}
-            />
-            <span>
-              I am <strong>18+</strong>
-            </span>
-          </label>
-          <label className="bx-home-consent">
-            <input
-              type="checkbox"
-              checked={acceptPrivacy}
-              onChange={(e) => setAcceptPrivacy(e.target.checked)}
-            />
-            <span>
-              I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
-              <Link to="/terms">Terms</Link>
-            </span>
-          </label>
-        </div>
-
-        <p className="bx-home-google-hint" aria-live="polite">
-          {confirmAge18 && acceptPrivacy
-            ? "Optional — Google (opens once, then back)"
-            : "Optional Google — tick both boxes first"}
-        </p>
-
-        <GoogleSignInButton
-          label="Continue with Google"
-          confirmAge18={confirmAge18}
-          acceptPrivacy={acceptPrivacy}
-          requireAgeConfirm
-          requirePrivacyConfirm
-        />
+        <details className="bx-native-launch-google">
+          <summary>Optional — Continue with Google</summary>
+          <div
+            className="bx-native-launch-consent bx-home-consent-card"
+            role="group"
+            aria-label="Confirm before Google sign-in"
+          >
+            <label className="bx-home-consent">
+              <input
+                type="checkbox"
+                checked={confirmAge18}
+                onChange={(e) => setConfirmAge18(e.target.checked)}
+              />
+              <span>
+                I am <strong>18+</strong>
+              </span>
+            </label>
+            <label className="bx-home-consent">
+              <input
+                type="checkbox"
+                checked={acceptPrivacy}
+                onChange={(e) => setAcceptPrivacy(e.target.checked)}
+              />
+              <span>
+                I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
+                <Link to="/terms">Terms</Link>
+              </span>
+            </label>
+          </div>
+          <p className="bx-home-google-hint" aria-live="polite">
+            {confirmAge18 && acceptPrivacy
+              ? "Ready — continue with Google"
+              : "Tick both boxes, then continue with Google"}
+          </p>
+          <GoogleSignInButton
+            label="Continue with Google"
+            confirmAge18={confirmAge18}
+            acceptPrivacy={acceptPrivacy}
+            requireAgeConfirm
+            requirePrivacyConfirm
+          />
+        </details>
 
         <p className="bx-native-launch-switch">
           New here? <Link to="/signup">Create account</Link>

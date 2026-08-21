@@ -398,7 +398,9 @@ export default function Home() {
                         ? `@${liveDebates[0].host.username}`
                         : t("nav.live")}
                       {typeof liveDebates[0].post_count === "number"
-                        ? ` · ${liveDebates[0].post_count}`
+                        ? liveDebates[0].post_count > 0
+                          ? ` · ${liveDebates[0].post_count}`
+                          : ` · ${t("live.firstVoice")}`
                         : ""}
                     </span>
                   </Link>

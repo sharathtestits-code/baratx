@@ -87,7 +87,7 @@ export default function FoundingChip({ refreshKey = 0 }) {
       <span className="founding-chip-sep" aria-hidden="true">
         ·
       </span>
-      <span>{status.slots_remaining} left · earn it</span>
+        <span>{status.slots_remaining} left · earn with quality</span>
     </Link>
   );
 }
