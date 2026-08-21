@@ -286,6 +286,8 @@ class UserOut(BaseModel):
     follower_count: int = 0
     following_count: int = 0
     is_following: bool = False
+    # Self only — IST debate participation streak.
+    debate_streak: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -343,6 +345,11 @@ class PostOut(BaseModel):
     founding_awarded: Optional[bool] = None
     founding_status: Optional[str] = None
     founding_message: Optional[str] = None
+    # Substance reactions (beyond Spark).
+    reaction_helpful: int = 0
+    reaction_counterpoint: int = 0
+    reaction_mind_changed: int = 0
+    my_reactions: list[str] = []
 
     class Config:
         from_attributes = True
@@ -1031,6 +1038,7 @@ class FoundingStatusOut(BaseModel):
     qualify_arenas: list[str] = []
     civic_arenas: list[str] = []
     eval: Optional[dict] = None
+    debate_streak: Optional[int] = None
 
 
 class FoundingRewardRow(BaseModel):

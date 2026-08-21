@@ -6,6 +6,7 @@ import PostCard from "../components/PostCard";
 import Avatar from "../components/Avatar";
 import MentionTextarea from "../components/MentionTextarea";
 import LiveTalkPanel from "../components/LiveTalkPanel";
+import ShareCard from "../components/ShareCard";
 
 export default function SpaceRoom() {
   const { spaceId } = useParams();
@@ -22,6 +23,7 @@ export default function SpaceRoom() {
   const [stanceHint, setStanceHint] = useState(false);
   const [talkJoinToken, setTalkJoinToken] = useState(0);
   const [inConversation, setInConversation] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const composeRef = useRef(null);
   const talkRef = useRef(null);
 
@@ -64,6 +66,7 @@ export default function SpaceRoom() {
     try {
       const updated = await spacesApi.setStance(token, spaceId, side);
       setSpace(updated);
+      setShareOpen(true);
       requestAnimationFrame(() => {
         if (typeof composeRef.current?.focus === "function") composeRef.current.focus();
       });
@@ -293,7 +296,10 @@ export default function SpaceRoom() {
                     ? space.side_depends_label || "It depends"
                     : space.side_against_label}
               </strong>{" "}
-              — type your take below.
+              — type your take below.{" "}
+              <button type="button" className="text-btn" onClick={() => setShareOpen(true)}>
+                Share your side
+              </button>
             </p>
           ) : (
             <p className="hint">Tap Agree, Disagree, or It depends, then type your take.</p>
@@ -416,6 +422,21 @@ export default function SpaceRoom() {
           ))}
         </div>
       )}
+      <ShareCard
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        question={space?.title || "Today's debate"}
+        side={space?.my_side}
+        sideLabel={
+          space?.my_side === "for"
+            ? space.side_for_label
+            : space?.my_side === "depends"
+              ? space.side_depends_label || "It depends"
+              : space?.my_side === "against"
+                ? space.side_against_label
+                : ""
+        }
+      />
     </div>
   );
 }

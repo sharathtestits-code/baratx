@@ -16,6 +16,16 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [likeBusy, setLikeBusy] = useState(false);
 
+  const [myReactions, setMyReactions] = useState(() =>
+    Array.isArray(post.my_reactions) ? post.my_reactions : []
+  );
+  const [reactionCounts, setReactionCounts] = useState({
+    helpful: post.reaction_helpful || 0,
+    counterpoint: post.reaction_counterpoint || 0,
+    mind_changed: post.reaction_mind_changed || 0,
+  });
+  const [reactionBusy, setReactionBusy] = useState("");
+
   const [reposted, setReposted] = useState(post.reposted_by_me);
   const [repostCount, setRepostCount] = useState(post.repost_count);
   const [repostBusy, setRepostBusy] = useState(false);
@@ -58,6 +68,36 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
       setLikeCount((c) => (wasLiked ? c + 1 : c - 1));
     } finally {
       setLikeBusy(false);
+    }
+  }
+
+  async function toggleReaction(kind) {
+    if (!token || reactionBusy || isMine) return;
+    setReactionBusy(kind);
+    const had = myReactions.includes(kind);
+    setMyReactions((prev) => (had ? prev.filter((k) => k !== kind) : [...prev, kind]));
+    setReactionCounts((prev) => ({
+      ...prev,
+      [kind]: Math.max(0, (prev[kind] || 0) + (had ? -1 : 1)),
+    }));
+    try {
+      const updated = had
+        ? await socialApi.removeReaction(token, post.id, kind)
+        : await socialApi.addReaction(token, post.id, kind);
+      setMyReactions(Array.isArray(updated.my_reactions) ? updated.my_reactions : []);
+      setReactionCounts({
+        helpful: updated.reaction_helpful || 0,
+        counterpoint: updated.reaction_counterpoint || 0,
+        mind_changed: updated.reaction_mind_changed || 0,
+      });
+    } catch {
+      setMyReactions((prev) => (had ? [...prev, kind] : prev.filter((k) => k !== kind)));
+      setReactionCounts((prev) => ({
+        ...prev,
+        [kind]: Math.max(0, (prev[kind] || 0) + (had ? 1 : -1)),
+      }));
+    } finally {
+      setReactionBusy("");
     }
   }
 
@@ -249,6 +289,47 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               </span>
               <span>{likeCount}</span>
             </button>
+            {token && !isMine ? (
+              <div className="substance-reactions" role="group" aria-label="Substance reactions">
+                <button
+                  type="button"
+                  className={`action-btn reaction-btn${myReactions.includes("helpful") ? " active" : ""}`}
+                  onClick={() => toggleReaction("helpful")}
+                  disabled={!!reactionBusy}
+                  title="Helpful"
+                >
+                  Helpful{reactionCounts.helpful ? ` ${reactionCounts.helpful}` : ""}
+                </button>
+                <button
+                  type="button"
+                  className={`action-btn reaction-btn${myReactions.includes("counterpoint") ? " active" : ""}`}
+                  onClick={() => toggleReaction("counterpoint")}
+                  disabled={!!reactionBusy}
+                  title="Best counterpoint"
+                >
+                  Counter{reactionCounts.counterpoint ? ` ${reactionCounts.counterpoint}` : ""}
+                </button>
+                <button
+                  type="button"
+                  className={`action-btn reaction-btn${myReactions.includes("mind_changed") ? " active" : ""}`}
+                  onClick={() => toggleReaction("mind_changed")}
+                  disabled={!!reactionBusy}
+                  title="Changed my mind"
+                >
+                  Mind{reactionCounts.mind_changed ? ` ${reactionCounts.mind_changed}` : ""}
+                </button>
+              </div>
+            ) : (reactionCounts.helpful || reactionCounts.counterpoint || reactionCounts.mind_changed) ? (
+              <p className="hint substance-reaction-summary">
+                {[
+                  reactionCounts.helpful ? `Helpful ${reactionCounts.helpful}` : null,
+                  reactionCounts.counterpoint ? `Counter ${reactionCounts.counterpoint}` : null,
+                  reactionCounts.mind_changed ? `Mind ${reactionCounts.mind_changed}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            ) : null}
             <button
               type="button"
               className={`action-btn bookmark-action ${bookmarked ? "active" : ""}`}

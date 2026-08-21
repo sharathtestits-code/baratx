@@ -2,10 +2,49 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { arenasApi, communitiesApi, spacesApi } from "../api";
 import { useAuth } from "../context/AuthContext";
-import { ARENA_TOPICS, arenaMeta } from "../arenas";
+import { ARENA_TOPICS, CIRCLE_TOPICS, arenaMeta } from "../arenas";
 import PlazaPageHeader from "../components/PlazaPageHeader";
 import LiveNowStrip from "../components/LiveNowStrip";
 import { useT } from "../context/LocaleContext";
+
+function TopicGrid({ topics, byKey, busyKey, toggleJoin, t }) {
+  return (
+    <div className="arena-grid">
+      {topics.map((meta) => {
+        const arena = byKey[meta.key];
+        return (
+          <div key={meta.key} className="arena-card" style={{ "--arena-accent": meta.accent }}>
+            <Link to={`/arenas/${meta.key}`} className="arena-card-main">
+              <div className="arena-card-name">{t(`arena.${meta.key}`)}</div>
+              <p className="arena-card-blurb">{t(`arena.${meta.key}.blurb`)}</p>
+              <div className="arena-card-meta">
+                {arena
+                  ? t(
+                      arena.open_debate_count === 1 ? "arenas.meta" : "arenas.metaPlural",
+                      {
+                        members: arena.member_count,
+                        debates: arena.open_debate_count,
+                      }
+                    )
+                  : t("arenas.openingSoon")}
+              </div>
+            </Link>
+            {arena && (
+              <button
+                type="button"
+                className={`arena-join-btn${arena.is_member ? " is-joined" : ""}`}
+                disabled={busyKey === meta.key}
+                onClick={() => toggleJoin(arena)}
+              >
+                {busyKey === meta.key ? "…" : arena.is_member ? t("arenas.joined") : t("arenas.join")}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Arenas() {
   const { token } = useAuth();
@@ -97,7 +136,7 @@ export default function Arenas() {
               </div>
             </div>
             <ul className="suggestions-list">
-              {ARENA_TOPICS.slice(0, 8).map((meta) => (
+              {[...ARENA_TOPICS, ...CIRCLE_TOPICS].slice(0, 9).map((meta) => (
                 <li key={meta.key}>
                   <Link to={`/arenas/${meta.key}`} className="suggestions-chip suggestions-chip-link">
                     {t(`arena.${meta.key}`)}
@@ -121,40 +160,26 @@ export default function Arenas() {
           {loading ? (
             <p className="hint">{t("arenas.loading")}</p>
           ) : (
-            <div className="arena-grid">
-              {ARENA_TOPICS.map((meta) => {
-                const arena = byKey[meta.key];
-                return (
-                  <div key={meta.key} className="arena-card" style={{ "--arena-accent": meta.accent }}>
-                    <Link to={`/arenas/${meta.key}`} className="arena-card-main">
-                      <div className="arena-card-name">{t(`arena.${meta.key}`)}</div>
-                      <p className="arena-card-blurb">{t(`arena.${meta.key}.blurb`)}</p>
-                      <div className="arena-card-meta">
-                        {arena
-                          ? t(
-                              arena.open_debate_count === 1 ? "arenas.meta" : "arenas.metaPlural",
-                              {
-                                members: arena.member_count,
-                                debates: arena.open_debate_count,
-                              }
-                            )
-                          : t("arenas.openingSoon")}
-                      </div>
-                    </Link>
-                    {arena && (
-                      <button
-                        type="button"
-                        className={`arena-join-btn${arena.is_member ? " is-joined" : ""}`}
-                        disabled={busyKey === meta.key}
-                        onClick={() => toggleJoin(arena)}
-                      >
-                        {busyKey === meta.key ? "…" : arena.is_member ? t("arenas.joined") : t("arenas.join")}
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+            <>
+              <h2 className="section-title arenas-section-title">{t("arenas.circlesTitle")}</h2>
+              <p className="hint arenas-section-hint">{t("arenas.circlesSub")}</p>
+              <TopicGrid
+                topics={CIRCLE_TOPICS}
+                byKey={byKey}
+                busyKey={busyKey}
+                toggleJoin={toggleJoin}
+                t={t}
+              />
+              <h2 className="section-title arenas-section-title">{t("arenas.nationalTitle")}</h2>
+              <p className="hint arenas-section-hint">{t("arenas.nationalSub")}</p>
+              <TopicGrid
+                topics={ARENA_TOPICS}
+                byKey={byKey}
+                busyKey={busyKey}
+                toggleJoin={toggleJoin}
+                t={t}
+              />
+            </>
           )}
         </div>
 

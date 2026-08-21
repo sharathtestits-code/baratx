@@ -27,8 +27,16 @@ function notificationCopy(n) {
       return n.message || "updated your account badge";
     case "post":
       return "posted in the Square";
+    case "reaction_helpful":
+      return n.message || "marked your take Helpful";
+    case "reaction_counterpoint":
+      return n.message || "flagged Best counterpoint on your take";
+    case "reaction_mind_changed":
+      return n.message || "said you Changed their mind";
+    case "streak":
+      return n.message || "kept your debate streak alive";
     default:
-      return "interacted with you";
+      return n.message || "interacted with you";
   }
 }
 

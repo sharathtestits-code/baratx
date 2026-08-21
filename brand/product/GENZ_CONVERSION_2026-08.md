@@ -15,18 +15,21 @@
 | Founding 100 benefit card + multi-path copy | Done — landing + Rewards + chip |
 | Debate question as headline (shorten SCOOP titles) | Done — `debateHeadline()` |
 | Desktop activity / proof strip | Done — landing proof row |
-| Circles teaser (campus, city, language…) | Teaser on landing; full Circles product still roadmap |
-| Co-host / clips / new reactions / full week-1 onboarding | Roadmap (below) |
+| Circles v1 (Campus & Careers, My City, Builders) | Done — under Arenas + seed + first-session join |
+| First-session guarantee (side → take) | Done — reads `bx_landing_take`; requires stance before post |
+| Substance reactions | Done — Helpful / Best counterpoint / Changed my mind |
+| Native shareable cards | Done — canvas share after debate stance |
+| Debate streak + high-value alerts | Done — IST streak on stance; Rewards + notifs at 3/7/14/30 |
+| Co-host / clips / full week-1 onboarding | Still roadmap (below) |
 
 ## Roadmap (next product slices)
 
-1. **Circles** under Arenas: Campus & Careers, Builders, Creator Corner, My City, Desi Internet, Wellbeing, Regional Rooms  
-2. **Substance reactions:** Best counterpoint / Helpful / Changed my mind  
-3. **Live creator tools:** co-host, guest slots, clip highlights  
-4. **First-week onboarding:** intent → language/city → auto-join 3 Circles → stance → one-sentence reason → fast reply loop  
-5. **Founding multi-path scoring** in rewards engine (quality takes, helpful replies, hosting, referrals)  
-6. **Language content lanes:** Tamil, Malayalam, Marathi, Bengali, Hinglish (UI already has EN/HI/TE)
+1. **More Circles:** Creator Corner, Desi Internet, Wellbeing, Regional Rooms  
+2. **Live creator tools:** co-host, guest slots, clip highlights  
+3. **First-week onboarding:** intent → language → auto-join 3 Circles → stance → fast reply loop  
+4. **Founding multi-path scoring** in rewards engine (quality takes, helpful replies, hosting, referrals)  
+5. **Language content lanes:** Tamil, Malayalam, Marathi, Bengali, Hinglish (UI already has EN/HI/TE)
 
 ## Branch alignment
 
-Ship on **`main`**. Sync **`qa`**, **`dev`**, and the active agent branch after each release so orgs/environments do not drift.
+Ship on `main`, then sync `qa` and `dev`. Hard-refresh the live site after Pages deploy so hashed assets are not stuck on SPA fallback cache.
