@@ -91,6 +91,8 @@ def run_migrations():
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
                     if "side_against_label" not in space_cols:
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+                    if "side_depends_label" not in space_cols:
+                        conn.execute(text("ALTER TABLE spaces ADD COLUMN side_depends_label VARCHAR DEFAULT 'It depends'"))
                     if "topic_id" not in space_cols:
                         conn.execute(text("ALTER TABLE spaces ADD COLUMN topic_id VARCHAR"))
                     if "source_url" not in space_cols:
@@ -186,6 +188,8 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN side_for_label VARCHAR DEFAULT 'For'"))
                 if "side_against_label" not in space_cols:
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN side_against_label VARCHAR DEFAULT 'Against'"))
+                if "side_depends_label" not in space_cols:
+                    conn.execute(text("ALTER TABLE spaces ADD COLUMN side_depends_label VARCHAR DEFAULT 'It depends'"))
                 if "topic_id" not in space_cols:
                     conn.execute(text("ALTER TABLE spaces ADD COLUMN topic_id VARCHAR"))
                 if "source_url" not in space_cols:
@@ -1167,8 +1171,12 @@ def admin_delete_user(
     if user.username in seed.PROTECTED_BLUE_USERNAMES:
         raise HTTPException(status_code=400, detail="Cannot delete protected blue official accounts")
     username = user.username
-    purge_user(db, user)
-    db.commit()
+    try:
+        purge_user(db, user)
+        db.commit()
+    except Exception as exc:  # noqa: BLE001 — surface FK/cleanup failures to ops
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Could not delete @{username}: {exc}") from exc
     return schemas.MessageResponse(message=f"Deleted @{username}")
 
 
@@ -1969,28 +1977,18 @@ def delete_my_account(
     db: Session = Depends(get_db),
 ):
     """DPDP right to erasure — permanent account + personal data deletion."""
+    from app.moderation import purge_user
+
     if current_user.username in set(seed.OFFICIAL_USERNAMES) or getattr(current_user, "is_official", False):
         raise HTTPException(status_code=400, detail="Official accounts cannot be self-deleted")
-    uid = current_user.id
     phone = current_user.phone
     delete_media_file(current_user.avatar_url)
     delete_media_file(current_user.cover_url)
-    data_protection.erase_user_auth_artefacts(db, uid)
     if phone:
         db.query(models.OTP).filter(models.OTP.phone == phone).delete(synchronize_session=False)
-    # Soft-clear PII then remove user row (cascades posts/likes via relationships where configured).
-    current_user.email = None
-    current_user.phone = None
-    current_user.display_name = "Deleted"
-    current_user.bio = ""
-    current_user.avatar_url = None
-    current_user.cover_url = None
-    auth.bump_token_version(current_user)
+    # Full FK-safe purge (posts, rewards, tokens, graph) — avoids zombie "Deleted" rows.
+    purge_user(db, current_user)
     db.commit()
-    user = db.query(models.User).filter(models.User.id == uid).first()
-    if user:
-        db.delete(user)
-        db.commit()
     return schemas.MessageResponse(message="Your BarathX account and personal data have been deleted.")
 
 
@@ -2551,7 +2549,7 @@ async def create_post(
 def list_posts(
     limit: int = 20,
     before: Optional[str] = None,  # ISO timestamp cursor for pagination
-    feed: str = "global",  # "global" | "following" | "mentions"
+    feed: str = "global",  # "global" | "following" | "mentions" | "mine"
     db: Session = Depends(get_db),
     current_user: Optional[models.User] = Depends(get_current_user_optional),
 ):
@@ -2573,6 +2571,10 @@ def list_posts(
         if not current_user:
             raise HTTPException(status_code=401, detail="Log in to view your following feed")
         author_filter_ids = [f.followed_id for f in current_user.following] + [current_user.id]
+    elif feed == "mine":
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Log in to view your posts")
+        author_filter_ids = [current_user.id]
 
     # Home Square "For you": Square takes + Arena floor takes + Live/debate space takes.
     # Keep member-run Communities (non-arena) off Home so Arenas ≠ private groups.
@@ -2771,7 +2773,7 @@ def delete_post(
     db.delete(post)
     db.flush()
 
-    if space_id and debate_side in ("for", "against"):
+    if space_id and debate_side in ("for", "against", "depends"):
         remaining = (
             db.query(models.Post.id)
             .filter(
@@ -3348,6 +3350,37 @@ def admin_daily_digest(
     )
 
 
+@app.post("/admin/social-pack-notify", response_model=schemas.SocialPackNotifyOut)
+def admin_social_pack_notify(
+    payload: schemas.SocialPackNotifyIn,
+    _: bool = Depends(require_admin),
+):
+    """Email owner: daily pack is ready to paste. Never posts to WhatsApp/X/LinkedIn."""
+    slot = (payload.slot or "morning").strip().lower()
+    if slot not in ("morning", "evening"):
+        raise HTTPException(status_code=400, detail="slot must be morning or evening")
+    pack_path = payload.pack_path or f"brand/social/daily/{payload.date}/PACK.md"
+    sent = email_service.send_daily_pack_ready_email(
+        date=payload.date,
+        slot=slot,
+        channels=payload.channels or "WhatsApp + X + LinkedIn",
+        pack_path=pack_path,
+        wa_body=payload.wa_body or "",
+        x_body=payload.x_body or "",
+        li_body=payload.li_body or "",
+        image_hint=payload.image_hint or "",
+        feature=payload.feature or "",
+        trend=payload.trend or "",
+        video_hint=payload.video_hint or "",
+    )
+    return schemas.SocialPackNotifyOut(
+        sent=bool(sent),
+        to=email_service.SOCIAL_PACK_EMAIL,
+        date=payload.date,
+        slot=slot,
+    )
+
+
 @app.post("/admin/instagram-carousel")
 def admin_instagram_carousel(
     pack: str = "evening",
@@ -3599,7 +3632,7 @@ register_social_surfaces(
     notify_mentions=notify_mentions,
 )
 
-# Daily @sharath trending digest (~09:05 IST). Disable with DISABLE_DAILY_DIGEST=1.
+# Daily @baratx + @sharath peak digest (09:00 / 13:30 / 20:00 IST). Disable with DISABLE_DAILY_DIGEST=1.
 try:
     from app import daily_digest
 

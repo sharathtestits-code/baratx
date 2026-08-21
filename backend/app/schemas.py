@@ -550,6 +550,29 @@ class AdminStatsOut(BaseModel):
     posters_last_24h: int = 0
 
 
+class SocialPackNotifyIn(BaseModel):
+    """Email Sharath that a daily social pack is ready to paste (never auto-posts)."""
+
+    date: str
+    slot: str = "morning"  # morning | evening
+    channels: str = "WhatsApp + X + LinkedIn"
+    pack_path: str = ""
+    wa_body: str = ""
+    x_body: str = ""
+    li_body: str = ""
+    image_hint: str = ""
+    feature: str = ""
+    trend: str = ""
+    video_hint: str = ""
+
+
+class SocialPackNotifyOut(BaseModel):
+    sent: bool
+    to: str
+    date: str
+    slot: str
+
+
 class AdminUserRow(BaseModel):
     id: str
     username: str
@@ -789,8 +812,10 @@ class SpaceOut(BaseModel):
     source_url: Optional[str] = None
     side_for_label: str = "For"
     side_against_label: str = "Against"
+    side_depends_label: str = "It depends"
     for_count: int = 0
     against_count: int = 0
+    depends_count: int = 0
     my_side: Optional[str] = None
 
 
@@ -801,8 +826,8 @@ class StanceCreate(BaseModel):
     @classmethod
     def valid_side(cls, v):
         v = (v or "").strip().lower()
-        if v not in ("for", "against"):
-            raise ValueError("side must be for or against")
+        if v not in ("for", "against", "depends"):
+            raise ValueError("side must be for, against, or depends")
         return v
 
 
@@ -989,8 +1014,8 @@ class SurfacePostCreate(BaseModel):
         if v is None or v == "":
             return None
         v = v.strip().lower()
-        if v not in ("for", "against"):
-            raise ValueError("debate_side must be for or against")
+        if v not in ("for", "against", "depends"):
+            raise ValueError("debate_side must be for, against, or depends")
         return v
 
 

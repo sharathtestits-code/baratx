@@ -1,9 +1,12 @@
 # BaratX mobile soft launch (Gen Z)
-Updated: **2026-08-09**
+Updated: **2026-08-18**
 
 **Why:** Indian Gen Z prefers apps over browser. Soft-launch Android first, iOS second.
 
 Capacitor shells already exist (`com.baratx.app`). This is the ship checklist.
+
+> **Working path (2026-08-18):** Sideload APK + **phone OTP** — verified. See `SOFT-LAUNCH-WORKING.md`.  
+> Install: https://barathx.com/get-app/ · Push `barathx-latest-release.apk` to main when you ship app changes.
 
 ---
 
@@ -26,7 +29,7 @@ Do **not** wait for public Production store listing to start Campus Voice testin
 | Privacy Policy URL | **Added** `/privacy` | Deploy frontend so https://barathx.com/privacy works |
 | Terms of Service URL | **Added** `/terms` | Deploy frontend so https://barathx.com/terms works |
 | Real SMS OTP (MSG91) | Often demo OTP in API | Soft launch **needs real OTP** — set `MSG91_AUTH_KEY` + `MSG91_TEMPLATE_ID` on Railway |
-| Google Sign-In in app | **Wired** — needs Cloud SHA-1 | Create Android OAuth client (`com.baratx.app` + SHA-1). Phone OTP still works. |
+| Google Sign-In in app | **Deferred** — Cloud access / SHA-1 blocked | Soft launch uses **phone OTP** + sideload APK (`/get-app`). Fix Google later. |
 | Play Console account | You | Create / pay $25 one-time |
 | Apple Developer | You | $99/year — only when iOS week starts |
 | Release keystore | You | Generate once; never commit |

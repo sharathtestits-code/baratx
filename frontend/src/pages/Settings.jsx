@@ -21,6 +21,7 @@ export default function Settings() {
   const [language, setLanguage] = useState(() => user?.language || localeLang || getStoredLanguage());
   const [languageSaving, setLanguageSaving] = useState(false);
   const [emailActivity, setEmailActivity] = useState(() => user?.email_activity_enabled !== false);
+  const [emailSaving, setEmailSaving] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -50,6 +51,12 @@ export default function Settings() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
+      if (!token) {
+        setListsLoading(false);
+        setMutes([]);
+        setBlocks([]);
+        return;
+      }
       setListsLoading(true);
       try {
         const [m, b] = await Promise.all([
@@ -57,11 +64,11 @@ export default function Settings() {
           socialApi.listBlocks(token),
         ]);
         if (!cancelled) {
-          setMutes(m);
-          setBlocks(b);
+          setMutes(Array.isArray(m) ? m : []);
+          setBlocks(Array.isArray(b) ? b : []);
         }
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) setError(err.message || "Could not load mutes/blocks.");
       } finally {
         if (!cancelled) setListsLoading(false);
       }
@@ -215,9 +222,21 @@ export default function Settings() {
   }
 
   return (
-    <div className="feed-wrap surface-page plaza-page">
-      <div className="feed-header">
+    <div className="feed-wrap surface-page plaza-page settings-page">
+      <div className="feed-header settings-header">
+        <button
+          type="button"
+          className="settings-back"
+          onClick={() => {
+            if (window.history.length > 1) navigate(-1);
+            else navigate("/home");
+          }}
+          aria-label="Back"
+        >
+          ← Back
+        </button>
         <h1>{t("settings.title")}</h1>
+        <span className="settings-header-spacer" aria-hidden="true" />
       </div>
 
       {error && <div className="error">{error}</div>}

@@ -5,6 +5,7 @@
  * Required Google Cloud clients (same project):
  * - Web application → VITE_GOOGLE_CLIENT_ID (also GOOGLE_CLIENT_ID on API)
  * - Android (package com.baratx.app + SHA-1) — console only, not passed to JS
+ *   Register debug, upload/release, AND Play App Signing SHA-1 (separate Android OAuth clients).
  * - iOS (bundle com.baratx.app) → VITE_GOOGLE_IOS_CLIENT_ID + Info.plist URL scheme
  */
 import { SocialLogin } from "@capgo/capacitor-social-login";
@@ -40,6 +41,7 @@ export async function ensureNativeGoogleReady() {
     initPromise = SocialLogin.initialize({
       google: {
         webClientId: WEB_CLIENT_ID,
+        // online = ID token for our API; Capgo retries error 16 once internally.
         mode: "online",
         ...(IOS_CLIENT_ID
           ? {
@@ -57,15 +59,28 @@ export async function ensureNativeGoogleReady() {
   await initPromise;
 }
 
-/**
- * @returns {Promise<string>} Google ID token for POST /auth/google
- */
-export async function nativeGoogleIdToken() {
-  await ensureNativeGoogleReady();
+function isReauthFailure(err) {
+  const raw = String(err?.message || err || "");
+  const code = String(err?.code || "");
+  return (
+    code === "16" ||
+    /\[?\s*16\s*\]?/.test(raw) ||
+    /Account reauth failed/i.test(raw) ||
+    /couldn't re-auth/i.test(raw)
+  );
+}
+
+async function clearGoogleSession() {
+  try {
+    await SocialLogin.logout({ provider: "google" });
+  } catch {
+    // ignore — may not have been signed in
+  }
+}
+
+async function loginOnce() {
   // Do NOT pass `scopes` on Android unless MainActivity implements
-  // ModifiedMainActivityForSocialLoginPlugin — Capgo rejects with:
-  // "You CANNOT use scopes without modifying the main activity…"
-  // Defaults already include email + profile + openid (enough for our ID token).
+  // ModifiedMainActivityForSocialLoginPlugin.
   const res = await SocialLogin.login({
     provider: "google",
     options: {
@@ -81,6 +96,34 @@ export async function nativeGoogleIdToken() {
   return idToken;
 }
 
+/**
+ * @returns {Promise<string>} Google ID token for POST /auth/google
+ */
+export async function nativeGoogleIdToken() {
+  await ensureNativeGoogleReady();
+
+  try {
+    return await loginOnce();
+  } catch (err) {
+    if (!isReauthFailure(err)) throw err;
+    // Stale Credential Manager state / previous account: clear and prompt again.
+    await clearGoogleSession();
+    try {
+      return await loginOnce();
+    } catch (retryErr) {
+      if (isReauthFailure(retryErr)) {
+        const e = new Error(
+          "Google couldn’t re-auth that account. Tap “Continue with Google in browser”, or use email / phone OTP. (Play builds also need the Play App Signing SHA-1 in Google Cloud; see MOBILE.md.)"
+        );
+        e.code = "16";
+        e.cause = retryErr;
+        throw e;
+      }
+      throw retryErr;
+    }
+  }
+}
+
 export function friendlyNativeGoogleError(err) {
   const raw = String(err?.message || err || "");
   const code = err?.code || "";
@@ -93,8 +136,11 @@ export function friendlyNativeGoogleError(err) {
   if (/28444|Developer console is not set up|console is not set up/i.test(raw)) {
     return "Google Sign-In needs Android OAuth setup: add package com.baratx.app + this build’s SHA-1 in Google Cloud (see MOBILE.md). Phone OTP still works.";
   }
-  if (/16|Account reauth failed/i.test(raw)) {
-    return "Google couldn’t re-auth that account. Try another Google account, or use phone OTP.";
+  if (isReauthFailure(err) || /Play App Signing SHA-1/i.test(raw)) {
+    return (
+      raw ||
+      "Google couldn’t re-auth that account. Try another Google account, or use email / phone OTP."
+    );
   }
   if (/VITE_GOOGLE_IOS_CLIENT_ID|iOS needs/i.test(raw)) {
     return raw;

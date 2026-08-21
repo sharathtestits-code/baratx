@@ -9,6 +9,8 @@ Usage:
 
 Requires RESEND_API_KEY or SMTP_* on the host (Railway / local).
 Falls back to writing brand/social/daily/YYYY-MM-DD/NOTIFY-PREVIEW.md if email is not configured.
+
+Never posts to WhatsApp / X / LinkedIn — email/preview only.
 """
 
 from __future__ import annotations
@@ -33,6 +35,11 @@ def _section(pack: str, heading: str) -> str:
     return (m.group(1).strip() if m else "")
 
 
+def _meta(pack: str, label: str) -> str:
+    m = re.search(rf"\*\*{re.escape(label)}:\*\*\s*(.+)", pack)
+    return (m.group(1).strip() if m else "")
+
+
 def _images_for_slot(date_dir: Path, slot: str) -> str:
     if slot == "morning":
         names = ["morning-shared.jpg", "morning-linkedin.jpg"]
@@ -42,6 +49,13 @@ def _images_for_slot(date_dir: Path, slot: str) -> str:
     return ", ".join(existing) if existing else "(images pending)"
 
 
+def _video_hint(date_dir: Path) -> str:
+    for name in ("barathx-daily-reel-20s.mp4", "barathx-mobile-ui-reel.mp4"):
+        if (date_dir / name).exists():
+            return name
+    return "(video pending)"
+
+
 def notify_slot(date: str, slot: str) -> bool:
     date_dir = DAILY / date
     pack_path = date_dir / "PACK.md"
@@ -49,7 +63,11 @@ def notify_slot(date: str, slot: str) -> bool:
         raise SystemExit(f"Missing pack: {pack_path}")
     text = pack_path.read_text(encoding="utf-8")
 
-    # Prefer the slot block: "## Post 1 — Morning" / "## Post 2 — Evening"
+    feature = _meta(text, "Feature of the day")
+    # Line looks like: `square` · **Square** — keep readable form
+    feature = re.sub(r"`([^`]+)`\s*·\s*\*\*([^*]+)\*\*", r"\2 (\1)", feature)
+    trend = _meta(text, "Trend hook")
+
     if slot == "morning":
         block_m = re.search(r"## Post 1 — Morning.*?(?=## Post 2|\Z)", text, re.S)
         block = block_m.group(0) if block_m else text
@@ -63,6 +81,7 @@ def notify_slot(date: str, slot: str) -> bool:
     x = _section(block, "X")
     li = _section(block, "LinkedIn")
     images = _images_for_slot(date_dir, slot)
+    video = _video_hint(date_dir)
     rel = f"brand/social/daily/{date}/PACK.md"
 
     sent = email_mod.send_daily_pack_ready_email(
@@ -74,6 +93,9 @@ def notify_slot(date: str, slot: str) -> bool:
         x_body=x,
         li_body=li,
         image_hint=images,
+        feature=feature,
+        trend=trend,
+        video_hint=video,
     )
 
     preview = date_dir / f"NOTIFY-PREVIEW-{slot}.md"
@@ -82,7 +104,11 @@ def notify_slot(date: str, slot: str) -> bool:
         f"Email sent: **{sent}**\n"
         f"To: `{email_mod.SOCIAL_PACK_EMAIL}`\n"
         f"Subject: Your BarathX post is ready — {date} {slot.title()}\n\n"
-        f"Images: {images}\n\n"
+        f"Feature: {feature}\n"
+        f"Trend: {trend}\n"
+        f"Images: {images}\n"
+        f"Video: {video}\n\n"
+        f"> Draft only — paste yourself. Do not auto-post to WhatsApp.\n\n"
         f"## WhatsApp\n```\n{wa}\n```\n\n"
         f"## X\n```\n{x}\n```\n\n"
         f"## LinkedIn\n```\n{li}\n```\n",

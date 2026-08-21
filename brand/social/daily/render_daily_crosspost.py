@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
 """
-Render BarathX daily cross-post mockups (WhatsApp + X + LinkedIn).
+Render BarathX daily cross-post stills (WhatsApp + X + LinkedIn).
 
-1080×1080 JPGs with product UI + trend hook copy.
-Adds a subtle MOCKUP / FOR APPROVAL ribbon until you approve.
+Layouts rotate by product feature + optional India trend hook.
+1080×1080 JPGs. Use --approve for finals (no MOCKUP ribbon).
 """
 
 from __future__ import annotations
 
 import argparse
 import glob
+from datetime import date, datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
+
+from features import Feature, feature_by_key, feature_for_date
 
 ROOT = Path(__file__).resolve().parents[3]
-SCREENS = ROOT / "brand" / "social" / "whatsapp" / "screens"
-LIVE = SCREENS / "live-2026-08-16"  # current product UI captures
-CAROUSEL = ROOT / "brand" / "carousel" / "screens"
+LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / "live-2026-08-19"
 LOGO = ROOT / "brand" / "baratx-logo-avatar.png"
 DAILY = Path(__file__).resolve().parent
 
@@ -27,26 +29,55 @@ WHITE = (255, 255, 255)
 CREAM = (255, 248, 235)
 SAFFRON = (255, 103, 31)
 MUTED = (150, 150, 160)
-TEAL = (46, 196, 182)
 SLATE = (28, 30, 38)
+TEAL = (46, 196, 182)
 
-FONT_B = glob.glob("/usr/share/fonts/**/*Inter*Bold*.ttf", recursive=True)[0]
-FONT_R = (
-    glob.glob("/usr/share/fonts/**/*Inter-Regular*.ttf", recursive=True) or [FONT_B]
-)[0]
+def _font_paths() -> tuple[str, str]:
+    bold = (
+        glob.glob("/usr/share/fonts/**/*Inter*Bold*.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/DejaVuSans-Bold.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/LiberationSans-Bold.ttf", recursive=True)
+    )
+    regular = (
+        glob.glob("/usr/share/fonts/**/*Inter-Regular*.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/DejaVuSans.ttf", recursive=True)
+        or glob.glob("/usr/share/fonts/**/LiberationSans-Regular.ttf", recursive=True)
+        or bold
+    )
+    if not bold:
+        raise SystemExit("No usable Bold TTF found under /usr/share/fonts")
+    return bold[0], regular[0]
+
+
+FONT_B, FONT_R = _font_paths()
+
+SCREEN_FILES = {
+    "square": "square-mobile.png",
+    "arenas": "arenas-mobile.png",
+    "live": "live-mobile.png",
+    "explore": "explore-mobile.png",
+    "home": "home-mobile.png",
+    "rewards": "rewards-mobile.png",
+    "landing": "landing-mobile.png",
+    "search": "search-mobile.png",
+    "signup": "signup-mobile.png",
+    "get_app": "get-app-mobile.png",
+    "login_phone": "login-mobile.png",
+    "soft_launch_phone": "soft-launch-phone-mobile.png",
+}
 
 
 def fnt(size: int, bold: bool = True) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(FONT_B if bold else FONT_R, size)
 
 
-def canvas() -> tuple[Image.Image, ImageDraw.ImageDraw]:
+def canvas(accent: tuple[int, int, int] = SAFFRON) -> tuple[Image.Image, ImageDraw.ImageDraw]:
     img = Image.new("RGB", (W, H), DARK)
     d = ImageDraw.Draw(img)
     for i, y in enumerate(range(0, H, 8)):
         shade = 12 + (i % 3)
         d.line([(0, y), (W, y)], fill=(shade, shade, shade + 2), width=1)
-    d.rectangle([0, 0, 14, H], fill=SAFFRON)
+    d.rectangle([0, 0, 14, H], fill=accent)
     return img, d
 
 
@@ -74,234 +105,266 @@ def approval_ribbon(base: Image.Image) -> None:
     overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     od = ImageDraw.Draw(overlay)
     od.polygon([(W - 260, 0), (W, 0), (W, 260)], fill=(255, 103, 31, 230))
-    # rotate text via temp
     tmp = Image.new("RGBA", (220, 40), (0, 0, 0, 0))
     td = ImageDraw.Draw(tmp)
     td.text((0, 4), "MOCKUP · APPROVE", font=fnt(18), fill=DARK)
-    tmp = tmp.rotate(45, expand=True, resample=Image.Resampling.BICUBIC)
-    overlay.paste(tmp, (W - 210, 18), tmp)
-    base.paste(Image.alpha_composite(base.convert("RGBA"), overlay).convert("RGB"))
+    rotated = tmp.rotate(-45, expand=True, fillcolor=(0, 0, 0, 0))
+    overlay.paste(rotated, (W - 210, 8), rotated)
+    composed = Image.alpha_composite(base.convert("RGBA"), overlay).convert("RGB")
+    base.paste(composed, (0, 0))
 
 
-def phone(path: Path, h: int = 560) -> Image.Image:
-    im = Image.open(path).convert("RGBA")
-    tw = max(1, int(h * im.width / im.height))
-    im = im.resize((tw, h), Image.Resampling.LANCZOS)
-    pad = 10
-    frame = Image.new("RGBA", (tw + pad * 2, h + pad * 2), (0, 0, 0, 0))
+def phone(screen_key: str, height: int = 520) -> Image.Image:
+    name = SCREEN_FILES.get(screen_key, "square-mobile.png")
+    path = LIVE / name
+    if not path.exists():
+        path = LIVE / "square-mobile.png"
+    ui = Image.open(path).convert("RGBA")
+    scale = height / ui.height
+    nw, nh = int(ui.width * scale), int(ui.height * scale)
+    ui = ui.resize((nw, nh), Image.Resampling.LANCZOS)
+    pad = 12
+    frame = Image.new("RGBA", (nw + pad * 2, nh + pad * 2), (28, 28, 34, 255))
     fd = ImageDraw.Draw(frame)
-    fd.rounded_rectangle([0, 0, frame.width - 1, frame.height - 1], radius=36, fill=(28, 28, 34, 255))
-    fd.rounded_rectangle([2, 2, frame.width - 3, frame.height - 3], radius=34, outline=(*SAFFRON, 200), width=3)
-    mask = Image.new("L", (tw, h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, tw - 1, h - 1], radius=24, fill=255)
-    screen = Image.new("RGBA", (tw, h), (0, 0, 0, 0))
-    screen.paste(im, (0, 0), mask)
-    frame.paste(screen, (pad, pad), screen)
-    shadow = Image.new("RGBA", (frame.width + 28, frame.height + 28), (0, 0, 0, 0))
-    sd = ImageDraw.Draw(shadow)
-    sd.rounded_rectangle([12, 16, 12 + frame.width, 20 + frame.height], radius=40, fill=(0, 0, 0, 100))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(12))
-    out = Image.new("RGBA", shadow.size, (0, 0, 0, 0))
-    out = Image.alpha_composite(out, shadow)
-    out.paste(frame, (12, 8), frame)
-    return out
+    fd.rounded_rectangle([0, 0, frame.width - 1, frame.height - 1], radius=36, outline=SAFFRON, width=3)
+    frame.paste(ui, (pad, pad), ui)
+    return frame
 
 
-def screen(name: str) -> Path:
-    # Prefer fresh live captures of current BarathX UI (Home / Square / Arenas / Live).
-    m = {
-        "square": LIVE / "square-mobile.png",
-        "square2": LIVE / "square-foryou-mobile.png",
-        "arenas": LIVE / "arenas-mobile.png",
-        "live": LIVE / "live-mobile.png",
-        "home": LIVE / "home-mobile.png",
-        "signup": LIVE / "signup-mobile.png",
-        "landing": LIVE / "landing-mobile.png",
-        "feed": LIVE / "square-mobile.png",
-        "compose": LIVE / "square-mobile.png",
-        "search": LIVE / "search-mobile.png",
-        "profile": LIVE / "profile-mobile.png",
-        "rewards": LIVE / "rewards-mobile.png",
-        "landing_desk": LIVE / "landing-desktop.png",
-        "home_desk": LIVE / "home-desktop.png",
-        "square_desk": LIVE / "square-desktop.png",
-        "live_desk": LIVE / "live-desktop.png",
-        "arenas_desk": LIVE / "arenas-desktop.png",
-    }
-    # Fallbacks to older brand screens / carousel if a live file is missing.
-    fallback = {
-        "square": SCREENS / "bx-site-square-b.jpg",
-        "square2": SCREENS / "bx-site-square-c.jpg",
-        "arenas": SCREENS / "bx-site-arenas.jpg",
-        "live": SCREENS / "bx-site-live.jpg",
-        "home": SCREENS / "bx-site-home.jpg",
-        "signup": SCREENS / "bx-site-signup.png",
-        "landing": SCREENS / "bx-site-landing.png",
-        "feed": CAROUSEL / "m03-feed.png",
-        "compose": CAROUSEL / "07-compose.png",
-        "search": CAROUSEL / "m05-search.png",
-        "profile": CAROUSEL / "m06-profile.png",
-        "rewards": SCREENS / "bx-site-arenas.jpg",
-    }
-    p = m.get(name)
-    if p and p.exists():
-        return p
-    fb = fallback.get(name)
-    if fb and fb.exists():
-        return fb
-    for alt in list(m.values()) + list(fallback.values()):
-        if alt.exists():
-            return alt
-    raise FileNotFoundError(name)
+def _wrap(d: ImageDraw.ImageDraw, text: str, font, max_w: int) -> list[str]:
+    words = (text or "").split()
+    lines: list[str] = []
+    cur = ""
+    for w in words:
+        trial = (cur + " " + w).strip()
+        if d.textbbox((0, 0), trial, font=font)[2] <= max_w:
+            cur = trial
+        else:
+            if cur:
+                lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
+    return lines or [""]
 
 
-def morning_genz(*, for_approval: bool) -> Image.Image:
-    """Trend: Gen Z voice / campus debate energy — takes die in comments."""
-    base, d = canvas()
-    stamp(base, d, pill="AM · TREND")
-    d.text((36, 110), "GEN Z HAS TAKES", font=fnt(22), fill=SAFFRON)
-    d.text((36, 150), "Reels bury them.", font=fnt(52), fill=WHITE)
-    d.text((36, 218), "Chats delete them.", font=fnt(52), fill=SAFFRON)
-    d.text(
-        (36, 300),
-        "BarathX keeps them on the record —\nSquare · Arenas · Live. Human only.",
-        font=fnt(26, bold=False),
-        fill=MUTED,
-    )
-    chips = ["On the record", "Pick a side", "No AI slop"]
-    x = 36
-    for c in chips:
-        bb = d.textbbox((0, 0), c, font=fnt(18))
-        tw = bb[2] - bb[0]
-        d.rectangle([x, 400, x + tw + 20, 438], outline=SAFFRON, width=2)
-        d.text((x + 10, 408), c, font=fnt(18), fill=WHITE)
-        x += tw + 32
+def render_still(
+    *,
+    feature: Feature,
+    trend: str,
+    slot: str,
+    channel: str,
+    for_approval: bool,
+) -> Image.Image:
+    """channel: shared | linkedin | whatsapp. slot: morning | evening."""
+    pill = f"{'AM' if slot == 'morning' else 'PM'} · {feature.name.upper()[:10]}"
+    trend_line = (trend or "India is talking").strip()
+    if len(trend_line) > 72:
+        trend_line = trend_line[:69] + "…"
 
-    ph = phone(screen("square"), 480)
-    ph = ph.resize((int(ph.width * 0.88), int(ph.height * 0.88)), Image.Resampling.LANCZOS)
-    layer = base.convert("RGBA")
-    layer.paste(ph, (W - ph.width - 20, 430), ph)
-    d2 = ImageDraw.Draw(layer)
-    cta(d2, "Join free → barathx.com")
-    out = layer.convert("RGB")
+    tpl = feature.template
+    if channel == "linkedin":
+        tpl = "linkedin_board"
+    elif channel == "whatsapp" and slot == "evening":
+        tpl = "whatsapp_trio"
+
+    if tpl == "phone_right":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 110), trend_line.upper()[:40], font=fnt(20), fill=SAFFRON)
+        d.text((36, 150), feature.name, font=fnt(54), fill=WHITE)
+        for i, line in enumerate(_wrap(d, feature.one_liner, fnt(28, False), 520)[:3]):
+            d.text((36, 230 + i * 40), line, font=fnt(28, bold=False), fill=MUTED)
+        y = 360
+        for b in feature.bullets[:3]:
+            d.ellipse([44, y + 8, 60, y + 24], fill=SAFFRON)
+            d.text((76, y), b, font=fnt(26), fill=CREAM)
+            y += 48
+        ph = phone(feature.screen, 500)
+        ph = ph.resize((int(ph.width * 0.9), int(ph.height * 0.9)), Image.Resampling.LANCZOS)
+        layer = base.convert("RGBA")
+        layer.paste(ph, (W - ph.width - 18, 380), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Join free → barathx.com")
+        out = layer.convert("RGB")
+
+    elif tpl == "split_cards":
+        base, d = canvas(TEAL)
+        stamp(base, d, pill=pill)
+        d.text((36, 110), "TRENDING · INDIA", font=fnt(20), fill=SAFFRON)
+        for i, line in enumerate(_wrap(d, trend_line, fnt(40), W - 72)[:2]):
+            d.text((36, 150 + i * 52), line, font=fnt(40), fill=WHITE)
+        d.text((36, 280), f"Feature · {feature.name}", font=fnt(24), fill=SAFFRON)
+        d.rounded_rectangle([36, 340, W // 2 - 16, 720], radius=20, fill=SLATE)
+        d.rounded_rectangle([W // 2 + 8, 340, W - 36, 720], radius=20, fill=SLATE)
+        d.text((56, 380), "Agree", font=fnt(36), fill=TEAL)
+        d.text((W // 2 + 28, 380), "Disagree", font=fnt(36), fill=SAFFRON)
+        d.text((56, 460), feature.one_liner[:48], font=fnt(22, False), fill=MUTED)
+        d.text((W // 2 + 28, 460), "Pick a side. On the record.", font=fnt(22, False), fill=MUTED)
+        ph = phone(feature.screen, 280)
+        layer = base.convert("RGBA")
+        layer.paste(ph, ((W - ph.width) // 2, 760), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Open Arenas → barathx.com")
+        out = layer.convert("RGB")
+
+    elif tpl == "phone_center":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 110), trend_line.upper()[:42], font=fnt(20), fill=SAFFRON)
+        d.text((36, 155), "Argue it live.", font=fnt(52), fill=WHITE)
+        d.text((36, 225), feature.one_liner[:56], font=fnt(26, False), fill=MUTED)
+        ph = phone(feature.screen, 560)
+        layer = base.convert("RGBA")
+        layer.paste(ph, ((W - ph.width) // 2, 300), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Enter Live → barathx.com")
+        out = layer.convert("RGB")
+
+    elif tpl == "search_focus":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 120), "EXPLORE", font=fnt(22), fill=SAFFRON)
+        d.text((36, 165), "People or topics.", font=fnt(48), fill=WHITE)
+        d.text((36, 235), "Not a buried dump.", font=fnt(48), fill=SAFFRON)
+        d.rounded_rectangle([36, 340, W - 36, 430], radius=28, outline=SAFFRON, width=3)
+        d.text((60, 368), f"Try @{trend_line.split()[0][:16].lower() if trend_line else 'username'} · or cricket", font=fnt(26, False), fill=MUTED)
+        for i, b in enumerate(feature.bullets[:3]):
+            d.text((48, 480 + i * 50), f"→  {b}", font=fnt(28), fill=CREAM)
+        ph = phone(feature.screen, 360)
+        layer = base.convert("RGBA")
+        layer.paste(ph, (W - ph.width - 24, 640), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Get app → barathx.com/get-app")
+        out = layer.convert("RGB")
+
+    elif tpl == "bold_type":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 140), "FEEDS ARE FULL OF AI", font=fnt(22), fill=SAFFRON)
+        d.text((36, 190), "We rank", font=fnt(64), fill=WHITE)
+        d.text((36, 270), "humans first.", font=fnt(64), fill=SAFFRON)
+        d.text((36, 380), trend_line, font=fnt(24, False), fill=MUTED)
+        y = 460
+        for b in feature.bullets:
+            d.rounded_rectangle([36, y, W - 36, y + 70], radius=16, fill=SLATE)
+            d.text((60, y + 18), b, font=fnt(28), fill=CREAM)
+            y += 90
+        cta(d, "Human takes only → barathx.com")
+        out = base
+
+    elif tpl == "founding_banner":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 130), "FOUNDING 100", font=fnt(22), fill=SAFFRON)
+        d.text((36, 175), "Earned,", font=fnt(56), fill=WHITE)
+        d.text((36, 250), "not bought.", font=fnt(56), fill=SAFFRON)
+        for i, line in enumerate(_wrap(d, feature.one_liner, fnt(26, False), W - 72)[:4]):
+            d.text((36, 350 + i * 36), line, font=fnt(26, bold=False), fill=MUTED)
+        ph = phone(feature.screen, 420)
+        layer = base.convert("RGBA")
+        layer.paste(ph, (W - ph.width - 20, 520), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Open a debate → barathx.com")
+        out = layer.convert("RGB")
+
+    elif tpl == "launch_hero":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 140), "SOFT LAUNCH", font=fnt(22), fill=SAFFRON)
+        d.text((36, 190), "Install. Phone OTP.", font=fnt(48), fill=WHITE)
+        d.text((36, 255), "You’re in.", font=fnt(48), fill=SAFFRON)
+        d.text((36, 340), trend_line, font=fnt(24, False), fill=MUTED)
+        for i, b in enumerate(feature.bullets[:3]):
+            d.text((48, 400 + i * 48), f"•  {b}", font=fnt(28), fill=CREAM)
+        ph = phone(feature.screen, 400)
+        layer = base.convert("RGBA")
+        layer.paste(ph, ((W - ph.width) // 2, 560), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Get app → barathx.com/get-app")
+        out = layer.convert("RGB")
+
+    elif tpl == "linkedin_board":
+        base, d = canvas()
+        stamp(base, d, pill=f"LI · {feature.name.upper()[:8]}")
+        d.text((36, 120), "BUILDING IN PUBLIC", font=fnt(20), fill=SAFFRON)
+        d.text((36, 165), feature.name, font=fnt(48), fill=WHITE)
+        for i, line in enumerate(_wrap(d, feature.one_liner, fnt(28, False), W - 72)[:3]):
+            d.text((36, 240 + i * 38), line, font=fnt(28, bold=False), fill=MUTED)
+        d.rounded_rectangle([36, 370, 560, 720], radius=22, fill=SLATE)
+        d.text((56, 400), f"India hook: {trend_line[:40]}", font=fnt(20), fill=SAFFRON)
+        for i, b in enumerate(feature.bullets[:4]):
+            d.text((56, 450 + i * 48), f"→  {b}", font=fnt(24, False), fill=CREAM)
+        ph = phone(feature.screen, 420)
+        layer = base.convert("RGBA")
+        layer.paste(ph, (W - ph.width - 28, 360), ph)
+        d2 = ImageDraw.Draw(layer)
+        cta(d2, "Get app → barathx.com/get-app")
+        out = layer.convert("RGB")
+
+    elif tpl == "whatsapp_trio":
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 120), "TONIGHT ON BARATHX", font=fnt(20), fill=SAFFRON)
+        d.text((36, 165), feature.name, font=fnt(48), fill=WHITE)
+        d.text((36, 235), feature.one_liner[:52], font=fnt(24, False), fill=MUTED)
+        keys = [feature.screen, "square", "live"]
+        xs = [40, 380, 720]
+        labels = [feature.name[:8], "Square", "Live"]
+        layer = base.convert("RGBA")
+        for key, x, label in zip(keys, xs, labels):
+            ph = phone(key, 380)
+            ph = ph.resize((int(ph.width * 0.7), int(ph.height * 0.7)), Image.Resampling.LANCZOS)
+            layer.paste(ph, (x, 320), ph)
+        d2 = ImageDraw.Draw(layer)
+        for label, x in zip(labels, xs):
+            d2.text((x + 36, 860), label, font=fnt(22), fill=SAFFRON)
+        cta(d2, "Open → barathx.com")
+        out = layer.convert("RGB")
+
+    else:
+        base, d = canvas()
+        stamp(base, d, pill=pill)
+        d.text((36, 160), feature.name, font=fnt(52), fill=WHITE)
+        d.text((36, 240), feature.one_liner[:60], font=fnt(28, False), fill=MUTED)
+        cta(d, "barathx.com")
+        out = base
+
     if for_approval:
         approval_ribbon(out)
     return out
-
-
-def evening_human(*, for_approval: bool) -> Image.Image:
-    """Highlight: human-first + AI demotion + soft launch promo."""
-    base, d = canvas()
-    stamp(base, d, pill="PM · HIGHLIGHT")
-    d.text((36, 110), "FEEDS ARE FULL OF AI", font=fnt(22), fill=SAFFRON)
-    d.text((36, 150), "We rank humans", font=fnt(52), fill=WHITE)
-    d.text((36, 218), "first.", font=fnt(52), fill=SAFFRON)
-    d.text(
-        (36, 300),
-        "AI drafts get flagged. Real replies rise.\nSoft launch — first voices get seen.",
-        font=fnt(26, bold=False),
-        fill=MUTED,
-    )
-
-    items = [
-        ("Square", "Takes that stay"),
-        ("Arenas", "Agree / Disagree"),
-        ("Live", "Argue it live"),
-        ("Founding", "Earned, not bought"),
-    ]
-    y = 420
-    for title, sub in items:
-        d.ellipse([44, y + 8, 60, y + 24], fill=SAFFRON)
-        d.text((76, y), f"{title} — {sub}", font=fnt(28), fill=CREAM)
-        y += 52
-
-    ph = phone(screen("live"), 420)
-    ph = ph.resize((int(ph.width * 0.78), int(ph.height * 0.78)), Image.Resampling.LANCZOS)
-    layer = base.convert("RGBA")
-    layer.paste(ph, (W - ph.width - 16, 520), ph)
-    d2 = ImageDraw.Draw(layer)
-    cta(d2, "Leave one honest take → barathx.com")
-    out = layer.convert("RGB")
-    if for_approval:
-        approval_ribbon(out)
-    return out
-
-
-def morning_linkedin(*, for_approval: bool) -> Image.Image:
-    """LinkedIn-leaning: professional identity / public square."""
-    base, d = canvas()
-    stamp(base, d, pill="AM · LINKEDIN")
-    d.text((36, 120), "STOP PERFORMING.", font=fnt(22), fill=SAFFRON)
-    d.text((36, 165), "Start arguing", font=fnt(54), fill=WHITE)
-    d.text((36, 235), "on the record.", font=fnt(54), fill=SAFFRON)
-    d.rounded_rectangle([36, 340, W - 36, 620], radius=22, fill=SLATE)
-    d.text((60, 380), "What BarathX gives that feeds don’t", font=fnt(26), fill=SAFFRON)
-    for i, line in enumerate(
-        [
-            "Takes that stay (not buried comments)",
-            "Forced sides — real stakes",
-            "Live rooms for human argument",
-            "Human-first ranking — AI demoted",
-        ]
-    ):
-        d.text((60, 440 + i * 42), f"→  {line}", font=fnt(24, bold=False), fill=CREAM)
-    cta(d, "Soft launch open → barathx.com")
-    if for_approval:
-        approval_ribbon(base)
-    return base
-
-
-def evening_whatsapp(*, for_approval: bool) -> Image.Image:
-    """Family/community WA style — current product: Square · Arenas · Live."""
-    base, d = canvas()
-    stamp(base, d, pill="PM · WHATSAPP")
-    d.text((36, 120), "TONIGHT ON BARATHX", font=fnt(22), fill=SAFFRON)
-    d.text((36, 165), "Drop. Pick.", font=fnt(54), fill=WHITE)
-    d.text((36, 235), "Argue live.", font=fnt(54), fill=SAFFRON)
-
-    # Current mobile UI only (no legacy desktop compose / old screens).
-    phones = [("square", "Drop"), ("arenas", "Pick"), ("live", "Argue")]
-    layer = base.convert("RGBA")
-    xs = [40, 380, 720]
-    for (name, label), x in zip(phones, xs):
-        ph = phone(screen(name), 400)
-        ph = ph.resize((int(ph.width * 0.72), int(ph.height * 0.72)), Image.Resampling.LANCZOS)
-        layer.paste(ph, (x, 340), ph)
-    d2 = ImageDraw.Draw(layer)
-    for (name, label), x in zip(phones, xs):
-        d2.text((x + 40, 880), label, font=fnt(24), fill=SAFFRON)
-    cta(d2, "Open → barathx.com")
-    out = layer.convert("RGB")
-    if for_approval:
-        approval_ribbon(out)
-    return out
-
-
-SLOTS = {
-    "morning-shared": morning_genz,
-    "evening-shared": evening_human,
-    "morning-linkedin": morning_linkedin,
-    "evening-whatsapp": evening_whatsapp,
-}
 
 
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--date", required=True, help="IST date YYYY-MM-DD")
-    p.add_argument("--approve", action="store_true", help="Render final (no MOCKUP ribbon)")
+    p.add_argument("--approve", action="store_true", help="Final (no MOCKUP ribbon)")
+    p.add_argument("--feature", default="", help="Override feature key")
+    p.add_argument("--trend", default="", help="India trend / headline hook")
     args = p.parse_args()
+
+    d = date.fromisoformat(args.date)
+    feature = feature_by_key(args.feature) or feature_for_date(d)
+    trend = args.trend.strip() or "India is talking — leave a take"
     out_dir = DAILY / args.date
     out_dir.mkdir(parents=True, exist_ok=True)
     for_approval = not args.approve
-    print(f"Rendering daily mockups → {out_dir} (approval={for_approval})")
-    mapping = {
-        "morning-shared.jpg": morning_genz,
-        "evening-shared.jpg": evening_human,
-        "morning-linkedin.jpg": morning_linkedin,
-        "evening-whatsapp.jpg": evening_whatsapp,
-    }
-    for name, fn in mapping.items():
-        img = fn(for_approval=for_approval)
+
+    mapping = [
+        ("morning-shared.jpg", "morning", "shared"),
+        ("morning-linkedin.jpg", "morning", "linkedin"),
+        ("evening-shared.jpg", "evening", "shared"),
+        ("evening-whatsapp.jpg", "evening", "whatsapp"),
+    ]
+    print(f"Rendering → {out_dir} feature={feature.key} trend={trend[:50]!r} approval={for_approval}")
+    for name, slot, channel in mapping:
+        img = render_still(
+            feature=feature,
+            trend=trend,
+            slot=slot,
+            channel=channel,
+            for_approval=for_approval,
+        )
         path = out_dir / name
         img.save(path, quality=92, optimize=True)
         print(f"  {path.relative_to(ROOT)}")

@@ -639,6 +639,11 @@ def register_social_surfaces(
             .filter(models.SpaceStance.space_id == s.id, models.SpaceStance.side == "against")
             .count()
         )
+        depends_count = (
+            db.query(models.SpaceStance)
+            .filter(models.SpaceStance.space_id == s.id, models.SpaceStance.side == "depends")
+            .count()
+        )
         my_side = None
         if current_user:
             stance = (
@@ -688,8 +693,10 @@ def register_social_surfaces(
             source_url=getattr(s, "source_url", None),
             side_for_label=getattr(s, "side_for_label", None) or "For",
             side_against_label=getattr(s, "side_against_label", None) or "Against",
+            side_depends_label=getattr(s, "side_depends_label", None) or "It depends",
             for_count=for_count,
             against_count=against_count,
+            depends_count=depends_count,
             my_side=my_side,
         )
 
@@ -813,13 +820,17 @@ def register_social_surfaces(
             c = db.query(models.Community).filter(models.Community.id == community_id).first()
             if not c:
                 raise HTTPException(status_code=404, detail="Community not found")
-        default_for, default_against = debate_sides_for(payload.arena_key)
+        from app.topics_data import debate_sides_three
+
+        default_for, default_against, default_depends = debate_sides_three(payload.arena_key)
         if payload.arena_key:
             side_for = (payload.side_for_label or default_for).strip()[:40] or default_for
             side_against = (payload.side_against_label or default_against).strip()[:40] or default_against
+            side_depends = default_depends
         else:
             side_for = (payload.side_for_label or "For").strip()[:40] or "For"
             side_against = (payload.side_against_label or "Against").strip()[:40] or "Against"
+            side_depends = "It depends"
 
         topic_id = payload.topic_id
         if topic_id:
@@ -838,6 +849,7 @@ def register_social_surfaces(
             topic_id=topic_id,
             side_for_label=side_for,
             side_against_label=side_against,
+            side_depends_label=side_depends,
             closes_at=now + timedelta(hours=hours),
         )
         db.add(s)

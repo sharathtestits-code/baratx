@@ -130,7 +130,7 @@ class Post(Base):
     quoted_post_id = Column(String, ForeignKey("posts.id"), nullable=True, index=True)
     community_id = Column(String, ForeignKey("communities.id"), nullable=True, index=True)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=True, index=True)
-    debate_side = Column(String, nullable=True)  # for | against (arena debates only)
+    debate_side = Column(String, nullable=True)  # for | against | depends (arena debates only)
     # Heuristic AI-slop flag — demoted in feeds so human takes stay on top.
     likely_ai = Column(Boolean, default=False, nullable=False, index=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
@@ -386,6 +386,7 @@ class Space(Base):
     source_url = Column(String, nullable=True, index=True)  # RSS / news link for prompts
     side_for_label = Column(String, default="For", nullable=False)
     side_against_label = Column(String, default="Against", nullable=False)
+    side_depends_label = Column(String, default="It depends", nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)
     closes_at = Column(DateTime, nullable=True)
 
@@ -405,7 +406,7 @@ class SpaceStance(Base):
     id = Column(String, primary_key=True, default=gen_uuid)
     space_id = Column(String, ForeignKey("spaces.id"), nullable=False, index=True)
     user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
-    side = Column(String, nullable=False)  # for | against
+    side = Column(String, nullable=False)  # for | against | depends
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     space = relationship("Space", back_populates="stances")

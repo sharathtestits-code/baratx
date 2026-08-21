@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { IconLive } from "./Icons";
 import { useT } from "../context/LocaleContext";
+import { debateHeadline, debateHeadlineContext, liveTakesLabel } from "../liveCopy";
 
 /**
  * Live rooms strip — rail (desktop) or horizontal scroll (mobile via plaza-layout CSS).
@@ -31,18 +32,28 @@ export default function LiveNowStrip({
         <p className="hint plaza-rail-empty">{emptyHint}</p>
       ) : (
         <ul className="plaza-onair-list plaza-onair-scroll">
-          {rows.map((d) => (
-            <li key={d.id}>
-              <Link to={`/spaces/${d.id}`} className="plaza-onair-card">
-                <span className="live-pill">{t("live.liveNow")}</span>
-                <strong>{d.title}</strong>
-                <span className="hint">
-                  {d.topic_name || d.arena_name || (d.host?.username ? `@${d.host.username}` : "Debate")}
-                  {typeof d.post_count === "number" ? ` · ${d.post_count}` : ""}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {rows.map((d) => {
+            const head = debateHeadline(d.title);
+            const context = debateHeadlineContext(d.title);
+            const takes = liveTakesLabel(d.post_count, {
+              firstVoice: t("live.firstVoice"),
+            });
+            return (
+              <li key={d.id}>
+                <Link to={`/spaces/${d.id}`} className="plaza-onair-card">
+                  <span className="live-pill">{t("live.liveNow")}</span>
+                  <strong>{head}</strong>
+                  {context ? <span className="hint plaza-onair-context">{context}</span> : null}
+                  <span className="hint">
+                    {d.topic_name ||
+                      d.arena_name ||
+                      (d.host?.username ? `@${d.host.username}` : "Debate")}
+                    {takes ? ` · ${takes}` : ""}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

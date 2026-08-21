@@ -1,14 +1,18 @@
-# Play Console upload — BarathX 0.1.5
+# Skip Play Console wait
 
-## Use this build (versionCode **7**)
+**Install APK directly (no 15‑min verification):**
 
-| File | Use |
-|------|-----|
-| `barathx-0.1.5-release.aab` | **Upload this to Play Console** |
-| `barathx-0.1.5-release.apk` | Sideload / direct install |
+- Latest: https://github.com/sharathtestits-code/baratx/raw/main/brand/mobile/play-upload/barathx-latest-release.apk  
+- Or open: https://barathx.com/get-app/
 
-- package: `com.baratx.app`
-- versionCode: **7**
-- versionName: **0.1.5**
+1. Uninstall the Play build first (signature clash otherwise)  
+2. Download → Install  
+3. Open app → **Continue with phone** (OTP) — no Google Cloud / SHA-1 / Studio wait  
 
-Includes: Explore people fix, India-now trending, warmer DMs, adult-content block, `@username` search.
+Current sideload build: **0.1.11** (`barathx-0.1.11-release.apk`) — includes Home hub tabs (Overview / Tagged / Following / My posts)
+
+---
+
+# Play Console upload — optional later
+
+When you have time for Studio: use an AAB from this folder (`0.1.9` / newer). Soft launch users can stay on APK + phone OTP.

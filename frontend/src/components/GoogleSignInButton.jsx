@@ -3,19 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { api, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { isNativeApp } from "../native";
-import {
-  friendlyNativeGoogleError,
-  nativeGoogleConfigured,
-  nativeGoogleIdToken,
-} from "../nativeGoogleAuth";
+import { openBrowserGoogleSignIn } from "../nativeGoogleBrowserAuth";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 /**
  * Google sign-in:
- * - Web: GIS renderButton (popup account chooser)
- * - Native Capacitor: @capgo/capacitor-social-login → ID token → /auth/google
+ * - Web: GIS renderButton (one account chooser)
+ * - Native: one Custom Tabs session → barathx.com/native-google-auth (auto-starts Google)
+ *   Skips Capgo Credential Manager so users are not asked to pick an account twice.
  */
 export default function GoogleSignInButton({
   label = "Continue with Google",
@@ -34,6 +31,7 @@ export default function GoogleSignInButton({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
+  const [browserHint, setBrowserHint] = useState("");
   const native = isNativeApp();
 
   ageRef.current = { confirmAge18, requireAgeConfirm, acceptPrivacy, requirePrivacyConfirm };
@@ -101,7 +99,7 @@ export default function GoogleSignInButton({
     await finishWithIdToken(response.credential);
   };
 
-  async function handleNativeGoogle() {
+  async function startBrowserGoogle() {
     const {
       confirmAge18: ageOk,
       requireAgeConfirm: needAge,
@@ -120,27 +118,31 @@ export default function GoogleSignInButton({
       onError?.(msg);
       return;
     }
-    if (!nativeGoogleConfigured()) {
-      const msg =
-        "Google Sign-In needs one more setup step (Android SHA-1 / iOS client, see MOBILE.md). Use phone OTP to join now.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
     setBusy(true);
     setError("");
+    setBrowserHint("Opening Google — pick your account once, then you’ll return to the app.");
     try {
-      const idToken = await nativeGoogleIdToken();
-      // finishWithIdToken manages busy / navigation for the API hop
-      setBusy(false);
-      await finishWithIdToken(idToken);
+      await openBrowserGoogleSignIn({ confirmAge18: ageOk, acceptPrivacy: privacyOk });
     } catch (err) {
-      const msg = friendlyNativeGoogleError(err);
+      const msg = err?.message || "Could not open Google Sign-In.";
       setError(msg);
       onError?.(msg);
+      setBrowserHint("");
+    } finally {
       setBusy(false);
     }
   }
+
+  useEffect(() => {
+    function onBrowserAuthError(ev) {
+      const msg = ev?.detail || "Google sign-in failed.";
+      setError(String(msg));
+      setBrowserHint("");
+      onError?.(String(msg));
+    }
+    window.addEventListener("bx-google-auth-error", onBrowserAuthError);
+    return () => window.removeEventListener("bx-google-auth-error", onBrowserAuthError);
+  }, [onError]);
 
   useEffect(() => {
     if (!CLIENT_ID || native) return undefined;
@@ -155,12 +157,10 @@ export default function GoogleSignInButton({
       window.google.accounts.id.initialize({
         client_id: CLIENT_ID,
         callback: (res) => callbackRef.current?.(res),
-        // popup is more reliable than redirect on iOS Safari / in-app browsers
         ux_mode: "popup",
         auto_select: false,
         cancel_on_tap_outside: true,
         context: "signin",
-        // Prefer FedCM where available; falls back when unsupported.
         use_fedcm_for_prompt: true,
       });
 
@@ -222,21 +222,23 @@ export default function GoogleSignInButton({
           type="button"
           className="x-btn x-btn-google"
           disabled={busy || blocked}
-          onClick={handleNativeGoogle}
+          onClick={startBrowserGoogle}
         >
           <GoogleG className="x-btn-icon" />
-          {busy ? "Signing in…" : label}
+          {busy ? "Opening Google…" : label}
         </button>
         {ageBlocked && (
-          <p className="hint x-google-loading">Confirm you are 18+ below to continue with Google.</p>
+          <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
         )}
         {privacyBlocked && !ageBlocked && (
-          <p className="hint x-google-loading">Accept the Privacy Policy below to continue with Google.</p>
+          <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
         )}
         {!blocked && (
-          <p className="hint x-google-loading">Phone OTP also works if Google isn’t set up on this build yet.</p>
+          <p className="hint x-google-loading">
+            {browserHint || "One Google account pick — then you’re back in the app."}
+          </p>
         )}
-        {error && <p className="x-inline-error">{error}</p>}
+        {error && !onError && <p className="x-inline-error">{error}</p>}
       </div>
     );
   }
@@ -291,13 +293,13 @@ export default function GoogleSignInButton({
         />
       </div>
       {ageBlocked && (
-        <p className="hint x-google-loading">Confirm you are 18+ below to continue with Google.</p>
+        <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
       )}
       {privacyBlocked && !ageBlocked && (
-        <p className="hint x-google-loading">Accept the Privacy Policy below to continue with Google.</p>
+        <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
       )}
       {!gisReady && !error && !blocked && <p className="hint x-google-loading">Loading Google…</p>}
-      {error && <p className="x-inline-error">{error}</p>}
+      {error && !onError && <p className="x-inline-error">{error}</p>}
     </div>
   );
 }
