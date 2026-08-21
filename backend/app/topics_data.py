@@ -5,7 +5,7 @@ Each topic has an RSS query for Google News (IN). Used to seed debate prompts.
 
 from __future__ import annotations
 
-# Default For / Against / It depends labels per arena.
+# Default For / Against / It depends labels per arena (+ Circles).
 ARENA_DEBATE_SIDES: dict[str, tuple[str, str, str]] = {
     "sports": ("Agree", "Disagree", "It depends"),
     "politics": ("Agree", "Disagree", "It depends"),
@@ -13,9 +13,16 @@ ARENA_DEBATE_SIDES: dict[str, tuple[str, str, str]] = {
     "news": ("Agree", "Disagree", "It depends"),
     "spirituality": ("Resonates", "Skeptical", "It depends"),
     "startups": ("Fund it", "Pass", "It depends"),
+    # Circles v1 — belonging lanes under Arenas
+    "campus-careers": ("Agree", "Disagree", "It depends"),
+    "my-city": ("Agree", "Disagree", "It depends"),
+    "builders": ("Agree", "Disagree", "It depends"),
 }
 
-# Public arenas shown in product.
+# Circles are joinable arenas with a belonging frame (not national debate lanes).
+CIRCLE_ARENA_KEYS = frozenset({"campus-careers", "my-city", "builders"})
+
+# Public arenas + Circles shown in product.
 ACTIVE_ARENA_KEYS = frozenset(ARENA_DEBATE_SIDES.keys())
 
 # Civic pulse path — real problems / debates that count toward founding rewards.
@@ -229,6 +236,36 @@ TOPICS_BY_ARENA: dict[str, list[dict]] = {
         {"key": "space-startups", "name": "Space Startups", "blurb": "Private space race.", "rss_query": "India space startup"},
         {"key": "banking-startups", "name": "Neo Banks", "blurb": "Digital banking plays.", "rss_query": "India neobank startup"},
         {"key": "founder-stories", "name": "Founder Stories", "blurb": "Builds, pivots, lessons.", "rss_query": "India startup founder interview"},
+    ],
+    "campus-careers": [
+        {"key": "placements", "name": "Placements", "blurb": "Campus drives and offers.", "rss_query": "India campus placements"},
+        {"key": "first-job", "name": "First Job", "blurb": "Joining and surviving year one.", "rss_query": "India first job salary"},
+        {"key": "internships", "name": "Internships", "blurb": "Stints that lead somewhere.", "rss_query": "India internship students"},
+        {"key": "wfh-office", "name": "WFH vs Office", "blurb": "Where Gen Z wants to work.", "rss_query": "India WFH hybrid work"},
+        {"key": "salary-talk", "name": "Salary Talk", "blurb": "Offers, hikes, negotiation.", "rss_query": "India salary negotiation Gen Z"},
+        {"key": "study-abroad", "name": "Study Abroad", "blurb": "MS, visas, ROI debates.", "rss_query": "India students study abroad"},
+        {"key": "upskilling", "name": "Upskilling", "blurb": "Courses vs real projects.", "rss_query": "India upskilling courses"},
+        {"key": "campus-life", "name": "Campus Life", "blurb": "Fests, hostels, culture.", "rss_query": "India college campus life"},
+    ],
+    "my-city": [
+        {"key": "bengaluru", "name": "Bengaluru", "blurb": "Traffic, tech, and rains.", "rss_query": "Bengaluru city news"},
+        {"key": "hyderabad", "name": "Hyderabad", "blurb": "Cyberabad and beyond.", "rss_query": "Hyderabad city news"},
+        {"key": "mumbai", "name": "Mumbai", "blurb": "Local, work, cost of living.", "rss_query": "Mumbai city news"},
+        {"key": "chennai", "name": "Chennai", "blurb": "Heat, beaches, industry.", "rss_query": "Chennai city news"},
+        {"key": "delhi-ncr", "name": "Delhi NCR", "blurb": "Capital chaos and culture.", "rss_query": "Delhi NCR city news"},
+        {"key": "pune", "name": "Pune", "blurb": "Students, IT, weekends.", "rss_query": "Pune city news"},
+        {"key": "tier2-cities", "name": "Tier-2 Cities", "blurb": "Growth beyond the metros.", "rss_query": "India tier 2 cities"},
+        {"key": "local-issues", "name": "Local Issues", "blurb": "Civic fights that matter here.", "rss_query": "India municipal civic issues"},
+    ],
+    "builders": [
+        {"key": "product-feedback", "name": "Product Feedback", "blurb": "Ship, critique, iterate.", "rss_query": "India product management startup"},
+        {"key": "ai-tools", "name": "AI Tools", "blurb": "What builders actually use.", "rss_query": "India AI tools developers"},
+        {"key": "hiring-builders", "name": "Hiring", "blurb": "Finding and keeping talent.", "rss_query": "India startup hiring engineers"},
+        {"key": "side-projects", "name": "Side Projects", "blurb": "Nights and weekends builds.", "rss_query": "India side project indie hacker"},
+        {"key": "design-critique", "name": "Design Critique", "blurb": "UI that India will use.", "rss_query": "India UX design startup"},
+        {"key": "gtm", "name": "Go-to-Market", "blurb": "Launch and distribution.", "rss_query": "India startup go to market"},
+        {"key": "open-source", "name": "Open Source", "blurb": "Contribute and ship in public.", "rss_query": "India open source developers"},
+        {"key": "no-code", "name": "No-code / Low-code", "blurb": "Build without a full stack.", "rss_query": "India no code startup tools"},
     ],
 }
 

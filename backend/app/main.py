@@ -55,6 +55,10 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at DATETIME"))
             if "privacy_notice_version" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
+            if "debate_streak" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN debate_streak INTEGER DEFAULT 0"))
+            if "debate_streak_day" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN debate_streak_day VARCHAR"))
 
             post_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(posts)"))}
             if "quoted_post_id" not in post_cols:
@@ -158,6 +162,10 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at TIMESTAMP"))
                 if "privacy_notice_version" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
+                if "debate_streak" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN debate_streak INTEGER DEFAULT 0"))
+                if "debate_streak_day" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN debate_streak_day VARCHAR"))
 
             post_cols = cols("posts")
             if post_cols and "quoted_post_id" not in post_cols:
@@ -589,6 +597,7 @@ def serialize_user(user: models.User, current_user: Optional[models.User]) -> sc
         follower_count=len(user.followers),
         following_count=len(user.following),
         is_following=is_following,
+        debate_streak=int(getattr(user, "debate_streak", 0) or 0) if self_view else None,
     )
 
 
@@ -643,6 +652,22 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         me = current_user.username.lower()
         mentions_me = me in {m.lower() for m in text_parse.extract_mentions(safe_text)}
 
+    reaction_helpful = 0
+    reaction_counterpoint = 0
+    reaction_mind_changed = 0
+    my_reactions: list[str] = []
+    reactions = getattr(post, "reactions", None) or []
+    for r in reactions:
+        kind = (getattr(r, "kind", None) or "").strip()
+        if kind == "helpful":
+            reaction_helpful += 1
+        elif kind == "counterpoint":
+            reaction_counterpoint += 1
+        elif kind == "mind_changed":
+            reaction_mind_changed += 1
+        if current_user and r.user_id == current_user.id and kind:
+            my_reactions.append(kind)
+
     return schemas.PostOut(
         id=post.id,
         text=safe_text,
@@ -661,6 +686,10 @@ def serialize_post(post: models.Post, current_user: Optional[models.User]) -> sc
         space_id=getattr(post, "space_id", None),
         likely_ai=likely_ai,
         mentions_me=mentions_me,
+        reaction_helpful=reaction_helpful,
+        reaction_counterpoint=reaction_counterpoint,
+        reaction_mind_changed=reaction_mind_changed,
+        my_reactions=my_reactions,
     )
 
 
@@ -2850,6 +2879,85 @@ def unlike_post(
     return serialize_post(post, current_user)
 
 
+_REACTION_KINDS = frozenset({"helpful", "counterpoint", "mind_changed"})
+_REACTION_NOTIF = {
+    "helpful": ("reaction_helpful", "marked your take Helpful"),
+    "counterpoint": ("reaction_counterpoint", "flagged Best counterpoint on your take"),
+    "mind_changed": ("reaction_mind_changed", "said you Changed their mind"),
+}
+
+
+# ---------- Substance reactions ----------
+
+@app.post("/posts/{post_id}/reactions/{kind}", response_model=schemas.PostOut)
+def add_post_reaction(
+    post_id: str,
+    kind: str,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    kind = (kind or "").strip().lower()
+    if kind not in _REACTION_KINDS:
+        raise HTTPException(status_code=400, detail="Unknown reaction kind")
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    existing = (
+        db.query(models.PostReaction)
+        .filter(
+            models.PostReaction.post_id == post_id,
+            models.PostReaction.user_id == current_user.id,
+            models.PostReaction.kind == kind,
+        )
+        .first()
+    )
+    if not existing:
+        db.add(
+            models.PostReaction(post_id=post_id, user_id=current_user.id, kind=kind)
+        )
+        notif_kind, _ = _REACTION_NOTIF[kind]
+        create_notification(
+            db,
+            recipient_id=post.author_id,
+            actor_id=current_user.id,
+            kind=notif_kind,
+            post_id=post.id,
+            message=_REACTION_NOTIF[kind][1],
+        )
+        db.commit()
+        db.refresh(post)
+    return serialize_post(post, current_user)
+
+
+@app.delete("/posts/{post_id}/reactions/{kind}", response_model=schemas.PostOut)
+def remove_post_reaction(
+    post_id: str,
+    kind: str,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    kind = (kind or "").strip().lower()
+    if kind not in _REACTION_KINDS:
+        raise HTTPException(status_code=400, detail="Unknown reaction kind")
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    existing = (
+        db.query(models.PostReaction)
+        .filter(
+            models.PostReaction.post_id == post_id,
+            models.PostReaction.user_id == current_user.id,
+            models.PostReaction.kind == kind,
+        )
+        .first()
+    )
+    if existing:
+        db.delete(existing)
+        db.commit()
+        db.refresh(post)
+    return serialize_post(post, current_user)
+
+
 # ---------- Reposts ----------
 
 @app.post("/posts/{post_id}/repost", response_model=schemas.PostOut)
@@ -3630,6 +3738,7 @@ register_social_surfaces(
     serialize_post=serialize_post,
     attach_hashtags=attach_hashtags,
     notify_mentions=notify_mentions,
+    create_notification=create_notification,
 )
 
 # Daily @baratx + @sharath peak digest (09:00 / 13:30 / 20:00 IST). Disable with DISABLE_DAILY_DIGEST=1.

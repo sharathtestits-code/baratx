@@ -33,6 +33,7 @@ def register_social_surfaces(
     serialize_post,
     attach_hashtags: Callable,
     notify_mentions: Callable,
+    create_notification: Optional[Callable] = None,
 ):
     # ---------- Settings helpers: mutes / blocks ----------
 
@@ -593,9 +594,16 @@ def register_social_surfaces(
             db.add(
                 models.SpaceStance(space_id=s.id, user_id=current_user.id, side=payload.side)
             )
-        from app import rewards
+        from app import debate_streak, rewards
 
+        streak = debate_streak.bump_debate_streak(current_user)
         rewards.bump_founding_for_space(db, s.id)
+        debate_streak.maybe_notify_streak(
+            db,
+            user=current_user,
+            streak=streak,
+            create_notification=create_notification,
+        )
         db.commit()
         db.refresh(s)
         return _space_out(s, current_user, db)

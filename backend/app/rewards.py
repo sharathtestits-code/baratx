@@ -197,6 +197,9 @@ def status_payload(db: Session, user: Optional[models.User] = None) -> dict:
             "min_replies": FOUNDING_MIN_REPLIES,
             "payout": "Private thank-you after bar met — never advertised up front",
         },
+        "debate_streak": (
+            int(getattr(user, "debate_streak", 0) or 0) if user else None
+        ),
     }
 
 

@@ -175,6 +175,10 @@ const EN = {
   "arenas.noLiveHint": "No live debates yet, open an arena.",
   "arenas.meta": "{members} joined · {debates} live debate",
   "arenas.metaPlural": "{members} joined · {debates} live debates",
+  "arenas.circlesTitle": "Circles",
+  "arenas.circlesSub": "Belonging lanes — Campus, City, Builders.",
+  "arenas.nationalTitle": "National Arenas",
+  "arenas.nationalSub": "Pick a side on the fights India argues about.",
 
   "settings.title": "Settings and privacy",
   "settings.appearance": "Appearance",
@@ -221,12 +225,18 @@ const EN = {
   "arena.entertainment": "Entertainment",
   "arena.news": "News",
   "arena.spirituality": "Spirituality",
+  "arena.campus-careers": "Campus & Careers",
+  "arena.my-city": "My City",
+  "arena.builders": "Builders",
   "arena.startups.blurb": "Funding, founders, and the India builder economy. Fund it or Pass.",
   "arena.sports.blurb": "Cricket, football, and every match India argues about.",
   "arena.politics.blurb": "Policy, parties, and the fights that shape the country.",
   "arena.entertainment.blurb": "Film, music, and celebrity culture, pick a side.",
   "arena.news.blurb": "Breaking stories and the takes India can’t ignore.",
   "arena.spirituality.blurb": "Faith, yoga, festivals, and the searches shaping modern India.",
+  "arena.campus-careers.blurb": "Placements, first jobs, WFH, salary talk, study abroad.",
+  "arena.my-city.blurb": "Bengaluru, Hyderabad, Mumbai, Chennai, Delhi, Pune — local belonging.",
+  "arena.builders.blurb": "Startup feedback, AI tools, product critique, hiring.",
 };
 
 const HI = {
@@ -422,12 +432,18 @@ const HI = {
   "arena.entertainment": "मनोरंजन",
   "arena.news": "समाचार",
   "arena.spirituality": "अध्यात्म",
+  "arena.campus-careers": "कैंपस और करियर",
+  "arena.my-city": "मेरा शहर",
+  "arena.builders": "बिल्डर्स",
   "arena.startups.blurb": "फ़ंडिंग, फाउंडर्स और भारत की बिल्डर इकोनॉमी, फंड करें या पास।",
   "arena.sports.blurb": "क्रिकेट, फ़ुटबॉल और हर मैच जिस पर भारत बहस करता है।",
   "arena.politics.blurb": "नीति, दल और वो लड़ाइयाँ जो देश को आकार देती हैं।",
   "arena.entertainment.blurb": "फ़िल्म, संगीत और सेलिब्रिटी संस्कृति, पक्ष चुनें।",
   "arena.news.blurb": "ब्रेकिंग खबरें और वो राय जिन्हें भारत नज़रअंदाज़ नहीं कर सकता।",
   "arena.spirituality.blurb": "आस्था, योग, त्योहार और आधुनिक भारत को आकार देने वाली खोज।",
+  "arena.campus-careers.blurb": "प्लेसमेंट, पहली नौकरी, WFH, सैलरी और विदेश पढ़ाई।",
+  "arena.my-city.blurb": "बेंगलुरु, हैदराबाद, मुंबई, चेन्नई, दिल्ली, पुणे — स्थानीय जुड़ाव।",
+  "arena.builders.blurb": "स्टार्टअप फ़ीडबैक, AI टूल्स, प्रोडक्ट क्रिटिक, हायरिंग।",
 };
 
 const TE = {
@@ -623,12 +639,18 @@ const TE = {
   "arena.entertainment": "వినోదం",
   "arena.news": "వార్తలు",
   "arena.spirituality": "ఆధ్యాత్మికత",
+  "arena.campus-careers": "క్యాంపస్ & కెరీర్స్",
+  "arena.my-city": "నా నగరం",
+  "arena.builders": "బిల్డర్స్",
   "arena.startups.blurb": "ఫండింగ్, ఫౌండర్లు మరియు భారత్ బిల్డర్ ఎకానమీ, ఫండ్ ఇవ్వండి లేదా పాస్.",
   "arena.sports.blurb": "క్రికెట్, ఫుట్‌బాల్ మరియు భారత్ చర్చించే ప్రతి మ్యాచ్.",
   "arena.politics.blurb": "విధానం, పార్టీలు మరియు దేశాన్ని ఆకృతి చేసే పోరాటాలు.",
   "arena.entertainment.blurb": "సినిమా, సంగీతం మరియు సెలబ్రిటీ సంస్కృతి, వైపు ఎంచుకోండి.",
   "arena.news.blurb": "బ్రేకింగ్ కథనాలు మరియు భారత్ విస్మరించలేని అభిప్రాయాలు.",
   "arena.spirituality.blurb": "విశ్వాసం, యోగా, పండుగలు మరియు ఆధునిక భారత్‌ను ఆకృతి చేసే అన్వేషణలు.",
+  "arena.campus-careers.blurb": "ప్లేస్‌మెంట్స్, మొదటి ఉద్యోగం, WFH, జీతం, విదేశాల్లో చదువు.",
+  "arena.my-city.blurb": "బెంగళూరు, హైదరాబాద్, ముంబై, చెన్నై, ఢిల్లీ, పూణే — స్థానిక చెందిక.",
+  "arena.builders.blurb": "స్టార్టప్ ఫీడ్‌బ్యాక్, AI టూల్స్, ప్రొడక్ట్ క్రిటిక్, హైరింగ్.",
 };
 
 export const MESSAGES = { en: EN, hi: HI, te: TE };

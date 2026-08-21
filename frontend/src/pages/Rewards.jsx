@@ -94,6 +94,16 @@ export default function Rewards() {
             Be one of BarathX&apos;s first recognized voices. {founding.slots_remaining} of{" "}
             {founding.cap} spots left.
           </p>
+          {typeof founding.debate_streak === "number" && founding.debate_streak > 0 ? (
+            <p className="hint ok-hint rewards-streak">
+              Debate streak: {founding.debate_streak} day{founding.debate_streak === 1 ? "" : "s"} —
+              pick a side today to keep it going.
+            </p>
+          ) : (
+            <p className="hint rewards-streak">
+              Debate streak starts when you pick a side in a live debate.
+            </p>
+          )}
           <ul className="rewards-founding-perks">
             <li>Founder badge on your profile</li>
             <li>Priority visibility in your favorite Arena</li>
