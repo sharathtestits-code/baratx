@@ -82,7 +82,7 @@ export default function Landing() {
             </Link>
           </div>
           <p className="bx-home-hero-legal">
-            Soft launch in your browser (phone or desktop). {APP_COMING_SOON_LINE}. Age and terms
+            Soft launch in your browser (phone or desktop). {APP_COMING_SOON_LINE}. Privacy and terms
             confirmation happens when you create an account — not before you know why BarathX
             matters.
           </p>

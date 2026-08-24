@@ -14,12 +14,15 @@ export default function Terms() {
 
       <h2>The basics</h2>
       <ul>
-        <li>You must be 18 or older to create a BarathX account</li>
         <li>You&apos;re responsible for what you post</li>
         <li>Don&apos;t impersonate others or spam the square</li>
         <li>Don&apos;t post illegal content, harassment, or doxxing</li>
         <li>Human takes only, don&apos;t flood the square with AI slop</li>
       </ul>
+      <p className="hint">
+        Soft launch note: a formal age gate (18+) is planned for a later release. Until then, parents
+        and guardians should supervise how younger users use the square.
+      </p>
 
       <h2>Your content</h2>
       <p>

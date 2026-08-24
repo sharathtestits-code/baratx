@@ -78,8 +78,9 @@ export default function Privacy() {
 
       <h2>4. Children</h2>
       <p>
-        BarathX is <strong>18+</strong> only. We do not knowingly create accounts for children. If you
-        believe a minor has an account, email{" "}
+        Soft launch: we do not knowingly target accounts at young children. A formal <strong>18+</strong>{" "}
+        age gate is planned for a later release. If you believe a child has an account that should be
+        removed, email{" "}
         <a href="mailto:privacy@barathx.com">privacy@barathx.com</a> and we will erase it.
       </p>
 

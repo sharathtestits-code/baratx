@@ -16,25 +16,22 @@ export function nativeGoogleDeepLinkPrefix() {
 }
 
 export function buildNativeGoogleAuthUrl({
-  confirmAge18 = false,
   acceptPrivacy = false,
 } = {}) {
   // Trailing slash hits the static page; autostart jumps straight to Google (one account pick).
   const u = new URL(`${PUBLIC_URL}/native-google-auth/`);
-  if (confirmAge18) u.searchParams.set("age", "1");
   if (acceptPrivacy) u.searchParams.set("privacy", "1");
   u.searchParams.set("src", "app");
   return u.toString();
 }
 
 export async function openBrowserGoogleSignIn({
-  confirmAge18 = false,
   acceptPrivacy = false,
 } = {}) {
   if (!isNativeApp()) {
     throw new Error("Browser Google Sign-In is only for the app.");
   }
-  const url = buildNativeGoogleAuthUrl({ confirmAge18, acceptPrivacy });
+  const url = buildNativeGoogleAuthUrl({ acceptPrivacy });
   // Custom Tabs (toolbar) so users can finish Google Sign-In and return via deep link.
   await Browser.open({
     url,

@@ -6,10 +6,10 @@ import { useState } from "react";
 /**
  * Native-app-only entry. Browser keeps the marketing Landing;
  * Capacitor opens here so mobile feels like an app, not a dumped website.
- * Phone OTP first (soft launch). Age/terms only with optional Google.
+ * Phone OTP first (soft launch). Privacy/terms with optional Google.
+ * Age 18+ gate deferred to a later release.
  */
 export default function NativeLaunch() {
-  const [confirmAge18, setConfirmAge18] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
   return (
@@ -42,8 +42,8 @@ export default function NativeLaunch() {
         </Link>
 
         <p className="bx-native-launch-copy" style={{ marginTop: "0.55rem", marginBottom: "0.15rem" }}>
-          Soft launch: phone OTP is the fastest way in. Age &amp; terms confirm when you create an
-          account (or with Google below).
+          Soft launch: phone OTP is the fastest way in. Privacy &amp; terms confirm when you create
+          an account (or with Google below).
         </p>
 
         <details className="bx-native-launch-google">
@@ -53,16 +53,6 @@ export default function NativeLaunch() {
             role="group"
             aria-label="Confirm before Google sign-in"
           >
-            <label className="bx-home-consent">
-              <input
-                type="checkbox"
-                checked={confirmAge18}
-                onChange={(e) => setConfirmAge18(e.target.checked)}
-              />
-              <span>
-                I am <strong>18+</strong>
-              </span>
-            </label>
             <label className="bx-home-consent">
               <input
                 type="checkbox"
@@ -76,15 +66,11 @@ export default function NativeLaunch() {
             </label>
           </div>
           <p className="bx-home-google-hint" aria-live="polite">
-            {confirmAge18 && acceptPrivacy
-              ? "Ready — continue with Google"
-              : "Tick both boxes, then continue with Google"}
+            {acceptPrivacy ? "Ready — continue with Google" : "Accept Privacy & Terms, then continue with Google"}
           </p>
           <GoogleSignInButton
             label="Continue with Google"
-            confirmAge18={confirmAge18}
             acceptPrivacy={acceptPrivacy}
-            requireAgeConfirm
             requirePrivacyConfirm
           />
         </details>

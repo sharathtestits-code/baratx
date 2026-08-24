@@ -17,8 +17,6 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 export default function GoogleSignInButton({
   label = "Continue with Google",
   onError,
-  confirmAge18 = false,
-  requireAgeConfirm = false,
   acceptPrivacy = false,
   requirePrivacyConfirm = false,
 }) {
@@ -27,28 +25,20 @@ export default function GoogleSignInButton({
   const wrapRef = useRef(null);
   const hostRef = useRef(null);
   const callbackRef = useRef(null);
-  const ageRef = useRef({ confirmAge18, requireAgeConfirm, acceptPrivacy, requirePrivacyConfirm });
+  const consentRef = useRef({ acceptPrivacy, requirePrivacyConfirm });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
   const [browserHint, setBrowserHint] = useState("");
   const native = isNativeApp();
 
-  ageRef.current = { confirmAge18, requireAgeConfirm, acceptPrivacy, requirePrivacyConfirm };
+  consentRef.current = { acceptPrivacy, requirePrivacyConfirm };
 
   async function finishWithIdToken(idToken) {
     const {
-      confirmAge18: ageOk,
-      requireAgeConfirm: needAge,
       acceptPrivacy: privacyOk,
       requirePrivacyConfirm: needPrivacy,
-    } = ageRef.current;
-    if (needAge && !ageOk) {
-      const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
+    } = consentRef.current;
     if (needPrivacy && !privacyOk) {
       const msg = "Accept the Privacy Policy (DPDP) to create an account.";
       setError(msg);
@@ -60,7 +50,6 @@ export default function GoogleSignInButton({
     try {
       const data = await api.loginGoogle({
         id_token: idToken,
-        ...(ageOk ? { confirm_age_18: true } : {}),
         ...(privacyOk ? { accept_privacy: true } : {}),
       });
       login(data.access_token);
@@ -101,17 +90,9 @@ export default function GoogleSignInButton({
 
   async function startBrowserGoogle() {
     const {
-      confirmAge18: ageOk,
-      requireAgeConfirm: needAge,
       acceptPrivacy: privacyOk,
       requirePrivacyConfirm: needPrivacy,
-    } = ageRef.current;
-    if (needAge && !ageOk) {
-      const msg = "You must be 18 or older to join BarathX. Confirm your age to continue.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
+    } = consentRef.current;
     if (needPrivacy && !privacyOk) {
       const msg = "Accept the Privacy Policy (DPDP) to create an account.";
       setError(msg);
@@ -122,7 +103,7 @@ export default function GoogleSignInButton({
     setError("");
     setBrowserHint("Opening Google — pick your account once, then you’ll return to the app.");
     try {
-      await openBrowserGoogleSignIn({ confirmAge18: ageOk, acceptPrivacy: privacyOk });
+      await openBrowserGoogleSignIn({ acceptPrivacy: privacyOk });
     } catch (err) {
       const msg = err?.message || "Could not open Google Sign-In.";
       setError(msg);
@@ -213,27 +194,22 @@ export default function GoogleSignInButton({
   }, [native]);
 
   if (native) {
-    const ageBlocked = requireAgeConfirm && !confirmAge18;
     const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
-    const blocked = ageBlocked || privacyBlocked;
     return (
       <div className="x-google-wrap">
         <button
           type="button"
           className="x-btn x-btn-google"
-          disabled={busy || blocked}
+          disabled={busy || privacyBlocked}
           onClick={startBrowserGoogle}
         >
           <GoogleG className="x-btn-icon" />
           {busy ? "Opening Google…" : label}
         </button>
-        {ageBlocked && (
-          <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
-        )}
-        {privacyBlocked && !ageBlocked && (
+        {privacyBlocked && (
           <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
         )}
-        {!blocked && (
+        {!privacyBlocked && (
           <p className="hint x-google-loading">
             {browserHint || "One Google account pick — then you’re back in the app."}
           </p>
@@ -263,15 +239,13 @@ export default function GoogleSignInButton({
     );
   }
 
-  const ageBlocked = requireAgeConfirm && !confirmAge18;
   const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
-  const blocked = ageBlocked || privacyBlocked;
 
   return (
-    <div className={`x-google-wrap${blocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
+    <div className={`x-google-wrap${privacyBlocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
       <div
         className={`x-google-shell ${busy ? "is-busy" : ""} ${gisReady ? "is-ready" : ""}${
-          blocked ? " is-age-blocked" : ""
+          privacyBlocked ? " is-age-blocked" : ""
         }`}
       >
         <div className="x-btn x-btn-google x-google-face" aria-hidden="true">
@@ -281,24 +255,15 @@ export default function GoogleSignInButton({
         <div
           ref={hostRef}
           className="google-btn-host"
-          title={
-            ageBlocked
-              ? "Confirm you are 18+ first"
-              : privacyBlocked
-                ? "Accept Privacy Policy first"
-                : label
-          }
+          title={privacyBlocked ? "Accept Privacy Policy first" : label}
           aria-label={label}
-          aria-disabled={blocked}
+          aria-disabled={privacyBlocked}
         />
       </div>
-      {ageBlocked && (
-        <p className="hint x-google-loading">Confirm you are 18+ above to continue with Google.</p>
-      )}
-      {privacyBlocked && !ageBlocked && (
+      {privacyBlocked && (
         <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
       )}
-      {!gisReady && !error && !blocked && <p className="hint x-google-loading">Loading Google…</p>}
+      {!gisReady && !error && !privacyBlocked && <p className="hint x-google-loading">Loading Google…</p>}
       {error && !onError && <p className="x-inline-error">{error}</p>}
     </div>
   );

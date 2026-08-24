@@ -7,7 +7,8 @@
 
 | Review ask | Status |
 |---|---|
-| Defer 18+ / terms before value on landing | Done — consent stays on **Signup** / optional Google; landing shows today’s question first |
+| Defer 18+ / terms before value on landing | Done — landing is value-first; Privacy/Terms on signup |
+| Soft-launch: remove 18+ age checkbox | Done — 18+ deferred to a later release; Privacy/Terms stay |
 | Hero: “India has opinions. Now it has a home.” + safety promise | Done (`Landing.jsx`, `NativeLaunch.jsx`) |
 | CTAs: Take today’s side / Watch the debate | Done |
 | Agree / Disagree / **It depends** | Done — backend + Live debate UI |
