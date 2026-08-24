@@ -1820,11 +1820,7 @@ def auth_google(
         .first()
     )
     if not user:
-        if not payload.confirm_age_18:
-            raise HTTPException(
-                status_code=400,
-                detail="You must be 18 or older to join BarathX. Confirm your age to continue.",
-            )
+        # Soft launch: 18+ age confirm deferred to a later release.
         if not payload.accept_privacy:
             raise HTTPException(
                 status_code=400,

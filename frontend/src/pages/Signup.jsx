@@ -17,7 +17,6 @@ export default function Signup() {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [confirmAge18, setConfirmAge18] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
   const [email, setEmail] = useState(params.get("email") || "");
@@ -69,11 +68,7 @@ export default function Signup() {
     }
   }
 
-  function requireAge() {
-    if (!confirmAge18) {
-      setError("You must be 18 or older to join BarathX. Confirm your age to continue.");
-      return false;
-    }
+  function requireConsent() {
     if (!acceptPrivacy) {
       setError("Accept the Privacy Policy (DPDP) to create an account.");
       return false;
@@ -90,7 +85,7 @@ export default function Signup() {
 
   async function handleEmailSignup(e) {
     e.preventDefault();
-    if (!requireAge()) return;
+    if (!requireConsent()) return;
     const userErr = validateUsername(username);
     if (userErr) {
       setError(userErr);
@@ -104,7 +99,6 @@ export default function Signup() {
         password,
         username,
         display_name: displayName,
-        confirm_age_18: true,
         accept_privacy: true,
       });
       if (res.dev_verify_url) {
@@ -122,7 +116,7 @@ export default function Signup() {
 
   async function handleRequestOtp(e) {
     e.preventDefault();
-    if (!requireAge()) return;
+    if (!requireConsent()) return;
     if (!displayName.trim()) {
       setError("Enter your display name");
       return;
@@ -147,7 +141,7 @@ export default function Signup() {
 
   async function handleVerifyOtp(e) {
     e.preventDefault();
-    if (!requireAge()) return;
+    if (!requireConsent()) return;
     const userErr = validateUsername(username);
     if (userErr) {
       setError(userErr);
@@ -162,7 +156,6 @@ export default function Signup() {
         username,
         display_name: displayName,
         region,
-        confirm_age_18: true,
         accept_privacy: true,
       });
       login(access_token);
@@ -179,43 +172,28 @@ export default function Signup() {
     <span className="hint">3–20 chars. Letters, numbers, _ . - (e.g. rahul_99 or john.doe)</span>
   );
 
-  const ageGate = (
-    <>
-      <label className="age-gate">
-        <input
-          type="checkbox"
-          checked={confirmAge18}
-          onChange={(e) => {
-            setConfirmAge18(e.target.checked);
-            if (e.target.checked) setError("");
-          }}
-        />
-        <span>
-          I confirm I am <strong>18 or older</strong>. BarathX is for adults only.
-        </span>
-      </label>
-      <label className="age-gate">
-        <input
-          type="checkbox"
-          checked={acceptPrivacy}
-          onChange={(e) => {
-            setAcceptPrivacy(e.target.checked);
-            if (e.target.checked) setError("");
-          }}
-        />
-        <span>
-          I have read and accept the{" "}
-          <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-            Privacy Policy
-          </Link>{" "}
-          (India DPDP) and{" "}
-          <Link to="/terms" target="_blank" rel="noopener noreferrer">
-            Terms
-          </Link>
-          .
-        </span>
-      </label>
-    </>
+  const privacyGate = (
+    <label className="age-gate">
+      <input
+        type="checkbox"
+        checked={acceptPrivacy}
+        onChange={(e) => {
+          setAcceptPrivacy(e.target.checked);
+          if (e.target.checked) setError("");
+        }}
+      />
+      <span>
+        I have read and accept the{" "}
+        <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+          Privacy Policy
+        </Link>{" "}
+        (India DPDP) and{" "}
+        <Link to="/terms" target="_blank" rel="noopener noreferrer">
+          Terms
+        </Link>
+        .
+      </span>
+    </label>
   );
 
   return (
@@ -227,9 +205,7 @@ export default function Signup() {
           <GoogleSignInButton
             label="Sign up with Google"
             onError={setError}
-            confirmAge18={confirmAge18}
             acceptPrivacy={acceptPrivacy}
-            requireAgeConfirm
             requirePrivacyConfirm
           />
 
@@ -308,8 +284,8 @@ export default function Signup() {
               required
             />
           </label>
-          {ageGate}
-          <button type="submit" disabled={busy || !confirmAge18 || !acceptPrivacy}>
+          {privacyGate}
+          <button type="submit" disabled={busy || !acceptPrivacy}>
             {busy ? "Creating account..." : "Sign up"}
           </button>
         </form>
@@ -342,8 +318,8 @@ export default function Signup() {
             onRegionChange={setRegion}
             onPhoneChange={setPhone}
           />
-          {ageGate}
-          <button type="submit" disabled={busy || !confirmAge18 || !acceptPrivacy}>
+          {privacyGate}
+          <button type="submit" disabled={busy || !acceptPrivacy}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>
         </form>
@@ -380,8 +356,8 @@ export default function Signup() {
               required
             />
           </label>
-          {ageGate}
-          <button type="submit" disabled={busy || !confirmAge18 || !acceptPrivacy}>
+          {privacyGate}
+          <button type="submit" disabled={busy || !acceptPrivacy}>
             {busy ? "Verifying..." : "Verify & create account"}
           </button>
           <button type="button" className="auth-back-btn" onClick={goBackFromOtp} disabled={busy}>
