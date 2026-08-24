@@ -12,7 +12,6 @@ const DEEP_LINK = "barathx://google-auth";
  */
 export default function NativeGoogleAuth() {
   const [params] = useSearchParams();
-  const confirmAge18 = params.get("age") === "1";
   const acceptPrivacy = params.get("privacy") === "1";
   const hostRef = useRef(null);
   const [error, setError] = useState("");
@@ -56,7 +55,6 @@ export default function NativeGoogleAuth() {
           headers: { "Content-Type": "application/json", "X-BarathX-Client": "web" },
           body: JSON.stringify({
             id_token: idToken,
-            confirm_age_18: confirmAge18,
             accept_privacy: acceptPrivacy,
           }),
         });
@@ -123,7 +121,7 @@ export default function NativeGoogleAuth() {
     return () => {
       cancelled = true;
     };
-  }, [confirmAge18, acceptPrivacy]);
+  }, [acceptPrivacy]);
 
   return (
     <div className="page page-auth bx-native-google-auth">
@@ -133,9 +131,9 @@ export default function NativeGoogleAuth() {
         <p className="hint">
           This browser window signs you into the BarathX app (bypasses Android Google re-auth issues).
         </p>
-        {!confirmAge18 || !acceptPrivacy ? (
+        {!acceptPrivacy ? (
           <p className="error">
-            Go back to the app, tick <strong>18+</strong> and <strong>Privacy</strong>, then try Google again.
+            Go back to the app, accept <strong>Privacy &amp; Terms</strong>, then try Google again.
           </p>
         ) : null}
         <div ref={hostRef} className="google-btn-host" style={{ marginTop: "1.25rem", minHeight: 48 }} />

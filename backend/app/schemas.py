@@ -39,7 +39,8 @@ class EmailSignupRequest(BaseModel):
     password: str
     username: str
     display_name: str
-    confirm_age_18: bool = False
+    # Soft launch: 18+ gate deferred; field kept optional for older clients.
+    confirm_age_18: Optional[bool] = None
     accept_privacy: bool = False
 
     @field_validator("username")
@@ -60,13 +61,6 @@ class EmailSignupRequest(BaseModel):
     @classmethod
     def lower_email(cls, v):
         return str(v).strip().lower()
-
-    @field_validator("confirm_age_18")
-    @classmethod
-    def must_confirm_age(cls, v):
-        if not v:
-            raise ValueError("You must be 18 or older to join BarathX")
-        return True
 
     @field_validator("accept_privacy")
     @classmethod
@@ -107,20 +101,14 @@ class PhoneSignupVerify(BaseModel):
     username: str
     display_name: str
     region: Optional[str] = None
-    confirm_age_18: bool = False
+    # Soft launch: 18+ gate deferred; field kept optional for older clients.
+    confirm_age_18: Optional[bool] = None
     accept_privacy: bool = False
 
     @field_validator("username")
     @classmethod
     def valid_username(cls, v):
         return normalize_username(v)
-
-    @field_validator("confirm_age_18")
-    @classmethod
-    def must_confirm_age(cls, v):
-        if not v:
-            raise ValueError("You must be 18 or older to join BarathX")
-        return True
 
     @field_validator("accept_privacy")
     @classmethod
@@ -184,7 +172,7 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
-    # Required only when Google creates a new BarathX account (18+ gate + DPDP consent).
+    # Soft launch: 18+ deferred. accept_privacy required only when Google creates a new account.
     confirm_age_18: Optional[bool] = None
     accept_privacy: Optional[bool] = None
 

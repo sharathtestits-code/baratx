@@ -55,7 +55,7 @@ Same **feature set** when QA is deployed from the **`qa`** branch and prod from 
 
 | ID | Rule | Tester note |
 |----|------|-------------|
-| G1 | Users must be **18+** (signup / Google age confirm) | Reject under-age flows |
+| G1 | Users must be **18+** (signup / Google age confirm) | **Deferred soft launch** — re-enable in a later release; Privacy/Terms still required |
 | G2 | English-first UI | Preference picker for en/hi/te; full hi/te chrome later — see I18N_HINDI_TELUGU.md |
 | G3 | Post text max **500** chars; reply max **220** | |
 | G4 | Images: JPEG/PNG/GIF/WebP, **≤ 5MB** | |
@@ -81,7 +81,7 @@ Same **feature set** when QA is deployed from the **`qa`** branch and prod from 
 
 | ID | Feature | Path | Requirement / expected behavior |
 |----|---------|------|--------------------------------|
-| A1 | Email signup | `/signup` | Email, password, username, display name, **age 18+** confirm → Square / first session |
+| A1 | Email signup | `/signup` | Email, password, username, display name, **Privacy/Terms** confirm → Square / first session (18+ deferred) |
 | A2 | Email login | `/login` | Email or username + password → Square |
 | A3 | Google sign-in | `/login`, `/signup` | Opens Square; new Google users need age confirm |
 | A4 | Phone OTP signup/login | `/signup`, `/login` | India phone flow; if SMS not configured, **dev OTP** may appear (document env) |
