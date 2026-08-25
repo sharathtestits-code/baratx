@@ -114,18 +114,22 @@ Sharath · @getbarathx
 
 ---
 
+---
+
 ## Nikhil Kamath / All Things WTF — FOLLOW-UP — info@allthingswtf.com
-**Subject:** Follow-up — we’re building the Indian social you described
+**Subject:** Follow-up — BarathX is the Indian social you described
 
-Hi Nikhil / All Things WTF team — Sharath again from BarathX.
+Hi Nikhil / team — Sharath again from BarathX.
 
-Watched your talk on building social out of India (real discourse, not rage algorithms, not another ads machine).
+You described building social out of India: real discourse, not rage algorithms, not another ads machine.
 
-**We’re exactly building what you’re looking for — specially for India.** BarathX: India’s public square. Built by Indians, for Indians, owned by Indians. Soft launch: barathx.com
+**We’re exactly building what you’re looking for — specially for India.** Soft launch: barathx.com
 
 Human takes only · No AI slop · No adult content (country blocks next) · DPDP · Not an ads feed · Pick a side, argue live.
 
-2 minutes on the site would mean a lot. Deck + one-pager attached.
+2 minutes on the site would mean a lot. New one-pager + deck attached.
 
 Sharath · barathx.com · @getbarathx
+
+**Attach:** `BarathX-Nikhil-One-Pager.pdf` + `BarathX-Nikhil-Brief.pptx`
 

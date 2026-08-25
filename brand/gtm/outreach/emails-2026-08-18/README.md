@@ -2,8 +2,10 @@
 
 ## Send these
 - **[SHORT-EMAILS.md](./SHORT-EMAILS.md)** — crisp versions (use these)
-- **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — **default attach** (visual, live screens)
-- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — 6 visual slides with product screens
+- **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — default attach
+- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — visual deck
+- **[BarathX-Nikhil-One-Pager.pdf](./BarathX-Nikhil-One-Pager.pdf)** + **[BarathX-Nikhil-Brief.pptx](./BarathX-Nikhil-Brief.pptx)** — Nikhil follow-up pack
+- **[09-nikhil-kamath-followup.md](./09-nikhil-kamath-followup.md)** — full Nikhil email
 - **[HOW-TO-SHARE.md](./HOW-TO-SHARE.md)** — PDF + PPT > MD
 
 Rebuild visuals (live midnight screens): `python3 build_visual_deck.py`

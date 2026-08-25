@@ -17,6 +17,8 @@ LIVE = OUT_DIR / "screens-live"
 FONTS = OUT_DIR / "_fonts"
 PPTX_OUT = OUT_DIR / "BarathX-Creator-Collab-Brief.pptx"
 PDF_OUT = OUT_DIR / "BarathX-One-Pager.pdf"
+NIKHIL_PPTX = OUT_DIR / "BarathX-Nikhil-Brief.pptx"
+NIKHIL_PDF = OUT_DIR / "BarathX-Nikhil-One-Pager.pdf"
 
 W, H = 1920, 1080
 
@@ -325,7 +327,12 @@ def build_pptx(paths):
         s = prs.slides.add_slide(blank)
         s.shapes.add_picture(str(p), 0, 0, width=prs.slide_width, height=prs.slide_height)
     prs.save(PPTX_OUT)
+    # Nikhil / advisor-facing copy of the same visual brief
+    import shutil
+
+    shutil.copy2(PPTX_OUT, NIKHIL_PPTX)
     print(f"Wrote {PPTX_OUT}")
+    print(f"Wrote {NIKHIL_PPTX}")
 
 
 def build_pdf():
@@ -396,7 +403,11 @@ def build_pdf():
     c.drawImage(ImageReader(tmp), 0, 0, width=page_w, height=page_h, preserveAspectRatio=False, mask="auto")
     c.showPage()
     c.save()
+    import shutil
+
+    shutil.copy2(PDF_OUT, NIKHIL_PDF)
     print(f"Wrote {PDF_OUT}")
+    print(f"Wrote {NIKHIL_PDF}")
 
 
 def main():
