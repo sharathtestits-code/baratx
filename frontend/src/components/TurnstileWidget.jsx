@@ -1,13 +1,66 @@
 import { useEffect, useRef, useState } from "react";
+import { API_BASE } from "../api";
 
-const SITE_KEY = (import.meta.env.VITE_TURNSTILE_SITE_KEY || "").trim();
+const BUILD_SITE_KEY = (import.meta.env.VITE_TURNSTILE_SITE_KEY || "").trim();
+
+let cachedConfig = null;
+let configPromise = null;
+
+async function loadTurnstileConfig() {
+  if (cachedConfig) return cachedConfig;
+  if (BUILD_SITE_KEY) {
+    cachedConfig = { required: true, siteKey: BUILD_SITE_KEY };
+    return cachedConfig;
+  }
+  if (!configPromise) {
+    configPromise = fetch(`${API_BASE}/public/config`, {
+      headers: { "X-BarathX-Client": "web" },
+    })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        const siteKey = String(data.turnstile_site_key || "").trim();
+        const required = Boolean(data.turnstile_required) && Boolean(siteKey);
+        cachedConfig = { required, siteKey: required ? siteKey : "" };
+        return cachedConfig;
+      })
+      .catch(() => {
+        cachedConfig = { required: false, siteKey: "" };
+        return cachedConfig;
+      });
+  }
+  return configPromise;
+}
+
+/** Hook: whether email/Google need Turnstile, and the public site key. */
+export function useTurnstileConfig() {
+  const [state, setState] = useState(() =>
+    BUILD_SITE_KEY
+      ? { loading: false, required: true, siteKey: BUILD_SITE_KEY }
+      : { loading: true, required: false, siteKey: "" }
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    loadTurnstileConfig().then((cfg) => {
+      if (cancelled) return;
+      setState({ loading: false, required: cfg.required, siteKey: cfg.siteKey });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return state;
+}
 
 /**
  * Cloudflare Turnstile — bot gate for email / Google signup.
  * Phone OTP does not use this (preferred human path).
- * Renders nothing when site key is unset.
+ * Site key from Vite build env, or runtime GET /public/config (Railway).
  */
-export default function TurnstileWidget({ onToken, onExpire, theme = "dark" }) {
+export default function TurnstileWidget({ onToken, onExpire, theme = "dark", siteKey: siteKeyProp }) {
+  const { siteKey: runtimeKey, loading } = useTurnstileConfig();
+  const siteKey = (siteKeyProp || runtimeKey || "").trim();
   const hostRef = useRef(null);
   const widgetId = useRef(null);
   const [ready, setReady] = useState(false);
@@ -16,7 +69,7 @@ export default function TurnstileWidget({ onToken, onExpire, theme = "dark" }) {
   cbRef.current = { onToken, onExpire };
 
   useEffect(() => {
-    if (!SITE_KEY) return undefined;
+    if (!siteKey) return undefined;
     let cancelled = false;
 
     function render() {
@@ -31,7 +84,7 @@ export default function TurnstileWidget({ onToken, onExpire, theme = "dark" }) {
       }
       hostRef.current.innerHTML = "";
       widgetId.current = window.turnstile.render(hostRef.current, {
-        sitekey: SITE_KEY,
+        sitekey: siteKey,
         theme,
         appearance: "always",
         callback: (token) => {
@@ -83,9 +136,17 @@ export default function TurnstileWidget({ onToken, onExpire, theme = "dark" }) {
         }
       }
     };
-  }, [theme]);
+  }, [theme, siteKey]);
 
-  if (!SITE_KEY) return null;
+  if (loading && !siteKey) {
+    return (
+      <div className="bx-turnstile">
+        <p className="hint">Loading security check…</p>
+      </div>
+    );
+  }
+
+  if (!siteKey) return null;
 
   return (
     <div className="bx-turnstile">
@@ -97,6 +158,7 @@ export default function TurnstileWidget({ onToken, onExpire, theme = "dark" }) {
   );
 }
 
+/** Build-time only (may be false until /public/config loads). Prefer useTurnstileConfig(). */
 export function turnstileConfigured() {
-  return Boolean(SITE_KEY);
+  return Boolean(BUILD_SITE_KEY);
 }

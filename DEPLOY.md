@@ -79,23 +79,25 @@ QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
 
 Phone OTP does **not** use Turnstile. Email + new Google accounts do, once keys are set.
 
+**Critical:** set **both** keys on Railway. Secret alone blocks email/Google with no widget on screen.
+
 1. **Create the widget** — open [Turnstile dashboard](https://dash.cloudflare.com/?to=:/account/turnstile) → **Add widget** (or **Set up with Spin**).
    - Name: `BarathX signup`
    - Domains: `barathx.com`, `qa.barathx.com`, `www.barathx.com` (localhost is auto-allowed for local)
    - Mode: **Managed**
    - Create → copy **Site key** and **Secret key** (secret shown once — save it)
-2. **Railway API (prod)** — service that serves `baratx-production.up.railway.app`:
-   - Variables → add `TURNSTILE_SECRET_KEY` = the **secret** key
-   - Redeploy / restart the API
-3. **Railway API (QA, optional)** — same var on `baratx-qa` with the same secret (same widget covers both hostnames)
-4. **Site key for the frontend** — Vite bakes this at **GitHub Actions** build time (not Cloudflare Pages UI):
-   - GitHub repo → **Settings → Secrets and variables → Actions**
-   - Add secret (or variable) `VITE_TURNSTILE_SITE_KEY` = the **site** key
-   - Redeploy Pages: push a no-op to `main` / `qa`, or run workflow **Deploy Cloudflare Pages** → **Run workflow**
-5. **Hard-refresh** `https://barathx.com/signup` — you should see the Turnstile widget above email/Google. Phone tab stays clean.
-6. **Sanity check:** email signup without completing the check should fail with “Security check failed…”. Phone OTP should still work.
+2. **Railway API (prod)** — service `baratx-production.up.railway.app` → **Variables** → add **both**:
+   - `TURNSTILE_SECRET_KEY` = **secret** key (server verify)
+   - `TURNSTILE_SITE_KEY` = **site** key (public; SPA loads it from `GET /public/config`)
+   - Optional alias: `VITE_TURNSTILE_SITE_KEY` is also accepted for the site key
+   - **Redeploy** the API after saving
+3. **Railway API (QA)** — same two vars on `baratx-qa`
+4. **Hard-refresh** `https://barathx.com/signup` — Turnstile should appear for email/Google. Phone stays clean.
+5. **Sanity check:** email without completing Turnstile → “Security check failed…”. Phone OTP still works.
 
-Unset secret on Railway = gate off (dev-friendly). Set secret but missing site key in the build = users see no widget and email/Google signup fails closed — always set both.
+Optional (Pages bake-in): GitHub Actions secret `VITE_TURNSTILE_SITE_KEY` + working `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`. Not required once Railway has `TURNSTILE_SITE_KEY` — runtime config covers barathx.com.
+
+Unset `TURNSTILE_SECRET_KEY` = gate off (dev-friendly).
 
 ### Railway deploy notes
 

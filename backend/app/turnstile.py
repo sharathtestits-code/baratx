@@ -24,6 +24,15 @@ def secret_key() -> str:
     return (os.environ.get("TURNSTILE_SECRET_KEY") or "").strip()
 
 
+def site_key() -> str:
+    """Public site key for the widget (safe to expose to browsers)."""
+    return (
+        os.environ.get("TURNSTILE_SITE_KEY")
+        or os.environ.get("VITE_TURNSTILE_SITE_KEY")
+        or ""
+    ).strip()
+
+
 def required() -> bool:
     return bool(secret_key())
 
