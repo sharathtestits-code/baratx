@@ -137,7 +137,7 @@ def slide_title():
     t(d, "Built by Indians · for Indians · owned by Indians", (110, 400), 22, display=False, fill=SOFT)
     t(
         d,
-        "Exactly what India needs from social —\nreal discourse, not another foreign feed.",
+        "Exactly what India needs from social —\nlive product, not another foreign feed.",
         (110, 470),
         26,
         display=False,
@@ -292,21 +292,29 @@ def slide_no_monetization():
 def slide_ask():
     img = gradient_bg()
     d = ImageDraw.Draw(img)
-    t(d, "Next step", (110, 170), 22, display=False, fill=SAFFRON, medium=True)
-    t(d, "Try the square.\nTell us what breaks.", (110, 230), 52)
+    t(d, "Live product · the ask", (110, 120), 22, display=False, fill=SAFFRON, medium=True)
+    t(d, "Not an idea.\nA live site.", (110, 180), 52)
     t(
         d,
-        "Soft launch live at barathx.com\n2 minutes: pick a side · leave one take.\nHappy to take 10 minutes if this is useful.",
-        (110, 450),
+        "Sign up at barathx.com and explore —\nor we run a quick demo if you prefer.",
+        (110, 360),
         24,
         display=False,
         fill=MUTED,
     )
-    pill = Image.new("RGBA", (480, 70), (0, 0, 0, 0))
-    ImageDraw.Draw(pill).rounded_rectangle((0, 0, 479, 69), 35, fill=SAFFRON)
-    img.alpha_composite(pill, (110, 640))
-    t(d, "→  barathx.com", (145, 655), 26, fill=(13, 13, 18))
-    t(d, "@getbarathx  ·  hello@barathx.com", (110, 750), 22, display=False, fill=SOFT)
+    t(
+        d,
+        "We’re not asking for help to build this.\nWe’re asking for GTM support: reach a large\nIndian audience so we get real human validation.",
+        (110, 480),
+        22,
+        display=False,
+        fill=SOFT,
+    )
+    pill = Image.new("RGBA", (520, 70), (0, 0, 0, 0))
+    ImageDraw.Draw(pill).rounded_rectangle((0, 0, 519, 69), 35, fill=SAFFRON)
+    img.alpha_composite(pill, (110, 660))
+    t(d, "→  barathx.com  ·  sign up live", (130, 675), 24, fill=(13, 13, 18))
+    t(d, "@getbarathx  ·  hello@barathx.com", (110, 770), 20, display=False, fill=MUTED)
     paste_phone(img, SCREENS["m_landing"], (1280, 100), height=880)
     return img
 
@@ -351,7 +359,7 @@ def build_pdf():
 
     tt("BarathX", (64, 50), 48)
     tt("India’s public square", (64, 112), 22, display=False, fill=SAFFRON, medium=True)
-    tt("Exactly what India needs from social — built here, owned here.", (64, 152), 15, display=False, fill=SOFT)
+    tt("Exactly what India needs from social — live now, not a concept.", (64, 152), 15, display=False, fill=SOFT)
     tt("Built by Indians · for Indians · owned by Indians", (64, 182), 14, display=False, fill=MUTED)
 
     phones = [SCREENS["m_landing"], SCREENS["m_login"], SCREENS["m_signup"]]
@@ -392,8 +400,8 @@ def build_pdf():
     bar = Image.new("RGBA", (pw - 128, 64), (0, 0, 0, 0))
     ImageDraw.Draw(bar).rounded_rectangle((0, 0, pw - 129, 63), 32, fill=SAFFRON)
     canvas_img.alpha_composite(bar, (64, ph - 160))
-    tt("→  barathx.com   ·   @getbarathx", (90, ph - 142), 20, fill=(13, 13, 18))
-    tt("Human discourse · soft launch live", (64, ph - 70), 14, display=False, fill=MUTED)
+    tt("→  barathx.com   ·   sign up & explore", (90, ph - 142), 20, fill=(13, 13, 18))
+    tt("Live product · GTM reach for real human validation", (64, ph - 70), 14, display=False, fill=MUTED)
 
     tmp = SLIDES_DIR / "one-pager.png"
     SLIDES_DIR.mkdir(parents=True, exist_ok=True)
