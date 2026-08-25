@@ -1,7 +1,8 @@
 # Creator outreach emails — 18 Aug 2026
 
 ## Send these
-- **[SHORT-EMAILS.md](./SHORT-EMAILS.md)** — crisp versions (use these)
+- **[FRESH-EMAILS-ANTI-SPAM.md](./FRESH-EMAILS-ANTI-SPAM.md)** — **use these** (spam-safe resend)
+- **[SHORT-EMAILS.md](./SHORT-EMAILS.md)** — earlier short drafts
 - **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — default attach
 - **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — visual deck
 - **[BarathX-Nikhil-One-Pager.pdf](./BarathX-Nikhil-One-Pager.pdf)** + **[BarathX-Nikhil-Brief.pptx](./BarathX-Nikhil-Brief.pptx)** — Nikhil follow-up pack
