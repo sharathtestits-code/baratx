@@ -4,7 +4,7 @@ import { api, arenasApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
-import TurnstileWidget, { turnstileConfigured } from "../components/TurnstileWidget";
+import TurnstileWidget, { useTurnstileConfig } from "../components/TurnstileWidget";
 import { validateUsername } from "../username";
 import { safeNextPath } from "../safeNextPath";
 
@@ -13,6 +13,7 @@ export default function Signup() {
   const [method, setMethod] = useState(params.get("method") === "email" ? "email" : "phone");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { required: needBotCheck } = useTurnstileConfig();
 
   const [username, setUsername] = useState(params.get("username") || "");
   const [displayName, setDisplayName] = useState("");
@@ -20,7 +21,6 @@ export default function Signup() {
   const [busy, setBusy] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
-  const needBotCheck = turnstileConfigured();
 
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
