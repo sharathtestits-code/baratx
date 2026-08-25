@@ -12,6 +12,7 @@ SPA_SHELL_SKIP_PREFIXES = (
     "/openapi.json",
     "/health",
     "/ops",
+    "/public",
 )
 
 
