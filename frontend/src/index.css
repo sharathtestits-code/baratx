@@ -11899,3 +11899,395 @@ a.suggestions-chip-link {
   margin: 0.35rem 0 0;
   font-size: 0.8rem;
 }
+
+/* ========== FB-style home gate (matches midnight mockup; guest = dark) ========== */
+.bx-gate {
+  --bx-gate-display: "Syne", system-ui, sans-serif;
+  --bx-gate-body: "DM Sans", system-ui, sans-serif;
+  /* Outside shell is always midnight — theme picker is Settings-only */
+  --bg: #0d0d12;
+  --surface: #1a1a24;
+  --surface-solid: #1a1a24;
+  --border: rgba(255, 255, 255, 0.12);
+  --text: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.72);
+  --text-tertiary: rgba(255, 255, 255, 0.48);
+  --brand: #ff9933;
+  --brand-hover: #ffb366;
+  --brand-tint: rgba(255, 153, 51, 0.16);
+  --btn-contrast-text: #0d0d12;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--bx-gate-body);
+  color-scheme: dark;
+}
+
+.bx-gate-brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: clamp(1.75rem, 4vw, 3rem) clamp(1.5rem, 4vw, 3.25rem);
+  background:
+    radial-gradient(ellipse 70% 55% at 35% 45%, rgba(255, 153, 51, 0.12), transparent 62%),
+    #0d0d12;
+  overflow: hidden;
+}
+
+.bx-gate-logo {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  position: relative;
+  z-index: 2;
+}
+
+.bx-gate-logo .logo-mark {
+  width: 2.6rem;
+  height: 2.6rem;
+  flex-shrink: 0;
+}
+
+.bx-gate-logo .logo-wordmark,
+.bx-gate-logo .logo-wordmark-barat {
+  color: #ffffff;
+  font-family: var(--bx-gate-display);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.bx-gate-logo .logo-wordmark-x {
+  color: #ff9933;
+}
+
+.bx-gate-collage {
+  position: relative;
+  flex: 1;
+  min-height: min(52vh, 420px);
+  margin: 0.5rem 0 1rem;
+}
+
+.bx-gate-shot {
+  position: absolute;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.bx-gate-shot-1 {
+  width: 42%;
+  height: 68%;
+  left: 4%;
+  top: 6%;
+  transform: rotate(-4deg);
+  z-index: 2;
+}
+
+.bx-gate-shot-2 {
+  width: 38%;
+  height: 48%;
+  right: 8%;
+  top: 2%;
+  border-radius: 50%;
+  transform: none;
+  z-index: 3;
+}
+
+.bx-gate-shot-3 {
+  width: 44%;
+  height: 52%;
+  right: 4%;
+  bottom: 8%;
+  transform: rotate(3deg);
+  z-index: 2;
+}
+
+.bx-gate-shot-4 {
+  width: 34%;
+  height: 40%;
+  left: 18%;
+  bottom: 4%;
+  border-radius: 50%;
+  z-index: 4;
+}
+
+.bx-gate-chip {
+  position: absolute;
+  z-index: 5;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: rgba(13, 13, 18, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid;
+  white-space: nowrap;
+}
+
+.bx-gate-chip-agree {
+  left: 8%;
+  top: 58%;
+  color: #ff9933;
+  border-color: #ff9933;
+}
+
+.bx-gate-chip-disagree {
+  right: 18%;
+  top: 42%;
+  color: #7dd3fc;
+  border-color: #38bdf8;
+}
+
+.bx-gate-chip-depends {
+  left: 36%;
+  bottom: 22%;
+  color: #fde047;
+  border-color: #eab308;
+}
+
+.bx-gate-headline {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--bx-gate-display);
+  font-size: clamp(2rem, 4.5vw, 3.35rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+  color: #ffffff;
+}
+
+.bx-gate-headline em {
+  font-style: normal;
+  color: #ff9933;
+}
+
+.bx-gate-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  background: #0d0d12;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.bx-gate-panel {
+  width: 100%;
+  max-width: 380px;
+}
+
+.bx-gate-title {
+  margin: 0 0 1.35rem;
+  text-align: center;
+  font-family: var(--bx-gate-display);
+  font-size: clamp(1.65rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.bx-gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.bx-gate-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 0.9rem;
+  min-height: 3.15rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #16161f;
+}
+
+.bx-gate-field:focus-within {
+  border-color: rgba(255, 153, 51, 0.65);
+  box-shadow: 0 0 0 3px rgba(255, 153, 51, 0.14);
+}
+
+.bx-gate-field-icon {
+  color: rgba(255, 255, 255, 0.45);
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.bx-gate-field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.9rem 0;
+  outline: none;
+}
+
+.bx-gate-field input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.bx-gate-field-plain {
+  padding-left: 0.9rem;
+}
+
+.bx-gate-eye {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  display: inline-flex;
+  padding: 0.2rem;
+  cursor: pointer;
+}
+
+.bx-gate-eye:hover {
+  color: #ffffff;
+}
+
+.bx-gate-submit {
+  width: 100%;
+  margin-top: 0.15rem;
+  padding: 0.95rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: #ff9933;
+  color: #0d0d12;
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.bx-gate-submit:hover:not(:disabled) {
+  background: #ffb366;
+}
+
+.bx-gate-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.bx-gate-forgot {
+  margin: 0.15rem 0 0;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.bx-gate-forgot a {
+  color: #ff9933;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bx-gate-forgot a:hover {
+  text-decoration: underline;
+}
+
+.bx-gate-create {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.15rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid #ff9933;
+  color: #ffffff;
+  font-weight: 750;
+  text-decoration: none;
+  background: transparent;
+}
+
+.bx-gate-create:hover {
+  background: rgba(255, 153, 51, 0.1);
+}
+
+.bx-gate-otp-hint {
+  margin: 1.15rem 0 0;
+  text-align: center;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.bx-gate-otp-link,
+.bx-gate-text-switch {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #ff9933;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bx-gate-text-switch {
+  margin-top: 0.25rem;
+  text-align: center;
+}
+
+.bx-gate-otp-link:hover,
+.bx-gate-text-switch:hover {
+  text-decoration: underline;
+}
+
+.bx-gate-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.75rem;
+}
+
+.bx-gate-foot-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.bx-gate-foot-mark {
+  width: 1.85rem;
+  height: 1.85rem;
+  flex-shrink: 0;
+}
+
+.bx-gate .phone-field,
+.bx-gate .bx-field {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+@media (max-width: 900px) {
+  .bx-gate {
+    grid-template-columns: 1fr;
+  }
+
+  .bx-gate-brand {
+    min-height: auto;
+    padding-bottom: 1.25rem;
+  }
+
+  .bx-gate-collage {
+    min-height: 240px;
+  }
+
+  .bx-gate-main {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .bx-gate-headline {
+    font-size: clamp(1.7rem, 7vw, 2.2rem);
+  }
+}

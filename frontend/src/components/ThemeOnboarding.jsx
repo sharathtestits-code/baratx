@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { applyTheme, getStoredTheme, hasChosenTheme, markThemeChosen } from "../theme";
+import { applyTheme, DEFAULT_THEME, hasChosenTheme, markThemeChosen } from "../theme";
 
 /**
- * Theme picker lives in Settings → Appearance.
- * On first run we keep Tri-Color Midnight silently (no modal stack).
+ * Theme picker lives in Settings → Appearance (signed-in only).
+ * Outside always uses Midnight. First signed-in run keeps Midnight silently.
  */
 export default function ThemeOnboarding() {
   useEffect(() => {
     if (hasChosenTheme()) return;
-    applyTheme(getStoredTheme());
+    applyTheme(DEFAULT_THEME);
     markThemeChosen();
   }, []);
 
