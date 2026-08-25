@@ -5,12 +5,17 @@
 **Length:** **25.0s** · 9:16  
 **Screens source:** `brand/social/whatsapp/screens/live-2026-08-25/` (**today — do not use older live-* folders**)
 
+### Direct download (click)
+**https://raw.githubusercontent.com/sharathtestits-code/baratx/cursor/daily-part1-25s-2af5/brand/social/daily/2026-08-25/barathx-part1-25s.mp4**
+
+GitHub file page (Download button):  
+https://github.com/sharathtestits-code/baratx/blob/cursor/daily-part1-25s-2af5/brand/social/daily/2026-08-25/barathx-part1-25s.mp4
+
 | Asset | Path |
 |-------|------|
-| **Download / post this MP4** | `brand/social/daily/2026-08-25/barathx-part1-25s.mp4` |
+| **MP4 (repo)** | `brand/social/daily/2026-08-25/barathx-part1-25s.mp4` |
 | Alias | `brand/social/daily/2026-08-25/barathx-daily-reel-25s.mp4` |
 | Series copy | `brand/social/instagram/demo-series/PART-01-square-v5/barathx-demo-PART1-25s.mp4` |
-| Artifact download | `/opt/cursor/artifacts/downloads/barathx-part1-25s-LATEST.mp4` |
 | Poster | `barathx-part1-25s-poster.jpg` |
 | **Your phone recording script** | `RECORDING-SCRIPT.md` |
 | Still screens (today) | `../../whatsapp/screens/live-2026-08-25/` |
