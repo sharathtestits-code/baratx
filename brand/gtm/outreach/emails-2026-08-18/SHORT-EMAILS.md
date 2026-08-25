@@ -111,3 +111,21 @@ India’s public square: pick a side, leave a take, get real replies. Built by I
 Open to a short promo (Reel / Story — your call)? If yes, tell me what you’d usually ask for that and when you could post. One-pager attached.
 
 Sharath · @getbarathx
+
+---
+
+## Nikhil Kamath / All Things WTF — FOLLOW-UP — info@allthingswtf.com
+**Subject:** Follow-up — we’re building the Indian social you described
+
+Hi Nikhil / All Things WTF team — Sharath again from BarathX.
+
+Watched your talk on building social out of India (real discourse, not rage algorithms, not another ads machine).
+
+**We’re exactly building what you’re looking for — specially for India.** BarathX: India’s public square. Built by Indians, for Indians, owned by Indians. Soft launch: barathx.com
+
+Human takes only · No AI slop · Safe square (18+, DPDP) · Not an ads feed · Pick a side, argue live.
+
+2 minutes on the site would mean a lot. Deck + one-pager attached.
+
+Sharath · barathx.com · @getbarathx
+

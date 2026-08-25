@@ -130,10 +130,17 @@ def t(draw, s, xy, size=48, display=True, fill=WHITE, medium=False, anchor=None)
 def slide_title():
     img = gradient_bg()
     d = ImageDraw.Draw(img)
-    t(d, "BarathX", (110, 250), 92)
-    t(d, "India’s public square", (110, 365), 34, display=False, fill=SAFFRON, medium=True)
-    t(d, "Built by Indians · for Indians · owned by Indians", (110, 430), 22, display=False, fill=SOFT)
-    t(d, "Creator collab brief", (110, 520), 26, display=False, fill=MUTED)
+    t(d, "BarathX", (110, 220), 92)
+    t(d, "India’s public square", (110, 335), 34, display=False, fill=SAFFRON, medium=True)
+    t(d, "Built by Indians · for Indians · owned by Indians", (110, 400), 22, display=False, fill=SOFT)
+    t(
+        d,
+        "Exactly what India needs from social —\nreal discourse, not another foreign feed.",
+        (110, 470),
+        26,
+        display=False,
+        fill=MUTED,
+    )
     t(d, "barathx.com  ·  @getbarathx", (110, 980), 20, display=False, fill=MUTED)
     paste_phone(img, SCREENS["m_landing"], (1280, 90), height=900)
     return img
@@ -142,9 +149,16 @@ def slide_title():
 def slide_problem():
     img = gradient_bg()
     d = ImageDraw.Draw(img)
-    t(d, "The problem", (110, 160), 24, display=False, fill=SAFFRON, medium=True)
-    t(d, "Hot takes die\nin WhatsApp.", (110, 240), 70)
-    t(d, "Reels want your thumb —\nnot your opinion.", (110, 500), 30, display=False, fill=MUTED)
+    t(d, "The problem", (110, 140), 24, display=False, fill=SAFFRON, medium=True)
+    t(d, "Hot takes die\nin WhatsApp.", (110, 210), 64)
+    t(
+        d,
+        "Youth hours go to foreign apps.\nReels want your thumb — not your opinion.\nIndia needs its own square for real discourse.",
+        (110, 450),
+        26,
+        display=False,
+        fill=MUTED,
+    )
     paste_phone(img, SCREENS["m_login"], (1240, 100), height=880)
     return img
 
@@ -190,29 +204,97 @@ def slide_square():
 def slide_india():
     img = gradient_bg()
     d = ImageDraw.Draw(img)
-    t(d, "Why this matters", (110, 180), 22, display=False, fill=SAFFRON, medium=True)
-    t(d, "Built by Indians.\nFor Indians.\nOwned by Indians.", (110, 250), 58)
+    t(d, "Built for India", (110, 150), 22, display=False, fill=SAFFRON, medium=True)
+    t(d, "Exactly what you’re\nlooking for —\nspecially for India.", (110, 210), 44)
+    t(d, "Built by Indians.\nFor Indians.\nOwned by Indians.", (110, 480), 36)
     t(
         d,
-        "Midnight theme. Soft launch live.\nA square that belongs here.",
-        (110, 560),
-        24,
+        "Not a US clone with India skin.\nA public square for sided debate — made here.",
+        (110, 680),
+        22,
         display=False,
         fill=MUTED,
     )
-    # desktop landing panel
     paste_panel(img, SCREENS["d_landing"], (980, 160, 860, 760), radius=22)
+    return img
+
+
+def slide_human():
+    img = gradient_bg()
+    d = ImageDraw.Draw(img)
+    t(d, "Human first", (110, 140), 22, display=False, fill=SAFFRON, medium=True)
+    t(d, "No AI slop.\nOnly real humans.", (110, 200), 58)
+    bullets = [
+        "Human takes only — AI drafts flagged & demoted",
+        "Real replies rise. Bot / paste-AI sinks.",
+        "Agree / Disagree — sided talk, not scroll theater",
+        "Live rooms: human voices only",
+    ]
+    y = 420
+    for line in bullets:
+        t(d, "→  " + line, (110, y), 24, display=False, fill=MUTED)
+        y += 58
+    paste_phone(img, SCREENS["m_landing"], (1280, 100), height=880)
+    return img
+
+
+def slide_safety():
+    img = gradient_bg()
+    d = ImageDraw.Draw(img)
+    t(d, "Safety we ship", (110, 100), 22, display=False, fill=SAFFRON, medium=True)
+    t(d, "Safe square.\nNot an afterthought.", (110, 160), 52)
+    left = [
+        "18+ only · age gate at signup",
+        "No adult / sexual content (posts, DMs, Live)",
+        "Report → review · spam & harassment paths",
+        "Community guidelines in-product",
+    ]
+    right = [
+        "India DPDP — consent, export, delete",
+        "Passwords hashed · private email/phone",
+        "OTP / Google rate limits · session kill",
+        "privacy@barathx.com for grievances",
+    ]
+    y = 380
+    for line in left:
+        t(d, "•  " + line, (110, y), 22, display=False, fill=MUTED)
+        y += 52
+    y = 380
+    for line in right:
+        t(d, "•  " + line, (1000, y), 22, display=False, fill=MUTED)
+        y += 52
+    t(d, "Soft launch — we treat trust as product.", (110, 980), 20, display=False, fill=SOFT)
+    return img
+
+
+def slide_no_monetization():
+    img = gradient_bg()
+    d = ImageDraw.Draw(img)
+    t(d, "Incentives", (110, 140), 22, display=False, fill=SAFFRON, medium=True)
+    t(d, "Not an ads feed.\nNot selling your mood.", (110, 200), 52)
+    bullets = [
+        "Built for discourse — not engagement farming",
+        "No ads marketplace on the square (by design)",
+        "No pay-to-post / cash-for-signup growth games",
+        "Status earned by real debate, not installs",
+        "Foreign algorithms don’t own this product",
+    ]
+    y = 420
+    for line in bullets:
+        t(d, "→  " + line, (110, y), 24, display=False, fill=MUTED)
+        y += 58
+    paste_panel(img, SCREENS["ui_square"], (1180, 200, 660, 700), radius=22)
     return img
 
 
 def slide_ask():
     img = gradient_bg()
     d = ImageDraw.Draw(img)
-    t(d, "The ask", (110, 170), 22, display=False, fill=SAFFRON, medium=True)
-    t(d, "1 Reel + 1 Story.\nYour creative.", (110, 230), 56)
+    t(d, "Next step", (110, 170), 22, display=False, fill=SAFFRON, medium=True)
+    t(d, "Try the square.\nTell us what breaks.", (110, 230), 52)
     t(
         d,
-        "We send the exclusive link + short brief.\nYou tell us how partnerships work on your side.",
+        "Soft launch live at barathx.com\n2 minutes: pick a side · leave one take.\nHappy to take 10 minutes if this is useful.",
         (110, 450),
         24,
         display=False,
@@ -220,9 +302,9 @@ def slide_ask():
     )
     pill = Image.new("RGBA", (480, 70), (0, 0, 0, 0))
     ImageDraw.Draw(pill).rounded_rectangle((0, 0, 479, 69), 35, fill=SAFFRON)
-    img.alpha_composite(pill, (110, 600))
-    t(d, "→  barathx.com", (145, 615), 26, fill=(13, 13, 18))
-    t(d, "@getbarathx", (110, 710), 22, display=False, fill=SOFT)
+    img.alpha_composite(pill, (110, 640))
+    t(d, "→  barathx.com", (145, 655), 26, fill=(13, 13, 18))
+    t(d, "@getbarathx  ·  hello@barathx.com", (110, 750), 22, display=False, fill=SOFT)
     paste_phone(img, SCREENS["m_landing"], (1280, 100), height=880)
     return img
 
@@ -260,30 +342,51 @@ def build_pdf():
         f = font_display(size) if display else font_body(size, medium=medium)
         d.text(xy, s, font=f, fill=fill)
 
-    tt("BarathX", (64, 60), 52)
-    tt("India’s public square", (64, 128), 24, display=False, fill=SAFFRON, medium=True)
-    tt("Built by Indians · for Indians · owned by Indians", (64, 172), 16, display=False, fill=SOFT)
+    tt("BarathX", (64, 50), 48)
+    tt("India’s public square", (64, 112), 22, display=False, fill=SAFFRON, medium=True)
+    tt("Exactly what India needs from social — built here, owned here.", (64, 152), 15, display=False, fill=SOFT)
+    tt("Built by Indians · for Indians · owned by Indians", (64, 182), 14, display=False, fill=MUTED)
 
     phones = [SCREENS["m_landing"], SCREENS["m_login"], SCREENS["m_signup"]]
-    f, _ = phone(phones[0], height=820, bezel=11, radius=46)
+    f, _ = phone(phones[0], height=780, bezel=11, radius=46)
     gap = 24
     total = f.width * 3 + gap * 2
     x0 = (pw - total) // 2
-    y0 = 230
+    y0 = 250
     for i, p in enumerate(phones):
-        fr, sh = phone(p, height=820, bezel=11, radius=46)
+        fr, sh = phone(p, height=780, bezel=11, radius=46)
         canvas_img.alpha_composite(sh, (x0 + i * (f.width + gap) - 14, y0 - 10))
         canvas_img.alpha_composite(fr, (x0 + i * (f.width + gap), y0))
 
-    y = y0 + f.height + 55
-    tt("Drop a take. Pick a side. Get real replies.", (64, y), 26)
-    tt("Human takes only. Soft launch live — midnight theme.", (64, y + 46), 18, display=False, fill=MUTED)
+    y = y0 + f.height + 40
+    tt("Drop a take. Pick a side. Get real replies.", (64, y), 24)
+    # feature chips
+    chips = [
+        "No AI slop — humans only",
+        "Safe square · 18+ · DPDP",
+        "Not an ads feed",
+        "Indian-built & owned",
+    ]
+    cy = y + 50
+    x = 64
+    for chip in chips:
+        fnt = font_body(15, medium=True)
+        tw = fnt.getlength(chip) if hasattr(fnt, "getlength") else len(chip) * 8
+        bw = int(tw + 28)
+        chip_img = Image.new("RGBA", (bw, 36), (0, 0, 0, 0))
+        ImageDraw.Draw(chip_img).rounded_rectangle((0, 0, bw - 1, 35), 18, fill=SURFACE, outline=SAFFRON + (120,))
+        canvas_img.alpha_composite(chip_img, (x, cy))
+        tt(chip, (x + 14, cy + 8), 15, display=False, fill=SOFT, medium=True)
+        x += bw + 12
+        if x > pw - 200:
+            x = 64
+            cy += 44
 
-    bar = Image.new("RGBA", (pw - 128, 68), (0, 0, 0, 0))
-    ImageDraw.Draw(bar).rounded_rectangle((0, 0, pw - 129, 67), 34, fill=SAFFRON)
-    canvas_img.alpha_composite(bar, (64, y + 110))
-    tt("→  barathx.com   ·   @getbarathx", (90, y + 128), 22, fill=(13, 13, 18))
-    tt("Creator / media intro  ·  reply with how you partner", (64, ph - 70), 14, display=False, fill=MUTED)
+    bar = Image.new("RGBA", (pw - 128, 64), (0, 0, 0, 0))
+    ImageDraw.Draw(bar).rounded_rectangle((0, 0, pw - 129, 63), 32, fill=SAFFRON)
+    canvas_img.alpha_composite(bar, (64, ph - 160))
+    tt("→  barathx.com   ·   @getbarathx", (90, ph - 142), 20, fill=(13, 13, 18))
+    tt("Human discourse · soft launch live", (64, ph - 70), 14, display=False, fill=MUTED)
 
     tmp = SLIDES_DIR / "one-pager.png"
     SLIDES_DIR.mkdir(parents=True, exist_ok=True)
@@ -305,8 +408,11 @@ def main():
         ("02-problem", slide_problem),
         ("03-product", slide_product),
         ("04-square", slide_square),
-        ("05-india", slide_india),
-        ("06-ask", slide_ask),
+        ("05-human", slide_human),
+        ("06-safety", slide_safety),
+        ("07-no-ads", slide_no_monetization),
+        ("08-india", slide_india),
+        ("09-ask", slide_ask),
     ]
     paths = []
     for name, fn in builders:
