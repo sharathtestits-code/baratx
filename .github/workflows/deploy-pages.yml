@@ -55,6 +55,8 @@ jobs:
           VITE_PUBLIC_URL: ${{ steps.env.outputs.public_url }}
           VITE_MVP_VERSION: ${{ steps.mvp.outputs.n }}
           VITE_GOOGLE_CLIENT_ID: 682923055091-imk39450dk207psnoetvhnvseslvq0qp.apps.googleusercontent.com
+          # Bot gate on email/Google signup (phone OTP skips). Set repo secret or var.
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY || vars.VITE_TURNSTILE_SITE_KEY }}
       - name: Require Cloudflare credentials
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

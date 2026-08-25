@@ -75,6 +75,28 @@ QA vs Production URL map: `brand/qa/ENVIRONMENTS.md`.
 3. On https://barathx.com/login use username `baratx` (or email `baratx@barathx.com`) + that password.
 4. Same password works for `@bharatvoices` and `@indiatech`.
 
+### Cloudflare Turnstile (bot gate — email / Google signup)
+
+Phone OTP does **not** use Turnstile. Email + new Google accounts do, once keys are set.
+
+1. **Create the widget** — open [Turnstile dashboard](https://dash.cloudflare.com/?to=:/account/turnstile) → **Add widget** (or **Set up with Spin**).
+   - Name: `BarathX signup`
+   - Domains: `barathx.com`, `qa.barathx.com`, `www.barathx.com` (localhost is auto-allowed for local)
+   - Mode: **Managed**
+   - Create → copy **Site key** and **Secret key** (secret shown once — save it)
+2. **Railway API (prod)** — service that serves `baratx-production.up.railway.app`:
+   - Variables → add `TURNSTILE_SECRET_KEY` = the **secret** key
+   - Redeploy / restart the API
+3. **Railway API (QA, optional)** — same var on `baratx-qa` with the same secret (same widget covers both hostnames)
+4. **Site key for the frontend** — Vite bakes this at **GitHub Actions** build time (not Cloudflare Pages UI):
+   - GitHub repo → **Settings → Secrets and variables → Actions**
+   - Add secret (or variable) `VITE_TURNSTILE_SITE_KEY` = the **site** key
+   - Redeploy Pages: push a no-op to `main` / `qa`, or run workflow **Deploy Cloudflare Pages** → **Run workflow**
+5. **Hard-refresh** `https://barathx.com/signup` — you should see the Turnstile widget above email/Google. Phone tab stays clean.
+6. **Sanity check:** email signup without completing the check should fail with “Security check failed…”. Phone OTP should still work.
+
+Unset secret on Railway = gate off (dev-friendly). Set secret but missing site key in the build = users see no widget and email/Google signup fails closed — always set both.
+
 ### Railway deploy notes
 
 - Repo: `sharathtestits-code/baratx`
