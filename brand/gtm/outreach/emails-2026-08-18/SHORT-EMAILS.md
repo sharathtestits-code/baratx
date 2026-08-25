@@ -123,7 +123,7 @@ Watched your talk on building social out of India (real discourse, not rage algo
 
 **We’re exactly building what you’re looking for — specially for India.** BarathX: India’s public square. Built by Indians, for Indians, owned by Indians. Soft launch: barathx.com
 
-Human takes only · No AI slop · Safe square (18+, DPDP) · Not an ads feed · Pick a side, argue live.
+Human takes only · No AI slop · No adult content (country blocks next) · DPDP · Not an ads feed · Pick a side, argue live.
 
 2 minutes on the site would mean a lot. Deck + one-pager attached.
 

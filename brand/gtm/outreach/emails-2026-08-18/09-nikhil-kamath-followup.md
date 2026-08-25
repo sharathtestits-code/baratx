@@ -19,7 +19,8 @@ Built by Indians, for Indians, owned by Indians. Soft launch is live in the brow
 What we locked as product, not marketing:
 
 - **Human takes only. No AI slop.** Likely-AI drafts get flagged and demoted; real replies rise.  
-- **Safe square.** 18+ · no adult/sexual content · report paths · community guidelines.  
+- **Safe square — we do not encourage adult content.** Adult / sexual content is blocked in posts, replies, DMs, and Live. Report paths + community guidelines are in-product.  
+- **Country-based restrictions next.** We’ll tighten geo controls against sources that target the square with adult or abusive traffic.  
 - **India DPDP.** Consent at signup, export/delete in Settings, privacy@barathx.com.  
 - **Not an ads feed.** Built for discourse — not selling attention or pay-to-post growth games.  
 - **Pick a side. Argue it live.** Takes stay on the record instead of dying in WhatsApp.
@@ -37,4 +38,4 @@ barathx.com · @getbarathx · hello@barathx.com
 
 **Attach:** `BarathX-One-Pager.pdf` + `BarathX-Creator-Collab-Brief.pptx`  
 **Video ref:** https://youtu.be/7fw2Ob6w3Gg  
-**Tone:** follow-up; “exactly what you’re looking for — specially for India.” No ₹ / fees.
+**Prod note (Aug 2026):** 18+ signup gate deferred for soft launch reach — do **not** claim 18+ in outreach. Adult content still blocked; country-based restrictions planned.

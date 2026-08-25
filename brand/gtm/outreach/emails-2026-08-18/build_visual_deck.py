@@ -244,8 +244,8 @@ def slide_safety():
     t(d, "Safety we ship", (110, 100), 22, display=False, fill=SAFFRON, medium=True)
     t(d, "Safe square.\nNot an afterthought.", (110, 160), 52)
     left = [
-        "18+ only · age gate at signup",
         "No adult / sexual content (posts, DMs, Live)",
+        "We do not encourage adult content — blocked by design",
         "Report → review · spam & harassment paths",
         "Community guidelines in-product",
     ]
@@ -253,7 +253,7 @@ def slide_safety():
         "India DPDP — consent, export, delete",
         "Passwords hashed · private email/phone",
         "OTP / Google rate limits · session kill",
-        "privacy@barathx.com for grievances",
+        "Country-based blocks next (abuse / adult traffic)",
     ]
     y = 380
     for line in left:
@@ -363,7 +363,7 @@ def build_pdf():
     # feature chips
     chips = [
         "No AI slop — humans only",
-        "Safe square · 18+ · DPDP",
+        "No adult content · safe square",
         "Not an ads feed",
         "Indian-built & owned",
     ]
