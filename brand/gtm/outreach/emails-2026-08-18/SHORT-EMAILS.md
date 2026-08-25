@@ -118,18 +118,18 @@ Sharath · @getbarathx
 
 ---
 
+---
+
 ## Nikhil Kamath / All Things WTF — FOLLOW-UP — info@allthingswtf.com
-**Subject:** Follow-up — BarathX is live (not a pitch deck idea)
+**Subject:** Follow-up — BarathX is live (sign up & explore)
 
 Hi Nikhil / team — Sharath again from BarathX.
 
-You described Indian social for real discourse — not rage algorithms, not another ads machine.
+**We’re exactly building what you’re looking for — specially for India.** Live site (not an idea): https://barathx.com — sign up & explore, or we can do a quick demo.
 
-**We’re exactly building that — specially for India.** And it’s **live**, not an idea: https://barathx.com — sign up and explore, or we can do a quick demo.
+Human takes only · No AI slop · No adult content (country blocks next) · DPDP · Not an ads feed · Agree / Disagree / It depends.
 
-Human takes only · No AI slop · No adult content (country blocks next) · DPDP · Not an ads feed.
-
-We’re not asking for help to build this. We’re asking for **GTM support** — reach a large audience so we get **real human validation** at scale.
+Not asking help to build — asking **GTM support** for large-scale signups → **real human validation**.
 
 Sharath · barathx.com · @getbarathx
 

@@ -1,6 +1,6 @@
 # To: info@allthingswtf.com  
 # CC (optional): letscreate@allthingswtf.com  
-# Subject: Follow-up — BarathX is live (not a pitch deck idea)
+# Subject: Follow-up — BarathX is live (sign up & explore)
 
 ---
 
@@ -8,26 +8,30 @@ Hi Nikhil / team,
 
 Sharath again from BarathX.
 
-You talked about building a social product out of India — real people, real discourse, not a rage algorithm, and not another ads machine while foreign apps own most of India’s phone time.
+You talked about building social out of India — real discourse, not a rage algorithm, not another ads machine, while foreign apps own most of India’s phone time.
 
-**We’re exactly building what you’re looking for — specially for India.** And this isn’t a concept slide: **the product is live.**
+**We’re exactly building what you’re looking for — specially for India.**  
+And this is a **live site**, not a pitch idea.
 
-**BarathX** → https://barathx.com  
-India’s public square: Square · Arenas · Live.  
-Built by Indians, for Indians, owned by Indians. Soft launch running in the browser today — you (or anyone) can **sign up and click around**, or if you’d rather, we can do a **quick live demo**.
+→ https://barathx.com  
 
-What’s already in the product:
+**BarathX** = India’s public square (Square · Arenas · Live).  
+Built by Indians, for Indians, owned by Indians.  
+Tagline live on the product: *India has opinions. Now it has a home.*
 
-1. **Human takes only. No AI slop.** AI-looking drafts flagged and demoted. Real replies rise.  
-2. **We do not encourage adult content.** Adult / sexual content is blocked in posts, replies, DMs, and Live.  
-3. **Country-based restrictions next** — against sources that target the square with adult or abusive traffic.  
-4. **India DPDP** — consent, export/delete, privacy@barathx.com.  
-5. **Not an ads feed** — sided debate, not selling attention.  
-6. **Pick a side. Argue it live** — takes stay on the record.
+You can **sign up and click around** today, or we can do a **quick demo** if easier.
 
-What we’re asking isn’t help building this — it’s already shipping. We’re asking for **support going to market**: help more people discover and sign up at scale so we get **real human validation** from a large Indian audience, not lab feedback.
+What’s already shipping:
 
-If that resonates: try barathx.com yourself, or reply and we’ll set a short demo. One-pager + deck attached.
+- **Human takes only. No AI slop.**  
+- **We do not encourage adult content** — blocked in posts, replies, DMs, Live. Country-based restrictions next.  
+- **India DPDP** — consent, export/delete.  
+- **Not an ads feed** — sided debate (Agree / Disagree / It depends).  
+- Takes stay on the record instead of dying in WhatsApp.
+
+We’re not asking for help to build this — it’s live. We’re asking for **GTM support**: help more people discover and sign up at scale so we get **real human validation** from a large Indian audience.
+
+Fresh one-pager + deck attached (latest home + login screens).
 
 — Sharath  
 Founder, BarathX  
@@ -38,6 +42,3 @@ barathx.com · @getbarathx · hello@barathx.com
 **Attach:**
 - `BarathX-Nikhil-One-Pager.pdf`
 - `BarathX-Nikhil-Brief.pptx`
-
-**Video:** https://youtu.be/7fw2Ob6w3Gg  
-**Tone:** live product + GTM/audience support for human validation — not “help us build.”

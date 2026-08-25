@@ -196,9 +196,9 @@ def slide_title():
     t(d, "Built by Indians · for Indians · owned by Indians", (110, 385), 22, display=False, fill=SOFT)
     t(
         d,
-        "Exactly what India needs from social —\nlive now, not a concept deck.",
+        "India has opinions. Now it has a home.\nLive product — not a concept deck.",
         (110, 470),
-        28,
+        26,
         display=False,
         fill=MUTED,
     )
@@ -226,7 +226,7 @@ def slide_product():
     t(d, "Drop a take. Pick a side.\nGet real replies.", (110, 120), 48)
     t(d, "Human takes only. No AI slop.", (110, 280), 22, display=False, fill=SAFFRON, medium=True)
     phones = [SCREENS["m_landing"], SCREENS["m_login"], SCREENS["m_signup"]]
-    labels = ["Landing", "Sign in", "Create account"]
+    labels = ["Home", "Login", "Create account"]
     hs = 700
     f, _ = phone(phones[0], height=hs)
     gap = 48
