@@ -2,6 +2,7 @@
 
 export const THEME_STORAGE_KEY = "bx_theme";
 export const THEME_CHOSEN_KEY = "bx_theme_chosen";
+export const AUTH_TOKEN_KEY = "iv_token";
 
 export const THEMES = [
   {
@@ -31,11 +32,19 @@ export const THEMES = [
 ];
 
 export const THEME_IDS = THEMES.map((t) => t.id);
-/** Default: Tri-Color Midnight (dark). Users can change in Settings → Appearance. */
+/** Default: Tri-Color Midnight (dark). Change only in Settings after signup. */
 export const DEFAULT_THEME = "midnight";
 
 export function isValidTheme(id) {
   return THEME_IDS.includes(id);
+}
+
+export function hasAuthSession() {
+  try {
+    return Boolean(localStorage.getItem(AUTH_TOKEN_KEY));
+  } catch {
+    return false;
+  }
 }
 
 export function getStoredTheme() {
@@ -62,15 +71,21 @@ const THEME_COLORS = {
   ink: "#000080",
 };
 
-export function applyTheme(themeId) {
+/**
+ * @param {string} themeId
+ * @param {{ persist?: boolean }} [opts] persist=false keeps guest shell dark without wiping saved preference
+ */
+export function applyTheme(themeId, { persist = true } = {}) {
   const id = isValidTheme(themeId) ? themeId : DEFAULT_THEME;
   document.documentElement.setAttribute("data-theme", id);
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", THEME_COLORS[id] || THEME_COLORS.midnight);
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, id);
-  } catch {
-    // ignore quota / private mode
+  if (persist) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, id);
+    } catch {
+      // ignore quota / private mode
+    }
   }
   // Native shell (Capacitor), keep status bar in sync with theme
   try {
@@ -83,6 +98,11 @@ export function applyTheme(themeId) {
   return id;
 }
 
+/** Logged-out marketing / auth pages always look Midnight (dark). */
+export function applyGuestShellTheme() {
+  return applyTheme(DEFAULT_THEME, { persist: false });
+}
+
 export function markThemeChosen() {
   try {
     localStorage.setItem(THEME_CHOSEN_KEY, "1");
@@ -91,7 +111,12 @@ export function markThemeChosen() {
   }
 }
 
-/** Call once at boot before React paints when possible. */
+/**
+ * Boot theme: guests → midnight; signed-in → saved preference (Settings).
+ */
 export function initThemeFromStorage() {
+  if (!hasAuthSession()) {
+    return applyGuestShellTheme();
+  }
   return applyTheme(getStoredTheme());
 }

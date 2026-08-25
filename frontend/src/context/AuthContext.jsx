@@ -6,7 +6,7 @@ import {
   listenForNativeGoogleAuth,
   parseGoogleAuthDeepLink,
 } from "../nativeGoogleBrowserAuth";
-import { applyTheme, isValidTheme } from "../theme";
+import { applyGuestShellTheme, applyTheme, isValidTheme } from "../theme";
 
 const AuthContext = createContext(null);
 
@@ -80,6 +80,8 @@ export function AuthProvider({ children }) {
       setUser(null);
       setBootError("");
       setLoading(false);
+      // Outside (landing / login / signup): always dark. Theme picker is Settings-only.
+      applyGuestShellTheme();
       return;
     }
     let cancelled = false;
@@ -102,6 +104,7 @@ export function AuthProvider({ children }) {
           setUser(null);
           setBootError("");
           localStorage.removeItem("iv_token");
+          applyGuestShellTheme();
           return;
         }
         if (isTransientFailure(err)) {
@@ -134,6 +137,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setBootError("");
     setLoading(false);
+    applyGuestShellTheme();
     // Best-effort: don't block UI if the network is down.
     if (current) {
       try {
@@ -159,6 +163,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setBootError("");
     setLoading(false);
+    applyGuestShellTheme();
   }
 
   function updateUser(partialOrFull) {
