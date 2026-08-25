@@ -13,6 +13,7 @@ const DEEP_LINK = "barathx://google-auth";
 export default function NativeGoogleAuth() {
   const [params] = useSearchParams();
   const acceptPrivacy = params.get("privacy") === "1";
+  const turnstileToken = params.get("ts") || "";
   const hostRef = useRef(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -56,6 +57,7 @@ export default function NativeGoogleAuth() {
           body: JSON.stringify({
             id_token: idToken,
             accept_privacy: acceptPrivacy,
+            ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
           }),
         });
         const data = await res.json().catch(() => ({}));
@@ -121,7 +123,7 @@ export default function NativeGoogleAuth() {
     return () => {
       cancelled = true;
     };
-  }, [acceptPrivacy]);
+  }, [acceptPrivacy, turnstileToken]);
 
   return (
     <div className="page page-auth bx-native-google-auth">

@@ -17,21 +17,24 @@ export function nativeGoogleDeepLinkPrefix() {
 
 export function buildNativeGoogleAuthUrl({
   acceptPrivacy = false,
+  turnstileToken = "",
 } = {}) {
   // Trailing slash hits the static page; autostart jumps straight to Google (one account pick).
   const u = new URL(`${PUBLIC_URL}/native-google-auth/`);
   if (acceptPrivacy) u.searchParams.set("privacy", "1");
+  if (turnstileToken) u.searchParams.set("ts", turnstileToken);
   u.searchParams.set("src", "app");
   return u.toString();
 }
 
 export async function openBrowserGoogleSignIn({
   acceptPrivacy = false,
+  turnstileToken = "",
 } = {}) {
   if (!isNativeApp()) {
     throw new Error("Browser Google Sign-In is only for the app.");
   }
-  const url = buildNativeGoogleAuthUrl({ acceptPrivacy });
+  const url = buildNativeGoogleAuthUrl({ acceptPrivacy, turnstileToken });
   // Custom Tabs (toolbar) so users can finish Google Sign-In and return via deep link.
   await Browser.open({
     url,

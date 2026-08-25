@@ -406,6 +406,28 @@ export default function Profile() {
                           role="menuitem"
                           onClick={async () => {
                             setMoreMenuOpen(false);
+                            const reason = window.prompt(
+                              "Why report this account? (AI/bot, spam, harassment…)"
+                            );
+                            if (!reason || reason.trim().length < 3) return;
+                            try {
+                              await socialApi.report(token, {
+                                reason: reason.trim(),
+                                target_username: profile.username,
+                              });
+                              window.alert("Report submitted. Thanks — humans review this.");
+                            } catch (err) {
+                              setError(err.message);
+                            }
+                          }}
+                        >
+                          Report
+                        </button>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={async () => {
+                            setMoreMenuOpen(false);
                             if (!window.confirm(`Block @${profile.username}?`)) return;
                             try {
                               await socialApi.block(token, profile.username);

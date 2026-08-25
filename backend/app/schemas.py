@@ -42,6 +42,8 @@ class EmailSignupRequest(BaseModel):
     # Soft launch: 18+ gate deferred; field kept optional for older clients.
     confirm_age_18: Optional[bool] = None
     accept_privacy: bool = False
+    # Cloudflare Turnstile token (required when TURNSTILE_SECRET_KEY is set).
+    turnstile_token: Optional[str] = None
 
     @field_validator("username")
     @classmethod
@@ -175,6 +177,8 @@ class GoogleAuthRequest(BaseModel):
     # Soft launch: 18+ deferred. accept_privacy required only when Google creates a new account.
     confirm_age_18: Optional[bool] = None
     accept_privacy: Optional[bool] = None
+    # Required for brand-new Google accounts when Turnstile is configured.
+    turnstile_token: Optional[str] = None
 
 
 class DeleteAccountRequest(BaseModel):
@@ -580,6 +584,10 @@ class AdminUserRow(BaseModel):
     is_official: bool = False
     created_at: datetime
     signup_method: str
+    has_posted_once: bool = False
+    post_count: int = 0
+    report_count_24h: int = 0
+    review_flags: list[str] = []
 
 
 class AdminUsersOut(BaseModel):
