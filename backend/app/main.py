@@ -1022,6 +1022,15 @@ def health():
     return {"status": "ok", "mvp": info["mvp"], "version": info["version"], "environment": ENVIRONMENT}
 
 
+@app.get("/public/config")
+def public_config():
+    """Public client config (no secrets). Used so Turnstile works without a Pages rebuild."""
+    return {
+        "turnstile_required": turnstile.required(),
+        "turnstile_site_key": turnstile.site_key() if turnstile.required() else "",
+    }
+
+
 @app.get("/ops/config", response_model=schemas.OpsConfigOut)
 def ops_config():
     """Path only, needed so the SPA can route the secret URL.

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
-import TurnstileWidget, { turnstileConfigured } from "../components/TurnstileWidget";
+import TurnstileWidget, { useTurnstileConfig } from "../components/TurnstileWidget";
 import { useState } from "react";
 
 /**
@@ -13,7 +13,7 @@ import { useState } from "react";
 export default function NativeLaunch() {
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
-  const needBotCheck = turnstileConfigured();
+  const { required: needBotCheck } = useTurnstileConfig();
 
   return (
     <div className="bx-native-launch">
