@@ -1,0 +1,20 @@
+# Part 1 Square — v5 (exactly 25.0s)
+
+## Why v5
+- Locked length to **25 seconds** (title 2.0 + UI demo 20.5 + Part 2 end 2.5)
+- Corrected burn-in brand to **BarathX** (not BaratX)
+- Series framing: **Features · Part 1 of 7 · daily**
+- Same screen-recording demo as v4 (sped to fit), new title + cliffhanger cards
+
+## Files
+- Reel: `barathx-demo-PART1-25s.mp4`
+- Poster: `barathx-demo-PART1-25s-poster.jpg`
+- Daily aliases: `brand/social/daily/2026-08-25/barathx-part1-25s.mp4`
+
+## Rebuild
+```bash
+python3 brand/social/instagram/demo-series/render_part01_25s.py
+```
+
+## Music (IG app)
+Attach a **trending India audio** in the IG Reels editor. File is silent by design.

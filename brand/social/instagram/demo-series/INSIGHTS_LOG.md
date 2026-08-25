@@ -20,6 +20,16 @@ Append one row-block per day after checking @getbaratx Professional insights.
 
 ## Entries
 
+### 2026-08-25 — Part 1 — Square (25s v5)
+- **Reach:** (fill after post)
+- **Plays:**
+- **Avg watch %:**
+- **Likes / comments / shares / saves:**
+- **Audio:** (attach trending India audio in IG — file is silent)
+- **Worked:** —
+- **Flopped:** —
+- **Tomorrow change:** Ship Part 2 Arenas at same 25s length; watch 0–3s drop-off on title card.
+
 ### 2026-08-07 — Series kickoff
 - **Reach:** (fill after Part 1 posts)
 - **Plays:**
