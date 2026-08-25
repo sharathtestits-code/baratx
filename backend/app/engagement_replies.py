@@ -8,7 +8,8 @@ Rules (anti-slop):
 - Bug / product reports → support tone (“where are you seeing that?”), never philosophy.
 - Replies never count toward Founding / Race (official usernames excluded in rewards).
 
-Disable: default OFF. Opt in with ENABLE_OFFICIAL_ENGAGE=1 (or set DISABLE_OFFICIAL_ENGAGE=1 to force off).
+Disable: ongoing engage is OFF by default (ENABLE_OFFICIAL_ENGAGE=1 to opt in).
+First-session welcome replies are ON by default (DISABLE_FIRST_SESSION_ENGAGE=1 to force off).
 Purge old slop: POST /admin/engage/purge-slop (ops) or PURGE_ENGAGE_SLOP_ON_BOOT=1
 """
 
@@ -40,12 +41,20 @@ BATCH_LIMIT = 25
 
 def engage_disabled() -> bool:
     """
-    Official template auto-replies are OFF by default (felt like bot spam).
+    Ongoing auto-engage on every post is OFF by default (felt like bot spam).
     Opt in with ENABLE_OFFICIAL_ENGAGE=1. DISABLE_OFFICIAL_ENGAGE=1 also forces off.
+    First-session welcome replies use first_session_engage_enabled() instead.
     """
     if os.environ.get("DISABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
         return True
     if os.environ.get("ENABLE_OFFICIAL_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
+        return False
+    return True
+
+
+def first_session_engage_enabled() -> bool:
+    """First take always gets a human welcome unless explicitly disabled."""
+    if os.environ.get("DISABLE_FIRST_SESSION_ENGAGE", "").strip().lower() in ("1", "true", "yes"):
         return False
     return True
 
@@ -579,7 +588,10 @@ def engage_on_new_post(
     Both @baratx and @sharath reply on every community post (distinct copy).
     Idempotent for the poller, fills any missing official voice.
     """
-    if engage_disabled():
+    if is_first_post:
+        if not first_session_engage_enabled():
+            return {"ok": True, "skipped": True, "reason": "first_session_disabled"}
+    elif engage_disabled():
         return {"ok": True, "skipped": True, "reason": "disabled"}
 
     if _author_is_official(author):

@@ -609,17 +609,21 @@ export default function Admin() {
             </div>
           </section>
 
-          {(users.slice(0, 5).length > 0) && (
+          {(users.slice(0, 8).length > 0) && (
             <section className="admin-compose">
               <div className="admin-section-head">
-                <h2>Newest signups</h2>
+                <h2>Newest signups · review</h2>
                 <button type="button" className="admin-link-btn" onClick={() => goTab("users")}>
                   View all →
                 </button>
               </div>
+              <p className="admin-lead">
+                Flag no-posts, unverified email, and multi-reports. Prefer phone OTP humans.
+              </p>
               <ul className="admin-user-cards admin-user-cards--compact">
-                {users.slice(0, 5).map((u) => {
+                {users.slice(0, 8).map((u) => {
                   const badge = u.badge || (u.is_official ? "blue" : "none");
+                  const flags = Array.isArray(u.review_flags) ? u.review_flags : [];
                   return (
                     <li key={u.id} className={`admin-user-card admin-user-card--${badge}`}>
                       <div className="admin-user-card-main">
@@ -641,7 +645,23 @@ export default function Admin() {
                       <div className="admin-user-card-meta">
                         <span>{formatShortWhen(u.created_at)}</span>
                         <span>{u.email || u.phone || u.signup_method}</span>
+                        <span>
+                          {u.has_posted_once || u.post_count > 0
+                            ? `${u.post_count || 0} posts`
+                            : "no posts yet"}
+                        </span>
                       </div>
+                      {flags.length > 0 ? (
+                        <div className="admin-review-flags">
+                          {flags.map((f) => (
+                            <span key={f} className="admin-review-flag">
+                              {f}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="admin-muted admin-review-ok">Looks fine</p>
+                      )}
                     </li>
                   );
                 })}

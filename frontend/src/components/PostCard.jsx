@@ -165,15 +165,20 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
     navigate(postPath);
   }
 
-  async function handleReport() {
-    if (!token) return;
-    const reason = window.prompt("Why are you reporting this post?");
-    if (!reason || reason.trim().length < 3) return;
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportBusy, setReportBusy] = useState(false);
+
+  async function handleReport(reason) {
+    if (!token || reportBusy) return;
+    setReportBusy(true);
     try {
-      await socialApi.report(token, { reason: reason.trim(), target_post_id: post.id });
-      window.alert("Report submitted. Thanks.");
+      await socialApi.report(token, { reason, target_post_id: post.id });
+      setReportOpen(false);
+      window.alert("Report submitted. Thanks — humans review this.");
     } catch (err) {
       window.alert(err.message);
+    } finally {
+      setReportBusy(false);
     }
   }
 
@@ -357,12 +362,43 @@ export default function PostCard({ post, repostedBy = null, onDeleted = () => {}
               </button>
             ) : (
               token && (
-                <button type="button" className="action-btn report-action" onClick={handleReport} title="Report">
+                <button
+                  type="button"
+                  className="action-btn report-action"
+                  onClick={() => setReportOpen((v) => !v)}
+                  title="Report"
+                  aria-expanded={reportOpen}
+                >
                   …
                 </button>
               )
             )}
           </div>
+          {reportOpen ? (
+            <div className="post-report-sheet" role="group" aria-label="Report reasons">
+              <p className="hint">Why report this take?</p>
+              {[
+                "AI / bot slop",
+                "Spam or promo",
+                "Harassment",
+                "Impersonation",
+                "Illegal / unsafe",
+              ].map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  className="btn btn-secondary post-report-reason"
+                  disabled={reportBusy}
+                  onClick={() => handleReport(reason)}
+                >
+                  {reason}
+                </button>
+              ))}
+              <button type="button" className="text-btn" onClick={() => setReportOpen(false)}>
+                Cancel
+              </button>
+            </div>
+          ) : null}
           {isMine && confirmDelete ? (
             <p className="hint post-delete-hint">
               Tap Delete? again to remove this post.{" "}

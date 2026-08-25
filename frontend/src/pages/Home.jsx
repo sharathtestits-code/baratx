@@ -11,6 +11,7 @@ import PlazaPageHeader from "../components/PlazaPageHeader";
 import PostCard from "../components/PostCard";
 import SoftLaunchBanner from "../components/SoftLaunchBanner";
 import EmptyState from "../components/EmptyState";
+import InvitePeople from "../components/InvitePeople";
 
 const HOME_TABS = ["overview", "tagged", "following", "mine"];
 const OVERVIEW_PREVIEW = 3;
@@ -312,6 +313,8 @@ export default function Home() {
                   ))}
                 </ul>
               </section>
+
+              <InvitePeople compact />
 
               <section className="home-section home-section-card home-mentions" aria-labelledby="home-mentions-title">
                 <div className="home-section-head">

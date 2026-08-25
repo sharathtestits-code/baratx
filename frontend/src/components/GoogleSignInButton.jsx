@@ -19,28 +19,48 @@ export default function GoogleSignInButton({
   onError,
   acceptPrivacy = false,
   requirePrivacyConfirm = false,
+  turnstileToken = "",
+  requireTurnstile = false,
 }) {
   const { login } = useAuth();
   const navigate = useNavigate();
   const wrapRef = useRef(null);
   const hostRef = useRef(null);
   const callbackRef = useRef(null);
-  const consentRef = useRef({ acceptPrivacy, requirePrivacyConfirm });
+  const consentRef = useRef({
+    acceptPrivacy,
+    requirePrivacyConfirm,
+    turnstileToken,
+    requireTurnstile,
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [gisReady, setGisReady] = useState(false);
   const [browserHint, setBrowserHint] = useState("");
   const native = isNativeApp();
 
-  consentRef.current = { acceptPrivacy, requirePrivacyConfirm };
+  consentRef.current = {
+    acceptPrivacy,
+    requirePrivacyConfirm,
+    turnstileToken,
+    requireTurnstile,
+  };
 
   async function finishWithIdToken(idToken) {
     const {
       acceptPrivacy: privacyOk,
       requirePrivacyConfirm: needPrivacy,
+      turnstileToken: tsToken,
+      requireTurnstile: needTs,
     } = consentRef.current;
     if (needPrivacy && !privacyOk) {
       const msg = "Accept the Privacy Policy (DPDP) to create an account.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    if (needTs && !tsToken) {
+      const msg = "Complete the security check, or sign up with phone OTP.";
       setError(msg);
       onError?.(msg);
       return;
@@ -51,6 +71,7 @@ export default function GoogleSignInButton({
       const data = await api.loginGoogle({
         id_token: idToken,
         ...(privacyOk ? { accept_privacy: true } : {}),
+        ...(tsToken ? { turnstile_token: tsToken } : {}),
       });
       login(data.access_token);
       const next =
@@ -92,9 +113,17 @@ export default function GoogleSignInButton({
     const {
       acceptPrivacy: privacyOk,
       requirePrivacyConfirm: needPrivacy,
+      turnstileToken: tsToken,
+      requireTurnstile: needTs,
     } = consentRef.current;
     if (needPrivacy && !privacyOk) {
       const msg = "Accept the Privacy Policy (DPDP) to create an account.";
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
+    if (needTs && !tsToken) {
+      const msg = "Complete the security check, or sign up with phone OTP.";
       setError(msg);
       onError?.(msg);
       return;
@@ -103,7 +132,10 @@ export default function GoogleSignInButton({
     setError("");
     setBrowserHint("Opening Google — pick your account once, then you’ll return to the app.");
     try {
-      await openBrowserGoogleSignIn({ acceptPrivacy: privacyOk });
+      await openBrowserGoogleSignIn({
+        acceptPrivacy: privacyOk,
+        turnstileToken: tsToken,
+      });
     } catch (err) {
       const msg = err?.message || "Could not open Google Sign-In.";
       setError(msg);
@@ -195,12 +227,14 @@ export default function GoogleSignInButton({
 
   if (native) {
     const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
+    const turnstileBlocked = requireTurnstile && !turnstileToken;
+    const blocked = privacyBlocked || turnstileBlocked;
     return (
       <div className="x-google-wrap">
         <button
           type="button"
           className="x-btn x-btn-google"
-          disabled={busy || privacyBlocked}
+          disabled={busy || blocked}
           onClick={startBrowserGoogle}
         >
           <GoogleG className="x-btn-icon" />
@@ -209,7 +243,10 @@ export default function GoogleSignInButton({
         {privacyBlocked && (
           <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
         )}
-        {!privacyBlocked && (
+        {turnstileBlocked && !privacyBlocked && (
+          <p className="hint x-google-loading">Complete the security check above, or use phone OTP.</p>
+        )}
+        {!blocked && (
           <p className="hint x-google-loading">
             {browserHint || "One Google account pick — then you’re back in the app."}
           </p>
@@ -240,12 +277,14 @@ export default function GoogleSignInButton({
   }
 
   const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
+  const turnstileBlocked = requireTurnstile && !turnstileToken;
+  const blocked = privacyBlocked || turnstileBlocked;
 
   return (
-    <div className={`x-google-wrap${privacyBlocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
+    <div className={`x-google-wrap${blocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
       <div
         className={`x-google-shell ${busy ? "is-busy" : ""} ${gisReady ? "is-ready" : ""}${
-          privacyBlocked ? " is-age-blocked" : ""
+          blocked ? " is-age-blocked" : ""
         }`}
       >
         <div className="x-btn x-btn-google x-google-face" aria-hidden="true">
@@ -255,15 +294,24 @@ export default function GoogleSignInButton({
         <div
           ref={hostRef}
           className="google-btn-host"
-          title={privacyBlocked ? "Accept Privacy Policy first" : label}
+          title={
+            privacyBlocked
+              ? "Accept Privacy Policy first"
+              : turnstileBlocked
+                ? "Complete security check first"
+                : label
+          }
           aria-label={label}
-          aria-disabled={privacyBlocked}
+          aria-disabled={blocked}
         />
       </div>
       {privacyBlocked && (
         <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
       )}
-      {!gisReady && !error && !privacyBlocked && <p className="hint x-google-loading">Loading Google…</p>}
+      {turnstileBlocked && !privacyBlocked && (
+        <p className="hint x-google-loading">Complete the security check above, or use phone OTP.</p>
+      )}
+      {!gisReady && !error && !blocked && <p className="hint x-google-loading">Loading Google…</p>}
       {error && !onError && <p className="x-inline-error">{error}</p>}
     </div>
   );

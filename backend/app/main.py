@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse
+from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse, turnstile
 from app import ai_filter, anti_scrape, data_protection, search_query
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
@@ -1160,11 +1160,34 @@ def admin_users(
         .limit(limit)
         .all()
     )
-    return schemas.AdminUsersOut(
-        total=total,
-        limit=limit,
-        offset=offset,
-        users=[
+    since = datetime.now(timezone.utc) - timedelta(hours=24)
+    out_users = []
+    for u in rows:
+        post_count = (
+            db.query(func.count(models.Post.id))
+            .filter(models.Post.author_id == u.id)
+            .scalar()
+            or 0
+        )
+        report_count = (
+            db.query(func.count(models.Report.id))
+            .filter(
+                models.Report.target_user_id == u.id,
+                models.Report.created_at >= since,
+            )
+            .scalar()
+            or 0
+        )
+        has_posted = bool(getattr(u, "has_posted_once", False) or post_count > 0)
+        flags: list[str] = []
+        if not has_posted:
+            flags.append("no_posts")
+        if report_count >= 2:
+            flags.append("reports")
+        method = _signup_method(u)
+        if method == "email" and not u.is_email_verified:
+            flags.append("unverified_email")
+        out_users.append(
             schemas.AdminUserRow(
                 id=u.id,
                 username=u.username,
@@ -1174,12 +1197,22 @@ def admin_users(
                 is_email_verified=bool(u.is_email_verified),
                 is_phone_verified=bool(u.is_phone_verified),
                 badge=(getattr(u, "badge", None) or "none"),
-                is_official=bool(getattr(u, "is_official", False) or (getattr(u, "badge", None) == "blue")),
+                is_official=bool(
+                    getattr(u, "is_official", False) or (getattr(u, "badge", None) == "blue")
+                ),
                 created_at=u.created_at,
-                signup_method=_signup_method(u),
+                signup_method=method,
+                has_posted_once=has_posted,
+                post_count=int(post_count),
+                report_count_24h=int(report_count),
+                review_flags=flags,
             )
-            for u in rows
-        ],
+        )
+    return schemas.AdminUsersOut(
+        total=total,
+        limit=limit,
+        offset=offset,
+        users=out_users,
     )
 
 
@@ -1523,6 +1556,15 @@ def signup_email(
     except ValueError as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
 
+    if turnstile.required() and not turnstile.verify_token(
+        getattr(payload, "turnstile_token", None),
+        remote_ip=rate_limit.client_ip(request),
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Security check failed. Refresh and try again, or sign up with phone OTP.",
+        )
+
     email = str(payload.email).strip().lower()
     if db.query(models.User).filter(models.User.email == email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -1825,6 +1867,14 @@ def auth_google(
             raise HTTPException(
                 status_code=400,
                 detail="New accounts must accept the Privacy Policy. Open Sign up, tick Privacy (DPDP), then continue with Google.",
+            )
+        if turnstile.required() and not turnstile.verify_token(
+            getattr(payload, "turnstile_token", None),
+            remote_ip=rate_limit.client_ip(request),
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Security check failed. Refresh and try again, or sign up with phone OTP.",
             )
         base = "".join(ch for ch in email.split("@")[0].lower() if ch.isalnum() or ch == "_")[:16] or "user"
         username = base
@@ -2685,16 +2735,29 @@ def list_posts(
                 items.append(mention_item)
                 seen_ids.add(mention_item.post.id)
 
-        # Square "For you": tagged posts first, then member takes, then official digests.
-        # Within each band, human takes beat likely-AI drafts.
+        # Square "For you": tagged posts first, then sided / reacted human takes,
+        # then other member takes, then official digests. AI drafts sink.
         def _sort_key(i: schemas.FeedItemOut):
             author = getattr(i.post, "author", None)
             uname = (getattr(author, "username", None) or "").lower() if author else ""
             is_seed_official = uname in official_names
             is_ai = bool(getattr(i.post, "likely_ai", False))
             tagged = bool(getattr(i.post, "mentions_me", False))
+            has_side = bool(getattr(i.post, "debate_side", None))
+            substance = (
+                int(getattr(i.post, "reaction_helpful", 0) or 0)
+                + int(getattr(i.post, "reaction_counterpoint", 0) or 0)
+                + int(getattr(i.post, "reaction_mind_changed", 0) or 0)
+            )
             ts = i.item_time.timestamp() if i.item_time else 0.0
-            return (0 if tagged else 1, 1 if is_seed_official else 0, 1 if is_ai else 0, -ts)
+            return (
+                0 if tagged else 1,
+                1 if is_seed_official else 0,
+                1 if is_ai else 0,
+                0 if has_side else 1,
+                -min(substance, 20),
+                -ts,
+            )
 
         items.sort(key=_sort_key)
     else:
@@ -2702,6 +2765,12 @@ def list_posts(
             key=lambda i: (
                 0 if getattr(i.post, "mentions_me", False) else 1,
                 1 if getattr(i.post, "likely_ai", False) else 0,
+                0 if getattr(i.post, "debate_side", None) else 1,
+                -(
+                    int(getattr(i.post, "reaction_helpful", 0) or 0)
+                    + int(getattr(i.post, "reaction_counterpoint", 0) or 0)
+                    + int(getattr(i.post, "reaction_mind_changed", 0) or 0)
+                ),
                 -(i.item_time.timestamp() if i.item_time else 0.0),
             )
         )
