@@ -4,6 +4,7 @@ import { api, arenasApi } from "../api";
 import { useAuth } from "../context/AuthContext";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
+import TurnstileWidget, { turnstileConfigured } from "../components/TurnstileWidget";
 import { validateUsername } from "../username";
 import { safeNextPath } from "../safeNextPath";
 
@@ -18,6 +19,8 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const needBotCheck = turnstileConfigured();
 
   const [email, setEmail] = useState(params.get("email") || "");
   const [password, setPassword] = useState("");
@@ -68,9 +71,13 @@ export default function Signup() {
     }
   }
 
-  function requireConsent() {
+  function requireConsent({ needTurnstile = false } = {}) {
     if (!acceptPrivacy) {
       setError("Accept the Privacy Policy (DPDP) to create an account.");
+      return false;
+    }
+    if (needTurnstile && needBotCheck && !turnstileToken) {
+      setError("Complete the security check (or use phone OTP — no bot check needed).");
       return false;
     }
     return true;
@@ -85,7 +92,7 @@ export default function Signup() {
 
   async function handleEmailSignup(e) {
     e.preventDefault();
-    if (!requireConsent()) return;
+    if (!requireConsent({ needTurnstile: true })) return;
     const userErr = validateUsername(username);
     if (userErr) {
       setError(userErr);
@@ -100,6 +107,7 @@ export default function Signup() {
         username,
         display_name: displayName,
         accept_privacy: true,
+        ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
       });
       if (res.dev_verify_url) {
         sessionStorage.setItem("bx_dev_verify_url", res.dev_verify_url);
@@ -196,17 +204,33 @@ export default function Signup() {
     </label>
   );
 
+  const botGate = needBotCheck ? (
+    <TurnstileWidget
+      onToken={(tok) => {
+        setTurnstileToken(tok || "");
+        if (tok) setError("");
+      }}
+    />
+  ) : null;
+
   return (
     <div className="auth-card auth-card-x">
       <h1>Create your account</h1>
+      <p className="hint auth-human-pref">
+        Prefer <strong>phone OTP</strong> — built for real people. Email / Google use a bot check.
+      </p>
 
       {!otpSent && (
         <>
+          {privacyGate}
+          {botGate}
           <GoogleSignInButton
             label="Sign up with Google"
             onError={setError}
             acceptPrivacy={acceptPrivacy}
             requirePrivacyConfirm
+            turnstileToken={turnstileToken}
+            requireTurnstile={needBotCheck}
           />
 
           <div className="x-auth-or" role="separator">
@@ -284,8 +308,10 @@ export default function Signup() {
               required
             />
           </label>
-          {privacyGate}
-          <button type="submit" disabled={busy || !acceptPrivacy}>
+          <button
+            type="submit"
+            disabled={busy || !acceptPrivacy || (needBotCheck && !turnstileToken)}
+          >
             {busy ? "Creating account..." : "Sign up"}
           </button>
         </form>
@@ -318,7 +344,6 @@ export default function Signup() {
             onRegionChange={setRegion}
             onPhoneChange={setPhone}
           />
-          {privacyGate}
           <button type="submit" disabled={busy || !acceptPrivacy}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>

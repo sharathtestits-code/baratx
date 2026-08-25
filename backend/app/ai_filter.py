@@ -87,8 +87,9 @@ class AiScore:
 
 
 # Thresholds tuned for short Square takes (post/reply ≤500).
-FLAG_SCORE = 4
-REJECT_SCORE = 8
+# Soft launch: slightly stricter so AI paste sinks / rejects sooner.
+FLAG_SCORE = 3
+REJECT_SCORE = 7
 
 
 def score_ai_text(text: str) -> AiScore:

@@ -2,8 +2,9 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo, { LogoMark } from "../components/Logo";
 import { APP_COMING_SOON_LINE, isSoftLaunchWindow, SOFT_LAUNCH_LINE } from "../softLaunch";
-import { WHATSAPP_CHANNEL, WHATSAPP_COMMUNITY, X_PROFILE } from "../socialLinks";
+import { WHATSAPP_CHANNEL, WHATSAPP_COMMUNITY, X_PROFILE, IG_PROFILE } from "../socialLinks";
 import { todaysSquareQuestion } from "../square";
+import InvitePeople from "../components/InvitePeople";
 
 const STANCES = [
   { id: "for", label: "Agree" },
@@ -229,6 +230,11 @@ export default function Landing() {
         </Link>
       </section>
 
+      <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-invite">
+        <p className="bx-home-kicker">People</p>
+        <InvitePeople />
+      </section>
+
       <section className="bx-home-section bx-home-section-alt" aria-labelledby="bx-home-apps">
         <p className="bx-home-kicker">Apps</p>
         <h2 id="bx-home-apps">Soft launch in browser · apps coming soon</h2>
@@ -255,8 +261,15 @@ export default function Landing() {
           <div>
             <dt>Do I need to accept terms before trying it?</dt>
             <dd>
-              No. See today&apos;s question and pick a side first. Age verification and Privacy /
-              Terms confirm at account creation.
+              No. See today&apos;s question and pick a side first. Privacy / Terms confirm at account
+              creation. Prefer phone OTP — email and Google use a bot check.
+            </dd>
+          </div>
+          <div>
+            <dt>How do you keep bots and AI slop out?</dt>
+            <dd>
+              Phone OTP for humans, Turnstile on email/Google when configured, AI paste rejected or
+              demoted, and report / mute / block for the community.
             </dd>
           </div>
           <div>
@@ -315,6 +328,11 @@ export default function Landing() {
           {" · "}
           X →{" "}
           <a href={X_PROFILE} target="_blank" rel="noreferrer">
+            @getbaratx
+          </a>
+          {" · "}
+          IG →{" "}
+          <a href={IG_PROFILE} target="_blank" rel="noreferrer">
             @getbaratx
           </a>
           {" · "}

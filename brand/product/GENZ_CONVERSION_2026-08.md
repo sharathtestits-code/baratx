@@ -9,6 +9,11 @@
 |---|---|
 | Defer 18+ / terms before value on landing | Done — landing is value-first; Privacy/Terms on signup |
 | Soft-launch: remove 18+ age checkbox | Done — 18+ deferred to a later release; Privacy/Terms stay |
+| Bot gate (Turnstile) + phone OTP preferred | Done — email/Google require Turnstile when keys set; phone skips |
+| First-session human welcome replies | Done — ON by default (`DISABLE_FIRST_SESSION_ENGAGE=1` to off) |
+| Human ranking (side + substance > AI) | Done — Square feed boosts sided + reacted takes; AI sinks |
+| Report reasons + ops signup review flags | Done — post report chips; admin newest review flags |
+| Invite real people (WA / IG / X + Circles) | Done — Home + Landing invite surface |
 | Hero: “India has opinions. Now it has a home.” + safety promise | Done (`Landing.jsx`, `NativeLaunch.jsx`) |
 | CTAs: Take today’s side / Watch the debate | Done |
 | Agree / Disagree / **It depends** | Done — backend + Live debate UI |

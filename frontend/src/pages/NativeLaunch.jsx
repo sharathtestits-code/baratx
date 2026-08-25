@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
 import GoogleSignInButton from "../components/GoogleSignInButton";
+import TurnstileWidget, { turnstileConfigured } from "../components/TurnstileWidget";
 import { useState } from "react";
 
 /**
@@ -11,6 +12,8 @@ import { useState } from "react";
  */
 export default function NativeLaunch() {
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const needBotCheck = turnstileConfigured();
 
   return (
     <div className="bx-native-launch">
@@ -42,8 +45,8 @@ export default function NativeLaunch() {
         </Link>
 
         <p className="bx-native-launch-copy" style={{ marginTop: "0.55rem", marginBottom: "0.15rem" }}>
-          Soft launch: phone OTP is the fastest way in. Privacy &amp; terms confirm when you create
-          an account (or with Google below).
+          Soft launch: phone OTP is the fastest way in (no bot check). Privacy &amp; terms confirm
+          when you create an account (or with Google below).
         </p>
 
         <details className="bx-native-launch-google">
@@ -65,13 +68,24 @@ export default function NativeLaunch() {
               </span>
             </label>
           </div>
+          {needBotCheck ? (
+            <TurnstileWidget
+              onToken={(tok) => setTurnstileToken(tok || "")}
+            />
+          ) : null}
           <p className="bx-home-google-hint" aria-live="polite">
-            {acceptPrivacy ? "Ready — continue with Google" : "Accept Privacy & Terms, then continue with Google"}
+            {acceptPrivacy && (!needBotCheck || turnstileToken)
+              ? "Ready — continue with Google"
+              : needBotCheck
+                ? "Accept Privacy & complete security check, then Google"
+                : "Accept Privacy & Terms, then continue with Google"}
           </p>
           <GoogleSignInButton
             label="Continue with Google"
             acceptPrivacy={acceptPrivacy}
             requirePrivacyConfirm
+            turnstileToken={turnstileToken}
+            requireTurnstile={needBotCheck}
           />
         </details>
 
