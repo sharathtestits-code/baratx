@@ -7,17 +7,18 @@
 
 Music is attached **in the IG app** (trending India audio matched to the topic). Graph API cannot attach Reels music.
 
-**Today (2026-08-25):** post **Part 1** from `PART-01-square-v5/barathx-demo-PART1-25s.mp4`  
-built from **`live-2026-08-25` screens only** (never older `live-*` / never v4 recording).  
-Phone filming shot list: `brand/social/daily/2026-08-25/RECORDING-SCRIPT.md`.
+**Today:** post **Part 1** from `PART-01-square-v5/barathx-demo-PART1-25s.mp4`  
+**Open with scroll-stop hook** (“1,000 likes vs 10 real opinions”) → Square immediately.  
+Discovery map at end: Part 1 Square · Part 2 Arenas · Part 3 ???  
+Phone script: `brand/social/daily/2026-08-25/RECORDING-SCRIPT.md`.
 
 ---
 
-## Series map (7 parts)
+## Series map (7 parts) — discovery loop
 
 | Day | Reel | Covers | Music vibe | End card |
 |-----|------|--------|------------|----------|
-| **1** | Features on BarathX · **Part 1 — Square** · **25s** | **Latest live UI**: landing, Today’s Square, Drop a take, Live strip, Home hub | Silent file; attach **trending India audio** in IG | Wait for Part 2 — Arenas |
+| **1** | **Part 1 — Square** · **25s** · hook: 1,000 likes vs 10 opinions | Latest Square UI: today’s question, Drop a take, Live strip | Silent file; attach **trending India audio** in IG | Part 2 Arenas · Part 3 ??? · Follow |
 | **2** | **Part 2 — Arenas & debates** | Arenas, topics, Join, For/Against, Leave, Live | Debate / siren energy | Wait for Part 3 — Profile |
 | **3** | **Part 3 — You** | Profile, Edit, photo, cover, Follow/Message | Softer / identity | Wait for Part 4 — Look |
 | **4** | **Part 4 — Look & explore** | Appearance themes, Explore, Search | Chill / aesthetic | Wait for Part 5 — Live |

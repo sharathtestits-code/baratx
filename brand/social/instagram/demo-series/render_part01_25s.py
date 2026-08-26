@@ -17,7 +17,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[4]
 TODAY = date.today().isoformat()
-LIVE = ROOT / "brand" / "social" / "whatsapp" / "screens" / f"live-{TODAY}"
+SCREENS_ROOT = ROOT / "brand" / "social" / "whatsapp" / "screens"
+# Canonical Part 1 pack folder (stable download path) + today's daily alias
+PACK_DAY = "2026-08-25"
 OUT_DIR = (
     ROOT
     / "brand"
@@ -26,7 +28,8 @@ OUT_DIR = (
     / "demo-series"
     / "PART-01-square-v5"
 )
-DAILY = ROOT / "brand" / "social" / "daily" / TODAY
+DAILY = ROOT / "brand" / "social" / "daily" / PACK_DAY
+DAILY_TODAY = ROOT / "brand" / "social" / "daily" / TODAY
 LOGO = ROOT / "brand" / "baratx-logo-avatar.png"
 DOWNLOADS = Path("/opt/cursor/artifacts/downloads")
 SHOTS = Path("/opt/cursor/artifacts/screenshots")
@@ -39,48 +42,47 @@ CREAM = (255, 248, 235)
 SAFFRON = (255, 153, 51)
 MUTED = (160, 160, 170)
 
-# Exact 25.0s
+NEED_SCREENS = (
+    "square-mobile.png",
+    "square-compose-mobile.png",
+    "square-engage-mobile.png",
+)
+
+# Exact 25.0s — scroll-stop hook → Square immediately → discovery cliffhanger
 BEATS: list[tuple[str, str, str, str, float]] = [
     # screen_file, kicker, title, sub, seconds
-    ("__title__", "Features · Part 1", "Square", "Daily series · latest UI", 2.0),
-    (
-        "landing-mobile.png",
-        "Soft launch",
-        "India has opinions. Now it has a home.",
-        "Agree · Disagree · It depends",
-        4.0,
-    ),
+    ("__hook__", "", "", "", 3.5),
     (
         "square-mobile.png",
-        "Square",
+        "Part 1 · Square",
+        "Questions & conversations",
         "One question. Your take.",
-        "No Reels required.",
-        5.0,
+        6.0,
     ),
     (
         "square-compose-mobile.png",
         "Drop a take",
+        "10 real opinions > 1,000 empty likes",
         "Short post. Real replies.",
-        "Photo · Live · Community",
         5.0,
     ),
     (
         "square-engage-mobile.png",
         "On the Square",
-        "Live now + human takes",
-        "Human first. No AI slop.",
+        "Human takes. Live talk.",
+        "No AI slop.",
         4.5,
     ),
     (
-        "home-mobile.png",
-        "Home hub",
-        "Overview · Tagged · Following",
-        "Then Arenas tomorrow",
-        2.0,
+        "arenas-mobile.png",
+        "Coming next",
+        "Part 2 — Arenas",
+        "Debates. Pick a side.",
+        2.5,
     ),
-    ("__end__", "Part 2 →", "Arenas & debates", "Drops tomorrow · @getbaratx", 2.5),
+    ("__end__", "", "", "", 3.5),
 ]
-# 2+4+5+5+4.5+2+2.5 = 25.0
+# 3.5+6+5+4.5+2.5+3.5 = 25.0
 
 
 def _font_paths() -> tuple[str, str]:
@@ -132,47 +134,84 @@ def wrap(d: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, max_w:
     return lines
 
 
-def require_live() -> None:
-    if not LIVE.is_dir():
+def resolve_live() -> Path:
+    """Newest live-YYYY-MM-DD folder with required screens (never older than that pick)."""
+    candidates: list[Path] = []
+    for p in SCREENS_ROOT.glob("live-20*"):
+        if not p.is_dir():
+            continue
+        ok = all((p / n).exists() and (p / n).stat().st_size >= 80_000 for n in NEED_SCREENS)
+        if ok:
+            candidates.append(p)
+    if not candidates:
         raise SystemExit(
-            f"Missing TODAY screens: {LIVE}\n"
+            f"No usable live-* screens under {SCREENS_ROOT}\n"
             "Run: /tmp/bx-pw/bin/python brand/social/capture_live_screens_today.py"
         )
-    need = [
-        "landing-mobile.png",
-        "square-mobile.png",
-        "square-compose-mobile.png",
-        "square-engage-mobile.png",
-        "home-mobile.png",
-    ]
-    missing = [n for n in need if not (LIVE / n).exists() or (LIVE / n).stat().st_size < 80_000]
-    if missing:
-        raise SystemExit(f"Stale/missing screens in {LIVE}: {missing}")
+    return sorted(candidates, key=lambda x: x.name)[-1]
 
 
-def title_card() -> Image.Image:
+def hook_card() -> Image.Image:
+    """Scroll-stop opener — question first, not a feature label."""
     base = Image.new("RGB", (W, H), DARK)
     d = ImageDraw.Draw(base)
     d.rectangle([0, 0, W, 18], fill=SAFFRON)
-    paste_logo(base, 160, ((W - 160) // 2, 420))
-    d.text((W // 2 - 170, 640), "BarathX", font=fnt(72), fill=WHITE)
-    d.text((W // 2 - 220, 740), "Features · Part 1", font=fnt(40), fill=SAFFRON)
-    d.text((W // 2 - 120, 820), "Square", font=fnt(56), fill=CREAM)
-    d.text((W // 2 - 260, 940), "Latest UI · filmed today", font=fnt(28, False), fill=MUTED)
+    paste_logo(base, 96, ((W - 96) // 2, 220))
+    d.text((W // 2 - 110, 340), "BarathX", font=fnt(36), fill=MUTED)
+
+    lines = [
+        "WOULD YOU RATHER",
+        "GET 1,000 LIKES…",
+        "",
+        "OR 10 REAL",
+        "OPINIONS?",
+    ]
+    y = 520
+    for line in lines:
+        if not line:
+            y += 36
+            continue
+        font = fnt(64 if "OR" not in line and "OPINIONS" not in line else 68)
+        fill = SAFFRON if line.startswith("OR") or line == "OPINIONS?" else WHITE
+        if line == "OPINIONS?":
+            fill = SAFFRON
+        tw = d.textlength(line, font=font)
+        d.text(((W - tw) / 2, y), line, font=font, fill=fill)
+        y += 86
+
+    d.text(
+        (W // 2 - 280, 1180),
+        "Part 1 · Square — watch what that looks like",
+        font=fnt(26, False),
+        fill=MUTED,
+    )
     d.rectangle([0, H - 110, W, H], fill=SAFFRON)
-    d.text((48, H - 72), "Daily series · Part 1 of 7", font=fnt(32), fill=DARK)
+    d.text((48, H - 72), "Discovery series · follow for Part 2", font=fnt(30), fill=DARK)
     return base
 
 
 def end_card() -> Image.Image:
+    """Discovery cliffhanger — reason to follow for the next feature."""
     base = Image.new("RGB", (W, H), DARK)
     d = ImageDraw.Draw(base)
     d.rectangle([0, 0, W, 18], fill=SAFFRON)
-    paste_logo(base, 120, ((W - 120) // 2, 480))
-    d.text((W // 2 - 140, 660), "Part 2 →", font=fnt(64), fill=SAFFRON)
-    d.text((W // 2 - 220, 760), "Arenas & debates", font=fnt(44), fill=WHITE)
-    d.text((W // 2 - 200, 860), "Drops tomorrow", font=fnt(36, False), fill=MUTED)
-    d.text((W // 2 - 180, 980), "Follow @getbaratx", font=fnt(32), fill=CREAM)
+    paste_logo(base, 110, ((W - 110) // 2, 360))
+
+    d.text((80, 540), "This is a discovery.", font=fnt(40), fill=MUTED)
+    rows = [
+        ("Part 1", "Square", "questions & conversations", True),
+        ("Part 2", "Arenas", "debates — next", False),
+        ("Part 3", "???", "next feature — soon", False),
+    ]
+    y = 640
+    for part, name, blurb, done in rows:
+        d.text((80, y), part, font=fnt(28), fill=SAFFRON if not done else MUTED)
+        d.text((220, y), name, font=fnt(36), fill=WHITE if done else CREAM)
+        d.text((80, y + 48), blurb, font=fnt(26, False), fill=MUTED)
+        y += 120
+
+    d.text((80, 1080), "Follow @getbaratx", font=fnt(40), fill=CREAM)
+    d.text((80, 1150), "so you don’t miss Part 2.", font=fnt(32, False), fill=MUTED)
     d.rectangle([0, H - 110, W, H], fill=SAFFRON)
     d.text((48, H - 72), "Join free → barathx.com", font=fnt(32), fill=DARK)
     return base
@@ -271,17 +310,19 @@ def concat(clips: list[Path], out: Path, tmp: Path) -> None:
 
 
 def poster_from(mp4: Path, jpg: Path) -> None:
+    # Poster = Square beat (after hook) so thumbnail shows product, not only text
     subprocess.run(
-        ["ffmpeg", "-y", "-ss", "6.5", "-i", str(mp4), "-frames:v", "1", "-q:v", "2", str(jpg)],
+        ["ffmpeg", "-y", "-ss", "4.0", "-i", str(mp4), "-frames:v", "1", "-q:v", "2", str(jpg)],
         check=True,
         capture_output=True,
     )
 
 
 def main() -> None:
-    require_live()
+    live = resolve_live()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     DAILY.mkdir(parents=True, exist_ok=True)
+    DAILY_TODAY.mkdir(parents=True, exist_ok=True)
     DOWNLOADS.mkdir(parents=True, exist_ok=True)
     SHOTS.mkdir(parents=True, exist_ok=True)
 
@@ -289,16 +330,20 @@ def main() -> None:
     if abs(total - 25.0) > 0.01:
         raise SystemExit(f"Beat sum must be 25.0s, got {total}")
 
+    # arenas teaser is optional — fall back to home if missing
     with tempfile.TemporaryDirectory(prefix="bx-p1-live-") as td:
         tmp = Path(td)
         clips: list[Path] = []
         for i, (screen, kicker, title, sub, dur) in enumerate(BEATS):
-            if screen == "__title__":
-                img = title_card()
+            if screen == "__hook__":
+                img = hook_card()
             elif screen == "__end__":
                 img = end_card()
             else:
-                path = LIVE / screen
+                path = live / screen
+                if not path.exists() or path.stat().st_size < 80_000:
+                    alt = live / "home-mobile.png"
+                    path = alt if alt.exists() else live / "square-mobile.png"
                 img = phone_frame(path, kicker=kicker, title=title, sub=sub)
             clips.append(jpg_clip(img, tmp / f"{i:02d}.jpg", dur))
 
@@ -307,12 +352,14 @@ def main() -> None:
         poster = OUT_DIR / "barathx-demo-PART1-25s-poster.jpg"
         poster_from(out, poster)
 
-        for dest in (DAILY / "barathx-part1-25s.mp4", DAILY / "barathx-daily-reel-25s.mp4"):
-            dest.write_bytes(out.read_bytes())
-        (DAILY / "barathx-part1-25s-poster.jpg").write_bytes(poster.read_bytes())
+        for folder in {DAILY, DAILY_TODAY}:
+            folder.mkdir(parents=True, exist_ok=True)
+            for name in ("barathx-part1-25s.mp4", "barathx-daily-reel-25s.mp4"):
+                (folder / name).write_bytes(out.read_bytes())
+            (folder / "barathx-part1-25s-poster.jpg").write_bytes(poster.read_bytes())
 
-        # Download aliases (clear names)
         (DOWNLOADS / "barathx-part1-25s-LATEST.mp4").write_bytes(out.read_bytes())
+        (DOWNLOADS / "BarathX-Part1-Square-25s.mp4").write_bytes(out.read_bytes())
         (DOWNLOADS / "barathx-demo-PART1-25s.mp4").write_bytes(out.read_bytes())
         (SHOTS / "barathx-part1-25s-poster.jpg").write_bytes(poster.read_bytes())
 
@@ -329,9 +376,9 @@ def main() -> None:
             ],
             text=True,
         ).strip()
-        print(f"LIVE={LIVE}")
+        print(f"LIVE={live}")
         print(f"Wrote {out} ({probe}s)")
-        print(f"Download: {DOWNLOADS / 'barathx-part1-25s-LATEST.mp4'}")
+        print(f"Download: {DOWNLOADS / 'BarathX-Part1-Square-25s.mp4'}")
         print(f"Daily: {DAILY / 'barathx-part1-25s.mp4'}")
 
 

@@ -1,17 +1,12 @@
-# Script — BarathX Part 1 · Square · 25s (latest UI)
-
-See **`RECORDING-SCRIPT.md`** for the phone filming shot list.
-
-## Prebuilt reel beats (automated cut)
+# Script — Part 1 Square · 25s (hook version)
 
 | Time | Line |
 |------|------|
-| 0:00 | BarathX. Features. Part 1 — Square. |
-| 0:02 | India has opinions. Now it has a home. |
-| 0:06 | One question. Your take. No Reels required. |
-| 0:11 | Drop a take — short post, real replies. |
-| 0:16 | Live now + human takes. No AI slop. |
-| 0:20 | Home hub — Overview, Tagged, Following. |
-| 0:22 | Part 2 tomorrow — Arenas. Follow @getbaratx. |
+| 0:00 | Would you rather get 1,000 likes… or 10 real opinions? |
+| 0:03.5 | Square — questions & conversations. |
+| 0:09.5 | Drop a take. Ten real opinions beat empty likes. |
+| 0:14.5 | Human takes. Live talk. No AI slop. |
+| 0:19 | Part 2 is Arenas — debates. |
+| 0:21.5 | Part 1 Square. Part 2 Arenas. Part 3 soon. Follow @getbaratx. |
 
-Screens: `brand/social/whatsapp/screens/live-2026-08-25/` only.
+See `RECORDING-SCRIPT.md` for phone filming.
