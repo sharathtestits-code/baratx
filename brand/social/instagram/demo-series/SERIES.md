@@ -2,17 +2,23 @@
 
 **Account:** [@getbaratx](https://www.instagram.com/getbaratx/)  
 **Rule:** **1 elaborated demo Reel per day** (not a rushed “everything” dump).  
+**Length:** target **~25s** each (Part 1 locked at 25.0s).  
 **Cliffhanger:** every part ends with **Wait for Part N+1**.
 
 Music is attached **in the IG app** (trending India audio matched to the topic). Graph API cannot attach Reels music.
 
+**Today:** post **Part 1** from `PART-01-square-v5/barathx-demo-PART1-25s.mp4`  
+**Open with scroll-stop hook** (“1,000 likes vs 10 real opinions”) → Square immediately.  
+Discovery map at end: Part 1 Square · Part 2 Arenas · Part 3 ???  
+Phone script: `brand/social/daily/2026-08-25/RECORDING-SCRIPT.md`.
+
 ---
 
-## Series map (7 parts)
+## Series map (7 parts) — discovery loop
 
 | Day | Reel | Covers | Music vibe | End card |
 |-----|------|--------|------------|----------|
-| **1** | Features on BarathX · **Part 1 — Square** | **Screen recording** of compose, AI Assist, like/reply/repost/save, arenas menu | Soft bed in file; attach **trending India audio** in IG (rotate — not Faah-only) | Wait for Part 2 — Arenas |
+| **1** | **Part 1 — Square** · **25s** · hook: 1,000 likes vs 10 opinions | Latest Square UI: today’s question, Drop a take, Live strip | Silent file; attach **trending India audio** in IG | Part 2 Arenas · Part 3 ??? · Follow |
 | **2** | **Part 2 — Arenas & debates** | Arenas, topics, Join, For/Against, Leave, Live | Debate / siren energy | Wait for Part 3 — Profile |
 | **3** | **Part 3 — You** | Profile, Edit, photo, cover, Follow/Message | Softer / identity | Wait for Part 4 — Look |
 | **4** | **Part 4 — Look & explore** | Appearance themes, Explore, Search | Chill / aesthetic | Wait for Part 5 — Live |
@@ -74,13 +80,16 @@ Log file: `brand/social/instagram/demo-series/INSIGHTS_LOG.md` (append daily).
 ## Asset folders
 ```
 brand/social/instagram/demo-series/
-  PART-01-square-v2/ (safe-margin + UI callouts; replaces v1)
-  PART-01-square/  # archived draft
+  PART-01-square-v5/   # ← CURRENT · 25.0s · BarathX title + cliffhanger
+  PART-01-square-v4/   # archived screen-recording cut (~33s)
+  PART-01-square-v3/ … # archived drafts
+  render_part01_25s.py
   
-  PART-02-arenas/
+  PART-02-arenas/      # tomorrow
   …
   INSIGHTS_LOG.md
-  SERIES.md          (this file)
+  SERIES.md            (this file)
 ```
 
+Daily paste pack: `brand/social/daily/2026-08-25/`  
 Local renders also copy to `/opt/cursor/artifacts/downloads/`.

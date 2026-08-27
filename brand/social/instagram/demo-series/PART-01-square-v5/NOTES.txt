@@ -1,0 +1,21 @@
+# Part 1 Square — v5 (25.0s · TODAY screens only)
+
+## Hard rule
+Uses **only** `brand/social/whatsapp/screens/live-YYYY-MM-DD/` for the date of the render.
+Does **not** use:
+- PART-01-square-v4 screen recording
+- live-2026-08-19 / live-2026-08-21 / any older capture folder
+
+## Beats
+Landing → Square (today’s question) → Drop a take → Engage/Live strip → Home tease → Part 2 cliffhanger
+
+## Rebuild
+```bash
+/tmp/bx-pw/bin/python brand/social/capture_live_screens_today.py
+python3 brand/social/instagram/demo-series/render_part01_25s.py
+```
+
+## Files
+- `barathx-demo-PART1-25s.mp4`
+- Daily: `brand/social/daily/<today>/barathx-part1-25s.mp4`
+- Download: `/opt/cursor/artifacts/downloads/barathx-part1-25s-LATEST.mp4`
