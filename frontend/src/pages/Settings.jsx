@@ -323,10 +323,11 @@ export default function Settings() {
         </p>
         <ul className="settings-security-points">
           <li>Passwords stored with bcrypt, never plain text</li>
-          <li>Email / phone visible only to you</li>
+          <li>Email / phone / date of birth visible only to you</li>
           <li>Confirm email before posting (if you signed up with email)</li>
-          <li>Login &amp; OTP attempts are rate-limited</li>
-          <li>Log out revokes your session token so a copied key stops working</li>
+          <li>Login, OTP, and password-reset attempts are rate-limited</li>
+          <li>Bot checks on email/Google signup; phone OTP preferred for real people</li>
+          <li>Log out / “Sign out everywhere” revokes session tokens</li>
           <li>
             India DPDP: access, correct, erase, and withdraw consent (see Privacy Policy)
           </li>
