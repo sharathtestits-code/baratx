@@ -6,18 +6,14 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import Logo, { LogoMark } from "../components/Logo";
 import { isNativeApp } from "../native";
+import { safeNextPath } from "../safeNextPath";
 
 export default function Login() {
   const [params] = useSearchParams();
   const initialId = params.get("email") || params.get("username") || "";
   const native = isNativeApp();
   const preferPhone = params.get("method") === "phone" || (native && params.get("method") !== "email");
-  const nextPath = (() => {
-    const raw = (params.get("next") || "").trim();
-    // Only allow same-origin relative paths (ops console, feed, etc.)
-    if (raw.startsWith("/") && !raw.startsWith("//") && !raw.includes("://")) return raw;
-    return "/home";
-  })();
+  const nextPath = safeNextPath(params.get("next") || "", "/home");
   const [method, setMethod] = useState(preferPhone ? "phone" : "email");
   const navigate = useNavigate();
   const { login } = useAuth();
