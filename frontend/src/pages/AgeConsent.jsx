@@ -34,13 +34,15 @@ export default function AgeConsent() {
       <h2>2. How we use it</h2>
       <ul>
         <li>
-          <strong>Purpose:</strong> age eligibility and child-protection compliance only
+          <strong>We save it:</strong> date of birth is stored with your account for age eligibility
+          and child-protection compliance only
+        </li>
+        <li>
+          <strong>We do not sell it:</strong> we never sell DOB or other personal data to advertisers,
+          brokers, or anyone else, and we do not use DOB to build advertising profiles
         </li>
         <li>
           <strong>Not public:</strong> date of birth is never shown on your profile or in feeds
-        </li>
-        <li>
-          <strong>Not for ads:</strong> we do not sell DOB or use it to build advertising profiles
         </li>
         <li>
           <strong>Retention:</strong> kept while your account is active for this purpose; erased with

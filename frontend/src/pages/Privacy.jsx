@@ -8,12 +8,18 @@ export default function Privacy() {
   return (
     <div className="legal-page">
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: August 27, 2026 · Notice version 2026-08-27-dpdp</p>
+      <p className="legal-updated">Last updated: August 27, 2026 · Notice version 2026-08-27b-dpdp</p>
       <p>
         BarathX (&quot;BX&quot;, &quot;we&quot;) operates <strong>barathx.com</strong>, India&apos;s text-first public
         square. Under the <strong>Digital Personal Data Protection Act, 2023</strong> (DPDP Act) and
         the DPDP Rules, 2025, we are a <strong>Data Fiduciary</strong> and you are a{" "}
         <strong>Data Principal</strong> when we process your digital personal data.
+      </p>
+      <p>
+        <strong>We save your information</strong> to run your account and the square (login, profile,
+        posts, safety). <strong>We do not sell your personal information</strong> — not to advertisers,
+        data brokers, or anyone else. We do not build third-party advertising profiles from your
+        BarathX activity.
       </p>
       <p>
         This notice stands on its own. It explains what personal data we collect, why, how long we
@@ -41,8 +47,9 @@ export default function Privacy() {
         </li>
       </ul>
       <p>
-        We do <strong>not</strong> sell personal data. We do not run third-party advertising profiles
-        from your BarathX activity.
+        We <strong>store</strong> the personal data listed above to provide BarathX. We do{" "}
+        <strong>not</strong> sell personal data. We do not run third-party advertising profiles from
+        your BarathX activity.
       </p>
 
       <h2>2. Purpose (why we process it)</h2>

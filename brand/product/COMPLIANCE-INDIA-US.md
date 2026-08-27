@@ -9,7 +9,7 @@ Last updated: 2026-08-27 · Brand: **BarathX** · Site: https://barathx.com
 
 | Area | Status |
 |------|--------|
-| India DPDP privacy notice + consent at signup | Live (`Privacy` / `Terms`, `privacy_accepted_at`) |
+| India DPDP privacy notice + consent at signup | Live (`Privacy` / `Terms`, `privacy_accepted_at`) — notice states we **save** account data and **do not sell** personal information |
 | **18+ DOB + age consent** | Live — `/age-consent`, DOB on email/phone/Google new accounts |
 | Account data export / delete | Settings → Download my data / Delete account |
 | Grievance contact | privacy@barathx.com |
