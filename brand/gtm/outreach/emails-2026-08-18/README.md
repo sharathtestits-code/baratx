@@ -1,0 +1,32 @@
+# Creator outreach emails — 18 Aug 2026
+
+## Send these
+- **[FRESH-EMAILS-ANTI-SPAM.md](./FRESH-EMAILS-ANTI-SPAM.md)** — **use these** (spam-safe resend)
+- **[SHORT-EMAILS.md](./SHORT-EMAILS.md)** — earlier short drafts
+- **[BarathX-One-Pager.pdf](./BarathX-One-Pager.pdf)** — default attach
+- **[BarathX-Creator-Collab-Brief.pptx](./BarathX-Creator-Collab-Brief.pptx)** — visual deck
+- **[BarathX-Nikhil-One-Pager.pdf](./BarathX-Nikhil-One-Pager.pdf)** + **[BarathX-Nikhil-Brief.pptx](./BarathX-Nikhil-Brief.pptx)** — Nikhil follow-up pack
+- **[09-nikhil-kamath-followup.md](./09-nikhil-kamath-followup.md)** — full Nikhil email
+- **[HOW-TO-SHARE.md](./HOW-TO-SHARE.md)** — PDF + PPT > MD
+
+Rebuild visuals (live midnight screens): `python3 build_visual_deck.py`
+
+Long drafts `01–07` are backup only.
+
+| Short email | To |
+|-------------|-----|
+| Raw Talks | business@rawtalks.in |
+| Aye Jude | ajayfromayejude@gmail.com |
+| Figuring Out | partnerships@figuringout.co |
+| All Things WTF | info@allthingswtf.com |
+| Telugu Connects | Teamteluguconnects@gmail.com |
+| Aadhan | sudheer@aadhan.in |
+| Sri Mahalakshmi | teamsrimahalakshmi@gmail.com |
+| Bhargavi | Mebhargavi49@gmail.com |
+| Nikhil Kamath follow-up | info@allthingswtf.com |
+
+## Rules
+- Built by Indians, for Indians, owned by Indians  
+- No “we’ll pay / budget / ₹” in cold email  
+- Ask how *they* partner  
+- Spelling: **BarathX**
