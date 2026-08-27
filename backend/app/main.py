@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import func, or_, text
 from sqlalchemy.orm import Session, joinedload
 
-from app import auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse, turnstile
+from app import age_gate, auth, email as email_service, google_auth, image_validate, media_store, models, ops_access, rate_limit, rewards, schemas, seed, sms, text_parse, turnstile
 from app import ai_filter, anti_scrape, data_protection, search_query
 from app.database import Base, SessionLocal, engine, get_db
 from app.extra_routes import register_extra_routes
@@ -55,6 +55,12 @@ def run_migrations():
                 conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at DATETIME"))
             if "privacy_notice_version" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
+            if "date_of_birth" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN date_of_birth DATE"))
+            if "age_consent_accepted_at" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN age_consent_accepted_at DATETIME"))
+            if "age_consent_version" not in existing_cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN age_consent_version VARCHAR"))
             if "debate_streak" not in existing_cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN debate_streak INTEGER DEFAULT 0"))
             if "debate_streak_day" not in existing_cols:
@@ -162,6 +168,12 @@ def run_migrations():
                     conn.execute(text("ALTER TABLE users ADD COLUMN privacy_accepted_at TIMESTAMP"))
                 if "privacy_notice_version" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN privacy_notice_version VARCHAR"))
+                if "date_of_birth" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN date_of_birth DATE"))
+                if "age_consent_accepted_at" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN age_consent_accepted_at TIMESTAMP"))
+                if "age_consent_version" not in user_cols:
+                    conn.execute(text("ALTER TABLE users ADD COLUMN age_consent_version VARCHAR"))
                 if "debate_streak" not in user_cols:
                     conn.execute(text("ALTER TABLE users ADD COLUMN debate_streak INTEGER DEFAULT 0"))
                 if "debate_streak_day" not in user_cols:
@@ -969,7 +981,8 @@ def create_notification(
             if post:
                 preview = post.text
         unsub_token = auth.create_email_unsub_token(recipient.id)
-        unsub_url = f"{email_service.FRONTEND_URL}/unsubscribe?token={unsub_token}"
+        unsub_url = email_service.build_unsubscribe_page_url(unsub_token)
+        list_unsub_url = email_service.build_unsubscribe_api_url(unsub_token)
         email_service.send_activity_email(
             recipient.email,
             recipient.display_name or recipient.username,
@@ -979,6 +992,7 @@ def create_notification(
             preview=preview,
             post_id=post_id,
             unsubscribe_url=unsub_url,
+            list_unsubscribe_url=list_unsub_url,
         )
     except Exception:  # noqa: BLE001
         pass
@@ -1580,6 +1594,13 @@ def signup_email(
     if db.query(models.User).filter(models.User.username == payload.username).first():
         raise HTTPException(status_code=400, detail="Username already taken")
 
+    try:
+        dob = age_gate.require_adult_dob(payload.date_of_birth)
+        age_gate.require_age_attestation(payload.confirm_age_18)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    age_at, age_ver = age_gate.age_consent_stamp()
+
     user = models.User(
         username=payload.username,
         display_name=payload.display_name,
@@ -1591,6 +1612,9 @@ def signup_email(
         token_version=0,
         privacy_accepted_at=datetime.now(timezone.utc),
         privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
+        date_of_birth=dob,
+        age_consent_accepted_at=age_at,
+        age_consent_version=age_ver,
     )
     db.add(user)
     db.commit()
@@ -1871,12 +1895,16 @@ def auth_google(
         .first()
     )
     if not user:
-        # Soft launch: 18+ age confirm deferred to a later release.
         if not payload.accept_privacy:
             raise HTTPException(
                 status_code=400,
-                detail="New accounts must accept the Privacy Policy. Open Sign up, tick Privacy (DPDP), then continue with Google.",
+                detail="New accounts must accept the Privacy Policy. Open Sign up, tick Privacy (DPDP) and age consent, then continue with Google.",
             )
+        try:
+            dob = age_gate.require_adult_dob(getattr(payload, "date_of_birth", None))
+            age_gate.require_age_attestation(getattr(payload, "confirm_age_18", None))
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
         if turnstile.required() and not turnstile.verify_token(
             getattr(payload, "turnstile_token", None),
             remote_ip=rate_limit.client_ip(request),
@@ -1892,6 +1920,7 @@ def auth_google(
             n += 1
             username = f"{base}{n}"[:20]
 
+        age_at, age_ver = age_gate.age_consent_stamp()
         user = models.User(
             username=username,
             display_name=display_name,
@@ -1904,6 +1933,9 @@ def auth_google(
             token_version=0,
             privacy_accepted_at=datetime.now(timezone.utc),
             privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
+            date_of_birth=dob,
+            age_consent_accepted_at=age_at,
+            age_consent_version=age_ver,
         )
         db.add(user)
         try:
@@ -1980,6 +2012,13 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
 
     otp_row.consumed = True
 
+    try:
+        dob = age_gate.require_adult_dob(payload.date_of_birth)
+        age_gate.require_age_attestation(payload.confirm_age_18)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    age_at, age_ver = age_gate.age_consent_stamp()
+
     user = models.User(
         username=payload.username,
         display_name=payload.display_name,
@@ -1990,6 +2029,9 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
         is_official=False,
         privacy_accepted_at=datetime.now(timezone.utc),
         privacy_notice_version=data_protection.PRIVACY_NOTICE_VERSION,
+        date_of_birth=dob,
+        age_consent_accepted_at=age_at,
+        age_consent_version=age_ver,
     )
     db.add(user)
     db.commit()

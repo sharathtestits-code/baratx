@@ -14,6 +14,8 @@ export default function NativeGoogleAuth() {
   const [params] = useSearchParams();
   const acceptPrivacy = params.get("privacy") === "1";
   const turnstileToken = params.get("ts") || "";
+  const dateOfBirth = (params.get("dob") || "").trim();
+  const confirmAge18 = params.get("age") === "1";
   const hostRef = useRef(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -57,6 +59,8 @@ export default function NativeGoogleAuth() {
           body: JSON.stringify({
             id_token: idToken,
             accept_privacy: acceptPrivacy,
+            ...(confirmAge18 ? { confirm_age_18: true } : {}),
+            ...(dateOfBirth ? { date_of_birth: dateOfBirth } : {}),
             ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
           }),
         });
@@ -123,7 +127,7 @@ export default function NativeGoogleAuth() {
     return () => {
       cancelled = true;
     };
-  }, [acceptPrivacy, turnstileToken]);
+  }, [acceptPrivacy, turnstileToken, dateOfBirth, confirmAge18]);
 
   return (
     <div className="page page-auth bx-native-google-auth">
@@ -138,12 +142,19 @@ export default function NativeGoogleAuth() {
             Go back to the app, accept <strong>Privacy &amp; Terms</strong>, then try Google again.
           </p>
         ) : null}
+        {acceptPrivacy && (!confirmAge18 || !dateOfBirth) ? (
+          <p className="error">
+            Go back to the app, enter your <strong>date of birth</strong> and confirm you are 18+,
+            then try Google again.
+          </p>
+        ) : null}
         <div ref={hostRef} className="google-btn-host" style={{ marginTop: "1.25rem", minHeight: 48 }} />
         {!ready && !error && <p className="hint">Loading Google…</p>}
         {busy && <p className="hint">Signing you in…</p>}
         {error && <p className="error">{error}</p>}
         <p className="hint" style={{ marginTop: "1.5rem" }}>
-          <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link>
+          <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> ·{" "}
+          <Link to="/age-consent">Age consent</Link>
         </p>
       </main>
     </div>

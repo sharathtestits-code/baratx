@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app import models
 
 # Bump when the privacy notice text materially changes (consent re-notice).
-PRIVACY_NOTICE_VERSION = "2026-08-16-dpdp"
+PRIVACY_NOTICE_VERSION = "2026-08-27-dpdp"
 
 # Ephemeral auth artefacts — delete when purpose is served (DPDP retention).
 OTP_RETENTION_HOURS = 24
@@ -132,6 +132,17 @@ def build_personal_data_export(db: Session, user: models.User) -> dict[str, Any]
             "is_email_verified": user.is_email_verified,
             "is_phone_verified": user.is_phone_verified,
             "email_activity_enabled": bool(getattr(user, "email_activity_enabled", True)),
+            "date_of_birth": (
+                user.date_of_birth.isoformat()
+                if getattr(user, "date_of_birth", None)
+                else None
+            ),
+            "age_consent_accepted_at": (
+                user.age_consent_accepted_at.isoformat()
+                if getattr(user, "age_consent_accepted_at", None)
+                else None
+            ),
+            "age_consent_version": getattr(user, "age_consent_version", None),
             "privacy_accepted_at": (
                 user.privacy_accepted_at.isoformat()
                 if getattr(user, "privacy_accepted_at", None)

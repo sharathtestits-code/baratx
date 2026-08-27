@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, topicsApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import { parseDobAndAge } from "../ageConsent";
 import { isNativeApp } from "../native";
 import { openBrowserGoogleSignIn } from "../nativeGoogleBrowserAuth";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
@@ -19,6 +20,9 @@ export default function GoogleSignInButton({
   onError,
   acceptPrivacy = false,
   requirePrivacyConfirm = false,
+  dateOfBirth = "",
+  confirmAge18 = false,
+  requireAgeConfirm = false,
   turnstileToken = "",
   requireTurnstile = false,
 }) {
@@ -30,6 +34,9 @@ export default function GoogleSignInButton({
   const consentRef = useRef({
     acceptPrivacy,
     requirePrivacyConfirm,
+    dateOfBirth,
+    confirmAge18,
+    requireAgeConfirm,
     turnstileToken,
     requireTurnstile,
   });
@@ -42,35 +49,60 @@ export default function GoogleSignInButton({
   consentRef.current = {
     acceptPrivacy,
     requirePrivacyConfirm,
+    dateOfBirth,
+    confirmAge18,
+    requireAgeConfirm,
     turnstileToken,
     requireTurnstile,
   };
 
-  async function finishWithIdToken(idToken) {
+  function validateConsent() {
     const {
       acceptPrivacy: privacyOk,
       requirePrivacyConfirm: needPrivacy,
+      dateOfBirth: dob,
+      confirmAge18: ageOk,
+      requireAgeConfirm: needAge,
       turnstileToken: tsToken,
       requireTurnstile: needTs,
     } = consentRef.current;
     if (needPrivacy && !privacyOk) {
-      const msg = "Accept the Privacy Policy (DPDP) to create an account.";
-      setError(msg);
-      onError?.(msg);
-      return;
+      return "Accept the Privacy Policy (DPDP) to create an account.";
+    }
+    if (needAge) {
+      const dobCheck = parseDobAndAge(dob);
+      if (!dobCheck.ok) return dobCheck.error;
+      if (!ageOk) {
+        return "Confirm you are 18 or older and that your date of birth is accurate.";
+      }
     }
     if (needTs && !tsToken) {
-      const msg = "Complete the security check, or sign up with phone OTP.";
+      return "Complete the security check, or sign up with phone OTP.";
+    }
+    return "";
+  }
+
+  async function finishWithIdToken(idToken) {
+    const msg = validateConsent();
+    if (msg) {
       setError(msg);
       onError?.(msg);
       return;
     }
+    const {
+      acceptPrivacy: privacyOk,
+      dateOfBirth: dob,
+      confirmAge18: ageOk,
+      requireAgeConfirm: needAge,
+      turnstileToken: tsToken,
+    } = consentRef.current;
     setBusy(true);
     setError("");
     try {
       const data = await api.loginGoogle({
         id_token: idToken,
         ...(privacyOk ? { accept_privacy: true } : {}),
+        ...(needAge && ageOk ? { confirm_age_18: true, date_of_birth: dob } : {}),
         ...(tsToken ? { turnstile_token: tsToken } : {}),
       });
       login(data.access_token);
@@ -96,9 +128,9 @@ export default function GoogleSignInButton({
       sessionStorage.setItem("bx_welcome", "1");
       navigate("/feed?welcome=1");
     } catch (err) {
-      const msg = err.message || "Google sign-in failed";
-      setError(msg);
-      onError?.(msg);
+      const errMsg = err.message || "Google sign-in failed";
+      setError(errMsg);
+      onError?.(errMsg);
     } finally {
       setBusy(false);
     }
@@ -110,24 +142,19 @@ export default function GoogleSignInButton({
   };
 
   async function startBrowserGoogle() {
+    const msg = validateConsent();
+    if (msg) {
+      setError(msg);
+      onError?.(msg);
+      return;
+    }
     const {
       acceptPrivacy: privacyOk,
-      requirePrivacyConfirm: needPrivacy,
+      dateOfBirth: dob,
+      confirmAge18: ageOk,
+      requireAgeConfirm: needAge,
       turnstileToken: tsToken,
-      requireTurnstile: needTs,
     } = consentRef.current;
-    if (needPrivacy && !privacyOk) {
-      const msg = "Accept the Privacy Policy (DPDP) to create an account.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
-    if (needTs && !tsToken) {
-      const msg = "Complete the security check, or sign up with phone OTP.";
-      setError(msg);
-      onError?.(msg);
-      return;
-    }
     setBusy(true);
     setError("");
     setBrowserHint("Opening Google — pick your account once, then you’ll return to the app.");
@@ -135,11 +162,12 @@ export default function GoogleSignInButton({
       await openBrowserGoogleSignIn({
         acceptPrivacy: privacyOk,
         turnstileToken: tsToken,
+        ...(needAge && ageOk ? { dateOfBirth: dob, confirmAge18: true } : {}),
       });
     } catch (err) {
-      const msg = err?.message || "Could not open Google Sign-In.";
-      setError(msg);
-      onError?.(msg);
+      const errMsg = err?.message || "Could not open Google Sign-In.";
+      setError(errMsg);
+      onError?.(errMsg);
       setBrowserHint("");
     } finally {
       setBusy(false);
@@ -225,10 +253,13 @@ export default function GoogleSignInButton({
     };
   }, [native]);
 
+  const ageBlocked =
+    requireAgeConfirm && (!confirmAge18 || !parseDobAndAge(dateOfBirth).ok);
+
   if (native) {
     const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
     const turnstileBlocked = requireTurnstile && !turnstileToken;
-    const blocked = privacyBlocked || turnstileBlocked;
+    const blocked = privacyBlocked || turnstileBlocked || ageBlocked;
     return (
       <div className="x-google-wrap">
         <button
@@ -240,10 +271,15 @@ export default function GoogleSignInButton({
           <GoogleG className="x-btn-icon" />
           {busy ? "Opening Google…" : label}
         </button>
-        {privacyBlocked && (
+        {ageBlocked && (
+          <p className="hint x-google-loading">
+            Enter date of birth and confirm 18+ above to continue with Google.
+          </p>
+        )}
+        {privacyBlocked && !ageBlocked && (
           <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
         )}
-        {turnstileBlocked && !privacyBlocked && (
+        {turnstileBlocked && !privacyBlocked && !ageBlocked && (
           <p className="hint x-google-loading">Complete the security check above, or use phone OTP.</p>
         )}
         {!blocked && (
@@ -278,7 +314,7 @@ export default function GoogleSignInButton({
 
   const privacyBlocked = requirePrivacyConfirm && !acceptPrivacy;
   const turnstileBlocked = requireTurnstile && !turnstileToken;
-  const blocked = privacyBlocked || turnstileBlocked;
+  const blocked = privacyBlocked || turnstileBlocked || ageBlocked;
 
   return (
     <div className={`x-google-wrap${blocked ? " is-age-blocked" : ""}`} ref={wrapRef}>
@@ -295,20 +331,27 @@ export default function GoogleSignInButton({
           ref={hostRef}
           className="google-btn-host"
           title={
-            privacyBlocked
-              ? "Accept Privacy Policy first"
-              : turnstileBlocked
-                ? "Complete security check first"
-                : label
+            ageBlocked
+              ? "Confirm age / date of birth first"
+              : privacyBlocked
+                ? "Accept Privacy Policy first"
+                : turnstileBlocked
+                  ? "Complete security check first"
+                  : label
           }
           aria-label={label}
           aria-disabled={blocked}
         />
       </div>
-      {privacyBlocked && (
+      {ageBlocked && (
+        <p className="hint x-google-loading">
+          Enter date of birth and confirm 18+ above to continue with Google.
+        </p>
+      )}
+      {privacyBlocked && !ageBlocked && (
         <p className="hint x-google-loading">Accept the Privacy Policy above to continue with Google.</p>
       )}
-      {turnstileBlocked && !privacyBlocked && (
+      {turnstileBlocked && !privacyBlocked && !ageBlocked && (
         <p className="hint x-google-loading">Complete the security check above, or use phone OTP.</p>
       )}
       {!gisReady && !error && !blocked && <p className="hint x-google-loading">Loading Google…</p>}

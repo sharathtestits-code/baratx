@@ -4,25 +4,23 @@ export default function Terms() {
   return (
     <div className="legal-page">
       <h1>Terms of Service</h1>
-      <p className="legal-updated">Last updated: August 16, 2026</p>
+      <p className="legal-updated">Last updated: August 27, 2026</p>
       <p>
         By using BarathX (BX) at <strong>barathx.com</strong>, you agree to these terms. BarathX is an
         early product, features may change as we improve the square. Personal data is handled under
         our <Link to="/privacy">Privacy Policy</Link> and India&apos;s Digital Personal Data
-        Protection Act, 2023 (DPDP).
+        Protection Act, 2023 (DPDP). You must be <strong>18 or older</strong> to create an account.
       </p>
 
       <h2>The basics</h2>
       <ul>
+        <li>You must be 18+; date of birth is collected only for eligibility (see{" "}
+          <Link to="/age-consent">age consent</Link>)</li>
         <li>You&apos;re responsible for what you post</li>
         <li>Don&apos;t impersonate others or spam the square</li>
         <li>Don&apos;t post illegal content, harassment, or doxxing</li>
         <li>Human takes only, don&apos;t flood the square with AI slop</li>
       </ul>
-      <p className="hint">
-        Soft launch note: a formal age gate (18+) is planned for a later release. Until then, parents
-        and guardians should supervise how younger users use the square.
-      </p>
 
       <h2>Your content</h2>
       <p>
