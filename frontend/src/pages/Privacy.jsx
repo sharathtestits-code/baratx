@@ -8,7 +8,7 @@ export default function Privacy() {
   return (
     <div className="legal-page">
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: August 16, 2026 · Notice version 2026-08-16-dpdp</p>
+      <p className="legal-updated">Last updated: August 27, 2026 · Notice version 2026-08-27-dpdp</p>
       <p>
         BarathX (&quot;BX&quot;, &quot;we&quot;) operates <strong>barathx.com</strong>, India&apos;s text-first public
         square. Under the <strong>Digital Personal Data Protection Act, 2023</strong> (DPDP Act) and
@@ -24,8 +24,8 @@ export default function Privacy() {
       <h2>1. What personal data we collect</h2>
       <ul>
         <li>
-          <strong>Account data</strong>: display name, username, email and/or phone, language,
-          theme, bio, avatar/cover if you upload them
+          <strong>Account data</strong>: display name, username, email and/or phone, date of birth
+          (age eligibility only — never public), language, theme, bio, avatar/cover if you upload them
         </li>
         <li>
           <strong>Content you create</strong>: posts, replies, images, likes, follows, messages you
@@ -36,7 +36,8 @@ export default function Privacy() {
           OTPs, sign-in tokens, basic device/browser signals needed to stop abuse
         </li>
         <li>
-          <strong>Consent records</strong>: when you accepted this notice and which version
+          <strong>Consent records</strong>: when you accepted this notice, age/DOB consent, and which
+          versions
         </li>
       </ul>
       <p>
@@ -47,7 +48,7 @@ export default function Privacy() {
       <h2>2. Purpose (why we process it)</h2>
       <p>We process personal data only for these specified purposes:</p>
       <ul>
-        <li>Create and secure your account (including verification and fraud/spam prevention)</li>
+        <li>Create and secure your account (including verification, age eligibility, and fraud/spam prevention)</li>
         <li>Show your public posts and replies in the square so others can read and reply</li>
         <li>Send account-critical messages (verification, password reset) and optional activity emails you control</li>
         <li>Provide Settings features you choose (theme, language, mutes, blocks)</li>
@@ -63,6 +64,10 @@ export default function Privacy() {
       <ul>
         <li>We only ask for data needed for the purposes above</li>
         <li>Email and phone are private to you, not shown on public profiles</li>
+        <li>
+          Date of birth is private, used only to enforce our 18+ rule; it is never shown on profiles
+          or feeds
+        </li>
         <li>Passwords and OTPs are stored hashed</li>
         <li>
           <strong>Retention</strong>: account and public content stay while your account is active
@@ -78,10 +83,32 @@ export default function Privacy() {
 
       <h2>4. Children</h2>
       <p>
-        Soft launch: we do not knowingly target accounts at young children. A formal <strong>18+</strong>{" "}
-        age gate is planned for a later release. If you believe a child has an account that should be
-        removed, email{" "}
+        BarathX is for people <strong>18 and older</strong>. Under India&apos;s DPDP Act, under-18s are
+        treated as children; US COPPA also restricts collection from under-13. We require date of birth
+        and an age attestation at signup so we do not knowingly onboard minors. See the{" "}
+        <Link to="/age-consent">age &amp; date of birth consent notice</Link>. If a parent or guardian
+        believes a minor has an account, email{" "}
         <a href="mailto:privacy@barathx.com">privacy@barathx.com</a> and we will erase it.
+      </p>
+
+      <h2>4a. Email notifications</h2>
+      <p>
+        Optional <strong>activity emails</strong> (likes, replies, follows, mentions) default on when
+        you have an email address. You can:
+      </p>
+      <ul>
+        <li>
+          <strong>Unsubscribe</strong>: link in every activity email footer, or Settings → Email
+          notifications (uncheck)
+        </li>
+        <li>
+          <strong>Re-subscribe</strong>: Settings → Email notifications (check &quot;Send me activity
+          emails&quot;)
+        </li>
+      </ul>
+      <p>
+        Transactional emails (verify account, password reset) are account security and are not
+        optional. We do not send marketing newsletters unless we add a separate opt-in later.
       </p>
 
       <h2>5. Your rights (Data Principal)</h2>
@@ -130,6 +157,8 @@ export default function Privacy() {
         <Link to="/">← Back to BarathX</Link>
         {" · "}
         <Link to="/terms">Terms</Link>
+        {" · "}
+        <Link to="/age-consent">Age consent</Link>
         {" · "}
         <Link to="/settings">Settings</Link>
       </p>

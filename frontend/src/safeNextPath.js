@@ -24,6 +24,7 @@ const ALLOWED_PREFIXES = [
   "/guidelines",
   "/early-issues",
   "/privacy",
+  "/age-consent",
   "/terms",
 ];
 

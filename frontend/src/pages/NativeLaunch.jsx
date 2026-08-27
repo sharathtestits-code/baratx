@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Logo from "../components/Logo";
+import AgeConsentFields from "../components/AgeConsentFields";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import TurnstileWidget, { useTurnstileConfig } from "../components/TurnstileWidget";
 import { useState } from "react";
@@ -7,11 +8,12 @@ import { useState } from "react";
 /**
  * Native-app-only entry. Browser keeps the marketing Landing;
  * Capacitor opens here so mobile feels like an app, not a dumped website.
- * Phone OTP first (soft launch). Privacy/terms with optional Google.
- * Age 18+ gate deferred to a later release.
+ * Phone OTP first (soft launch). Privacy/terms + 18+ DOB with optional Google.
  */
 export default function NativeLaunch() {
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [confirmAge18, setConfirmAge18] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const { required: needBotCheck } = useTurnstileConfig();
 
@@ -24,7 +26,7 @@ export default function NativeLaunch() {
       </header>
 
       <main className="bx-native-launch-main">
-        <p className="bx-native-launch-kicker">SOFT LAUNCH · APP</p>
+        <p className="bx-native-launch-kicker">SOFT LAUNCH · APP · 18+</p>
         <h1 className="bx-native-launch-title">
           India has opinions.
           <span> Now it has a home.</span>
@@ -45,8 +47,8 @@ export default function NativeLaunch() {
         </Link>
 
         <p className="bx-native-launch-copy" style={{ marginTop: "0.55rem", marginBottom: "0.15rem" }}>
-          Soft launch: phone OTP is the fastest way in (no bot check). Privacy &amp; terms confirm
-          when you create an account (or with Google below).
+          Soft launch: phone OTP is the fastest way in (no bot check). New accounts need Privacy,
+          Terms, and age (18+) confirmation — on signup or with Google below.
         </p>
 
         <details className="bx-native-launch-google">
@@ -56,6 +58,13 @@ export default function NativeLaunch() {
             role="group"
             aria-label="Confirm before Google sign-in"
           >
+            <AgeConsentFields
+              idPrefix="native-google"
+              dateOfBirth={dateOfBirth}
+              onDateOfBirthChange={setDateOfBirth}
+              confirmAge18={confirmAge18}
+              onConfirmAge18Change={setConfirmAge18}
+            />
             <label className="bx-home-consent">
               <input
                 type="checkbox"
@@ -74,16 +83,19 @@ export default function NativeLaunch() {
             />
           ) : null}
           <p className="bx-home-google-hint" aria-live="polite">
-            {acceptPrivacy && (!needBotCheck || turnstileToken)
+            {acceptPrivacy && confirmAge18 && dateOfBirth && (!needBotCheck || turnstileToken)
               ? "Ready — continue with Google"
               : needBotCheck
-                ? "Accept Privacy & complete security check, then Google"
-                : "Accept Privacy & Terms, then continue with Google"}
+                ? "Confirm age, Privacy & security check, then Google"
+                : "Confirm age + Privacy & Terms, then continue with Google"}
           </p>
           <GoogleSignInButton
             label="Continue with Google"
             acceptPrivacy={acceptPrivacy}
             requirePrivacyConfirm
+            dateOfBirth={dateOfBirth}
+            confirmAge18={confirmAge18}
+            requireAgeConfirm
             turnstileToken={turnstileToken}
             requireTurnstile={needBotCheck}
           />

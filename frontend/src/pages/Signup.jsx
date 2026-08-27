@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { api, arenasApi } from "../api";
 import { useAuth } from "../context/AuthContext";
+import AgeConsentFields from "../components/AgeConsentFields";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 import PhoneField from "../components/PhoneField";
 import TurnstileWidget, { useTurnstileConfig } from "../components/TurnstileWidget";
+import { parseDobAndAge } from "../ageConsent";
 import { validateUsername } from "../username";
 import { safeNextPath } from "../safeNextPath";
 
@@ -20,6 +22,8 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [acceptPrivacy, setAcceptPrivacy] = useState(false);
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [confirmAge18, setConfirmAge18] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
 
   const [email, setEmail] = useState(params.get("email") || "");
@@ -76,6 +80,15 @@ export default function Signup() {
       setError("Accept the Privacy Policy (DPDP) to create an account.");
       return false;
     }
+    const dobCheck = parseDobAndAge(dateOfBirth);
+    if (!dobCheck.ok) {
+      setError(dobCheck.error);
+      return false;
+    }
+    if (!confirmAge18) {
+      setError("Confirm you are 18 or older and that your date of birth is accurate.");
+      return false;
+    }
     if (needTurnstile && needBotCheck && !turnstileToken) {
       setError("Complete the security check (or use phone OTP — no bot check needed).");
       return false;
@@ -106,6 +119,8 @@ export default function Signup() {
         password,
         username,
         display_name: displayName,
+        date_of_birth: dateOfBirth,
+        confirm_age_18: true,
         accept_privacy: true,
         ...(turnstileToken ? { turnstile_token: turnstileToken } : {}),
       });
@@ -164,6 +179,8 @@ export default function Signup() {
         username,
         display_name: displayName,
         region,
+        date_of_birth: dateOfBirth,
+        confirm_age_18: true,
         accept_privacy: true,
       });
       login(access_token);
@@ -178,6 +195,22 @@ export default function Signup() {
 
   const usernameHint = (
     <span className="hint">3–20 chars. Letters, numbers, _ . - (e.g. rahul_99 or john.doe)</span>
+  );
+
+  const ageGate = (
+    <AgeConsentFields
+      idPrefix="signup"
+      dateOfBirth={dateOfBirth}
+      onDateOfBirthChange={(v) => {
+        setDateOfBirth(v);
+        setError("");
+      }}
+      confirmAge18={confirmAge18}
+      onConfirmAge18Change={(v) => {
+        setConfirmAge18(v);
+        if (v) setError("");
+      }}
+    />
   );
 
   const privacyGate = (
@@ -213,15 +246,20 @@ export default function Signup() {
     />
   ) : null;
 
+  const canSubmit =
+    acceptPrivacy && confirmAge18 && Boolean(dateOfBirth) && (!needBotCheck || turnstileToken);
+
   return (
     <div className="auth-card auth-card-x">
       <h1>Create your account</h1>
       <p className="hint auth-human-pref">
         Prefer <strong>phone OTP</strong> — built for real people. Email / Google use a bot check.
+        BarathX is <strong>18+</strong>.
       </p>
 
       {!otpSent && (
         <>
+          {ageGate}
           {privacyGate}
           {botGate}
           <GoogleSignInButton
@@ -229,6 +267,9 @@ export default function Signup() {
             onError={setError}
             acceptPrivacy={acceptPrivacy}
             requirePrivacyConfirm
+            dateOfBirth={dateOfBirth}
+            confirmAge18={confirmAge18}
+            requireAgeConfirm
             turnstileToken={turnstileToken}
             requireTurnstile={needBotCheck}
           />
@@ -308,10 +349,7 @@ export default function Signup() {
               required
             />
           </label>
-          <button
-            type="submit"
-            disabled={busy || !acceptPrivacy || (needBotCheck && !turnstileToken)}
-          >
+          <button type="submit" disabled={busy || !canSubmit}>
             {busy ? "Creating account..." : "Sign up"}
           </button>
         </form>
@@ -344,7 +382,7 @@ export default function Signup() {
             onRegionChange={setRegion}
             onPhoneChange={setPhone}
           />
-          <button type="submit" disabled={busy || !acceptPrivacy}>
+          <button type="submit" disabled={busy || !acceptPrivacy || !confirmAge18 || !dateOfBirth}>
             {busy ? "Sending OTP..." : "Send OTP"}
           </button>
         </form>
@@ -381,8 +419,9 @@ export default function Signup() {
               required
             />
           </label>
+          {ageGate}
           {privacyGate}
-          <button type="submit" disabled={busy || !acceptPrivacy}>
+          <button type="submit" disabled={busy || !acceptPrivacy || !confirmAge18 || !dateOfBirth}>
             {busy ? "Verifying..." : "Verify & create account"}
           </button>
           <button type="button" className="auth-back-btn" onClick={goBackFromOtp} disabled={busy}>

@@ -121,11 +121,44 @@ def build_reset_url(token: str) -> str:
     return f"{FRONTEND_URL}/reset-password?token={token}"
 
 
-def _send_smtp(to_email: str, subject: str, text_body: str, html_body: str) -> None:
+def build_unsubscribe_page_url(token: str) -> str:
+    """Human-facing unsubscribe page (footer link)."""
+    return f"{FRONTEND_URL}/unsubscribe?token={token}"
+
+
+def build_unsubscribe_api_url(token: str) -> str:
+    """HTTPS endpoint for List-Unsubscribe one-click POST (CAN-SPAM / Gmail)."""
+    base = (
+        os.environ.get("PUBLIC_API_URL")
+        or os.environ.get("API_PUBLIC_URL")
+        or ""
+    ).strip().rstrip("/")
+    if not base:
+        fu = (FRONTEND_URL or "").lower()
+        if "qa.barathx.com" in fu or "baratx-qa" in fu:
+            base = "https://baratx-qa.up.railway.app"
+        elif "barathx.com" in fu or "baratx-production" in fu:
+            base = "https://baratx-production.up.railway.app"
+        else:
+            base = "http://localhost:8000"
+    return f"{base}/auth/unsubscribe?token={token}"
+
+
+def _send_smtp(
+    to_email: str,
+    subject: str,
+    text_body: str,
+    html_body: str,
+    *,
+    headers: Optional[dict] = None,
+) -> None:
     msg = EmailMessage()
     msg["Subject"] = subject
     msg["From"] = EMAIL_FROM
     msg["To"] = to_email
+    for key, value in (headers or {}).items():
+        if value:
+            msg[key] = value
     msg.set_content(text_body)
     msg.add_alternative(html_body, subtype="html")
 
@@ -136,7 +169,14 @@ def _send_smtp(to_email: str, subject: str, text_body: str, html_body: str) -> N
         server.send_message(msg)
 
 
-def _send_resend(to_email: str, subject: str, text_body: str, html_body: str) -> None:
+def _send_resend(
+    to_email: str,
+    subject: str,
+    text_body: str,
+    html_body: str,
+    *,
+    headers: Optional[dict] = None,
+) -> None:
     payload = {
         "from": EMAIL_FROM,
         "to": [to_email],
@@ -144,6 +184,8 @@ def _send_resend(to_email: str, subject: str, text_body: str, html_body: str) ->
         "text": text_body,
         "html": html_body,
     }
+    if headers:
+        payload["headers"] = {k: v for k, v in headers.items() if v}
     # Cloudflare in front of Resend blocks the default Python-urllib User-Agent
     # (HTTP 403 / error code 1010). Send an explicit client identity.
     req = urllib.request.Request(
@@ -166,13 +208,20 @@ def _send_resend(to_email: str, subject: str, text_body: str, html_body: str) ->
         raise RuntimeError(f"Resend failed: {exc.code} {detail}") from exc
 
 
-def send_email(to_email: str, subject: str, text_body: str, html_body: str) -> bool:
+def send_email(
+    to_email: str,
+    subject: str,
+    text_body: str,
+    html_body: str,
+    *,
+    headers: Optional[dict] = None,
+) -> bool:
     """Send email. Returns True if handed to a provider, False if logged only."""
     if RESEND_API_KEY:
-        _send_resend(to_email, subject, text_body, html_body)
+        _send_resend(to_email, subject, text_body, html_body, headers=headers)
         return True
     if SMTP_HOST and SMTP_USER and SMTP_PASSWORD:
-        _send_smtp(to_email, subject, text_body, html_body)
+        _send_smtp(to_email, subject, text_body, html_body, headers=headers)
         return True
 
     logger.warning(
@@ -272,6 +321,7 @@ def send_activity_email(
     preview: Optional[str] = None,
     post_id: Optional[str] = None,
     unsubscribe_url: Optional[str] = None,
+    list_unsubscribe_url: Optional[str] = None,
 ) -> bool:
     """Best-effort retention email when someone interacts with you."""
     if not to_email:
@@ -296,6 +346,14 @@ def send_activity_email(
         cta = f"{FRONTEND_URL}/notifications"
 
     unsub = unsubscribe_url or f"{FRONTEND_URL}/settings"
+    # One-click header URL should hit the API (POST). Footer stays on the web page.
+    one_click = list_unsubscribe_url or unsubscribe_url
+    headers = None
+    if one_click and str(one_click).startswith("http"):
+        headers = {
+            "List-Unsubscribe": f"<{one_click}>",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        }
     preview_line = f'\n"{preview[:140]}"\n' if preview else "\n"
     text_body = (
         f"Hi {recipient_name},\n\n"
@@ -336,7 +394,7 @@ def send_activity_email(
 </html>
 """
     try:
-        return send_email(to_email, subject, text_body, html_body)
+        return send_email(to_email, subject, text_body, html_body, headers=headers)
     except Exception:
         logger.exception("Activity email failed for %s", to_email)
         return False

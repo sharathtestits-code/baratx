@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -60,6 +60,10 @@ class User(Base):
     # DPDP: affirmative consent to privacy notice (Data Principal).
     privacy_accepted_at = Column(DateTime, nullable=True)
     privacy_notice_version = Column(String, nullable=True)
+    # Age eligibility (18+). DOB is private — never shown on profiles.
+    date_of_birth = Column(Date, nullable=True)
+    age_consent_accepted_at = Column(DateTime, nullable=True)
+    age_consent_version = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
