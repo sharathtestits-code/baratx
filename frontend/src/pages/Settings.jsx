@@ -289,8 +289,13 @@ export default function Settings() {
       <section className="settings-section">
         <h2>Email notifications</h2>
         <p className="hint">
-          One email per activity (reply, like, follow, mention). Turn off anytime. Alerts in the app
-          still work.
+          <strong>Subscribe:</strong> turn this on to get one email per activity (reply, like, follow,
+          mention). Default is on when you have an email.
+          <br />
+          <strong>Unsubscribe:</strong> turn this off here, or use the Unsubscribe link in any activity
+          email. In-app Alerts still work either way.
+          <br />
+          Verify / password-reset emails are security mail and cannot be turned off.
         </p>
         <label className="age-gate settings-email-toggle">
           <input
@@ -301,7 +306,7 @@ export default function Settings() {
           />
           <span>
             {user?.email
-              ? "Send me activity emails"
+              ? "Send me activity emails (subscribe)"
               : "Add an email on your profile to receive activity emails"}
           </span>
         </label>

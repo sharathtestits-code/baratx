@@ -11,6 +11,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import Unsubscribe from "./pages/Unsubscribe";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import AgeConsent from "./pages/AgeConsent";
 import Guidelines from "./pages/Guidelines";
 import EarlyIssues from "./pages/EarlyIssues";
 import Home from "./pages/Home";
@@ -132,6 +133,7 @@ function AppRoutes() {
       <Route path="/guidelines" element={<Guidelines />} />
       <Route path="/early-issues" element={<EarlyIssues />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/age-consent" element={<AgeConsent />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="*" element={<NotFound homeTo="/home" homeLabel="Back to Home" />} />
     </Routes>
@@ -235,6 +237,13 @@ export default function App() {
       </AuthChrome>
     );
   }
+  if (location.pathname === "/age-consent") {
+    return (
+      <AuthChrome legal>
+        <AgeConsent />
+      </AuthChrome>
+    );
+  }
   if (location.pathname === "/reset-password") {
     return (
       <AuthChrome>
@@ -299,6 +308,14 @@ export default function App() {
           element={
             <AuthChrome legal>
               <Privacy />
+            </AuthChrome>
+          }
+        />
+        <Route
+          path="/age-consent"
+          element={
+            <AuthChrome legal>
+              <AgeConsent />
             </AuthChrome>
           }
         />

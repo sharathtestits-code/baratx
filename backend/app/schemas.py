@@ -39,8 +39,9 @@ class EmailSignupRequest(BaseModel):
     password: str
     username: str
     display_name: str
-    # Soft launch: 18+ gate deferred; field kept optional for older clients.
-    confirm_age_18: Optional[bool] = None
+    # 18+ eligibility (India DPDP children + US COPPA-safe). Required for new signups.
+    date_of_birth: str
+    confirm_age_18: bool = False
     accept_privacy: bool = False
     # Cloudflare Turnstile token (required when TURNSTILE_SECRET_KEY is set).
     turnstile_token: Optional[str] = None
@@ -70,6 +71,20 @@ class EmailSignupRequest(BaseModel):
         if not v:
             raise ValueError("Accept the Privacy Policy to create an account")
         return True
+
+    @field_validator("confirm_age_18")
+    @classmethod
+    def must_confirm_age(cls, v):
+        if not v:
+            raise ValueError("Confirm you are 18 or older")
+        return True
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def valid_dob(cls, v):
+        from app.age_gate import require_adult_dob
+
+        return require_adult_dob(v).isoformat()
 
 
 class EmailLoginRequest(BaseModel):
@@ -103,8 +118,8 @@ class PhoneSignupVerify(BaseModel):
     username: str
     display_name: str
     region: Optional[str] = None
-    # Soft launch: 18+ gate deferred; field kept optional for older clients.
-    confirm_age_18: Optional[bool] = None
+    date_of_birth: str
+    confirm_age_18: bool = False
     accept_privacy: bool = False
 
     @field_validator("username")
@@ -118,6 +133,20 @@ class PhoneSignupVerify(BaseModel):
         if not v:
             raise ValueError("Accept the Privacy Policy to create an account")
         return True
+
+    @field_validator("confirm_age_18")
+    @classmethod
+    def must_confirm_age(cls, v):
+        if not v:
+            raise ValueError("Confirm you are 18 or older")
+        return True
+
+    @field_validator("date_of_birth")
+    @classmethod
+    def valid_dob(cls, v):
+        from app.age_gate import require_adult_dob
+
+        return require_adult_dob(v).isoformat()
 
     @model_validator(mode="after")
     def normalize(self):
@@ -174,9 +203,10 @@ class ResetPasswordRequest(BaseModel):
 
 class GoogleAuthRequest(BaseModel):
     id_token: str
-    # Soft launch: 18+ deferred. accept_privacy required only when Google creates a new account.
+    # Required when Google creates a new account (18+ + privacy).
     confirm_age_18: Optional[bool] = None
     accept_privacy: Optional[bool] = None
+    date_of_birth: Optional[str] = None
     # Required for brand-new Google accounts when Turnstile is configured.
     turnstile_token: Optional[str] = None
 
