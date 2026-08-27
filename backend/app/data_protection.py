@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app import models
 
 # Bump when the privacy notice text materially changes (consent re-notice).
-PRIVACY_NOTICE_VERSION = "2026-08-27-dpdp"
+PRIVACY_NOTICE_VERSION = "2026-08-27b-dpdp"
 
 # Ephemeral auth artefacts — delete when purpose is served (DPDP retention).
 OTP_RETENTION_HOURS = 24

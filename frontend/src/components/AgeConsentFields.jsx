@@ -26,7 +26,8 @@ export default function AgeConsentFields({
         />
       </label>
       <p className="hint">
-        Used only to confirm you are {MIN_AGE_YEARS}+. Never shown on your profile.{" "}
+        Used only to confirm you are {MIN_AGE_YEARS}+. Never shown on your profile. We save it for
+        eligibility only — we do not sell it.{" "}
         <Link to="/age-consent" target="_blank" rel="noopener noreferrer">
           Why we ask
         </Link>

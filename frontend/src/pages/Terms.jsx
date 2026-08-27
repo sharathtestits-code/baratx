@@ -10,6 +10,8 @@ export default function Terms() {
         early product, features may change as we improve the square. Personal data is handled under
         our <Link to="/privacy">Privacy Policy</Link> and India&apos;s Digital Personal Data
         Protection Act, 2023 (DPDP). You must be <strong>18 or older</strong> to create an account.
+        We save account information to operate the service; we do not sell your personal information
+        (see <Link to="/privacy">Privacy Policy</Link>).
       </p>
 
       <h2>The basics</h2>

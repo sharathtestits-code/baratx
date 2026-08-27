@@ -72,7 +72,9 @@ export default function NativeLaunch() {
                 onChange={(e) => setAcceptPrivacy(e.target.checked)}
               />
               <span>
-                I accept the <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
+                I understand BarathX <strong>saves my account information</strong> and{" "}
+                <strong>does not sell my personal information</strong>. I accept the{" "}
+                <Link to="/privacy">Privacy Policy</Link> (India DPDP) and{" "}
                 <Link to="/terms">Terms</Link>
               </span>
             </label>

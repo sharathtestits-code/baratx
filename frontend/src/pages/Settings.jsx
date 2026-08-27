@@ -316,8 +316,10 @@ export default function Settings() {
       <section className="settings-section settings-security">
         <h2>Privacy &amp; security</h2>
         <p className="hint">
-          Your password is hashed. Email and phone stay private on your profile. Sessions expire;
-          password reset and “sign out everywhere” kill stolen tokens on other devices.
+          Your password is hashed. Email, phone, and date of birth stay private. We save account
+          information to run BarathX; <strong>we do not sell your personal information</strong>.
+          Sessions expire; password reset and “sign out everywhere” kill stolen tokens on other
+          devices.
         </p>
         <ul className="settings-security-points">
           <li>Passwords stored with bcrypt, never plain text</li>
