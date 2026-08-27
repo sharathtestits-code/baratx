@@ -224,7 +224,8 @@ export default function Signup() {
         }}
       />
       <span>
-        I have read and accept the{" "}
+        I understand BarathX <strong>saves my account information</strong> to run the service and{" "}
+        <strong>does not sell my personal information</strong>. I have read and accept the{" "}
         <Link to="/privacy" target="_blank" rel="noopener noreferrer">
           Privacy Policy
         </Link>{" "}
