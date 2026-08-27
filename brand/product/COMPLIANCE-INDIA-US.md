@@ -15,7 +15,7 @@ Last updated: 2026-08-27 · Brand: **BarathX** · Site: https://barathx.com
 | Grievance contact | privacy@barathx.com |
 | Activity email opt-out | Settings toggle + `/unsubscribe?token=` footer + `List-Unsubscribe` headers |
 | Bot gate (Turnstile) + phone OTP preferred | Live |
-| HTTPS, rate limits, hashed passwords/OTPs | Live |
+| HTTPS, rate limits, hashed passwords/OTPs | Live — see also `SECURITY-HARDENING.md` |
 
 ---
 

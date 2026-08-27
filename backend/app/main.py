@@ -360,8 +360,27 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
     allow_credentials=False,  # Bearer tokens, not cookies
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "Accept",
+        "X-Admin-Secret",
+        "X-BarathX-Client",
+        "X-Requested-With",
+    ],
+)
+
+# CSP for HTML shells served from Railway (Pages has its own _headers CSP).
+_SPA_CSP = (
+    "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; "
+    "form-action 'self'; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "script-src 'self' https://accounts.google.com https://challenges.cloudflare.com; "
+    "frame-src https://accounts.google.com https://challenges.cloudflare.com; "
+    "connect-src 'self' https://accounts.google.com https://challenges.cloudflare.com "
+    "https://*.up.railway.app https://barathx.com https://www.barathx.com https://qa.barathx.com; "
+    "worker-src 'self' blob:"
 )
 
 
@@ -384,6 +403,11 @@ async def anti_scrape_middleware(request: Request, call_next):
         "Permissions-Policy",
         "camera=(), microphone=(), geolocation=()",
     )
+    if ENVIRONMENT in ("production", "prod", "qa", "staging"):
+        response.headers.setdefault(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains; preload",
+        )
     return response
 
 
@@ -444,9 +468,13 @@ def _otp_response(code: str, sms_sent: bool = False) -> dict:
     return body
 
 
-def issue_otp(db: Session, phone: str, purpose: str) -> dict:
+def issue_otp(db: Session, phone: str, purpose: str, *, client_ip: Optional[str] = None) -> dict:
     try:
         sms.check_otp_rate_limit(phone)
+        if client_ip:
+            rate_limit.check_rate_limit(
+                f"otp-ip:{client_ip}", limit=12, window_sec=900
+            )
     except ValueError as exc:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
 
@@ -726,11 +754,11 @@ def enforce_human_take(user: models.User, text: str) -> bool:
 
 
 def otp_matches(otp_row: models.OTP, code: str) -> bool:
-    """Accept bcrypt-hashed OTP (preferred) or legacy plaintext rows during rollout."""
-    stored = otp_row.code or ""
-    if stored.startswith("$2"):
-        return auth.verify_otp(code, stored)
-    return secrets.compare_digest(stored, code)
+    """OTPs are stored as bcrypt hashes only — reject any legacy plaintext row."""
+    stored = (otp_row.code or "").strip()
+    if not stored.startswith("$2"):
+        return False
+    return auth.verify_otp(code, stored)
 
 def serialize_reply(reply: models.Reply, current_user: Optional[models.User]) -> schemas.ReplyOut:
     liked_by_me = False
@@ -1634,7 +1662,17 @@ def signup_email(
 
 
 @app.post("/auth/verify-email", response_model=schemas.MessageResponse)
-def verify_email(payload: schemas.VerifyEmailRequest, db: Session = Depends(get_db)):
+def verify_email(
+    payload: schemas.VerifyEmailRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"verify-email:{rate_limit.client_ip(request)}", limit=30, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     raw = (payload.token or "").strip()
     if not raw:
         raise HTTPException(status_code=400, detail="Missing verification token")
@@ -1692,9 +1730,18 @@ def unsubscribe_activity_email(
 
 @app.post("/auth/resend-verification", response_model=schemas.MessageResponse)
 def resend_verification(
+    request: Request,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    try:
+        rate_limit.check_rate_limit(
+            f"resend-verify:{rate_limit.client_ip(request)}:{current_user.id}",
+            limit=5,
+            window_sec=900,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     if not current_user.email:
         raise HTTPException(status_code=400, detail="No email on this account")
     if current_user.is_email_verified:
@@ -1781,7 +1828,17 @@ def forgot_password(
 
 
 @app.post("/auth/reset-password", response_model=schemas.MessageResponse)
-def reset_password(payload: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
+def reset_password(
+    payload: schemas.ResetPasswordRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"reset-password:{rate_limit.client_ip(request)}", limit=10, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     row = (
         db.query(models.PasswordResetToken)
         .filter(
@@ -1982,14 +2039,28 @@ def auth_google(
 # (dev_otp) is returned for local testing. OTP requests are rate-limited.
 
 @app.post("/auth/signup/phone/request-otp")
-def signup_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depends(get_db)):
+def signup_phone_request_otp(
+    payload: schemas.PhoneOtpRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
     if db.query(models.User).filter(models.User.phone == payload.phone).first():
         raise HTTPException(status_code=400, detail="Phone number already registered")
-    return issue_otp(db, payload.phone, "signup")
+    return issue_otp(db, payload.phone, "signup", client_ip=rate_limit.client_ip(request))
 
 
 @app.post("/auth/signup/phone/verify", response_model=schemas.TokenResponse)
-def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depends(get_db)):
+def signup_phone_verify(
+    payload: schemas.PhoneSignupVerify,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"otp-verify:{rate_limit.client_ip(request)}", limit=20, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     otp_row = (
         db.query(models.OTP)
         .filter(
@@ -2045,8 +2116,17 @@ def signup_phone_verify(payload: schemas.PhoneSignupVerify, db: Session = Depend
 
 
 @app.post("/auth/login/phone/request-otp")
-def login_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depends(get_db)):
+def login_phone_request_otp(
+    payload: schemas.PhoneOtpRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
     """Do not reveal whether the phone is registered."""
+    ip = rate_limit.client_ip(request)
+    try:
+        rate_limit.check_rate_limit(f"otp-ip:{ip}", limit=12, window_sec=900)
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     user = db.query(models.User).filter(models.User.phone == payload.phone).first()
     if not user:
         try:
@@ -2058,11 +2138,21 @@ def login_phone_request_otp(payload: schemas.PhoneOtpRequest, db: Session = Depe
             "expires_in_minutes": OTP_TTL_MINUTES,
             "sms_sent": False,
         }
-    return issue_otp(db, payload.phone, "login")
+    return issue_otp(db, payload.phone, "login", client_ip=ip)
 
 
 @app.post("/auth/login/phone/verify", response_model=schemas.TokenResponse)
-def login_phone_verify(payload: schemas.PhoneLoginVerify, db: Session = Depends(get_db)):
+def login_phone_verify(
+    payload: schemas.PhoneLoginVerify,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    try:
+        rate_limit.check_rate_limit(
+            f"otp-verify:{rate_limit.client_ip(request)}", limit=20, window_sec=900
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=429, detail=str(exc)) from exc
     otp_row = (
         db.query(models.OTP)
         .filter(
@@ -3919,7 +4009,17 @@ def _spa_index_response(request: Optional[Request] = None) -> Response:
         html = html.replace("https://barathx.com/", f"{origin}/").replace(
             'content="https://barathx.com"', f'content="{origin}"'
         )
-    return Response(content=html, media_type="text/html; charset=utf-8")
+    headers = {
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "X-Frame-Options": "DENY",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "Content-Security-Policy": _SPA_CSP,
+        "X-Robots-Tag": "noai, noimageai",
+    }
+    if ENVIRONMENT in ("production", "prod", "qa", "staging"):
+        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    return Response(content=html, media_type="text/html; charset=utf-8", headers=headers)
 
 
 if _FRONTEND_DIST.is_dir():

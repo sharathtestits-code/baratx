@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { parseDobAndAge } from "../ageConsent";
 import { isNativeApp } from "../native";
 import { openBrowserGoogleSignIn } from "../nativeGoogleBrowserAuth";
+import { safeNextPath } from "../safeNextPath";
 import { hasSeenTopicOnboarding, markTopicOnboardingSeen } from "../topicsOnboarding";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -108,9 +109,10 @@ export default function GoogleSignInButton({
       login(data.access_token);
       const next =
         typeof sessionStorage !== "undefined" ? sessionStorage.getItem("bx_next") : "";
-      if (next && next.startsWith("/") && !next.startsWith("//")) {
+      const safe = safeNextPath(next || "", "");
+      if (safe) {
         sessionStorage.removeItem("bx_next");
-        navigate(next);
+        navigate(safe);
         return;
       }
       if (hasSeenTopicOnboarding()) {
