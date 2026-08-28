@@ -1,0 +1,24 @@
+# PART 2 — Arenas · 25s (HeyGen-ready)
+
+## File
+- **Video:** `barathx-PART2-arenas-25s.mp4` (exact **25.0s**, 9:16)
+- **Poster:** `barathx-PART2-arenas-25s-poster.jpg`
+- **Daily copy:** `brand/social/daily/2026-08-28/barathx-PART2-arenas-25s.mp4`
+- **Screens:** `screens/` (latest live Arenas UI)
+
+## Script followed
+WhatsApp-group hook → Arenas topics → Agree / Disagree / It depends → real opinions → not a group chat → Part 2 Arenas ✓ → Next YOU
+
+## Layout
+~35% left = **HeyGen avatar zone** (placeholder now — drop your clone over the circle + keep burn-in lines or mute them)  
+~65% right = live BarathX Arenas / debate UI
+
+Hook (0–3s): **no BarathX wordmark** — question first.
+
+## Rebuild
+```bash
+python3 brand/social/instagram/demo-series/PART-02-arenas/render_part02_arenas_25s.py
+```
+
+## HeyGen composite tip
+Export HeyGen talking-head (transparent or green). Place on left ~35% from 0–21s. Keep end card full-bleed brand (21–25s). Match VO to burn-in lines in SCRIPT.md.
