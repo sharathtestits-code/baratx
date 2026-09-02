@@ -198,6 +198,28 @@ ChatGPT brief for Parts 2–7 was produced in-thread (reuse from agent transcrip
 
 ---
 
+## HeyGen pipeline (this follow-up)
+
+Approved: HeyGen API + ffmpeg composite inside Cursor (no native HeyGen↔Cursor connector).
+
+**Branch / PR:** `cursor/heygen-composite-chat-2af5`  
+**Code:** `brand/social/instagram/demo-series/heygen-pipeline/`  
+**Chat records folder:** `brand/gtm/cursor-chat-records/` (this file)
+
+Quick start:
+```bash
+export HEYGEN_API_KEY=… HEYGEN_AVATAR_ID=… HEYGEN_VOICE_ID=…
+python3 brand/social/instagram/demo-series/heygen-pipeline/run_part02_composite.py --generate
+# or drop a UI export:
+python3 brand/social/instagram/demo-series/heygen-pipeline/run_part02_composite.py --avatar ~/Downloads/clone.webm
+# smoke (no key):
+python3 brand/social/instagram/demo-series/heygen-pipeline/run_part02_composite.py --smoke
+```
+
+IG Reels trending audio remains manual in the IG app.
+
+---
+
 ## Remaining work
 
 1. **Finish MSG91** — Authkey + DLT template + Sender ID → Railway vars → redeploy → verify India OTP SMS.  

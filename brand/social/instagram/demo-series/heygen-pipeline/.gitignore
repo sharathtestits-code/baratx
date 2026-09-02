@@ -1,0 +1,4 @@
+cache/
+*.webm
+*.mp4
+!README.md
