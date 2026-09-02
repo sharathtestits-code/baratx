@@ -71,9 +71,15 @@ Log file: `brand/social/instagram/demo-series/INSIGHTS_LOG.md` (append daily).
 
 ---
 
+## HeyGen composite (avatar left zone)
+
+Pipeline: `brand/social/instagram/demo-series/heygen-pipeline/`  
+Part 2 VO + overlay into the ~35% avatar panel (API or local export). See that folder’s `README.md`.
+
 ## Asset folders
 ```
 brand/social/instagram/demo-series/
+  heygen-pipeline/   # HeyGen API + ffmpeg composite
   PART-01-square-v2/ (safe-margin + UI callouts; replaces v1)
   PART-01-square/  # archived draft
   

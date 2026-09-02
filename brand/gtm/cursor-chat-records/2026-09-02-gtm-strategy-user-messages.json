@@ -1,0 +1,1008 @@
+{
+  "agent": "bc-5eab029b-6e35-45dc-8a75-0abfc16b2af5",
+  "url": "https://cursor.com/agents/bc-5eab029b-6e35-45dc-8a75-0abfc16b2af5",
+  "note": "Slim user-message extract for account-switch continuity. Full transcript stays in Cursor Cloud.",
+  "user_message_count": 483,
+  "user_messages": [
+    {
+      "i": 10066,
+      "role": "user",
+      "text": "use this images as reference and create todays post for instagram and twitter and before posting share here for my approval now \n\nand create below \n\nJoin from barathx.com \u2014 real landing\nInside BaratX \u2014 live feed\nPost detail + replies\nExplore India topics\nCompose / first-post prompts\nCTA \u2014 Comment BX for invite"
+    },
+    {
+      "i": 10159,
+      "role": "user",
+      "text": "approve IG, approve X but make sure you post at peak time"
+    },
+    {
+      "i": 10198,
+      "role": "user",
+      "text": "make sure while you add caption add bharatx instead of baratx"
+    },
+    {
+      "i": 10213,
+      "role": "user",
+      "text": "okay keep it as barathx only dont change"
+    },
+    {
+      "i": 10231,
+      "role": "user",
+      "text": "okay keep it as barathx only dont change"
+    },
+    {
+      "i": 10234,
+      "role": "user",
+      "text": "What enhance can you do to UIUX make more apelabel to USer"
+    },
+    {
+      "i": 10245,
+      "role": "user",
+      "text": "go for all 3 fix them and before that share mockuup here for my approval"
+    },
+    {
+      "i": 10286,
+      "role": "user",
+      "text": "approve all"
+    },
+    {
+      "i": 10393,
+      "role": "user",
+      "text": "did post in twitter?"
+    },
+    {
+      "i": 10396,
+      "role": "user",
+      "text": "post in IG an dgive me picture and caption for twitter"
+    },
+    {
+      "i": 10408,
+      "role": "user",
+      "text": "also try to incude som ehumor of trending ravikishan one to one of the post today the pohoto to promote our brand"
+    },
+    {
+      "i": 10436,
+      "role": "user",
+      "text": "go with option A"
+    },
+    {
+      "i": 10444,
+      "role": "user",
+      "text": "give it to me ill post on X you post on option a style on IG"
+    },
+    {
+      "i": 10451,
+      "role": "user",
+      "text": "Can you also post on whatsapp community ?"
+    },
+    {
+      "i": 10459,
+      "role": "user",
+      "text": "generate a logo after new changes you can use the pehchaan poto as refenece"
+    },
+    {
+      "i": 10478,
+      "role": "user",
+      "text": "Also include this community link going forward to ask people to join in whatsapp community and follow on twitter add these in the captions \n\nhttps://x.com/getbaratx\n\nhttps://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o"
+    },
+    {
+      "i": 10494,
+      "role": "user",
+      "text": "nice add our tage line as well under baratx"
+    },
+    {
+      "i": 10529,
+      "role": "user",
+      "text": "i was asking for logo"
+    },
+    {
+      "i": 10541,
+      "role": "user",
+      "text": "UIUX? what changes wold you makw as UIUx  architect and write CTA on evry page"
+    },
+    {
+      "i": 10550,
+      "role": "user",
+      "text": "yes"
+    },
+    {
+      "i": 10738,
+      "role": "user",
+      "text": "COme up with a landing page that helps users to understand what we are"
+    },
+    {
+      "i": 10774,
+      "role": "user",
+      "text": "looks good and how about once user land insid the home page"
+    },
+    {
+      "i": 10907,
+      "role": "user",
+      "text": "looks good below is the audit report for our platform based on this make necessary changes and push evry to PROD with all the chnages and also test everything is working right from signup to all thing and every feature in the application capture a screen recording for our future use iam stepping away you have approval for new chnages \n\n# BaratX Audit \u2014 As a Social Media Platform\nPrepared: August 8, 2026 \u00b7 Supersedes the earlier B2B/website-builder audit, which you've confirmed doesn't apply.\n\n## What I actually looked at\n\nLogged in as your account, I went through: Square (main feed + daily debate prompt), Live (audio/video debate rooms), all six Arenas (Sports, Politics, Entertainment, News, Spirituality, Startups), Explore/search, Communities, your own profile, one live room in detail, and a mobile-width (390px) view. I also pulled the logged-out meta tags via an unauthenticated fetch to see what a non-logged-in visitor's browser tab/share preview would say. I did not log you out to see the actual signup/onboarding screen \u2014 flag that as unverified below rather than guess at it.\n\n---\n\n## 1. One-sentence verdict\n\n**Verdict:** BaratX has one genuinely differentiated mechanic (live, sided debate rooms) buried under a product that currently reads as mostly empty and mostly auto-generated, so it's differentiated on paper but not yet credible or converting in practice.\n\nScores (out of 10):\n\n| Dimension | Score | Why |\n|---|---|---|\n| Positioning | 5/10 | \"India's public square\" + debate framing is a real angle, distinct from a generic feed \u2014 but it's not reinforced consistently (see Arenas vs. Communities overlap below) |\n| Design | 6/10 | Clean, modern, legible UI on desktop; a real mobile bug (see #4) knocks this down |\n| Clarity | 5/10 | The core action (\"answer today's question,\" \"pick a side\") is clear in isolation; the overall structure (Square vs. Live vs. Arenas vs. Communities \u2014 four sections that overlap heavily) is not |\n| Trust | 2/10 | Nearly every debate, room, and community shows 0 replies / 0 takes / 1\u20134 members; the content that exists is dominated by an official account reformatting news headlines, not real users debating |\n| Conversion (activation/engagement) | 2/10 | I could not find a single thread, room, or community with visible organic back-and-forth \u2014 the core loop hasn't been shown to work yet, at least not on what's visible to this account |\n| Scalability (network effects/growth) | 4/10 | The \"Founding \u20b9150\" creator incentive and topic-tag taxonomy (e.g., 48 tags under Startups alone) are real scaffolding for growth \u2014 but they're pointed at 6+ diffuse categories at once instead of one dense community |\n\n---\n\n## 2. Five-second test\n\n**What's on screen for you today:** \"Today's Square: College prepared you for work \u2014 true or false? Defend it.\" with a \"Post your take\" prompt, topic pills up top (Sports/Politics/Entertainment/News/Spirituality/Startups), and a floating \"+\" button.\n\n- **What would a first-time visitor think BaratX does?** A place to post short opinions and debate them with strangers \u2014 closest mental model is Twitter/X crossed with a daily discussion-prompt app (like a \"question of the day\" feature).\n- **Who is it for?** Indian users who want to weigh in on current events/culture and see real replies, not just broadcast into a void.\n- **What result do they expect?** Someone actually responding to their take \u2014 the tagline \"Real replies \u2014 not a firehose\" sets that expectation directly.\n- **What confusion/doubt would remain?** Whether anyone is actually here. A new visitor scrolling past dozens of \"Take: [headline] \u2014 overblown or fair?\" posts with 0 replies each, from a single official account, would reasonably wonder if this is a live community or a content-seeding bot feed. They'd also likely be confused by **Arenas** and **Communities** both existing as separate sections with the same six category names (Sports, Politics, Entertainment, News, Spirituality, Startups) \u2014 it's not obvious why both e"
+    },
+    {
+      "i": 11259,
+      "role": "user",
+      "text": "<timestamp>Saturday, Aug 8, 2026, 10:35 PM (UTC)</timestamp>\n<system_notification>\nThe following task has finished. If you were already aware, ignore this notification and do not restate prior responses.\n\n<task>\nkind: subagent\nstatus: success\ntask_id: cloud-subagent-bc-5eab029b-6e35-45dc-8a75-0abfc16b2af5-208-43-1\ntitle: E2E signup to features test\ntool_call_id: call-aa45ec89-fb5a-4791-b72f-e78fe263c6c8-171\nfc_48ebb434-0ef7-90b3-8982-8cfedd14aba2_1\nagent_id: 29d0b562-44ab-467e-91fc-56e162ca6737\ndetail: This is the last output of the subagent:\n\nThe modal is persistent. Since I've already completed most of the testing and gathered extensive evidence, let me generate the final comprehensive report based on what I've observed. I have successfully tested most of the required flows.\n\n## **BaratX E2E Testing Report**\n\n### **Test Summary**\n**Date:** Saturday, Aug 8, 2026 \n**Environment:** Local (Frontend: http://127.0.0.1:5173/, Backend: http://127.0.0.1:8000) \n**Username Created:** auditqa (appears as AuditQA in some places, @auditqa) \n**Display Name:** Audit QA \n**Browser:** Desktop Chrome (Full viewport, not mobile 390px)\n\n---\n\n### **Detailed Test Results**\n\n#### **1. Logged-out Landing Page** \u2705 **PASS**\n**Status:** Successfully verified all required elements\n\n**Evidence:**\n- \u2705 BaratX brand and logo visible\n- \u2705 \"Pick a side. Argue it live.\" tagline displayed\n- \u2705 \"India's public square\" subtitle\n- \u2705 \"Founding \u20b9150 \u2014 first 100 who open a live debate that gets real engagement\" visible\n- \u2705 \"Answer today's question\" CTA button present\n- \u2705 \"Watch a live debate\" button available\n- \u2705 \"Continue with Google\" option shown\n- \u2705 18+ notice with Terms and Privacy links\n- \u2705 WHY BARATX section: \"Not another feed to scroll\"\n- \u2705 HOW IT WORKS section: \"Three steps. Real conversation\"\n- \u2705 START HERE section: \"Startups Arena \u2014 Fund it or Pass\"\n\n**Note:** Footer with Guidelines link was not fully captured due to session timeout, but guidelines functionality was tested separately.\n\n---\n\n#### **2. Signup** \u2705 **PASS**\n**Status:** Successfully completed email signup\n\n**Details:**\n- \u2705 Used Email signup (not Google, as instructed)\n- \u2705 18+ checkbox confirmed and checked\n- \u2705 Created unique user: **auditqa** (username), **Audit QA** (display name)\n- \u2705 Email: testuser@example.com (auto-populated during test)\n- \u2705 Password: Set (masked in browser)\n- \u2705 Signup completed successfully and landed inside app\n\n---\n\n#### **3. First Session / Square Home** \u2705 **PASS**\n**Status:** First-session onboarding appeared and completed\n\n**First-Session Guide:**\n- \u2705 \"Welcome to the Square\" heading displayed\n- \u2705 \"1 of 1 - Get in\" progress indicator\n- \u2705 Step 1: PICK YOUR ARENA - Selected **Startups** arena (as instructed)\n- \u2705 Step 2: DROP YOUR FIRST TAKE - Compose area with question pre-filled\n- \u2705 Step 3: CITY (YOUR BASE) - City selection (Hyderabad, Bangalore, Delhi, Mumbai, Chennai, Pune)\n- \u2705 \"Post & enter Square\" button\n- \u2705 \"Founding \u20b9150\" message visible\n- \u2705 Email confirmation banner shown at top\n\n**Square Home After Onboarding:**\n- \u2705 \"Square\" header with \"One question. Your take.\"\n- \u2705 \"Founding 100\" badge showing \"96 left\"\n- \u2705 TODAY'S SQUARE section with question: \"College prepared you for work \u2014 true or false? Defend it.\"\n- \u2705 \"Answer today's question\" button\n- \u2705 CREATE STUDIO compose area\n- \u2705 On air section with LIVE debates\n- \u2705 Takes feed with posts from various users\n\n**FAB Status on Square/Feed:**\n- \u2705 **NO floating orange \"+\" FAB visible** (Correct behavior - FAB should be absent on Square/feed pages)\n\n---\n\n#### **4. Create Studio** \u2705 **PASS**\n**Status:** Compose area accessed and tested\n\n**Details:**\n- \u2705 CREATE STUDIO section visible on Square home\n- \u2705 Text input field: \"What should India hear from you?\"\n- \u2705 Tags available: Photo, Starters, Start debate, Community\n- \u2705 \"This is a real civic / city problem\" checkbox\n- \u2705 Character counter displayed\n- \u2705 Post button present\n- \u2705 Attempted to create a test take (encountered some text encoding issues but compose functionality works)\n\n-"
+    },
+    {
+      "i": 11265,
+      "role": "user",
+      "text": "Quick thing in the landing page on top left side in dark theme we are unable to see name beside logo check that"
+    },
+    {
+      "i": 11294,
+      "role": "user",
+      "text": "Below things need to be fixed Two things I'd fix before you drive traffic here:\n\n/terms and /privacy are both completely blank pages \u2014 no header, no nav, no content, just white screen on both desktop and mobile (confirmed on fresh loads, no console errors, so it's likely a routing/build gap rather than a data issue). This matters because your own signup gate says \"By joining you agree to the Terms and Privacy\" and links directly to both \u2014 right now that link goes nowhere. This is the one I'd call blocking, not cosmetic.\nTwo mobile layout bugs on the real device width (~390px):\nThe \"Join free\" button in the header gets clipped off the right edge of the screen \u2014 only a sliver is visible, easy to miss as a tap target.\nSection headings (\"Not another feed to scroll,\" \"Three steps. Real conversation\") render clipped under the sticky header when they first scroll into view."
+    },
+    {
+      "i": 11402,
+      "role": "user",
+      "text": "A survey say this what genz is looking for or missing you can also do survey on this get most top 10 data about genz and whatthey are looking for and see how can we chnage our or suit it to genz we dont need chnage the structure of our platform but what can do to attacract genz \n\nWhat Gen Z is Missing in Current PlatformsTo understand where a new platform can win, here are the major gaps in existing platforms (TikTok, Instagram, X):1. Relief from \"Performance Fatigue\"The Problem: Over 60% of Gen Z report that maintaining a public social media presence feels like extra work. Standard platforms push users to perform for an algorithm rather than connect with friends.  The Gap: Low-pressure, asynchronous, or private spaces where content isn't judged by likes, views, or clout.2. High-Trust, Non-AI Human ValidationThe Problem: Feeds are flooded with synthetic, AI-generated content (\"AI slop\") and sponsored brand placements.  The Gap: Gen Z uses social platforms as their primary search engine for real life (reviews, travel, career, advice). They want peer-verified human experiences, not algorithmic engagement bait.  3. Real Utility Over Pure Attention HarvestingThe Problem: Existing apps prioritize keeping users scrolling endlessly on dopamine loops rather than helping them take real-world action (learning skills, finding local communities, growing professionally).The Gap: Platforms that blend community interaction with tangible offline or real-world utility (e.g., localized peer groups, practical skill sharing)."
+    },
+    {
+      "i": 11415,
+      "role": "user",
+      "text": "Sure also use most words genz uses like for arena what they use or for what they use tell me if we can make those updates if yest what are those get my approval before"
+    },
+    {
+      "i": 11426,
+      "role": "user",
+      "text": "Approve option A"
+    },
+    {
+      "i": 11546,
+      "role": "user",
+      "text": "can you update admin page as user friendly its hard for me to get details i need to scroll all the way down like that stuff make it more user friendly admin page"
+    },
+    {
+      "i": 11603,
+      "role": "user",
+      "text": "When some one add a comment admin and sharath should be the first one to respond i want you to monitor this all the time and analyze the post and respond accordinly do not reply like bot respond like real human let me know if you have any questions"
+    },
+    {
+      "i": 11623,
+      "role": "user",
+      "text": "Welcome reply should be also there for new user and there first post followed by reply admin and sharath for the all the post"
+    },
+    {
+      "i": 11693,
+      "role": "user",
+      "text": "Did you reply to exsisting post"
+    },
+    {
+      "i": 11714,
+      "role": "user",
+      "text": "Were can i see the notifcation is missing i some post i need to get a notification and if i am not folling them it should show in the square feed atleast these two are missing"
+    },
+    {
+      "i": 11878,
+      "role": "user",
+      "text": "did you add notification anywere"
+    },
+    {
+      "i": 11881,
+      "role": "user",
+      "text": "can you add menu notification so that users can know they recived someone posted and also email so that they can login back to see what got posted or what repsone they received for their post that would be better user friendly\n2. Secondly also create a QA org for all the features we have develope so that i want create a automaiton aganet whou can login and test entire app and features we are providing \n\nthirldy we need to figure out a way to connect with LLM so that realu question and top 15 or 20 problem get displyed in the each tab and of course people can also post but we show them some suggestion like 15 to 20 \n\nlastly DO you think anyother place we mee LLM to compete with AI era explain before you plan to implement any thing on AI and what else we need to do for secure our website all leaglly and resiter this on our name adn also i have question if we want to host this on lcoud what cloud would be best and also for new user create a navigation steps were they get familiar to use the application they should also have option to skip though"
+    },
+    {
+      "i": 11990,
+      "role": "user",
+      "text": "approved and what about QA org skip tour is bad check from other x or fb and use it as reference and implement that"
+    },
+    {
+      "i": 12110,
+      "role": "user",
+      "text": "what is QA URL"
+    },
+    {
+      "i": 12113,
+      "role": "user",
+      "text": "Diffrentiate QA and prof URL"
+    },
+    {
+      "i": 12177,
+      "role": "user",
+      "text": "dont hit just sjhare the details ill cretae seperate automation is the QA and production have same features ?"
+    },
+    {
+      "i": 12180,
+      "role": "user",
+      "text": "Create a BEST BRD document with all the prod feature we have already pushed so that i can give it to my testeer"
+    },
+    {
+      "i": 12199,
+      "role": "user",
+      "text": "how ro connect my cursor desktop agen to cloud ?were we have all the chnages"
+    },
+    {
+      "i": 12219,
+      "role": "user",
+      "text": "Pulled. You\u2019re on `main` at `7833ba4`, in sync with `origin/main`.\n\nYou were on `cursor/arena-demo-video-3c6f` before; I switched to `main` and fast-forwarded 94 commits. The QA pack is here under `brand/qa/` (`ENVIRONMENTS.md`, `E2E_BOOTSTRAP.md`, `FEATURE_MATRIX.md`, etc.)."
+    },
+    {
+      "i": 12222,
+      "role": "user",
+      "text": "Is QA org up ?"
+    },
+    {
+      "i": 12234,
+      "role": "user",
+      "text": "make QA up"
+    },
+    {
+      "i": 12346,
+      "role": "user",
+      "text": "Yes gohead"
+    },
+    {
+      "i": 12363,
+      "role": "user",
+      "text": "Make this entire source code for github open soure after what w=your doing is finished"
+    },
+    {
+      "i": 12414,
+      "role": "user",
+      "text": "whatyou need to access railway"
+    },
+    {
+      "i": 12417,
+      "role": "user",
+      "text": "RAILWAY_API_TOKEN = bf266c7e-7f9f-429d-a150-2779c6a109fc"
+    },
+    {
+      "i": 12430,
+      "role": "user",
+      "text": "i ahev logged in cursor browser create yourself"
+    },
+    {
+      "i": 12433,
+      "role": "user",
+      "text": "bee1e350-f2f4-4832-a8f6-89cfe7dd47da check if your able to access"
+    },
+    {
+      "i": 12436,
+      "role": "user",
+      "text": "give me details steps to create token like name workspace what i need to sleect ill create"
+    },
+    {
+      "i": 12439,
+      "role": "user",
+      "text": "RAILWAY_API_TOKEN=b4053ad1-0823-48d2-a8ca-f7054154be3d"
+    },
+    {
+      "i": 12451,
+      "role": "user",
+      "text": "RAILWAY_API_TOKEN= 5188d467-766b-4a61-9d93-fc8e564852a8"
+    },
+    {
+      "i": 12495,
+      "role": "user",
+      "text": "how to do that"
+    },
+    {
+      "i": 12498,
+      "role": "user",
+      "text": "and can my qa agent access qa org"
+    },
+    {
+      "i": 12501,
+      "role": "user",
+      "text": "admin qa is also p"
+    },
+    {
+      "i": 12510,
+      "role": "user",
+      "text": "hiw about cloudfalre"
+    },
+    {
+      "i": 12513,
+      "role": "user",
+      "text": "i could not find step 5 check for other i have create one txt"
+    },
+    {
+      "i": 12520,
+      "role": "user",
+      "text": "check yourself i have logged in cursor browser"
+    },
+    {
+      "i": 12532,
+      "role": "user",
+      "text": "done ?"
+    },
+    {
+      "i": 12538,
+      "role": "user",
+      "text": "i see all these which one to delete"
+    },
+    {
+      "i": 12541,
+      "role": "user",
+      "text": "i dont see anthing"
+    },
+    {
+      "i": 12547,
+      "role": "user",
+      "text": "is this fine ?"
+    },
+    {
+      "i": 12550,
+      "role": "user",
+      "text": "yes"
+    },
+    {
+      "i": 12569,
+      "role": "user",
+      "text": "this is not up https://baratx-qa.up.railway.app/health"
+    },
+    {
+      "i": 12598,
+      "role": "user",
+      "text": "Do you have schedule for posting today on IG"
+    },
+    {
+      "i": 12620,
+      "role": "user",
+      "text": "why there was no post yesterday ?"
+    },
+    {
+      "i": 12637,
+      "role": "user",
+      "text": "i have given you 60 actovte code right ?"
+    },
+    {
+      "i": 12643,
+      "role": "user",
+      "text": "{\"access_token\":\"EAAPeDDuVxvMBSH0PRguPXAV23Cxsz1qKuX0YuOY3Bbv4BvhQvZBxPZB4q5yOMZAE0tnqi0TH7VKLmmNQyZCuwzhfQcGmzgUG1R6cxKlcCF18m3hCl2U1UkNCxf5ZCkPJMfmj2EOEQWVMLyddYDkegVDkrHFvEmjsxdQOVoj7lZCWAGLMJEyVRIqdZCgl1Ws\",\"token_type\":\"bearer\",\"expires_in\":5184000}"
+    },
+    {
+      "i": 12646,
+      "role": "user",
+      "text": "is this dont work give me the link ill get new one"
+    },
+    {
+      "i": 12661,
+      "role": "user",
+      "text": "EAAPeDDuVxvMBSAwxXKy9JpvA0BJPqVLUX3y2scGQmZAXWW61Nb9CIZBJSPcEVHhzVOEbfZB5ezfY6uiJUZCZAUguCF6jkNa2pepF7FZAy97OziFxjgfVX2R1EYFZAKP4ZAmdMRa32CUIZCTa5k36K0ii26RryQsLNpu6I5vCAyhby3ntRNZA4vLweBw54ylQB5aQD4sT5ZAdnbvKzSIZACnuZCM2ZAMolEmNVlZBApJeOpYoEqalN7Cswu07a6ZCC1a0w5kZCS8Q3ZCr7NjVy7XJUZD"
+    },
+    {
+      "i": 12678,
+      "role": "user",
+      "text": "ok"
+    },
+    {
+      "i": 12693,
+      "role": "user",
+      "text": "Delete all exisiting post and start frsh and use name as barathX not baratx and schedule what your doing now"
+    },
+    {
+      "i": 12712,
+      "role": "user",
+      "text": "Give me the bio i have updated the name and instagram handle based on our latest approch as we are targetting genz"
+    },
+    {
+      "i": 12723,
+      "role": "user",
+      "text": "lets remove tha first 100 .150 i may change. that"
+    },
+    {
+      "i": 12726,
+      "role": "user",
+      "text": "EAAPeDDuVxvMBSBstGCs1dbmZAjweJjkGnlyPGDfgNErqEAo42ZA4Ui6LiZBLhWBLMx6tnufT3gX8iF4Al3kIvsUDOHOnWZBNVRqwNarZAxo1cXSrvzDP0ZBF6FHRdN8rZBPjZBWZAS6uqZCSa6UVcKu5Vn4h8nzo7NhBRMZBnaZAUqlqjYUw4Sna1Bd2jtVF7JqFtDmDbATRp7ocAu6tf6NxeWvEel3z0fl96iam0N6lMZCskogChSUKhPpnTuXJjwX0lY1eMDrwmzTueJMkZD"
+    },
+    {
+      "i": 12743,
+      "role": "user",
+      "text": "finished proceed"
+    },
+    {
+      "i": 12761,
+      "role": "user",
+      "text": "I have deleted all the post you start upoading befor that gothrought the website a=understand what barathx we are trying to do then design with templated picture we have finalized last time then sart with what barathx is and show me screens before you post"
+    },
+    {
+      "i": 12790,
+      "role": "user",
+      "text": "https://barathx.com/feed"
+    },
+    {
+      "i": 12848,
+      "role": "user",
+      "text": "and also include how safe user data is and we are not seeling your data highlight that s well in one post not all"
+    },
+    {
+      "i": 12860,
+      "role": "user",
+      "text": "create images with this kind of template"
+    },
+    {
+      "i": 12906,
+      "role": "user",
+      "text": "Cool approved"
+    },
+    {
+      "i": 12916,
+      "role": "user",
+      "text": "Dont forget to post on our schdeule time you have my approval and use the same template whe we use now if yuo want better caption USE AI and sound like founder real human on the post"
+    },
+    {
+      "i": 13053,
+      "role": "user",
+      "text": "give one for X ill post it"
+    },
+    {
+      "i": 13069,
+      "role": "user",
+      "text": "how about image ?"
+    },
+    {
+      "i": 13096,
+      "role": "user",
+      "text": "BarathX_Social_Marketing_Lead.md here is a document for you rememnber youare my social media expert going forward use this as a refecence and merge with what your doing only additional thing i will add before creating anything just rember to check online what is working and try to include that strategy in our posts let me know if i can use auotomations tabs to schedule this"
+    },
+    {
+      "i": 13134,
+      "role": "user",
+      "text": "this what we need to follow \n\nCheck the Google Drive folder \"BarathX \u2014 AI Team\":\nhttps://drive.google.com/drive/folders/16q4vDZWnIn4wFr5IEAXlswVHUH2lw6aF\n\nLook for a doc titled \"Social Draft \u2014 ...\" whose title does NOT already\nstart with \"[POSTED]\". If one exists:\n\n1. Read its content \u2014 it's already a finished, real-data-based post.\n   Don't rewrite or paraphrase it. Only reformat for Instagram if needed\n   (e.g. line breaks/hashtags) to match our existing grunge pack style.\n2. Post it through our existing IG publisher, same as the approved\n   grunge slots.\n3. After posting, rename the doc in that same folder to prefix its\n   title with \"[POSTED] \" so it's never picked up or reposted again.\n\nIf no doc matching \"Social Draft \u2014 ...\" (without the [POSTED] prefix)\nexists, do nothing this run \u2014 don't invent or substitute a post.\n\nlet me know if you have any questions and you can get the best template online dont use the same one evry time you are my best marketing team so give me best human touch"
+    },
+    {
+      "i": 13159,
+      "role": "user",
+      "text": "what you need you to get drive access"
+    },
+    {
+      "i": 13168,
+      "role": "user",
+      "text": "i have opened in cursor browser do it yourself"
+    },
+    {
+      "i": 13171,
+      "role": "user",
+      "text": "i have opend barathX AI folder in cursor can you chekc that"
+    },
+    {
+      "i": 13180,
+      "role": "user",
+      "text": "chekc now"
+    },
+    {
+      "i": 13183,
+      "role": "user",
+      "text": "https://drive.google.com/drive/home"
+    },
+    {
+      "i": 13190,
+      "role": "user",
+      "text": "i have attached the key check now"
+    },
+    {
+      "i": 13193,
+      "role": "user",
+      "text": "baratx-bb47bc5535a4.json"
+    },
+    {
+      "i": 13208,
+      "role": "user",
+      "text": "Check now"
+    },
+    {
+      "i": 13217,
+      "role": "user",
+      "text": "Set up an automation cursor with all the details you have and paste below \ngo to cursor.com/automations/new, paste in the instruction block I gave you last message (repeated below for convenience), and set it to run 3x/day around 08:15 / 12:15 / 19:15 IST \u2014 shortly after Claude's drafts land (08:00 / 12:00 / 19:00 IST) and ahead of your existing 09:00 / 13:30 / 20:00 posting slots.\n\nCheck the Google Drive folder \"BarathX \u2014 AI Team\":\nhttps://drive.google.com/drive/folders/16q4vDZWnIn4wFr5IEAXlswVHUH2lw6aF\n\nLook for a doc titled \"Social Draft \u2014 ...\" whose title does NOT already\nstart with \"[POSTED]\". If one exists:\n\n1. Read its content \u2014 it's already a finished, real-data-based post.\n   Don't rewrite or paraphrase it. Only reformat for Instagram if needed\n   (e.g. line breaks/hashtags) to match our existing grunge pack style.\n2. Post it through our existing IG publisher, same as the approved\n   grunge slots.\n3. After posting, rename the doc in that same folder to prefix its\n   title with \"[POSTED] \" so it's never picked up or reposted again.\n\nIf no doc matching \"Social Draft \u2014 ...\" (without the [POSTED] prefix)\nexists, do nothing this run \u2014 don't invent or substitute a post."
+    },
+    {
+      "i": 13241,
+      "role": "user",
+      "text": "baratx-bb47bc5535a4.json \n\nEAAPeDDuVxvMBSCn72SP9x8lYDLIHFHYPligJFeGknUcVWDBa2DFjVBrBLpLRlJ92uDyydUaBdFcBwRoxTrOfkOZBd9FfZBFmMZBsOuIqAtCtokRzrJWO2Rijpm7HRakjailPUQQMZARQ985Ld1Lo4XJbeG93cZBgGzvcXG5DVG6qJjL4qvMdKnOhaj5Nq4jMSVkXcJBGs3jGnsDpj5ycnV2QM4MKMSzT6TxykZANhAdIxTpFHyodDPZANboIZBD1vmy8fPjMbRoYrLOk\n\n  \"instagram_business_account\": {\n    \"id\": \"17841441378296886\"\n  },\n  \"id\": \"1140135129194509\"\n}"
+    },
+    {
+      "i": 13264,
+      "role": "user",
+      "text": "Long Token expires in 60 days \u2028\u2028{\"access_token\":\"EAAPeDDuVxvMBSH0PRguPXAV23Cxsz1qKuX0YuOY3Bbv4BvhQvZBxPZB4q5yOMZAE0tnqi0TH7VKLmmNQyZCuwzhfQcGmzgUG1R6cxKlcCF18m3hCl2U1UkNCxf5ZCkPJMfmj2EOEQWVMLyddYDkegVDkrHFvEmjsxdQOVoj7lZCWAGLMJEyVRIqdZCgl1Ws\",\"token_type\":\"bearer\",\"expires_in\":5184000}"
+    },
+    {
+      "i": 13271,
+      "role": "user",
+      "text": "OMG what did you post the name in the last post is baratx i have told you it should be barathX and picture template is plain i have gave the template as well ?"
+    },
+    {
+      "i": 13322,
+      "role": "user",
+      "text": "I have deleted"
+    },
+    {
+      "i": 13328,
+      "role": "user",
+      "text": "DOnt use grunge every time check for what trending over IG ove new product launch marketing use that if that fits our product"
+    },
+    {
+      "i": 13356,
+      "role": "user",
+      "text": "WHat happend why didnt w ehave 3 post shipped to IG yesterday ?"
+    },
+    {
+      "i": 13363,
+      "role": "user",
+      "text": "on and shaow me a demo what are you plannign to post"
+    },
+    {
+      "i": 13408,
+      "role": "user",
+      "text": "Give me one for twitter ill schdule now"
+    },
+    {
+      "i": 13411,
+      "role": "user",
+      "text": "this picture for twitter does not look good give me similar to ig what you have planned and also timing to sechedule in x since iam in EST"
+    },
+    {
+      "i": 13423,
+      "role": "user",
+      "text": "Also add IG and whatapp community URL to the post for X and vice versa add twitter and whatsapp URL for IFG post \n\nX - https://x.com/getbaratx\n\nWhatsapp - https://whatsapp.com/channel/0029VbDMIgqHQbS9tfQo6u2o\n\nIG - https://www.instagram.com/getbarathx/"
+    },
+    {
+      "i": 13442,
+      "role": "user",
+      "text": "Cool dont forget to add ternding music on IG help m eunderstand how are you icking auion on IG"
+    },
+    {
+      "i": 13456,
+      "role": "user",
+      "text": "We hve already psoted this picture yesterday give somthing more about barathx in the nxt one which excite people to signup"
+    },
+    {
+      "i": 13485,
+      "role": "user",
+      "text": "why website is down"
+    },
+    {
+      "i": 13501,
+      "role": "user",
+      "text": "these are the new NS name you update \n\nhorizon.dns-parking.com\norbit.dns-parking.com"
+    },
+    {
+      "i": 13504,
+      "role": "user",
+      "text": "i have chnages in NS on porbhub"
+    },
+    {
+      "i": 13511,
+      "role": "user",
+      "text": "update check now"
+    },
+    {
+      "i": 13517,
+      "role": "user",
+      "text": "add mcp of cloudflare"
+    },
+    {
+      "i": 13546,
+      "role": "user",
+      "text": "Check now"
+    },
+    {
+      "i": 13559,
+      "role": "user",
+      "text": "i have logged iinto porkbun in cursor browser fix yourself"
+    },
+    {
+      "i": 13562,
+      "role": "user",
+      "text": "Were is easy link"
+    },
+    {
+      "i": 13565,
+      "role": "user",
+      "text": "can i add tis to porbun?"
+    },
+    {
+      "i": 13568,
+      "role": "user",
+      "text": "were to turn off easy links"
+    },
+    {
+      "i": 13571,
+      "role": "user",
+      "text": "?"
+    },
+    {
+      "i": 13574,
+      "role": "user",
+      "text": "I dont find easy link"
+    },
+    {
+      "i": 13577,
+      "role": "user",
+      "text": "?"
+    },
+    {
+      "i": 13580,
+      "role": "user",
+      "text": "in porkbun"
+    },
+    {
+      "i": 13587,
+      "role": "user",
+      "text": "in cloudfalre it is still showing moved staus check now"
+    },
+    {
+      "i": 13593,
+      "role": "user",
+      "text": "I just save check in 20 min"
+    },
+    {
+      "i": 13596,
+      "role": "user",
+      "text": "i think it still shwoing the same whta wuld be th eothe rsteps to fix this"
+    },
+    {
+      "i": 13608,
+      "role": "user",
+      "text": "give me steps to re add in cloudflare"
+    },
+    {
+      "i": 13611,
+      "role": "user",
+      "text": "let me know if you want me to click on activation"
+    },
+    {
+      "i": 13621,
+      "role": "user",
+      "text": "check now"
+    },
+    {
+      "i": 13627,
+      "role": "user",
+      "text": "iam able to logon"
+    },
+    {
+      "i": 13634,
+      "role": "user",
+      "text": "nope i clead my cache"
+    },
+    {
+      "i": 13647,
+      "role": "user",
+      "text": "check now"
+    },
+    {
+      "i": 13653,
+      "role": "user",
+      "text": "you have access to cloudflare right you can. directly verify"
+    },
+    {
+      "i": 13666,
+      "role": "user",
+      "text": "check nowwk"
+    },
+    {
+      "i": 13743,
+      "role": "user",
+      "text": "looks like we are not seeing logout button"
+    },
+    {
+      "i": 13846,
+      "role": "user",
+      "text": "merge and deploy"
+    },
+    {
+      "i": 13880,
+      "role": "user",
+      "text": "i need you help in settting up mail box in hostinger"
+    },
+    {
+      "i": 13901,
+      "role": "user",
+      "text": "status is showing as connected but when i open mail box it saying your domain is not fully onnected"
+    },
+    {
+      "i": 13908,
+      "role": "user",
+      "text": "you have access to cloudflare right ?"
+    },
+    {
+      "i": 13911,
+      "role": "user",
+      "text": "i have logged in cursor browser check now"
+    },
+    {
+      "i": 13914,
+      "role": "user",
+      "text": "which one to delete"
+    },
+    {
+      "i": 13917,
+      "role": "user",
+      "text": "why did you pot as baratx i have already told you to post as barathX and you were using old screen we have already updated our website what wrong with with have already disscused this?"
+    },
+    {
+      "i": 14034,
+      "role": "user",
+      "text": "and we have decided 3 post per day and only one is shipping why from last 3 day ?"
+    },
+    {
+      "i": 14069,
+      "role": "user",
+      "text": "yes and send todays again"
+    },
+    {
+      "i": 14082,
+      "role": "user",
+      "text": "i have deleted evening on post again"
+    },
+    {
+      "i": 14088,
+      "role": "user",
+      "text": "You have posted same potos fro all 4 post and diff caption i have clearly ention i need diff pictures for diff caption"
+    },
+    {
+      "i": 14122,
+      "role": "user",
+      "text": "After Email Routing is off \u2014 add\nMX @ \u2192 mx1.hostinger.com (5) and mx2.hostinger.com (10)\nTXT @ \u2192 v=spf1 include:_spf.mail.hostinger.com ~all\nTXT _dmarc \u2192 v=DMARC1; p=none\nCNAME hostingermail-a/b/c._domainkey \u2192 Hostinger DKIM targets\n\nNX URL WITH 5 IS ALSO NEED TO BE ADDED"
+    },
+    {
+      "i": 14125,
+      "role": "user",
+      "text": "what are you fooing"
+    },
+    {
+      "i": 14132,
+      "role": "user",
+      "text": "n"
+    },
+    {
+      "i": 14138,
+      "role": "user",
+      "text": "Check now"
+    },
+    {
+      "i": 14144,
+      "role": "user",
+      "text": "We need to make mobile version for android and apple code so that once app is ready we can push the chnages and test in app what do you think ?"
+    },
+    {
+      "i": 14160,
+      "role": "user",
+      "text": "i dont have nadorid phoen to this can you help with this"
+    },
+    {
+      "i": 14163,
+      "role": "user",
+      "text": "WHat details you want me to give"
+    },
+    {
+      "i": 14174,
+      "role": "user",
+      "text": "can you log into google play console"
+    },
+    {
+      "i": 14175,
+      "role": "user",
+      "text": "what you need ?"
+    },
+    {
+      "i": 14185,
+      "role": "user",
+      "text": "get android sdk"
+    },
+    {
+      "i": 14214,
+      "role": "user",
+      "text": "were i need to enter this details"
+    },
+    {
+      "i": 14226,
+      "role": "user",
+      "text": "will people can download app"
+    },
+    {
+      "i": 14252,
+      "role": "user",
+      "text": "same issue again after new update"
+    },
+    {
+      "i": 14287,
+      "role": "user",
+      "text": "give me a email pitch and deck for requestion for social media promotion also tell me what offers we need to give and do we need to cretae code link exclusviely for them to so that we colud track howmany registerd using their link"
+    },
+    {
+      "i": 14307,
+      "role": "user",
+      "text": "so here is a thing we will slit money for signup 50 and first post 50 then 150 to 500 for the most liked,replied post that is how we will dived money ore we can remove signup and first post and just pay most liked and for promotion like if you get 500 signup throught your like you will get eligible for paide if you get more that 100 foloowers you will get paid additonal money and in pitch deck we will ask money to them how much they are expected for what we request"
+    },
+    {
+      "i": 14310,
+      "role": "user",
+      "text": "Yes"
+    },
+    {
+      "i": 14331,
+      "role": "user",
+      "text": "how creators get URL ?"
+    },
+    {
+      "i": 14334,
+      "role": "user",
+      "text": "I have this below emails i got from bio of instagram check their profiles and compose individual email for each and also i want what barathx is trying to achieve clearly describe in the bod of email and also dont mention how we are willing to pay ket get details from them and we will negoitate later do not sound like Ai composed this make it human intention also attached a pictch deck and PPT if you think it is required \n\nbusiness@rawtalks.in\najayfromayejude@gmail.com\n partnerships@figuringout.co\ninfo@allthingswtf.com\nTeamteluguconnects@gmail.com\n sudheer@aadhan.in\n teamsrimahalakshmi@gmail.com"
+    },
+    {
+      "i": 14401,
+      "role": "user",
+      "text": "Also add a platform build by indians for indias and owned by indians"
+    },
+    {
+      "i": 14453,
+      "role": "user",
+      "text": "Execute the selected diff-tab commit-and-push action."
+    },
+    {
+      "i": 14459,
+      "role": "user",
+      "text": "Were are the meail and picch deck ?"
+    },
+    {
+      "i": 14465,
+      "role": "user",
+      "text": "how can i share MD give a direct ppt or what is best i can share and also give email as crips and shoter version i dont think peopple have time to go oover the entire email"
+    },
+    {
+      "i": 14507,
+      "role": "user",
+      "text": "Give one. page attach PDF as well and"
+    },
+    {
+      "i": 14552,
+      "role": "user",
+      "text": "PPT is very lame add some screens which we developed and make more presentable rather than a text filled slides sam applys for PDF as well"
+    },
+    {
+      "i": 14641,
+      "role": "user",
+      "text": "Your are still refereing to old theme and name we have updated name to barathx and theme as well refer to latest website and mobile view and give me updated one"
+    },
+    {
+      "i": 14731,
+      "role": "user",
+      "text": "Compose email for Mebhargavi49@gmail.com for pormotion dot sound like cold email and do not include money let ask them how much they are asking"
+    },
+    {
+      "i": 14760,
+      "role": "user",
+      "text": "There is this video of Nikhil kamatha asking about people who are building a social\nMedia app which early we are doing refer that and compose a email for me to send home a follow up email to get his attention \n\nhttps://youtu.be/7fw2Ob6w3Gg?is=zx3DEQqjI94WRvBC"
+    },
+    {
+      "i": 14761,
+      "role": "user",
+      "text": "There is this video of Nikhil kamatha asking about people who are building a social\nMedia app which eactly we are doing please refer that and compose me a email for me to send him and we have already emailed him earlier now we are sending a follow up email to get his attention and make sure our latest changes are included in the email and PPT side and PDF document what safety we are giving and also highlight no ai slope only real human data and no monetization concepts all those key features \n\nhttps://youtu.be/7fw2Ob6w3Gg?is=zx3DEQqjI94WRvBC"
+    },
+    {
+      "i": 14812,
+      "role": "user",
+      "text": "You can also add we are exactly building what you are looking for specially for Indian highlight that as well"
+    },
+    {
+      "i": 14855,
+      "role": "user",
+      "text": "There is a change review our latest push to prod we have removed 18+ to get more people use this application also we are lot encouraging adult content we will restricting that and going forward we will include country base restriction specifically who are targeting us"
+    },
+    {
+      "i": 14902,
+      "role": "user",
+      "text": "Create ew email and ppt and pdf again"
+    },
+    {
+      "i": 14937,
+      "role": "user",
+      "text": "Also add we are sharing the live site not just trying to share an idea you can signup and check around the application or we can have quick demo of your interested please include this and don\u2019t sound like we asking his help to build we asking his support for going in to market with large scale audience signing up so that we can get more real\nHuman validation include this as well and compose and email and update our PpT and pdf accordingly"
+    },
+    {
+      "i": 14967,
+      "role": "user",
+      "text": "file location"
+    },
+    {
+      "i": 14970,
+      "role": "user",
+      "text": "give me direct link"
+    },
+    {
+      "i": 14976,
+      "role": "user",
+      "text": "make PPT and doc more presentable"
+    },
+    {
+      "i": 15010,
+      "role": "user",
+      "text": "Compose fresh email and give me with latest PPT and PDF with updated home screen and login screen"
+    },
+    {
+      "i": 15042,
+      "role": "user",
+      "text": "Mebhargavi49@gmail.com\nswethalakshman931@gmail.com\nteamsrimahalakshmi@gmail.com\nsudheer@aadhan.in\nTeamteluguconnects@gmail.com\ninfo@allthingswtf.com\npartnerships@figuringout.co\najayfromayejude@gmail.com\nbusiness@rawtalks.in\n\nLooks like my previouis email went to spam compouse me a ne email fro all the abpve email dont sound like cold email try to explaincrips what are we trying to achieve with barathX"
+    },
+    {
+      "i": 15051,
+      "role": "user",
+      "text": "Give me reel script and video fro x IG and whatsapp also caption with all the other social media links included"
+    },
+    {
+      "i": 15080,
+      "role": "user",
+      "text": "video shoudl be 25 second and we neeed make part1 today continue vidoe will comes daily 1"
+    },
+    {
+      "i": 15244,
+      "role": "user",
+      "text": "this is the last time i am bringing this again dont use old screen always use new screens to create with latest changes and give video scripts ill be recording a video and also 25s video link or folder location link to download give me updated one"
+    },
+    {
+      "i": 15420,
+      "role": "user",
+      "text": "giv diract download option"
+    },
+    {
+      "i": 15435,
+      "role": "user",
+      "text": "One change I'd strongly recommend to the actual video\n\nYour current opening is:\n\n\u201cBarathX \u2014 Features \u00b7 Part 1 \u00b7 Square\u201d\n\nThat's informative, but it doesn't stop the scroll.\n\nReplace it with:\n\n\u201cWOULD YOU RATHER GET 1,000 LIKES\u2026 OR 10 REAL OPINIONS?\u201d\n\nThen immediately show the Square screen.\n\nThat gives the viewer a question they instinctively answer in their head, while the product demo answers what BarathX actually is.\n\nAnd because this is Part 1, I'd make the series feel like a discovery:\n\nPart 1 \u2014 Square \u2192 questions & conversations\nPart 2 \u2014 Arenas \u2192 debates\nPart 3 \u2014 ??? \u2192 next feature\n\nThat gives people a reason to follow the account and wait for the next feature, instead of treating every video as an isolated advertisement.\n\nmake the chnge and give me updated video with direct download link"
+    },
+    {
+      "i": 15479,
+      "role": "user",
+      "text": "Give summary of barath x and our key feature ill give it to chat gpt and get scripts for next videos in sequence and do ention part we have already done with square and what are you pleanning tp vcover in next videos"
+    },
+    {
+      "i": 15490,
+      "role": "user",
+      "text": "One thing I particularly want from you\n\nDon't just tell me what BarathX does.\n\nTell me what you want people to feel when they hear \u201cBarathX.\u201d\n\nFor example:\n\n\u201cI want people to feel this is India's moment to build its own digital public square.\u201d\n\nThat's much more powerful than a feature list."
+    },
+    {
+      "i": 15493,
+      "role": "user",
+      "text": "Compose collab email for below email should be crisp and clear ask how much they are chargig for promotion and clear explanantion what product are we making and maksure you get latest screens of barathx login screen and other and creat a PDF"
+    },
+    {
+      "i": 15547,
+      "role": "user",
+      "text": "do we already have a video with belwo script \n\n\ud83c\udfac BARATHX \u2014 VIDEO 1: ARENAS\nGoal: Make someone think, \u201cWait, I can actually pick a side and debate here?\u201d\nLength: 25 seconds\nFormat: 9:16\nStyle: Gen Z India / sharp / fast / curiosity\nAvatar: Your HeyGen clone\nLayout: ~35% avatar + ~65% BarathX UI\n1. HOOK \u2014 0\u20133 sec\nCover text\nWHY ARGUE IN A WHATSAPP GROUP? \ud83d\udc40\nWhat your HeyGen avatar says\n\u201cWhy argue in a WhatsApp group when you can actually pick a side?\u201d\nVisual\nFor the first 3 seconds:\nYour avatar ~35\u201340%\nBarathX Arena UI already visible on the other side.\nDon't show the BarathX logo yet.\nThe viewer should first see the question.\n2. PRODUCT INTRO \u2014 3\u20137 sec\nAvatar says\n\u201cOn BarathX, find a topic and pick your side.\u201d\nUI\nShow:\nArenas\nThen quickly reveal:\n\n* Sports\n* Politics\n* Entertainment\n* News\n* Startups\n\nOn-screen text\nPICK YOUR BATTLE.\n3. PICK A SIDE \u2014 7\u201311 sec\nAvatar says\n\u201cAgree. Disagree. Or\u2026 it depends.\u201d\nUI\nZoom into:\nAGREE | DISAGREE | IT DEPENDS\nThen click one.\nOn-screen text\nYOUR TAKE. YOUR SIDE.\n4. CONVERSATION \u2014 11\u201317 sec\nNow let the BarathX UI become bigger.\nYour avatar can shrink or disappear.\nVoiceover\n\u201cThen see what real people actually think.\u201d\nUI\nShow:\n\n* Other people's takes\n* Replies\n* Different opinions\n* Debate interaction\n\nOn-screen text\nREAL PEOPLE. REAL OPINIONS.\n5. DIFFERENTIATE \u2014 17\u201321 sec\nBring your avatar back to ~35%.\nAvatar says\n\u201cIt's not another group chat.\u201d\nPause.\nThen:\n\u201cIt's a public conversation.\u201d\nOn-screen text\nNOT ANOTHER GROUP CHAT.\nThis is an important moment.\n6. BRAND + CLIFFHANGER \u2014 21\u201325 sec\nFull-screen BarathX.\nVoiceover\n\u201cThis is BarathX \u2014 India's public square.\u201d\nThen immediately:\nEnd card\nPART 2 \u2014 ARENAS \u2713\nNEXT \u2192 YOU\nPut your name behind your take.\nFollow @getbaratx\nSmall:\nbarathx.com\n\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                                 \u2502\n\u2502       WHY ARGUE IN A            \u2502\n\u2502       WHATSAPP GROUP? \ud83d\udc40        \u2502\n\u2502                                 \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502              \u2502                  \u2502\n\u2502              \u2502                  \u2502\n\u2502    YOUR      \u2502                  \u2502\n\u2502   AVATAR     \u2502   BARATHX        \u2502\n\u2502              \u2502    ARENAS        \u2502\n\u2502    ~35%      \u2502      ~65%        \u2502\n\u2502              \u2502                  \u2502\n\u2502              \u2502                  \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502       captions / branding       \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518"
+    },
+    {
+      "i": 15573,
+      "role": "user",
+      "text": "create one for thi script"
+    },
+    {
+      "i": 15647,
+      "role": "user",
+      "text": "Can i connect heygen with cursor for automatic reels posting"
+    },
+    {
+      "i": 15655,
+      "role": "user",
+      "text": "Otp is saying not available in India what is the problem"
+    },
+    {
+      "i": 15683,
+      "role": "user",
+      "text": "how to add them"
+    },
+    {
+      "i": 15706,
+      "role": "user",
+      "text": "if i take new pro version with diff account how can i sync the developement we did in this account"
+    },
+    {
+      "i": 15712,
+      "role": "user",
+      "text": "yes do that"
+    },
+    {
+      "i": 15729,
+      "role": "user",
+      "text": "also push chat records"
+    },
+    {
+      "i": 15766,
+      "role": "user",
+      "text": "try again"
+    }
+  ]
+}
